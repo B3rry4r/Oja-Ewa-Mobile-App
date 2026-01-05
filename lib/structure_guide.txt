@@ -1,0 +1,38 @@
+Recommended scalable structure (feature-first + core):
+
+lib/
+  main.dart                 -> entrypoint (minimal)
+
+  app/
+    app.dart                -> root widget (MaterialApp)
+    router/
+      app_router.dart       -> routes + navigation setup
+    theme/
+      app_theme.dart        -> ThemeData, colors, typography
+
+  core/                     -> shared, cross-feature code
+    (suggested subfolders)
+    - config/               (env, build flavors)
+    - constants/            (app constants)
+    - errors/               (exceptions/failures)
+    - network/              (dio client, interceptors)
+    - storage/              (secure storage, hive, drift)
+    - utils/                (helpers, extensions)
+    - widgets/              (reusable UI primitives)
+
+  features/
+    <feature_name>/
+      data/                 -> repositories, datasources, DTOs
+      domain/               -> entities, use-cases, interfaces
+      presentation/         -> screens, widgets, controllers/providers
+
+Naming conventions:
+- snake_case for files/folders
+- one feature per folder under features/
+- keep app-wide singletons/providers in core/ (or app/ if purely app-shell)
+
+Tip:
+- With Riverpod, place providers near the layer that owns them:
+  - presentation: UI state providers (StateNotifier/Notifier)
+  - data: repository providers
+  - core: shared providers (dio client, databases)

@@ -1,0 +1,39 @@
+I have Figma design data in IR (Intermediate Representation) format. Please write clean, professional Flutter code that accurately implements this design.
+
+## CRITICAL REQUIREMENTS:
+1. **VISUAL FIDELITY FIRST** - Capture the designer's exact visual intent, even if IR data has inconsistencies
+2. **PROFESSIONAL UI/UX** - Build production-ready interfaces, not just literal IR translation
+3. **INFER VISUAL INTENT** - When IR data conflicts with visual patterns, prioritize what makes visual sense
+4. **MAINTAIN SEMANTICS** - Keep functional meaning intact while improving visual accuracy
+
+## HOW TO INTERPRET THE IR:
+- Look at the design holistically - what is the visual story?
+- Identify repeating patterns, visual groups, and hierarchy
+- The root frame often represents the device/screen shape (rounded corners for mobile)
+- Background colors typically apply to entire sections, not just containers
+- Spacing should create visual rhythm, not just follow exact coordinates
+- Overlap often indicates decorative elements or visual layers
+
+## TECHNICAL REQUIREMENTS:
+- **Package name**: ojaewa
+- **Responsive design**: Use SingleChildScrollView, Expanded, Flexible as needed
+- **Prevent overflows**: Handle text overflow, content clipping
+- **Inline styling**: No design system classes
+- **Use const** where possible for performance
+- **Fix IR errors**: Correct obvious positioning mistakes
+- **Semantic grouping**: Group related elements logically
+
+## OUTPUT FORMAT:
+1. Name the file appropriately based on screen purpose/function
+2. Write complete, runnable .dart code
+3. Include all necessary imports
+4. Add brief comments for complex sections
+5. Explain key design decisions
+
+## DESIGN PHILOSOPHY:
+- Think like a UI/UX designer, not just a developer
+- Prioritize visual harmony and user experience
+- Create interfaces that feel intentional and polished
+- Balance IR data with real-world UI patterns
+
+Now, here's the IR data:
