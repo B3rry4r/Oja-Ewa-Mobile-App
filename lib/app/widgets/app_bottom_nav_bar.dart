@@ -49,14 +49,14 @@ class AppBottomNavBar extends StatelessWidget {
               _NavItem(
                 icon: Icons.article_outlined,
                 label: 'Blog',
-                isActive: false,
-                onTap: () {},
+                isActive: currentIndex == 3,
+                onTap: () => onTap(3),
               ),
               _NavItem(
                 icon: Icons.person_outline,
                 label: 'Account',
-                isActive: false,
-                onTap: () {},
+                isActive: currentIndex == 4,
+                onTap: () => onTap(4),
               ),
             ],
           ),

@@ -10,9 +10,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFFFF8F1),
-        ),
+        decoration: BoxDecoration(color: const Color(0xFFFFF8F1)),
         child: Column(
           children: [
             Expanded(
@@ -23,7 +21,7 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 25),
 
                     // Header
-                    _buildHeader(),
+                    _buildHeader(context),
 
                     const SizedBox(height: 24),
 
@@ -62,14 +60,13 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -151,17 +148,22 @@ class HomeScreen extends StatelessWidget {
           Row(
             children: [
               // Notification Icon
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFDEDEDE)),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.notifications_none,
-                  size: 20,
-                  color: Colors.black54,
+              InkWell(
+                onTap: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.notifications),
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: const Color(0xFFDEDEDE)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.notifications_none,
+                    size: 20,
+                    color: Colors.black54,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -351,7 +353,8 @@ class HomeScreen extends StatelessWidget {
           title: 'Sustainability',
           color: const Color(0xFFA15E22),
           icon: Icons.eco_outlined,
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.sustainability),
+          onTap: () =>
+              Navigator.of(context).pushNamed(AppRoutes.sustainability),
         ),
       ],
     );
@@ -386,11 +389,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: Icon(
-                icon,
-                size: 80,
-                color: Colors.white.withOpacity(0.9),
-              ),
+              child: Icon(icon, size: 80, color: Colors.white.withOpacity(0.9)),
             ),
             const SizedBox(height: 16),
           ],
@@ -398,5 +397,4 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
 }

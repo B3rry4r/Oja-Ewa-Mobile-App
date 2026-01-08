@@ -15,6 +15,11 @@ import '../../features/home/subfeatures/market/presentation/market_screen.dart';
 import '../../features/home/subfeatures/music/presentation/music_screen.dart';
 import '../../features/home/subfeatures/schools/presentation/schools_screen.dart';
 import '../../features/home/subfeatures/sustainability/presentation/sustainability_screen.dart';
+import '../../features/account/subfeatures/edit_profile/presentation/edit_profile.dart';
+import '../../features/account/subfeatures/your_order/presentation/order_details.dart';
+import '../../features/account/subfeatures/your_order/presentation/tracking_order.dart';
+import '../../features/account/subfeatures/your_order/presentation/your_order.dart';
+import '../../features/notifications/presentation/notifications.dart';
 import '../../features/review_submission/presentation/review_submission.dart';
 import '../../features/screen_gallery/presentation/screen_gallery_screen.dart';
 import '../../features/shop_dashboard/presentation/shop_dashboard_screen.dart';
@@ -42,6 +47,11 @@ abstract class AppRoutes {
   static const sustainability = '/sustainability';
 
   // Feature screens
+  static const editProfile = '/edit-profile';
+  static const orders = '/orders';
+  static const orderDetails = '/order-details';
+  static const trackingOrder = '/tracking-order';
+  static const notifications = '/notifications';
   static const reviewSubmission = '/review-submission';
   static const yourShopDashboard = '/your-shop-dashboard';
 
@@ -144,6 +154,36 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const SustainabilityScreen(),
+        );
+
+      case AppRoutes.editProfile:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const EditProfileScreen(),
+        );
+
+      case AppRoutes.orders:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const OrdersScreen(),
+        );
+
+      case AppRoutes.orderDetails:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const OrderDetailsScreen(),
+        );
+
+      case AppRoutes.trackingOrder:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const TrackingOrderScreen(),
+        );
+
+      case AppRoutes.notifications:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const NotificationsScreen(),
         );
 
       case AppRoutes.reviewSubmission:

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
 import '../../features/wishlist/presentation/wishlist.dart';
+import '../../features/blog/presentation/blog.dart';
+import '../../features/account/presentation/account.dart';
 import '../widgets/app_bottom_nav_bar.dart';
 
 /// App-level shell that owns the bottom navigation.
@@ -27,6 +29,8 @@ class _AppShellState extends State<AppShell> {
           HomeScreen(),
           SearchScreen(),
           WishlistScreen(),
+          BlogScreen(),
+          AccountScreen(),
         ],
       ),
       bottomNavigationBar: AppBottomNavBar(

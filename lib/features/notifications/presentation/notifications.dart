@@ -12,7 +12,7 @@ class NotificationsScreen extends StatelessWidget {
         child: Column(
           children: [
             // Header with back and menu buttons
-            _buildHeader(),
+            _buildHeader(context),
             // Main content card
             Expanded(
               child: _buildNotificationContent(),
@@ -24,7 +24,7 @@ class NotificationsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -32,7 +32,7 @@ class NotificationsScreen extends StatelessWidget {
         children: [
           // Back button
           IconButton(
-            onPressed: () {},
+            onPressed: () => Navigator.of(context).maybePop(),
             style: IconButton.styleFrom(
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
@@ -112,7 +112,6 @@ class NotificationsScreen extends StatelessWidget {
               isUnread: false,
             ),
             // Add more notification items as needed
-            const SizedBox(height: 80), // Space for bottom nav
           ],
         ),
       ),

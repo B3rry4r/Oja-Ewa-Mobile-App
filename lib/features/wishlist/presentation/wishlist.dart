@@ -106,9 +106,11 @@ class WishlistScreen extends StatelessWidget {
   }
 
   Widget _buildWishlistContent(BuildContext context) {
-    // Mock: show some products for now.
-    // Later, replace with stored wishlist items.
-    if (mockProducts.isEmpty) {
+    // Mock: treat "wishlist" as the subset of mock products marked favorite.
+    // Later, replace with stored wishlist items from backend/local storage.
+    final wishlistProducts = mockProducts.where((p) => p.isFavorite).toList();
+
+    if (wishlistProducts.isEmpty) {
       return _buildEmptyStateContent();
     }
 
@@ -144,9 +146,9 @@ class WishlistScreen extends StatelessWidget {
               mainAxisSpacing: 24,
               childAspectRatio: 0.62,
             ),
-            itemCount: mockProducts.length,
+            itemCount: wishlistProducts.length,
             itemBuilder: (context, index) {
-              final product = mockProducts[index];
+              final product = wishlistProducts[index];
               return ProductCard(
                 product: product,
                 onTap: () {
@@ -164,8 +166,6 @@ class WishlistScreen extends StatelessWidget {
           ),
         ),
 
-        // Space for shell navigation bar
-        const SizedBox(height: 120),
       ],
     );
   }
