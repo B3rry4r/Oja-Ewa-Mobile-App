@@ -1,296 +1,170 @@
-// business_details_screen.dart
 import 'package:flutter/material.dart';
 
 import '../../../../../app/router/app_router.dart';
-
 class BusinessDetailsScreen extends StatelessWidget {
   const BusinessDetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Header
-              _buildHeader(),
-              
-              // Progress indicator
-              _buildProgressIndicator(),
-              
-              // Form content
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // About Business section title
-                    const SizedBox(height: 64),
-                    _buildSectionTitle('About Business'),
-                    const SizedBox(height: 35),
-                    
-                    // Business Name field
-                    _buildLabeledInput(
-                      label: 'Business Name',
-                      hintText: 'Your City', // From IR data - likely placeholder text
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // Business Registration Number field
-                    _buildLabeledInput(
-                      label: 'Business Registration Number',
-                      hintText: 'Your City', // From IR data - likely placeholder text
-                    ),
-                    const SizedBox(height: 99),
-                    
-                    // Business Certificate upload
-                    _buildUploadSection(
-                      title: 'Business Certificate',
-                      browseText: 'Browse Document',
-                      leftRequirements: 'High resolution image\nPDF, JPG, PNG formats',
-                      rightRequirements: '200 x 200px\n20kb max',
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // Business Logo upload
-                    _buildUploadSection(
-                      title: 'Business Logo',
-                      browseText: 'Browse Document',
-                      leftRequirements: 'High resolution image\nPNG format',
-                      rightRequirements: '200 x 200px\nMust be in Black',
-                    ),
-                    
-                    // Account Details section title
-                    const SizedBox(height: 32),
-                    _buildSectionTitle('Account Details'),
-                    const SizedBox(height: 35),
-                    
-                    // Bank Name field
-                    _buildLabeledInput(
-                      label: 'Bank Name',
-                      hintText: 'Your Bank',
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // Account Number field
-                    _buildLabeledInput(
-                      label: 'Account Number',
-                      hintText: 'Your Account Number',
-                    ),
-                    const SizedBox(height: 135),
-                    
-                    // Make Payment button
-                    _buildPaymentButton(context),
-                    const SizedBox(height: 40),
-                  ],
-                ),
-              ),
-            ],
+      backgroundColor: const Color(0xFFFFF8F1), // Background from IR
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16, top: 10),
+          child: _IconButton(icon: Icons.arrow_back_ios_new),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16, top: 10),
+            child: _IconButton(icon: Icons.close),
           ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            _buildStepper(), // Row-based stepper
+            const SizedBox(height: 32),
+
+            // --- About Business Section ---
+            _buildSectionHeader("About Business"),
+            const SizedBox(height: 16),
+            _buildTextInput("Business Name", "Your City"), // Hint from IR data
+            const SizedBox(height: 20),
+            _buildTextInput("Business Registration Number", "Your City"),
+
+            const SizedBox(height: 32),
+            _buildFileUploadSection(
+              label: "Business Certificate",
+              subtext1: "High resolution image\nPDF, JPG, PNG formats",
+              subtext2: "200 x 200px\n20kb max",
+            ),
+
+            const SizedBox(height: 32),
+            _buildFileUploadSection(
+              label: "Business Logo",
+              subtext1: "High resolution image\nPNG format",
+              subtext2: "200 x 200px\nMust be in Black", // Specific requirement
+            ),
+
+            const SizedBox(height: 40),
+
+            // --- Account Details Section ---
+            _buildSectionHeader("Account Details"),
+            const SizedBox(height: 16),
+            _buildTextInput("Bank Name", "Your Bank"),
+            const SizedBox(height: 20),
+            _buildTextInput("Account Number", "Your Account Number"),
+
+            const SizedBox(height: 48),
+
+            // --- Primary Action Button ---
+            _buildPaymentButton(context),
+            const SizedBox(height: 40),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Back button
-          _buildIconButton(Icons.arrow_back_ios_new_rounded),
-          
-          // Empty container for spacing (no title in header)
-          const SizedBox(width: 40),
-          
-          // Close button
-          _buildIconButton(Icons.close_rounded),
-        ],
-      ),
+  // Row-based Stepper to match your UI update
+  Widget _buildStepper() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _stepItem(1, "Basic\nInfo", isComplete: true, isActive: false),
+        _stepItem(2, "Business\nDetails", isComplete: false, isActive: true),
+        _stepItem(3, "Account\non review", isComplete: false, isActive: false),
+      ],
     );
   }
 
-  Widget _buildProgressIndicator() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(17, 101, 17, 0),
-      child: Column(
-        children: [
-          // Progress dots
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Step 1 (completed - inactive)
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE9E9E9),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Center(
-                  child: Text(
-                    '1',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFFF4F4F4),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 37),
-              
-              // Step 2 (current - active)
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF603814),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Center(
-                  child: Text(
-                    '2',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFFF4F4F4),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 37),
-              
-              // Step 3 (inactive)
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE9E9E9),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Center(
-                  child: Text(
-                    '3',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFFF4F4F4),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+  Widget _stepItem(
+    int num,
+    String label, {
+    required bool isComplete,
+    required bool isActive,
+  }) {
+    final Color activeColor = const Color(0xFF603814);
+    final Color inactiveColor = const Color(0xFFE9E9E9);
+
+    return Row(
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: (isActive || isComplete) ? activeColor : inactiveColor,
+            borderRadius: BorderRadius.circular(4),
           ),
-          
-          const SizedBox(height: 8),
-          
-          // Step labels
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Step 1 label (inactive)
-              Text(
-                'Basic\nInfo',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xFF777F84),
-                  height: 1.2,
+          alignment: Alignment.center,
+          child: isComplete
+              ? const Icon(Icons.check, color: Colors.white, size: 16)
+              : Text(
+                  num.toString(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 52),
-              
-              // Step 2 label (active)
-              const Text(
-                'Business\nDetails',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF603814),
-                  height: 1.2,
-                ),
-              ),
-              const SizedBox(width: 53),
-              
-              // Step 3 label (inactive)
-              Text(
-                'Account\non review',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xFF777F84),
-                  height: 1.2,
-                ),
-              ),
-            ],
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            height: 1.2,
+            color: (isActive || isComplete)
+                ? activeColor
+                : const Color(0xFF777F84),
+            fontWeight: (isActive || isComplete)
+                ? FontWeight.w500
+                : FontWeight.w400,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionHeader(String title) {
     return Text(
       title,
       style: const TextStyle(
         fontSize: 16,
-        fontFamily: 'Campton',
         fontWeight: FontWeight.w600,
         color: Color(0xFF3C4042),
       ),
     );
   }
 
-  Widget _buildLabeledInput({
-    required String label,
-    required String hintText,
-  }) {
+  Widget _buildTextInput(String label, String hint) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Label
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Campton',
-            color: Color(0xFF777F84),
-          ),
+          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
         ),
         const SizedBox(height: 8),
-        
-        // Text field container
-        Container(
-          height: 49,
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: hintText,
-                hintStyle: const TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Campton',
-                  color: Color(0xFFCCCCCC),
-                ),
-                border: InputBorder.none,
-              ),
+        TextFormField(
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(color: Color(0xFFCCCCCC)),
+            filled: true,
+            fillColor: Colors.transparent,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 16,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
             ),
           ),
         ),
@@ -298,86 +172,61 @@ class BusinessDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildUploadSection({
-    required String title,
-    required String browseText,
-    required String leftRequirements,
-    required String rightRequirements,
+  Widget _buildFileUploadSection({
+    required String label,
+    required String subtext1,
+    required String subtext2,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Title
         Text(
-          title,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Campton',
-            color: Color(0xFF777F84),
-          ),
+          label,
+          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
         ),
         const SizedBox(height: 8),
-        
-        // Upload container
         Container(
-          height: 137,
           width: double.infinity,
+          height: 137,
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFF89858A)),
             borderRadius: BorderRadius.circular(11),
+            border: Border.all(color: const Color(0xFF89858A)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Upload icon
               const Icon(
-                Icons.upload_rounded,
+                Icons.cloud_upload_outlined,
                 size: 24,
-                color: Color(0xFF1E2021),
+                color: Color(0xFF777F84),
               ),
               const SizedBox(height: 8),
-              
-              // Browse text
-              Text(
-                browseText,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Campton',
-                  color: Color(0xFF1E2021),
-                ),
+              const Text(
+                "Browse Document",
+                style: TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
               ),
-              
-              // Format requirements
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Left requirements
-                    Text(
-                      leftRequirements,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontFamily: 'Campton',
-                        color: Color(0xFF777F84),
-                        height: 1.4,
-                      ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    subtext1,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Color(0xFF777F84),
                     ),
-                    
-                    // Right requirements
-                    Text(
-                      rightRequirements,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontFamily: 'Campton',
-                        color: Color(0xFF777F84),
-                        height: 1.4,
-                      ),
+                  ),
+                  const SizedBox(width: 24),
+                  Text(
+                    subtext2,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Color(0xFF777F84),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -387,45 +236,44 @@ class BusinessDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildPaymentButton(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40),
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.3),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
+    return InkWell(
+      onTap: () => Navigator.of(context).pushNamed(AppRoutes.accountReview),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        width: double.infinity,
+        height: 57,
+        decoration: BoxDecoration(
+          color: const Color(0xFFFDAF40), // Primary Orange
           borderRadius: BorderRadius.circular(8),
-          onTap: () {
-            Navigator.of(context).pushNamed(AppRoutes.accountReview);
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 32),
-            alignment: Alignment.center,
-            child: const Text(
-              'Make Payment',
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w600,
-                color: Color(0xFFFFFBF5),
-              ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFFDAF40).withOpacity(0.4),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: Text(
+            "Make Payment", // Button text from Step 2 IR
+            style: TextStyle(
+              color: Color(0xFFFFFBF5),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildIconButton(IconData icon) {
+class _IconButton extends StatelessWidget {
+  final IconData icon;
+  const _IconButton({required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: 40,
       height: 40,
@@ -433,14 +281,7 @@ class BusinessDetailsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFDEDEDE)),
       ),
-      child: IconButton(
-        icon: Icon(
-          icon,
-          size: 20,
-        ),
-        onPressed: () {},
-        padding: EdgeInsets.zero,
-      ),
+      child: Icon(icon, size: 18, color: Colors.black),
     );
   }
 }
