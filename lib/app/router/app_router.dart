@@ -31,8 +31,10 @@ import '../../features/account/subfeatures/your_order/presentation/tracking_orde
 import '../../features/account/subfeatures/your_order/presentation/your_order.dart';
 import '../../features/notifications/presentation/notifications.dart';
 import '../../features/review_submission/presentation/review_submission.dart';
-import '../../features/screen_gallery/presentation/screen_gallery_screen.dart';
-import '../../features/shop_dashboard/presentation/shop_dashboard_screen.dart';
+import '../../features/your_shop/presentation/shop_dashboard.dart';
+import '../../features/your_shop/subfeatures/manage_shop/manage_shop.dart';
+import '../../features/your_shop/subfeatures/manage_shop/sub_features/delete_shop.dart';
+import '../../features/your_shop/subfeatures/manage_shop/sub_features/edit_business.dart';
 
 /// Central place for route names.
 abstract class AppRoutes {
@@ -77,6 +79,9 @@ abstract class AppRoutes {
   static const notifications = '/notifications';
   static const reviewSubmission = '/review-submission';
   static const yourShopDashboard = '/your-shop-dashboard';
+  static const manageShop = '/manage-shop';
+  static const editBusiness = '/edit-business';
+  static const deleteShop = '/delete-shop';
 
   /// Temporary route.
   ///
@@ -89,12 +94,6 @@ abstract class AppRoutes {
 abstract class AppRouter {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case AppRoutes.gallery:
-        return MaterialPageRoute<void>(
-          settings: settings,
-          builder: (_) => const ScreenGalleryScreen(),
-        );
-
       case AppRoutes.splash:
         return MaterialPageRoute<void>(
           settings: settings,
@@ -278,7 +277,25 @@ abstract class AppRouter {
       case AppRoutes.yourShopDashboard:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const YourShopDashboard(),
+          builder: (_) => const ShopDashboardScreen(),
+        );
+
+      case AppRoutes.manageShop:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const ManageShopScreen(),
+        );
+
+      case AppRoutes.editBusiness:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const EditBusinessScreen(),
+        );
+
+      case AppRoutes.deleteShop:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const DeleteShopScreen(),
         );
 
       case AppRoutes.home:

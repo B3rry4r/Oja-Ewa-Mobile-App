@@ -31,9 +31,11 @@ class _SortOverlayState extends State<SortOverlay> {
   
   // Sort options from the IR
   final List<Map<String, dynamic>> _sortOptions = [
-    {'id': 'most_recent', 'label': 'Most Recent', 'iconColor': Color(0xFFA15E22)},
-    {'id': 'a_to_z', 'label': 'A-Z', 'iconColor': Color(0xFF777F84)},
-    {'id': 'z_to_a', 'label': 'Z-A', 'iconColor': Color(0xFF777F84)},
+    {'id': 'most_recent', 'label': 'Most Recent'},
+    {'id': 'new_to_old', 'label': 'New to Old'},
+    {'id': 'old_to_new', 'label': 'Old to New'},
+    {'id': 'a_to_z', 'label': 'A-Z'},
+    {'id': 'z_to_a', 'label': 'Z-A'},
   ];
 
   @override
@@ -59,7 +61,7 @@ class _SortOverlayState extends State<SortOverlay> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.7),
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Column(
           children: [
@@ -156,7 +158,7 @@ class _SortOverlayState extends State<SortOverlay> {
       child: Column(
         children: _sortOptions.map((option) {
           final isSelected = _selectedSort == option['id'];
-          
+
           return Material(
             color: Colors.transparent,
             child: InkWell(
@@ -169,27 +171,13 @@ class _SortOverlayState extends State<SortOverlay> {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Row(
                   children: [
-                    // Icon with circular border
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: option['iconColor'] as Color,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: Icon(
-                        _getIconForSort(option['id']),
-                        size: 24,
-                        color: option['iconColor'] as Color,
-                      ),
+                    Icon(
+                      isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+                      color: isSelected
+                          ? const Color(0xFFA15E22)
+                          : const Color(0xFF777F84),
                     ),
-                    
                     const SizedBox(width: 16),
-                    
-                    // Label
                     Expanded(
                       child: Text(
                         option['label'],
@@ -201,17 +189,6 @@ class _SortOverlayState extends State<SortOverlay> {
                         ),
                       ),
                     ),
-                    
-                    // Selection indicator
-                    if (isSelected)
-                      Container(
-                        width: 12,
-                        height: 12,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFFFDB80),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
                   ],
                 ),
               ),
@@ -282,15 +259,4 @@ class _SortOverlayState extends State<SortOverlay> {
     );
   }
 
-  IconData _getIconForSort(String sortId) {
-    switch (sortId) {
-      case 'most_recent':
-        return Icons.access_time_filled;
-      case 'a_to_z':
-      case 'z_to_a':
-        return Icons.sort_by_alpha;
-      default:
-        return Icons.sort;
-    }
-  }
 }
