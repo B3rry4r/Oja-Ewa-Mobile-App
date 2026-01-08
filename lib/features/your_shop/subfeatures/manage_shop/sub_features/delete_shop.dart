@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/widgets/confirmation_modal.dart';
+
 class DeleteShopScreen extends StatefulWidget {
   const DeleteShopScreen({super.key});
 
@@ -56,7 +58,7 @@ class _DeleteShopScreenState extends State<DeleteShopScreen> {
               ),
 
               // Action Button
-              _buildDeleteButton(),
+              _buildDeleteButton(context),
               const SizedBox(height: 40),
             ],
           ),
@@ -136,29 +138,44 @@ class _DeleteShopScreenState extends State<DeleteShopScreen> {
     );
   }
 
-  Widget _buildDeleteButton() {
-    return Container(
-      width: double.infinity,
-      height: 57,
-      decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40), // Primary Orange from IR
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.4),
-            blurRadius: 16,
-            offset: const Offset(0, 8), // Shadow from IR
-          )
-        ],
-      ),
-      child: Center(
-        child: Text(
-          "Continue to delete",
-          style: TextStyle(
-            color: const Color(0xFFFFFBF5), // White text from IR
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Campton',
+  Widget _buildDeleteButton(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        if (selectedReason == null) return;
+        ConfirmationModal.show(
+          context,
+          title: 'Delete Shop',
+          message: 'Are you sure you want to delete this shop?',
+          confirmLabel: 'Delete',
+          onConfirm: () {
+            // TODO: Perform delete later.
+          },
+        );
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        width: double.infinity,
+        height: 57,
+        decoration: BoxDecoration(
+          color: const Color(0xFFFDAF40), // Primary Orange from IR
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFFDAF40).withOpacity(0.4),
+              blurRadius: 16,
+              offset: const Offset(0, 8), // Shadow from IR
+            )
+          ],
+        ),
+        child: const Center(
+          child: Text(
+            "Continue to delete",
+            style: TextStyle(
+              color: Color(0xFFFFFBF5),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Campton',
+            ),
           ),
         ),
       ),

@@ -4,6 +4,8 @@ import '../../../home/presentation/widgets/sort_sheet.dart';
 import '../add_edit_product/add_edit_product.dart';
 import 'data/mock_shop_products.dart';
 import 'domain/shop_product.dart';
+
+import '../../../../core/widgets/confirmation_modal.dart';
 class ProductListingsScreen extends StatelessWidget {
   const ProductListingsScreen({super.key});
 
@@ -289,7 +291,15 @@ class ProductListingsScreen extends StatelessWidget {
                   icon: Icons.delete_outline,
                   label: "Delete",
                   onTap: () {
-                    // TODO: delete later
+                    ConfirmationModal.show(
+                      context,
+                      title: 'Delete product',
+                      message: 'Are you sure you want to delete this product?',
+                      confirmLabel: 'Delete',
+                      onConfirm: () {
+                        // TODO: delete later
+                      },
+                    );
                   },
                 ),
               ],
