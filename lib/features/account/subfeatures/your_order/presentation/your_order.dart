@@ -356,21 +356,25 @@ class OrdersScreen extends StatelessWidget {
               Row(
                 children: [
                   if (hasReviewButton) ...[
-                    Container(
-                      height: 33,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFFDAF40)),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Review',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'Campton',
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xFFFDAF40),
+                    InkWell(
+                      onTap: () => Navigator.of(context).pushNamed(AppRoutes.reviewSubmission),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        height: 33,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFFDAF40)),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Review',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Campton',
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFFFDAF40),
+                            ),
                           ),
                         ),
                       ),

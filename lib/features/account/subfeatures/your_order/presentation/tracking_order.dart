@@ -7,19 +7,58 @@ class TrackingOrderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Header Section
-              _buildHeader(),
-              const SizedBox(height: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with buttons
+            _buildHeader(),
 
-              // Main Content Card
-              _buildMainContent(),
-            ],
-          ),
+            // Order ID
+            Padding(
+              padding: const EdgeInsets.only(left: 16, top: 12),
+              child: Text(
+                '#rt667899hnny007',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Campton',
+                  color: const Color(0xFF3C4042),
+                ),
+              ),
+            ),
+
+            // Main content - Scrollable area
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Shipping Info Card
+                    _buildShippingInfoCard(),
+
+                    // Tracking Timeline - Proper implementation
+                    _buildTrackingTimeline(),
+
+                    // Decorative image (low opacity)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Opacity(
+                        opacity: 0.03,
+                        child: Image.asset(
+                          'assets/images/tracking_decoration.png',
+                          width: 234,
+                          height: 347,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -28,17 +67,11 @@ class TrackingOrderScreen extends StatelessWidget {
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
-      child: Stack(
-        alignment: Alignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Back Button
-          Align(
-            alignment: Alignment.centerLeft,
-            child: _buildIconButton(
-              icon: Icons.arrow_back_ios_new_rounded,
-              onPressed: () {},
-            ),
-          ),
+          // Back button
+          _buildIconButton(Icons.arrow_back_ios_new_rounded),
 
           // Title
           const Text(
@@ -51,72 +84,8 @@ class TrackingOrderScreen extends StatelessWidget {
             ),
           ),
 
-          // Close/Other Button
-          Align(
-            alignment: Alignment.centerRight,
-            child: _buildIconButton(
-              icon: Icons.close_rounded,
-              onPressed: () {},
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMainContent() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(0),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF8F1),
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Order ID Section
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: Text(
-              '#rt667899hnny007',
-              style: TextStyle(
-                fontSize: 14,
-                fontFamily: 'Campton',
-                color: const Color(0xFF3C4042).withOpacity(0.8),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Shipping Info Card
-          _buildShippingInfoCard(),
-          const SizedBox(height: 24),
-
-          // Tracking Timeline with correct positioning
-          _buildTrackingTimeline(),
-
-          // Decorative Background Element (behind timeline)
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: Opacity(
-              opacity: 0.03,
-              child: Image.asset(
-                'assets/images/tracking_decoration.png',
-                width: 234,
-                height: 347,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
+          // Close button
+          _buildIconButton(Icons.close_rounded),
         ],
       ),
     );
@@ -124,16 +93,17 @@ class TrackingOrderScreen extends StatelessWidget {
 
   Widget _buildShippingInfoCard() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xFFCCCCCC)),
         borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Shipping Company
+          // Shipping company
           const Text(
             'Zikka Express',
             style: TextStyle(
@@ -145,37 +115,34 @@ class TrackingOrderScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // Delivery Date
-          _buildInfoRow(
+          // Delivery date
+          _buildInfoSection(
             label: 'Estimated Delivery Date',
             value: 'March 20 - March 25',
+            labelColor: const Color(0xFF777F84),
           ),
           const SizedBox(height: 16),
 
-          // Tracking Number with Copy Button
+          // Tracking number with copy button
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: _buildInfoRow(
+                child: _buildInfoSection(
                   label: 'Tracking Number',
                   value: 'NG1234567890',
+                  labelColor: const Color(0xFF777F84),
                 ),
               ),
               const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () {},
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
-                    vertical: 4,
-                  ),
-                  child: const Text(
-                    'Copy',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontFamily: 'Campton',
-                      color: Color(0xFF777F84),
-                    ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                child: const Text(
+                  'Copy',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontFamily: 'Campton',
+                    color: Color(0xFF777F84),
                   ),
                 ),
               ),
@@ -186,7 +153,11 @@ class TrackingOrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow({required String label, required String value}) {
+  Widget _buildInfoSection({
+    required String label,
+    required String value,
+    required Color labelColor,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -195,16 +166,16 @@ class TrackingOrderScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 10,
             fontFamily: 'Campton',
-            color: const Color(0xFF777F84).withOpacity(0.8),
+            color: labelColor,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
             fontFamily: 'Campton',
-            color: const Color(0xFF3C4042),
+            color: Color(0xFF3C4042),
           ),
         ),
       ],
@@ -212,164 +183,131 @@ class TrackingOrderScreen extends StatelessWidget {
   }
 
   Widget _buildTrackingTimeline() {
-    const List<TrackingStep> steps = [
-      TrackingStep(
-        status: 'Delivered',
-        time: 'Mar 25 2023  06:30',
-        isActive: false,
-        icon: Icons.check_circle_rounded,
-        iconColor: Color(0xFFE9E9E9),
-        stepColor: Color(0xFFE9E9E9),
+    const List<TimelineStep> steps = [
+      TimelineStep(
+        title: 'Delivered',
+        timestamp: 'Mar 25 2023  06:30',
+        isCompleted: true,
+        isCurrent: false,
+        dotColor: Color(0xFFE9E9E9),
         textColor: Color(0xFFE9E9E9),
         timeColor: Color(0xFFDEDEDE),
       ),
-      TrackingStep(
-        status: 'Out for Delivery',
-        time: 'Mar 25 2023  06:30',
-        isActive: false,
-        icon: Icons.local_shipping_rounded,
-        iconColor: Color(0xFFE9E9E9),
-        stepColor: Color(0xFFE9E9E9),
+      TimelineStep(
+        title: 'Out for Delivery',
+        timestamp: 'Mar 25 2023  06:30',
+        isCompleted: true,
+        isCurrent: false,
+        dotColor: Color(0xFFE9E9E9),
         textColor: Color(0xFFE9E9E9),
         timeColor: Color(0xFFDEDEDE),
       ),
-      TrackingStep(
-        status: 'Shipped',
-        time: 'Mar 25 2023  06:30',
-        isActive: false,
-        icon: Icons.inventory_rounded,
-        iconColor: Color(0xFFE9E9E9),
-        stepColor: Color(0xFFE9E9E9),
+      TimelineStep(
+        title: 'Shipped',
+        timestamp: 'Mar 25 2023  06:30',
+        isCompleted: true,
+        isCurrent: false,
+        dotColor: Color(0xFFE9E9E9),
         textColor: Color(0xFFE9E9E9),
         timeColor: Color(0xFFDEDEDE),
       ),
-      TrackingStep(
-        status: 'Processing',
-        time: 'Mar 25 2023  06:30',
-        isActive: false,
-        icon: Icons.settings_rounded,
-        iconColor: Color(0xFFE9E9E9),
-        stepColor: Color(0xFFE9E9E9),
+      TimelineStep(
+        title: 'Processing',
+        timestamp: 'Mar 25 2023  06:30',
+        isCompleted: true,
+        isCurrent: false,
+        dotColor: Color(0xFFE9E9E9),
         textColor: Color(0xFFE9E9E9),
         timeColor: Color(0xFFDEDEDE),
       ),
-      TrackingStep(
-        status: 'Order Placed',
-        time: 'Mar 25 2023  06:30',
-        isActive: true,
-        icon: Icons.shopping_bag_rounded,
-        iconColor: Color(0xFF603814),
-        stepColor: Color(0xFF603814),
+      TimelineStep(
+        title: 'Order Placed',
+        timestamp: 'Mar 25 2023  06:30',
+        isCompleted: true,
+        isCurrent: true,
+        dotColor: Color(0xFF603814),
         textColor: Colors.black,
         timeColor: Color(0xFF777F84),
       ),
     ];
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Stack(
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.only(top: 24, bottom: 16),
+      child: Column(
         children: [
-          // Vertical connector lines positioned ABSOLUTELY
-          ..._buildConnectorLines(steps.length),
-
-          // Steps content
-          Column(
-            children: [
-              for (int i = 0; i < steps.length; i++)
-                _buildTimelineStep(steps[i], i == steps.length - 1),
-            ],
-          ),
+          for (int i = 0; i < steps.length; i++) ...[
+            _buildTimelineItem(steps[i]),
+            if (i < steps.length - 1) _buildTimelineConnector(),
+          ],
         ],
       ),
     );
   }
 
-  List<Widget> _buildConnectorLines(int stepCount) {
-    List<Widget> connectors = [];
+  Widget _buildTimelineItem(TimelineStep step) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Timeline dot with proper centering
+        Container(
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            color: step.dotColor,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: step.isCurrent
+              ? Icon(Icons.check, size: 16, color: Colors.white)
+              : null,
+        ),
+        const SizedBox(width: 12),
 
-    // Each connector line is positioned absolutely based on the IR coordinates
-    // From the IR: Each connector is 1px wide, 26px tall, positioned at left: 26 (center of 20px icon + 16px left padding)
-    for (int i = 0; i < stepCount - 1; i++) {
-      // Calculate top position for each connector
-      // First step starts at top: 191, connector at top: 214 (after 23px)
-      // Each step is approximately 53px apart
-      double topPosition = 191 + 53 * i + 23;
-
-      connectors.add(
-        Positioned(
-          left: 26, // Center of 20px icon (16 + 10)
-          top: topPosition,
-          child: Container(
-            width: 1,
-            height: 26,
-            color: const Color(0xFFD9D9D9),
+        // Text content
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                step.title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Campton',
+                  color: step.textColor,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                step.timestamp,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Campton',
+                  color: step.timeColor,
+                ),
+              ),
+            ],
           ),
         ),
-      );
-    }
-
-    return connectors;
+      ],
+    );
   }
 
-  Widget _buildTimelineStep(TrackingStep step, bool isLast) {
-    // Calculate vertical positions based on IR data
-    // Each step has approximately 53px vertical spacing
-    return Container(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
+  Widget _buildTimelineConnector() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Step Icon Container
-          Container(
-            width: 20,
-            height: 20,
-            decoration: BoxDecoration(
-              color: step.stepColor,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Icon(
-              step.icon,
-              size: 16,
-              color: step.isActive ? Colors.white : step.iconColor,
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // Status and Time Text
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  step.status,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Campton',
-                    color: step.textColor,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  step.time,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'Campton',
-                    color: step.timeColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Connector line centered with the dot
+          Container(width: 1, height: 26, color: const Color(0xFFD9D9D9)),
+          const SizedBox(width: 29), // Space to align with next dot
         ],
       ),
     );
   }
 
-  Widget _buildIconButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
+  Widget _buildIconButton(IconData icon) {
     return Container(
       width: 40,
       height: 40,
@@ -378,31 +316,29 @@ class TrackingOrderScreen extends StatelessWidget {
         border: Border.all(color: const Color(0xFFDEDEDE)),
       ),
       child: IconButton(
-        icon: Icon(icon, size: 20, color: const Color(0xFF241508)),
-        onPressed: onPressed,
-        padding: const EdgeInsets.all(10),
+        icon: Icon(icon, size: 20),
+        onPressed: () {},
+        padding: EdgeInsets.zero,
       ),
     );
   }
 }
 
-class TrackingStep {
-  final String status;
-  final String time;
-  final bool isActive;
-  final IconData icon;
-  final Color iconColor;
-  final Color stepColor;
+class TimelineStep {
+  final String title;
+  final String timestamp;
+  final bool isCompleted;
+  final bool isCurrent;
+  final Color dotColor;
   final Color textColor;
   final Color timeColor;
 
-  const TrackingStep({
-    required this.status,
-    required this.time,
-    required this.isActive,
-    required this.icon,
-    required this.iconColor,
-    required this.stepColor,
+  const TimelineStep({
+    required this.title,
+    required this.timestamp,
+    required this.isCompleted,
+    required this.isCurrent,
+    required this.dotColor,
     required this.textColor,
     required this.timeColor,
   });

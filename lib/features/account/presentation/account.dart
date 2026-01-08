@@ -91,7 +91,7 @@ class AccountScreen extends StatelessWidget {
                         // Settings section
                         const SizedBox(height: 68), // 369 - 275 - 26
                         _buildSectionHeader('Settings'),
-                        _buildSettingsList(),
+                        _buildSettingsList(context),
 
                         // Business section
                         const SizedBox(height: 116), // 559 - 369 - 74
@@ -201,7 +201,7 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsList() {
+  Widget _buildSettingsList(BuildContext context) {
     return Column(
       children: [
         _buildMenuItem(
@@ -212,7 +212,7 @@ class AccountScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Icons.location_on_outlined,
           label: 'Your Addresses',
-          onTap: () {},
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.addresses),
         ),
         _buildMenuItem(
           icon: Icons.lock_outline,

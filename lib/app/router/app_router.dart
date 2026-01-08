@@ -16,6 +16,8 @@ import '../../features/home/subfeatures/music/presentation/music_screen.dart';
 import '../../features/home/subfeatures/schools/presentation/schools_screen.dart';
 import '../../features/home/subfeatures/sustainability/presentation/sustainability_screen.dart';
 import '../../features/account/subfeatures/edit_profile/presentation/edit_profile.dart';
+import '../../features/account/subfeatures/your_address/presentation/add_edit_address.dart';
+import '../../features/account/subfeatures/your_address/presentation/your_address.dart';
 import '../../features/account/subfeatures/your_order/presentation/order_details.dart';
 import '../../features/account/subfeatures/your_order/presentation/tracking_order.dart';
 import '../../features/account/subfeatures/your_order/presentation/your_order.dart';
@@ -48,6 +50,8 @@ abstract class AppRoutes {
 
   // Feature screens
   static const editProfile = '/edit-profile';
+  static const addresses = '/addresses';
+  static const addEditAddress = '/add-edit-address';
   static const orders = '/orders';
   static const orderDetails = '/order-details';
   static const trackingOrder = '/tracking-order';
@@ -160,6 +164,18 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const EditProfileScreen(),
+        );
+
+      case AppRoutes.addresses:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const AddressesScreen(),
+        );
+
+      case AppRoutes.addEditAddress:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const AddEditAddressScreen(),
         );
 
       case AppRoutes.orders:
