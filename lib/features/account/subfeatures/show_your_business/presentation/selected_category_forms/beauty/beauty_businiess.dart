@@ -250,7 +250,7 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
 
   Widget _buildSubmitButton() {
     return InkWell(
-      onTap: () => Navigator.of(context).pushNamed(AppRoutes.accountReview),
+      onTap: () => Navigator.of(context).pushNamed(AppRoutes.businessSettings),
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,

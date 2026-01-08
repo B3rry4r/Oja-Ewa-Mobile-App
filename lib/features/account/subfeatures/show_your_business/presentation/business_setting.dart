@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../app/router/app_router.dart';
+
 class BusinessSettingsScreen extends StatelessWidget {
   const BusinessSettingsScreen({super.key});
 
@@ -31,7 +33,10 @@ class BusinessSettingsScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _IconButton(icon: Icons.arrow_back_ios_new, onTap: () {}),
+          _IconButton(
+            icon: Icons.arrow_back_ios_new,
+            onTap: () => Navigator.of(context).maybePop(),
+          ),
           Row(
             children: [
               _IconButton(icon: Icons.search, onTap: () {}),
@@ -73,7 +78,7 @@ class BusinessSettingsScreen extends StatelessWidget {
                     color: const Color(0xFFFDAF40).withOpacity(0.4),
                     blurRadius: 16,
                     offset: const Offset(0, 8),
-                  )
+                  ),
                 ],
               ),
               child: const Text(
@@ -101,7 +106,8 @@ class BusinessSettingsScreen extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       itemCount: businesses.length,
-      separatorBuilder: (_, __) => const Divider(color: Color(0xFFDEDEDE), height: 1),
+      separatorBuilder: (_, __) =>
+          const Divider(color: Color(0xFFDEDEDE), height: 1),
       itemBuilder: (context, index) {
         return ListTile(
           contentPadding: const EdgeInsets.symmetric(vertical: 8),
@@ -151,7 +157,10 @@ class BusinessSettingsScreen extends StatelessWidget {
               _buildModalOption(
                 icon: Icons.edit_outlined,
                 label: "Edit Business Information",
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).pushNamed(AppRoutes.editBusiness);
+                },
               ),
               const Divider(color: Color(0xFFDEDEDE)),
               _buildModalOption(
@@ -164,7 +173,10 @@ class BusinessSettingsScreen extends StatelessWidget {
                 icon: Icons.power_settings_new,
                 label: "Deactivate Shop",
                 isDestructive: true,
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).pushNamed(AppRoutes.deactivateShop);
+                },
               ),
               const SizedBox(height: 20),
             ],
@@ -181,7 +193,10 @@ class BusinessSettingsScreen extends StatelessWidget {
     bool isDestructive = false,
   }) {
     return ListTile(
-      leading: Icon(icon, color: isDestructive ? Colors.red : const Color(0xFF1E2021)),
+      leading: Icon(
+        icon,
+        color: isDestructive ? Colors.red : const Color(0xFF1E2021),
+      ),
       title: Text(
         label,
         style: TextStyle(

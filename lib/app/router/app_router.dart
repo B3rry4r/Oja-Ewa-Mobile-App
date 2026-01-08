@@ -23,6 +23,8 @@ import '../../features/account/subfeatures/notifications/presentation/notificati
 import '../../features/account/subfeatures/password/presentation/password.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/business_category.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/business_onboarding.dart';
+import '../../features/account/subfeatures/show_your_business/presentation/business_setting.dart';
+import '../../features/account/subfeatures/show_your_business/presentation/deactivate_shop.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/selected_category_forms/business_seller_registration.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/selected_category_forms/beauty/beauty_businiess.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/selected_category_forms/brands/brand_business.dart';
@@ -82,6 +84,8 @@ abstract class AppRoutes {
   static const businessBrandsForm = '/business-brands-form';
   static const businessSchoolsForm = '/business-schools-form';
   static const businessMusicForm = '/business-music-form';
+  static const businessSettings = '/business-settings';
+  static const deactivateShop = '/deactivate-shop';
 
   // Seller onboarding
   static const sellerOnboarding = '/seller-onboarding';
@@ -276,6 +280,18 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const MusicBusinessDetailsScreen(),
+        );
+
+      case AppRoutes.businessSettings:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const BusinessSettingsScreen(),
+        );
+
+      case AppRoutes.deactivateShop:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const DeactivateShopScreen(),
         );
 
       case AppRoutes.sellerOnboarding:
