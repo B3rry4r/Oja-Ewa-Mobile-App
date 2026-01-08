@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/widgets/confirmation_modal.dart';
+import '../../../../../app/router/app_router.dart';
 
 class DeactivateShopScreen extends StatelessWidget {
   const DeactivateShopScreen({super.key});
@@ -61,6 +62,10 @@ class DeactivateShopScreen extends StatelessWidget {
                   confirmLabel: 'Deactivate',
                   onConfirm: () {
                     // TODO: deactivate later.
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      AppRoutes.home,
+                      (route) => false,
+                    );
                   },
                 );
               },

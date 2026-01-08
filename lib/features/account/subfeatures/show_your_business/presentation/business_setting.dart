@@ -166,7 +166,10 @@ class BusinessSettingsScreen extends StatelessWidget {
               _buildModalOption(
                 icon: Icons.payment_outlined,
                 label: "Manage Payment",
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).pushNamed(AppRoutes.managePayment);
+                },
               ),
               const Divider(color: Color(0xFFDEDEDE)),
               _buildModalOption(
