@@ -234,7 +234,7 @@ class AccountScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Icons.business_outlined,
           label: 'Show your business',
-          onTap: () {},
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.businessOnboarding),
         ),
       ],
     );

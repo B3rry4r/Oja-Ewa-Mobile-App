@@ -21,6 +21,8 @@ import '../../features/account/subfeatures/connect/connect.dart';
 import '../../features/account/subfeatures/faq/faq.dart';
 import '../../features/account/subfeatures/notifications/presentation/notifications_settings.dart';
 import '../../features/account/subfeatures/password/presentation/password.dart';
+import '../../features/account/subfeatures/show_your_business/presentation/business_category.dart';
+import '../../features/account/subfeatures/show_your_business/presentation/business_onboarding.dart';
 import '../../features/account/subfeatures/start_selling/presentation/account_review.dart';
 import '../../features/account/subfeatures/start_selling/presentation/business_details.dart';
 import '../../features/account/subfeatures/start_selling/presentation/seller_onboarding.dart';
@@ -66,6 +68,10 @@ abstract class AppRoutes {
   static const notificationsSettings = '/notifications-settings';
   static const faq = '/faq';
   static const connectToUs = '/connect-to-us';
+
+  // Business onboarding
+  static const businessOnboarding = '/business-onboarding';
+  static const businessCategory = '/business-category';
 
   // Seller onboarding
   static const sellerOnboarding = '/seller-onboarding';
@@ -218,6 +224,18 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const ConnectToUsScreen(),
+        );
+
+      case AppRoutes.businessOnboarding:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const BusinessOnboardingScreen(),
+        );
+
+      case AppRoutes.businessCategory:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const BusinessCategoryScreen(),
         );
 
       case AppRoutes.sellerOnboarding:
