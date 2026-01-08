@@ -1,6 +1,8 @@
 // seller_onboarding_screen.dart
 import 'package:flutter/material.dart';
 
+import '../../../../../app/router/app_router.dart';
+
 class SellerOnboardingScreen extends StatelessWidget {
   const SellerOnboardingScreen({super.key});
 
@@ -56,7 +58,7 @@ class SellerOnboardingScreen extends StatelessWidget {
                     const SizedBox(height: 40),
                     
                     // Start Selling button
-                    _buildStartSellingButton(),
+                    _buildStartSellingButton(context),
                     
                     const SizedBox(height: 40),
                   ],
@@ -198,7 +200,7 @@ class SellerOnboardingScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStartSellingButton() {
+  Widget _buildStartSellingButton(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -217,7 +219,7 @@ class SellerOnboardingScreen extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
           onTap: () {
-            // Start selling process
+            Navigator.of(context).pushNamed(AppRoutes.sellerRegistration);
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 32),

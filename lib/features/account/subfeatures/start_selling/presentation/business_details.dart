@@ -1,6 +1,8 @@
 // business_details_screen.dart
 import 'package:flutter/material.dart';
 
+import '../../../../../app/router/app_router.dart';
+
 class BusinessDetailsScreen extends StatelessWidget {
   const BusinessDetailsScreen({super.key});
 
@@ -80,7 +82,7 @@ class BusinessDetailsScreen extends StatelessWidget {
                     const SizedBox(height: 135),
                     
                     // Make Payment button
-                    _buildPaymentButton(),
+                    _buildPaymentButton(context),
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -384,7 +386,7 @@ class BusinessDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPaymentButton() {
+  Widget _buildPaymentButton(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -403,7 +405,7 @@ class BusinessDetailsScreen extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
           onTap: () {
-            // Make Payment action
+            Navigator.of(context).pushNamed(AppRoutes.accountReview);
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 32),

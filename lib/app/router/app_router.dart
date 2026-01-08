@@ -21,6 +21,10 @@ import '../../features/account/subfeatures/connect/connect.dart';
 import '../../features/account/subfeatures/faq/faq.dart';
 import '../../features/account/subfeatures/notifications/presentation/notifications_settings.dart';
 import '../../features/account/subfeatures/password/presentation/password.dart';
+import '../../features/account/subfeatures/start_selling/presentation/account_review.dart';
+import '../../features/account/subfeatures/start_selling/presentation/business_details.dart';
+import '../../features/account/subfeatures/start_selling/presentation/seller_onboarding.dart';
+import '../../features/account/subfeatures/start_selling/presentation/seller_registration.dart';
 import '../../features/account/subfeatures/your_address/presentation/your_address.dart';
 import '../../features/account/subfeatures/your_order/presentation/order_details.dart';
 import '../../features/account/subfeatures/your_order/presentation/tracking_order.dart';
@@ -60,6 +64,13 @@ abstract class AppRoutes {
   static const notificationsSettings = '/notifications-settings';
   static const faq = '/faq';
   static const connectToUs = '/connect-to-us';
+
+  // Seller onboarding
+  static const sellerOnboarding = '/seller-onboarding';
+  static const sellerRegistration = '/seller-registration';
+  static const businessDetails = '/business-details';
+  static const accountReview = '/account-review';
+
   static const orders = '/orders';
   static const orderDetails = '/order-details';
   static const trackingOrder = '/tracking-order';
@@ -208,6 +219,30 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const ConnectToUsScreen(),
+        );
+
+      case AppRoutes.sellerOnboarding:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const SellerOnboardingScreen(),
+        );
+
+      case AppRoutes.sellerRegistration:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const SellerRegistrationScreen(),
+        );
+
+      case AppRoutes.businessDetails:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const BusinessDetailsScreen(),
+        );
+
+      case AppRoutes.accountReview:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const AccountReviewScreen(),
         );
 
       case AppRoutes.orders:

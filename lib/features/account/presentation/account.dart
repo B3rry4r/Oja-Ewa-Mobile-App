@@ -96,7 +96,7 @@ class AccountScreen extends StatelessWidget {
                         // Business section
                         const SizedBox(height: 116), // 559 - 369 - 74
                         _buildSectionHeader('Oja Ewa Business'),
-                        _buildBusinessList(),
+                        _buildBusinessList(context),
 
                         // Support section
                         const SizedBox(height: 118), // 701 - 559 - 42
@@ -223,13 +223,13 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBusinessList() {
+  Widget _buildBusinessList(BuildContext context) {
     return Column(
       children: [
         _buildMenuItem(
           icon: Icons.store_outlined,
           label: 'Start selling',
-          onTap: () {},
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.sellerOnboarding),
         ),
         _buildMenuItem(
           icon: Icons.business_outlined,

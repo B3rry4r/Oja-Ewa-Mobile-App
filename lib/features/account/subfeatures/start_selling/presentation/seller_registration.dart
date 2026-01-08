@@ -1,6 +1,8 @@
 // seller_registration_screen.dart
 import 'package:flutter/material.dart';
 
+import '../../../../../app/router/app_router.dart';
+
 class SellerRegistrationScreen extends StatelessWidget {
   const SellerRegistrationScreen({super.key});
 
@@ -37,7 +39,7 @@ class SellerRegistrationScreen extends StatelessWidget {
                     const SizedBox(height: 40),
                     
                     // Save and Continue button
-                    _buildSaveButton(),
+                    _buildSaveButton(context),
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -419,7 +421,7 @@ class SellerRegistrationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildSaveButton(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -438,7 +440,7 @@ class SellerRegistrationScreen extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
           onTap: () {
-            // Save and continue
+            Navigator.of(context).pushNamed(AppRoutes.businessDetails);
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 32),
