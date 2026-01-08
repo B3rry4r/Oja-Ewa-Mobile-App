@@ -143,24 +143,22 @@ class AddressesScreen extends StatelessWidget {
               ),
               const SizedBox(width: 48),
 
-              // Edit icon
+              // Default/selected indicator (not an edit icon)
               Container(
                 width: 40,
                 height: 40,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.edit_outlined, size: 24),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            AddEditAddressScreen(initialAddress: address),
-                      ),
-                    );
-                  },
-                  padding: EdgeInsets.zero,
+                alignment: Alignment.center,
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFFCCCCCC)),
+                    color: address.isDefault ? const Color(0xFFFDAF40) : Colors.transparent,
+                  ),
+                  child: address.isDefault
+                      ? const Icon(Icons.check, size: 16, color: Colors.white)
+                      : const SizedBox.shrink(),
                 ),
               ),
             ],

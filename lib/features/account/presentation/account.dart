@@ -205,19 +205,19 @@ class AccountScreen extends StatelessWidget {
     return Column(
       children: [
         _buildMenuItem(
-          icon: Icons.notifications_outlined,
-          label: 'Notifications',
-          onTap: () {},
-        ),
-        _buildMenuItem(
           icon: Icons.location_on_outlined,
           label: 'Your Addresses',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.addresses),
         ),
         _buildMenuItem(
+          icon: Icons.notifications_outlined,
+          label: 'Notifications',
+          onTap: () {},
+        ),
+        _buildMenuItem(
           icon: Icons.lock_outline,
           label: 'Password',
-          onTap: () {},
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.changePassword),
         ),
       ],
     );

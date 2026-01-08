@@ -17,6 +17,7 @@ import '../../features/home/subfeatures/schools/presentation/schools_screen.dart
 import '../../features/home/subfeatures/sustainability/presentation/sustainability_screen.dart';
 import '../../features/account/subfeatures/edit_profile/presentation/edit_profile.dart';
 import '../../features/account/subfeatures/your_address/presentation/add_edit_address.dart';
+import '../../features/account/subfeatures/password/presentation/password.dart';
 import '../../features/account/subfeatures/your_address/presentation/your_address.dart';
 import '../../features/account/subfeatures/your_order/presentation/order_details.dart';
 import '../../features/account/subfeatures/your_order/presentation/tracking_order.dart';
@@ -52,6 +53,7 @@ abstract class AppRoutes {
   static const editProfile = '/edit-profile';
   static const addresses = '/addresses';
   static const addEditAddress = '/add-edit-address';
+  static const changePassword = '/change-password';
   static const orders = '/orders';
   static const orderDetails = '/order-details';
   static const trackingOrder = '/tracking-order';
@@ -176,6 +178,12 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const AddEditAddressScreen(),
+        );
+
+      case AppRoutes.changePassword:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const ChangePasswordScreen(),
         );
 
       case AppRoutes.orders:
