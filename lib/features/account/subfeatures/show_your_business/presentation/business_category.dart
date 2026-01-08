@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../app/router/app_router.dart';
+
 class BusinessCategoryScreen extends StatefulWidget {
   const BusinessCategoryScreen({super.key});
 
@@ -79,7 +81,7 @@ class _BusinessCategoryScreenState extends State<BusinessCategoryScreen> {
               ),
 
               // Primary Action Button
-              _buildSaveButton(),
+              _buildSaveButton(context),
               const SizedBox(height: 40),
             ],
           ),
@@ -148,8 +150,16 @@ class _BusinessCategoryScreenState extends State<BusinessCategoryScreen> {
     );
   }
 
-  Widget _buildSaveButton() {
-    return Container(
+  Widget _buildSaveButton(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          AppRoutes.businessSellerRegistration,
+          arguments: selectedCategory,
+        );
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
       width: double.infinity,
       height: 57,
       decoration: BoxDecoration(
@@ -174,6 +184,7 @@ class _BusinessCategoryScreenState extends State<BusinessCategoryScreen> {
           ),
         ),
       ),
-    );
+    ),
+   );
   }
 }

@@ -23,6 +23,11 @@ import '../../features/account/subfeatures/notifications/presentation/notificati
 import '../../features/account/subfeatures/password/presentation/password.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/business_category.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/business_onboarding.dart';
+import '../../features/account/subfeatures/show_your_business/presentation/selected_category_forms/business_seller_registration.dart';
+import '../../features/account/subfeatures/show_your_business/presentation/selected_category_forms/beauty/beauty_businiess.dart';
+import '../../features/account/subfeatures/show_your_business/presentation/selected_category_forms/brands/brand_business.dart';
+import '../../features/account/subfeatures/show_your_business/presentation/selected_category_forms/music/music_business.dart';
+import '../../features/account/subfeatures/show_your_business/presentation/selected_category_forms/schools/school_business.dart';
 import '../../features/account/subfeatures/start_selling/presentation/account_review.dart';
 import '../../features/account/subfeatures/start_selling/presentation/business_details.dart';
 import '../../features/account/subfeatures/start_selling/presentation/seller_onboarding.dart';
@@ -72,6 +77,11 @@ abstract class AppRoutes {
   // Business onboarding
   static const businessOnboarding = '/business-onboarding';
   static const businessCategory = '/business-category';
+  static const businessSellerRegistration = '/business-seller-registration';
+  static const businessBeautyForm = '/business-beauty-form';
+  static const businessBrandsForm = '/business-brands-form';
+  static const businessSchoolsForm = '/business-schools-form';
+  static const businessMusicForm = '/business-music-form';
 
   // Seller onboarding
   static const sellerOnboarding = '/seller-onboarding';
@@ -236,6 +246,36 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const BusinessCategoryScreen(),
+        );
+
+      case AppRoutes.businessSellerRegistration:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const BusinessSellerRegistrationScreen(),
+        );
+
+      case AppRoutes.businessBeautyForm:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const BeautyBusinessDetailsScreen(),
+        );
+
+      case AppRoutes.businessBrandsForm:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const BrandBusinessDetailsScreen(),
+        );
+
+      case AppRoutes.businessSchoolsForm:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const SchoolBusinessDetailsScreen(),
+        );
+
+      case AppRoutes.businessMusicForm:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const MusicBusinessDetailsScreen(),
         );
 
       case AppRoutes.sellerOnboarding:
