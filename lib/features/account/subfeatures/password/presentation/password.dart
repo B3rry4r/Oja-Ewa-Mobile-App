@@ -14,31 +14,31 @@ class ChangePasswordScreen extends StatelessWidget {
             children: [
               // Header
               _buildHeader(),
-              
+
               // Content
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
                     const SizedBox(height: 32),
-                    
+
                     // Old Password
                     _buildPasswordField(
                       label: 'Old Password',
                       hintText: 'Type your password',
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // New Password
                     _buildPasswordField(
                       label: 'New Password',
                       hintText: 'Type your password',
                     ),
                     const SizedBox(height: 80),
-                    
+
                     // Save Password Button
                     _buildSaveButton(),
-                    
+
                     // Decorative background image
                     Align(
                       alignment: Alignment.centerRight,
@@ -70,7 +70,7 @@ class ChangePasswordScreen extends StatelessWidget {
         children: [
           // Back button
           _buildIconButton(Icons.arrow_back_ios_new_rounded),
-          
+
           // Title
           const Text(
             'Change Password',
@@ -81,7 +81,7 @@ class ChangePasswordScreen extends StatelessWidget {
               color: Color(0xFF241508),
             ),
           ),
-          
+
           // Close button
           _buildIconButton(Icons.close_rounded),
         ],
@@ -94,7 +94,7 @@ class ChangePasswordScreen extends StatelessWidget {
     required String hintText,
   }) {
     bool isObscured = true;
-    
+
     return StatefulBuilder(
       builder: (context, setState) {
         return Column(
@@ -110,7 +110,7 @@ class ChangePasswordScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            
+
             // Password field container
             Container(
               height: 49,
@@ -137,7 +137,7 @@ class ChangePasswordScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // Eye toggle button
                   IconButton(
                     icon: Icon(
@@ -208,10 +208,7 @@ class ChangePasswordScreen extends StatelessWidget {
         border: Border.all(color: const Color(0xFFDEDEDE)),
       ),
       child: IconButton(
-        icon: Icon(
-          icon,
-          size: 20,
-        ),
+        icon: Icon(icon, size: 20),
         onPressed: () {},
         padding: EdgeInsets.zero,
       ),

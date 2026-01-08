@@ -17,6 +17,9 @@ import '../../features/home/subfeatures/schools/presentation/schools_screen.dart
 import '../../features/home/subfeatures/sustainability/presentation/sustainability_screen.dart';
 import '../../features/account/subfeatures/edit_profile/presentation/edit_profile.dart';
 import '../../features/account/subfeatures/your_address/presentation/add_edit_address.dart';
+import '../../features/account/subfeatures/connect/connect.dart';
+import '../../features/account/subfeatures/faq/faq.dart';
+import '../../features/account/subfeatures/notifications/presentation/notifications_settings.dart';
 import '../../features/account/subfeatures/password/presentation/password.dart';
 import '../../features/account/subfeatures/your_address/presentation/your_address.dart';
 import '../../features/account/subfeatures/your_order/presentation/order_details.dart';
@@ -54,6 +57,9 @@ abstract class AppRoutes {
   static const addresses = '/addresses';
   static const addEditAddress = '/add-edit-address';
   static const changePassword = '/change-password';
+  static const notificationsSettings = '/notifications-settings';
+  static const faq = '/faq';
+  static const connectToUs = '/connect-to-us';
   static const orders = '/orders';
   static const orderDetails = '/order-details';
   static const trackingOrder = '/tracking-order';
@@ -184,6 +190,24 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const ChangePasswordScreen(),
+        );
+
+      case AppRoutes.notificationsSettings:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const NotificationsSettingsScreen(),
+        );
+
+      case AppRoutes.faq:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const FaqsScreen(),
+        );
+
+      case AppRoutes.connectToUs:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const ConnectToUsScreen(),
         );
 
       case AppRoutes.orders:

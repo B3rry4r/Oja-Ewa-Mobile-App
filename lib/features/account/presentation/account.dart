@@ -101,7 +101,7 @@ class AccountScreen extends StatelessWidget {
                         // Support section
                         const SizedBox(height: 118), // 701 - 559 - 42
                         _buildSectionHeader('Support'),
-                        _buildSupportList(),
+                        _buildSupportList(context),
 
                         // Bottom spacing
                         const SizedBox(height: 32),
@@ -212,7 +212,7 @@ class AccountScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Icons.notifications_outlined,
           label: 'Notifications',
-          onTap: () {},
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.notificationsSettings),
         ),
         _buildMenuItem(
           icon: Icons.lock_outline,
@@ -240,7 +240,7 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSupportList() {
+  Widget _buildSupportList(BuildContext context) {
     return Column(
       children: [
         _buildMenuItem(
@@ -258,11 +258,15 @@ class AccountScreen extends StatelessWidget {
           label: 'Terms of Service',
           onTap: () {},
         ),
-        _buildMenuItem(icon: Icons.help_outline, label: 'FAQ', onTap: () {}),
+        _buildMenuItem(
+          icon: Icons.help_outline,
+          label: 'FAQ',
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.faq),
+        ),
         _buildMenuItem(
           icon: Icons.contact_support_outlined,
           label: 'Connect to us',
-          onTap: () {},
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.connectToUs),
         ),
         // Sign Out with different styling
         Container(
