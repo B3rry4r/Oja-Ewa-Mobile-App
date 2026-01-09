@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../../../../../../app/router/app_router.dart';
 
 
@@ -10,25 +12,12 @@ class BusinessSellerRegistrationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Main background from IR
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 15, top: 10),
-          child: _IconButton(
-            icon: Icons.arrow_back_ios_new,
-            onTap: () => Navigator.of(context).maybePop(),
-          ),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(104),
+        child: AppHeader(
+          backgroundColor: Color(0xFFFFF8F1),
+          iconColor: Color(0xFF241508),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 15, top: 10),
-            child: _IconButton(
-              icon: Icons.close,
-              onTap: () => Navigator.of(context).maybePop(),
-            ),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -294,30 +283,6 @@ class BusinessSellerRegistrationScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-// Custom Icon Button helper for top navigation
-class _IconButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback? onTap;
-  const _IconButton({required this.icon, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFDEDEDE)),
-        ),
-        child: Icon(icon, size: 18, color: Colors.black),
       ),
     );
   }

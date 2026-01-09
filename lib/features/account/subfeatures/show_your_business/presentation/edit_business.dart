@@ -124,8 +124,10 @@ class EditBusinessScreen extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Color(0xFFCCCCCC), fontSize: 16),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 16,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
@@ -196,7 +198,10 @@ class EditBusinessScreen extends StatelessWidget {
             children: [
               Icon(Icons.flag, size: 20),
               SizedBox(width: 8),
-              Text('+234', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(
+                '+234',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -227,9 +232,16 @@ class EditBusinessScreen extends StatelessWidget {
           child: const Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.cloud_upload_outlined, size: 24, color: Color(0xFF777F84)),
+              Icon(
+                Icons.cloud_upload_outlined,
+                size: 24,
+                color: Color(0xFF777F84),
+              ),
               SizedBox(height: 12),
-              Text('Browse Document', style: TextStyle(fontSize: 16, color: Color(0xFF1E2021))),
+              Text(
+                'Browse Document',
+                style: TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+              ),
             ],
           ),
         ),
@@ -251,7 +263,7 @@ class EditBusinessScreen extends StatelessWidget {
               color: const Color(0xFFFDAF40).withOpacity(0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         child: const Center(

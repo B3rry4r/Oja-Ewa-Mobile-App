@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../../../../../../../app/router/app_router.dart';
 
 class BrandBusinessDetailsScreen extends StatelessWidget {
@@ -9,7 +11,13 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Background from IR
-      appBar: _buildAppBar(context),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(104),
+        child: AppHeader(
+          backgroundColor: Color(0xFFFFF8F1),
+          iconColor: Color(0xFF241508),
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
@@ -66,24 +74,6 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: _HeaderButton(
-          icon: Icons.arrow_back_ios_new, 
-          onTap: () => Navigator.pop(context),
-        ),
-      ),
-      actions: [
-        _HeaderButton(icon: Icons.notifications_none, onTap: () {}),
-        const SizedBox(width: 16),
-      ],
     );
   }
 
@@ -269,28 +259,6 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _HeaderButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  const _HeaderButton({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFDEDEDE)),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(icon, size: 18, color: const Color(0xFF1E2021)),
       ),
     );
   }
