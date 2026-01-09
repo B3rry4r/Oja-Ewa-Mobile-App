@@ -57,7 +57,7 @@ jobs:
         # Create a proper Podfile with post_install script
         cat > ios/Podfile << 'EOF'
         # Minimum iOS deployment target
-        platform :ios, '13.0'
+        platform :ios, '15.0'
 
         # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
         ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -96,19 +96,19 @@ jobs:
           installer.pods_project.targets.each do |target|
             flutter_additional_ios_build_settings(target)
 
-            # Fix deployment target for all pods to minimum 13.0
+            # Fix deployment target for all pods to minimum 15.0
             target.build_configurations.each do |config|
-              config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+              config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
             end
           end
         end
         EOF
 
         # Update Flutter framework info
-        /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 13.0" ios/Flutter/AppFrameworkInfo.plist || true
+        /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 15.0" ios/Flutter/AppFrameworkInfo.plist || true
 
         # Update Runner Info.plist
-        /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 13.0" ios/Runner/Info.plist || true
+        /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 15.0" ios/Runner/Info.plist || true
 
     # Set basic Xcode project configuration
     - name: Set Xcode project team
