@@ -188,17 +188,21 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               // Cart Icon
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFDEDEDE)),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.shopping_cart_outlined,
-                  size: 20,
-                  color: Colors.black54,
+              InkWell(
+                onTap: () => Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: const Color(0xFFDEDEDE)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 20,
+                    color: Colors.black54,
+                  ),
                 ),
               ),
             ],

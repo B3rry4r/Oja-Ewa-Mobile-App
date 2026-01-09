@@ -12,7 +12,6 @@ class ShoppingBagScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 32), // Top padding
-            
             // Header with two icon buttons
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -24,7 +23,7 @@ class ShoppingBagScreen extends StatelessWidget {
                     icon: Icons.arrow_back_ios_new_rounded,
                     onPressed: () {},
                   ),
-                  
+
                   // Other icon button (likely menu or favorite)
                   _buildIconButton(
                     icon: Icons.more_vert_rounded,
@@ -33,9 +32,9 @@ class ShoppingBagScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Main content card
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -61,7 +60,7 @@ class ShoppingBagScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // First product item
                   _buildProductItem(
                     productName: 'Agbada in Voue',
@@ -70,7 +69,7 @@ class ShoppingBagScreen extends StatelessWidget {
                     size: 'XS',
                     isFirstItem: true,
                   ),
-                  
+
                   // Second product item
                   _buildProductItem(
                     productName: 'Agbada in Voue',
@@ -79,16 +78,16 @@ class ShoppingBagScreen extends StatelessWidget {
                     size: 'XS',
                     isFirstItem: false,
                   ),
-                  
+
                   // Summary section
                   _buildSummarySection(),
-                  
+
                   // Checkout button section
                   _buildCheckoutSection(),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 32), // Bottom padding
           ],
         ),
@@ -105,10 +104,7 @@ class ShoppingBagScreen extends StatelessWidget {
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        border: Border.all(
-          color: const Color(0xFFDEDEDE),
-          width: 1,
-        ),
+        border: Border.all(color: const Color(0xFFDEDEDE), width: 1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: IconButton(
@@ -137,10 +133,7 @@ class ShoppingBagScreen extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border.all(
-          color: const Color(0xFFDEDEDE),
-          width: 1,
-        ),
+        border: Border.all(color: const Color(0xFFDEDEDE), width: 1),
         borderRadius: BorderRadius.zero,
       ),
       child: Row(
@@ -155,11 +148,12 @@ class ShoppingBagScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             // In a real app, this would be an actual image
-            child: const Placeholder(), // Replace with Image.network or AssetImage
+            child:
+                const Placeholder(), // Replace with Image.network or AssetImage
           ),
-          
+
           const SizedBox(width: 12),
-          
+
           // Product details
           Expanded(
             child: Column(
@@ -183,7 +177,7 @@ class ShoppingBagScreen extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    
+
                     // Delete button
                     Container(
                       width: 36,
@@ -204,12 +198,15 @@ class ShoppingBagScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 4),
-                
+
                 // Size selector
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: const Color(0xFFCCCCCC),
@@ -231,16 +228,13 @@ class ShoppingBagScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(
-                        Icons.arrow_drop_down,
-                        size: 20,
-                      ),
+                      const Icon(Icons.arrow_drop_down, size: 20),
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Price and quantity selector
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -255,10 +249,13 @@ class ShoppingBagScreen extends StatelessWidget {
                         height: 1.2,
                       ),
                     ),
-                    
+
                     // Quantity selector
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: const Color(0xFFDEDEDE),
@@ -278,9 +275,9 @@ class ShoppingBagScreen extends StatelessWidget {
                               minHeight: 20,
                             ),
                           ),
-                          
+
                           const SizedBox(width: 24),
-                          
+
                           // Quantity
                           Text(
                             quantity.toString(),
@@ -292,9 +289,9 @@ class ShoppingBagScreen extends StatelessWidget {
                               height: 1.2,
                             ),
                           ),
-                          
+
                           const SizedBox(width: 24),
-                          
+
                           // Plus button
                           IconButton(
                             icon: const Icon(Icons.add, size: 20),
@@ -355,9 +352,9 @@ class ShoppingBagScreen extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Delivery disclaimer
           const Align(
             alignment: Alignment.centerLeft,
@@ -396,10 +393,7 @@ class ShoppingBagScreen extends StatelessWidget {
               // Handle checkout
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32,
-                vertical: 20,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
               width: double.infinity,
               child: const Center(
                 child: Text(

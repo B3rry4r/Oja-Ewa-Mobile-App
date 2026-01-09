@@ -1,4 +1,4 @@
-package com.example.ojaewa
+package com.wawuafrica.ojaewa
 
 import io.flutter.embedding.android.FlutterActivity
 

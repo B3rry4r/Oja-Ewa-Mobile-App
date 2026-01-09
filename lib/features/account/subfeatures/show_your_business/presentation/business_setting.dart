@@ -53,9 +53,9 @@ class BusinessSettingsScreen extends StatelessWidget {
   Widget _buildTitleAndAddButton(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.end,
+      child: Column(
+        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           const Text(
             "Your Business",
@@ -66,28 +66,35 @@ class BusinessSettingsScreen extends StatelessWidget {
               color: Color(0xFF241508),
             ),
           ),
-          GestureDetector(
-            onTap: () {},
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFDAF40),
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFFDAF40).withOpacity(0.4),
-                    blurRadius: 16,
-                    offset: const Offset(0, 8),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.topRight,
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDAF40),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFDAF40).withOpacity(0.4),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: const Text(
+                  "Add New Business",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Campton',
                   ),
-                ],
-              ),
-              child: const Text(
-                "Add New Business",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Campton',
                 ),
               ),
             ),
@@ -155,7 +162,6 @@ class BusinessSettingsScreen extends StatelessWidget {
                 ),
               ),
               _buildModalOption(
-                icon: Icons.edit_outlined,
                 label: "Edit Business Information",
                 onTap: () {
                   Navigator.pop(context);
@@ -164,7 +170,6 @@ class BusinessSettingsScreen extends StatelessWidget {
               ),
               const Divider(color: Color(0xFFDEDEDE)),
               _buildModalOption(
-                icon: Icons.payment_outlined,
                 label: "Manage Payment",
                 onTap: () {
                   Navigator.pop(context);
@@ -173,7 +178,6 @@ class BusinessSettingsScreen extends StatelessWidget {
               ),
               const Divider(color: Color(0xFFDEDEDE)),
               _buildModalOption(
-                icon: Icons.power_settings_new,
                 label: "Deactivate Shop",
                 isDestructive: true,
                 onTap: () {
@@ -190,16 +194,11 @@ class BusinessSettingsScreen extends StatelessWidget {
   }
 
   Widget _buildModalOption({
-    required IconData icon,
     required String label,
     required VoidCallback onTap,
     bool isDestructive = false,
   }) {
     return ListTile(
-      leading: Icon(
-        icon,
-        color: isDestructive ? Colors.red : const Color(0xFF1E2021),
-      ),
       title: Text(
         label,
         style: TextStyle(

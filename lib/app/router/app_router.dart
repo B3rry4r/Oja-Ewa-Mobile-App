@@ -40,6 +40,7 @@ import '../../features/account/subfeatures/your_order/presentation/order_details
 import '../../features/account/subfeatures/your_order/presentation/tracking_order.dart';
 import '../../features/account/subfeatures/your_order/presentation/your_order.dart';
 import '../../features/notifications/presentation/notifications.dart';
+import '../../features/shopping_bag/presentation/shopping_bag_screen.dart';
 import '../../features/review_submission/presentation/review_submission.dart';
 import '../../features/your_shop/presentation/shop_dashboard.dart';
 import '../../features/your_shop/subfeatures/manage_shop/manage_shop.dart';
@@ -69,6 +70,7 @@ abstract class AppRoutes {
   static const sustainability = '/sustainability';
 
   // Feature screens
+  static const shoppingBag = '/shopping-bag';
   static const editProfile = '/edit-profile';
   static const addresses = '/addresses';
   static const addEditAddress = '/add-edit-address';
@@ -348,6 +350,12 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const NotificationsScreen(),
+        );
+
+      case AppRoutes.shoppingBag:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const ShoppingBagScreen(),
         );
 
       case AppRoutes.reviewSubmission:
