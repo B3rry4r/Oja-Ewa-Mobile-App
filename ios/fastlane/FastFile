@@ -37,25 +37,29 @@ platform :ios do
 
     profile_name = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"]
     
-    # CRITICAL FIX: Copy ALL profiles from UserData to MobileDevice
+    # Get the profile UUID from the environment variable set by match
+    profile_uuid = ENV['sigh_com.wawuafrica.ojaewa_appstore']
+    profile_path = ENV['sigh_com.wawuafrica.ojaewa_appstore_profile-path']
+    
+    UI.message("Profile Name: #{profile_name}")
+    UI.message("Profile UUID: #{profile_uuid}")
+    UI.message("Profile Path: #{profile_path}")
+    
+    # CRITICAL FIX: Copy profile to MobileDevice location where Xcode looks for it
     UI.message("Setting Provisioning Profile type to 'app-store'")
     
     # Create MobileDevice directory
     UI.message("Copying profile to MobileDevice directory...")
     sh("mkdir -p ~/Library/MobileDevice/Provisioning\\ Profiles")
     
-    # Copy ALL .mobileprovision files from UserData to MobileDevice
-    userdata_profiles = Dir.glob(File.expand_path("~/Library/Developer/Xcode/UserData/Provisioning Profiles/*.mobileprovision"))
-    
-    userdata_profiles.each do |profile_path|
-      profile_filename = File.basename(profile_path)
-      destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/#{profile_filename}")
-      
-      UI.message("Copying: #{profile_filename}")
+    # Copy the profile using its UUID as the filename
+    if profile_path && File.exist?(profile_path)
+      destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/#{profile_uuid}.mobileprovision")
       sh("cp '#{profile_path}' '#{destination}'")
+      UI.success("Profile copied to: #{destination}")
+    else
+      UI.error("Profile not found at: #{profile_path}")
     end
-    
-    UI.message("Profile copied successfully!")
 
     update_project_team(
       path: "Runner.xcodeproj",
