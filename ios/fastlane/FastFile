@@ -45,15 +45,28 @@ platform :ios do
     )
 
     # -----------------------------
-    # SET TEAM ID IN PROJECT
+    # Get the provisioning profile UUID from match
+    # -----------------------------
+    profile_env_name = "sigh_com.wawuafrica.ojaewa_appstore_profile-path"
+    profile_path = ENV[profile_env_name]
+    
+    if profile_path.nil? || profile_path.empty?
+      UI.user_error!("Could not find provisioning profile path in environment")
+    end
+    
+    UI.message("Provisioning profile path: #{profile_path}")
+
+    # -----------------------------
+    # SET TEAM ID AND PROFILE IN PROJECT
     # -----------------------------
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "Runner.xcodeproj",
       team_id: ENV["APPLE_TEAM_ID"],
       bundle_identifier: "com.wawuafrica.ojaewa",
-      profile_name: "match AppStore com.wawuafrica.ojaewa",
-      code_sign_identity: "iPhone Distribution"
+      profile_uuid: lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"],
+      code_sign_identity: "iPhone Distribution",
+      build_configurations: ["Release"]
     )
 
     # -----------------------------
@@ -81,6 +94,11 @@ platform :ios do
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
       export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "com.wawuafrica.ojaewa" => "match AppStore com.wawuafrica.ojaewa"
+        }
+      },
       clean: true
     )
 
