@@ -1,6 +1,8 @@
 // File: shopping_bag_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 class ShoppingBagScreen extends StatelessWidget {
   const ShoppingBagScreen({super.key});
 
@@ -11,26 +13,8 @@ class ShoppingBagScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 32), // Top padding
-            // Header with two icon buttons
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Back button
-                  _buildIconButton(
-                    icon: Icons.arrow_back_ios_new_rounded,
-                    onPressed: () {},
-                  ),
-
-                  // Other icon button (likely menu or favorite)
-                  _buildIconButton(
-                    icon: Icons.more_vert_rounded,
-                    onPressed: () {},
-                  ),
-                ],
-              ),
+            const AppHeader(
+              iconColor: Colors.white,
             ),
 
             const SizedBox(height: 24),
@@ -91,27 +75,6 @@ class ShoppingBagScreen extends StatelessWidget {
             const SizedBox(height: 32), // Bottom padding
           ],
         ),
-      ),
-    );
-  }
-
-  // Reusable icon button widget
-  Widget _buildIconButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFDEDEDE), width: 1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 20),
-        onPressed: onPressed,
-        padding: const EdgeInsets.all(10),
-        constraints: const BoxConstraints(),
       ),
     );
   }

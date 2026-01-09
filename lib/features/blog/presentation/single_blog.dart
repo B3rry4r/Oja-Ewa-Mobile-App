@@ -1,6 +1,8 @@
 // blog_detail_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 class BlogDetailScreen extends StatelessWidget {
   const BlogDetailScreen({super.key});
 
@@ -11,24 +13,8 @@ class BlogDetailScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Top buttons
-            Container(
-              height: 120,
-              color: const Color(0xFF603814),
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16),
-                    child: _buildIconButton(Icons.arrow_back),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: _buildIconButton(Icons.favorite_border),
-                  ),
-                ],
-              ),
+            const AppHeader(
+              iconColor: Colors.white,
             ),
 
             // Header section - Image and Text in a Row
@@ -128,22 +114,6 @@ class BlogDetailScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildIconButton(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 20),
-        onPressed: () {},
-        padding: EdgeInsets.zero,
       ),
     );
   }

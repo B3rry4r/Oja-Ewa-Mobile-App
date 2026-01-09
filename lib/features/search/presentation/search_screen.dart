@@ -46,19 +46,6 @@ class _SearchScreenState extends State<SearchScreen> {
     // Navigate to category page or filter results
   }
 
-  // void _onBackPressed() {
-  //   Navigator.pop(context);
-  // }
-
-  void _onFilterPressed() {
-    print('Filter button pressed');
-    // Open filter dialog/screen
-  }
-
-  void _onSettingsPressed() {
-    print('Settings button pressed');
-    // Open settings screen
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -24,14 +24,8 @@ class BlogScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(top: 32),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // Left button with proper spacing
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16),
-                      child: const SizedBox(width: 40, height: 40),
-                    ),
-
                     // Right buttons group
                     Padding(
                       padding: const EdgeInsets.only(right: 16),

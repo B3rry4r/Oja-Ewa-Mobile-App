@@ -1,6 +1,8 @@
 // notifications_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
@@ -11,8 +13,9 @@ class NotificationsScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header with back and menu buttons
-            _buildHeader(context),
+            const AppHeader(
+              iconColor: Colors.white,
+            ),
             // Main content card
             Expanded(
               child: _buildNotificationContent(),
@@ -21,61 +24,6 @@ class NotificationsScreen extends StatelessWidget {
         ),
       ),
       // Bottom navigation bar
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Back button
-          IconButton(
-            onPressed: () => Navigator.of(context).maybePop(),
-            style: IconButton.styleFrom(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-                side: const BorderSide(color: Color(0xFFDEDEDE)),
-              ),
-              padding: const EdgeInsets.all(10),
-            ),
-            icon: const Icon(
-              Icons.arrow_back_ios_new,
-              size: 20,
-              color: Colors.black,
-            ),
-          ),
-          // Title (though hidden in background color)
-          const Text(
-            'Notifications',
-            style: TextStyle(
-              fontSize: 33,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
-            ),
-          ),
-          // Menu button
-          IconButton(
-            onPressed: () {},
-            style: IconButton.styleFrom(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-                side: const BorderSide(color: Color(0xFFDEDEDE)),
-              ),
-              padding: const EdgeInsets.all(10),
-            ),
-            icon: const Icon(
-              Icons.more_vert,
-              size: 20,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
     );
   }
 

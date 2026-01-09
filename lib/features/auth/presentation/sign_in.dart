@@ -163,19 +163,12 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Widget _buildWelcomeIcon() {
-    return Container(
+    return SizedBox(
       width: 41.6,
       height: 61.89,
-      decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40).withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.emoji_emotions_outlined,
-          size: 32,
-          color: Color(0xFFFDAF40),
-        ),
+      child: SvgPicture.asset(
+        AppImages.appLogo,
+        fit: BoxFit.contain,
       ),
     );
   }

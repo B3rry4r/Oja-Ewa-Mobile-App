@@ -59,29 +59,29 @@ class WishlistScreen extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 32, 16, 32),
-      child: Row(
-        children: [
-          const Spacer(),
-          Row(
-            children: [
-              HeaderIconButton(
-                asset: AppIcons.notification,
-                onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
-                iconColor: Colors.white,
-              ),
-              const SizedBox(width: 16),
-              HeaderIconButton(
-                asset: AppIcons.bag,
-                onTap: () => Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
-                iconColor: Colors.white,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+   return Padding(
+     padding: const EdgeInsets.fromLTRB(16, 32, 16, 32),
+     child: Row(
+       mainAxisAlignment: MainAxisAlignment.end,
+       children: [
+         Row(
+           children: [
+             HeaderIconButton(
+               asset: AppIcons.notification,
+               onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+               iconColor: Colors.white,
+             ),
+             const SizedBox(width: 16),
+             HeaderIconButton(
+               asset: AppIcons.bag,
+               onTap: () => Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
+               iconColor: Colors.white,
+             ),
+           ],
+         ),
+       ],
+     ),
+   );
   }
 
   Widget _buildWishlistContent(BuildContext context) {

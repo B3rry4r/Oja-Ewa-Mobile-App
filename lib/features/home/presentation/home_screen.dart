@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
 
 import '../../../app/router/app_router.dart';
 
@@ -76,9 +79,11 @@ class HomeScreen extends StatelessWidget {
           // Brand Logo
           Row(
             children: [
-              // Logo Mark (stacked lines)
-              SvgPicture.asset('app_icon/app_logo_2.svg',
-              width: 24,
+              // Logo Mark
+              SvgPicture.asset(
+                AppImages.appLogoAlt,
+                width: 24,
+                height: 24,
               ),
               const SizedBox(width: 8),
               // Brand Name
@@ -120,62 +125,24 @@ class HomeScreen extends StatelessWidget {
           // Header Icons
           Row(
             children: [
-              // Bag Icon
-              InkWell(
-                onTap: () => Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard),
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFDEDEDE)),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.shopping_bag_outlined,
-                    size: 20,
-                    color: Colors.black54,
-                  ),
+              HeaderIconButton(
+                asset: AppIcons.shop,
+                onTap: () => Navigator.of(context).pushNamed(
+                  AppRoutes.yourShopDashboard,
                 ),
               ),
               const SizedBox(width: 16),
-
-              // Notification Icon
-              InkWell(
-                onTap: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.notifications),
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFDEDEDE)),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.notifications_none,
-                    size: 20,
-                    color: Colors.black54,
-                  ),
+              HeaderIconButton(
+                asset: AppIcons.notification,
+                onTap: () => Navigator.of(context).pushNamed(
+                  AppRoutes.notifications,
                 ),
               ),
               const SizedBox(width: 8),
-              // Cart Icon
-              InkWell(
-                onTap: () => Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFDEDEDE)),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.shopping_cart_outlined,
-                    size: 20,
-                    color: Colors.black54,
-                  ),
+              HeaderIconButton(
+                asset: AppIcons.bag,
+                onTap: () => Navigator.of(context).pushNamed(
+                  AppRoutes.shoppingBag,
                 ),
               ),
             ],

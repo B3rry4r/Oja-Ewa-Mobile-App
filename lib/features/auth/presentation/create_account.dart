@@ -221,19 +221,12 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   }
 
   Widget _buildWelcomeIcon() {
-    return Container(
+    return SizedBox(
       width: 41.6,
       height: 63.58,
-      decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40).withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.person_add_alt_1_rounded,
-          size: 32,
-          color: Color(0xFFFDAF40),
-        ),
+      child: SvgPicture.asset(
+        AppImages.appLogoAlt,
+        fit: BoxFit.contain,
       ),
     );
   }
