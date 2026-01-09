@@ -122,6 +122,15 @@ jobs:
       run: |
         mkdir -p ios/fastlane
         # The Fastfile content will be created here or should already exist in your repo
+    
+    - name: Create API key file
+      run: |
+        mkdir -p ios/fastlane
+        cd ios/fastlane
+        printf '{\n  "key_id": "%s",\n  "issuer_id": "%s",\n  "key": "%s",\n  "duration": 1200,\n  "in_house": false\n}' \
+        "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" \
+        "${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}" \
+        "$(echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | base64 --decode | awk '{printf "%s\\n", $0}' | sed 's/\\n$//')" > apikey.json
 
     - name: Deploy to TestFlight
       env:
@@ -178,7 +187,7 @@ jobs:
         fi
 
         # Execute Fastlane with explicit platform
-        fastlane ios beta
+        fastlane ios beta --api_key_path fastlane/apikey.json
         # fastlane ios release
 
     # - name: Upload IPA artifact
