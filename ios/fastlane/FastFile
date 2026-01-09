@@ -70,7 +70,7 @@ platform :ios do
       scheme: "Runner",
       export_method: "app-store",
       xcargs: "DEVELOPMENT_TEAM=#{ENV['APPLE_TEAM_ID']}"
-      clean: true
+      # clean: true
     )
 
     # -----------------------------
