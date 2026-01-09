@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
           Row(
             children: [
               // Logo Mark (stacked lines)
-              SvgPicture.asset('asset/app_icon/app_logo.svg',
+              SvgPicture.asset('/app_icon/app_logo.svg',
               width: 16,
               ),
               const SizedBox(width: 8),
