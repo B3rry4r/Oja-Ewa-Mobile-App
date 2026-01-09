@@ -11,10 +11,9 @@ platform :ios do
     setup_ci
 
     # Setup keychain for CI
-    # The password here MUST match what's in KEYCHAIN_UNLOCK_PASSWORD GitHub Secret
     create_keychain(
       name: "signing_keychain",
-      password: ENV['MATCH_KEYCHAIN_PASSWORD'], # Using the ENV variable from YAML
+      password: ENV['MATCH_KEYCHAIN_PASSWORD'],
       default_keychain: true,
       unlock: true,
       timeout: 3600,
@@ -23,26 +22,27 @@ platform :ios do
     UI.message("Keychain 'signing_keychain' created and unlocked with password from ENV.")
 
     # Diagnostic: List identities in the new keychain immediately after creation/unlock
-    # This helps confirm the keychain is active and accessible for Fastlane's actions.
     UI.message("--- Listing identities in the newly created keychain (pre-match) ---")
     sh("security find-identity -p codesigning -v #{Actions.lane_context[SharedValues::KEYCHAIN_PATH]}")
     UI.message("--- End identities listing (pre-match) ---")
 
     # Load App Store Connect API key
-    # Fastlane runs from ios/ directory, and AuthKey.p8 is also created there
     api_key = app_store_connect_api_key(
       key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
       issuer_id: ENV['APP_STORE_CONNECT_ISSUER_ID'],
       key_filepath: './AuthKey.p8'
     )
 
+    # Create the provisioning profiles directory if it doesn't exist
+    sh("mkdir -p ~/Library/MobileDevice/Provisioning\\ Profiles")
+    UI.message("Ensured provisioning profiles directory exists")
+
     # Get certificates and provisioning profiles with Match
-    # `MATCH_PASSWORD` ENV is used by match to decrypt the .p12 from your git repo
     match(
       type: "appstore",
       keychain_name: Actions.lane_context[SharedValues::KEYCHAIN_PATH], 
-      keychain_password: ENV['MATCH_KEYCHAIN_PASSWORD'], # This ensures match can interact with the keychain
-      readonly: true, # Keep as true for now, assuming match repo is correct
+      keychain_password: ENV['MATCH_KEYCHAIN_PASSWORD'],
+      readonly: true,
       app_identifier: "com.wawuafrica.ojaewa",
       git_url: ENV['MATCH_GIT_URL'],
       git_basic_authorization: Base64.strict_encode64("#{ENV['MATCH_GIT_TOKEN']}:x-oauth-basic"),
@@ -58,39 +58,45 @@ platform :ios do
     sh("security find-identity -p codesigning -v #{Actions.lane_context[SharedValues::KEYCHAIN_PATH]}")
     UI.message("--- End identities listing (post-match) ---")
 
-    UI.message("Available provisioning profiles:")
+    # Diagnostic: Check if profiles were installed
+    UI.message("--- Checking installed provisioning profiles ---")
+    sh("ls -la ~/Library/MobileDevice/Provisioning\\ Profiles/ || echo 'Directory exists but is empty'")
+    sh("find ~/Library/MobileDevice -name '*.mobileprovision' || echo 'No mobileprovision files found'")
+    UI.message("--- End profile check ---")
+
+    # Get profile information from match
+    UI.message("Available provisioning profiles from match:")
     UI.message(Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING])
     profile_name = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"]
-    UI.message("Using profile: #{profile_name}")
-    
-    # Get the actual profile UUID by reading the installed profile
-    UI.message("--- Looking for installed provisioning profile ---")
-    profile_path = Dir[File.expand_path("~/Library/MobileDevice/Provisioning Profiles/*.mobileprovision")].find do |path|
-      profile_content = File.read(path)
-      profile_content.include?("com.wawuafrica.ojaewa") && profile_content.include?("AppStore")
-    end
-    
-    if profile_path
-      # Extract UUID from filename (the filename IS the UUID)
-      profile_uuid = File.basename(profile_path, ".mobileprovision")
-      UI.message("Found profile at: #{profile_path}")
-      UI.message("Profile UUID: #{profile_uuid}")
+    UI.message("Profile name from match: #{profile_name}")
+
+    # Since match may not install the profile in the standard location on CI,
+    # we need to use the profile that match downloaded directly
+    # Match stores profiles in the lane context
+    sigh_profile_path = Actions.lane_context[SharedValues::SIGH_PROFILE_PATH]
+    UI.message("Direct profile path from match: #{sigh_profile_path}")
+
+    # Copy the profile to the standard location if it's not there
+    if sigh_profile_path && File.exist?(sigh_profile_path)
+      profile_uuid = `grep -a -A 1 'UUID' "#{sigh_profile_path}" | grep string | sed -e 's/<string>//' -e 's/<\\/string>//' -e 's/^[[:space:]]*//'`.strip
+      UI.message("Extracted Profile UUID: #{profile_uuid}")
+      
+      # Copy to standard location
+      target_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/#{profile_uuid}.mobileprovision")
+      sh("cp '#{sigh_profile_path}' '#{target_path}'")
+      UI.message("Copied profile to: #{target_path}")
     else
-      # List all profiles for debugging
-      UI.message("All installed profiles:")
-      sh("ls -la ~/Library/MobileDevice/Provisioning\\ Profiles/")
-      UI.user_error!("Could not find provisioning profile for com.wawuafrica.ojaewa")
+      UI.user_error!("Could not find provisioning profile from match")
     end
 
-    # Assuming fastlane command is executed from the `ios/` directory in your GitHub Actions workflow.
+    # Update project team
     update_project_team(
-      path: "Runner.xcodeproj", # Path relative to `ios/` directory
+      path: "Runner.xcodeproj",
       teamid: ENV['APPLE_TEAM_ID']
     )
     UI.message("Updated project team settings.")
 
-    # **OPTION 1: Increment build number automatically**
-    # This gets the latest build number from App Store Connect and increments it
+    # Increment build number
     increment_build_number(
       build_number: latest_testflight_build_number(
         api_key: api_key,
@@ -100,77 +106,55 @@ platform :ios do
     )
     UI.message("Build number incremented to avoid TestFlight conflicts.")
 
-    # **OPTION 2: Use timestamp-based build number (alternative)**
-    # Uncomment the lines below and comment out the increment_build_number block above
-    # timestamp_build_number = Time.now.strftime("%Y%m%d%H%M")
-    # increment_build_number(
-    #   build_number: timestamp_build_number,
-    #   xcodeproj: "Runner.xcodeproj"
-    # )
-    # UI.message("Build number set to timestamp: #{timestamp_build_number}")
-
-    # **OPTION 3: Use GitHub Actions run number (alternative)**
-    # Uncomment the lines below and comment out the increment_build_number block above
-    # if ENV['GITHUB_RUN_NUMBER']
-    #   increment_build_number(
-    #     build_number: ENV['GITHUB_RUN_NUMBER'],
-    #     xcodeproj: "Runner.xcodeproj"
-    #   )
-    #   UI.message("Build number set to GitHub run number: #{ENV['GITHUB_RUN_NUMBER']}")
-    # end
-
-    # Change into the parent directory for flutter build
+    # Build Flutter app
     Dir.chdir("..") do
       sh("flutter", "build", "ios", "--release", "--no-codesign")
     end
     UI.message("Flutter build completed (no-codesign).")
-    # After Dir.chdir block, the working directory reverts to ios/fastlane/
 
     # Manually update Runner target settings via Xcodeproj gem
     require 'xcodeproj'
-    project = Xcodeproj::Project.open("../Runner.xcodeproj") # Path relative to ios/fastlane/
+    project = Xcodeproj::Project.open("../Runner.xcodeproj")
 
     project.targets.each do |target|
       if target.name == "Runner"
         target.build_configurations.each do |config|
           if config.name == "Release"
             config.build_settings["CODE_SIGN_STYLE"] = "Manual"
-            # Use UUID instead of name for better reliability
             config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_uuid
             config.build_settings["PROVISIONING_PROFILE"] = profile_uuid
             config.build_settings["DEVELOPMENT_TEAM"] = ENV['APPLE_TEAM_ID']
-            # Use "Apple Distribution" for modern Xcode
+            config.build_settings["CODE_SIGN_IDENTITY"] = "Apple Distribution"
             config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "Apple Distribution"
           end
         end
       end
     end
 
-    project.save # Crucial: Save the changes to the .xcodeproj file
-    UI.message("Updated Runner target code signing settings, leaving Pods untouched.")
+    project.save
+    UI.message("Updated Runner target code signing settings with UUID: #{profile_uuid}")
 
     # Build and sign the iOS app
     build_app(
-      workspace: "Runner.xcworkspace", # Path relative to ios/fastlane/
+      workspace: "Runner.xcworkspace",
       scheme: "Runner",
       configuration: "Release",
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          "com.wawuafrica.ojaewa" => profile_uuid  # Use UUID instead of name
+          "com.wawuafrica.ojaewa" => profile_uuid
         },
         signingStyle: "manual",
         teamID: ENV['APPLE_TEAM_ID'],
-        # Use "Apple Distribution" for modern Xcode versions
         signingCertificate: "Apple Distribution",
         uploadBitcode: false,
         uploadSymbols: true,
         compileBitcode: false
       },
-      clean: true, # Clean build to avoid caching issues
-      verbose: true, # Provides more detailed xcodebuild output
-      output_directory: "./build/ios/ipa/", # Relative to ios/fastlane/
-      silent: false # Set to false to see more xcodebuild output in Fastlane logs
+      clean: true,
+      verbose: true,
+      output_directory: "./build/ios/ipa/",
+      silent: false
     )
     UI.message("iOS app built and signed.")
 
@@ -194,10 +178,9 @@ platform :ios do
   lane :release do
     setup_ci
 
-    # Setup keychain for CI - FIXED: Use MATCH_KEYCHAIN_PASSWORD instead of KEYCHAIN_UNLOCK_PASSWORD
     create_keychain(
       name: "signing_keychain",
-      password: ENV['MATCH_KEYCHAIN_PASSWORD'], # FIXED: Changed from KEYCHAIN_UNLOCK_PASSWORD
+      password: ENV['MATCH_KEYCHAIN_PASSWORD'],
       default_keychain: true,
       unlock: true,
       timeout: 3600,
@@ -205,17 +188,19 @@ platform :ios do
     )
     UI.message("Keychain 'signing_keychain' created and unlocked for release lane.")
 
-    # Load App Store Connect API key from the JSON file created by GitHub Actions
-    # Path is relative to where fastlane is running (ios/ directory)
+    # Load App Store Connect API key
     api_key = app_store_connect_api_key(
       key_filepath: "fastlane/apikey.json"
     )
+
+    # Create provisioning profiles directory
+    sh("mkdir -p ~/Library/MobileDevice/Provisioning\\ Profiles")
 
     # Get certificates and provisioning profiles with Match
     match(
       type: "appstore",
       keychain_name: "signing_keychain",
-      keychain_password: ENV['MATCH_KEYCHAIN_PASSWORD'], # FIXED: Changed from KEYCHAIN_UNLOCK_PASSWORD
+      keychain_password: ENV['MATCH_KEYCHAIN_PASSWORD'],
       readonly: true,
       app_identifier: "com.wawuafrica.ojaewa",
       git_url: ENV['MATCH_GIT_URL'],
@@ -227,21 +212,19 @@ platform :ios do
     )
     UI.message("Match completed for release lane.")
 
-    # Get the provisioning profile name and UUID
+    # Get profile path and UUID
     profile_name = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"]
-    UI.message("Using profile for release: #{profile_name}")
+    sigh_profile_path = Actions.lane_context[SharedValues::SIGH_PROFILE_PATH]
     
-    # Get UUID
-    profile_path = Dir[File.expand_path("~/Library/MobileDevice/Provisioning Profiles/*.mobileprovision")].find do |path|
-      profile_content = File.read(path)
-      profile_content.include?("com.wawuafrica.ojaewa") && profile_content.include?("AppStore")
-    end
-    
-    if profile_path
-      profile_uuid = File.basename(profile_path, ".mobileprovision")
+    if sigh_profile_path && File.exist?(sigh_profile_path)
+      profile_uuid = `grep -a -A 1 'UUID' "#{sigh_profile_path}" | grep string | sed -e 's/<string>//' -e 's/<\\/string>//' -e 's/^[[:space:]]*//'`.strip
       UI.message("Profile UUID for release: #{profile_uuid}")
+      
+      target_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/#{profile_uuid}.mobileprovision")
+      sh("cp '#{sigh_profile_path}' '#{target_path}'")
+      UI.message("Copied profile to: #{target_path}")
     else
-      UI.user_error!("Could not find provisioning profile for com.wawuafrica.ojaewa")
+      UI.user_error!("Could not find provisioning profile for release")
     end
 
     # Update project team
@@ -251,7 +234,7 @@ platform :ios do
     )
     UI.message("Updated project team settings for release.")
 
-    # Increment build number for production release too
+    # Increment build number
     increment_build_number(
       build_number: latest_testflight_build_number(
         api_key: api_key,
@@ -276,10 +259,10 @@ platform :ios do
         target.build_configurations.each do |config|
           if config.name == "Release"
             config.build_settings["CODE_SIGN_STYLE"] = "Manual"
-            # Use UUID for both settings
             config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_uuid
             config.build_settings["PROVISIONING_PROFILE"] = profile_uuid 
             config.build_settings["DEVELOPMENT_TEAM"] = ENV['APPLE_TEAM_ID']
+            config.build_settings["CODE_SIGN_IDENTITY"] = "Apple Distribution"
             config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "Apple Distribution"
           end
         end
@@ -297,7 +280,7 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          "com.wawuafrica.ojaewa" => profile_uuid  # Use UUID
+          "com.wawuafrica.ojaewa" => profile_uuid
         },
         signingStyle: "manual",
         teamID: ENV['APPLE_TEAM_ID'],
@@ -321,13 +304,13 @@ platform :ios do
       force: true,
       skip_metadata: true,
       skip_screenshots: true,
-      skip_binary_upload: false, # IMPORTANT: Changed to false so it uploads the binary
-      ipa: "./build/ios/ipa/Runner.ipa", # Explicitly specify the IPA path
-      precheck_include_in_app_purchases: false, # Disable in-app purchase checks
-      run_precheck_before_submit: false, # Disable precheck entirely for API key compatibility
+      skip_binary_upload: false,
+      ipa: "./build/ios/ipa/Runner.ipa",
+      precheck_include_in_app_purchases: false,
+      run_precheck_before_submit: false,
       submission_information: {
-        export_compliance_uses_encryption: false, # Most Flutter apps using standard HTTPS/auth are exempt
-        export_compliance_is_exempt: true, # Standard system encryption is exempt
+        export_compliance_uses_encryption: false,
+        export_compliance_is_exempt: true,
         export_compliance_contains_third_party_cryptography: false,
         export_compliance_contains_proprietary_cryptography: false,
         export_compliance_available_on_french_store: true
@@ -341,8 +324,6 @@ platform :ios do
   end
 
   error do |lane, exception|
-    # Clean up keychain if there's an error
-    # Check if the keychain file actually exists before trying to delete
     delete_keychain(name: "signing_keychain") if File.exist?(File.expand_path("~/Library/Keychains/signing_keychain-db"))
     UI.message("Error occurred: #{exception.message}")
   end
