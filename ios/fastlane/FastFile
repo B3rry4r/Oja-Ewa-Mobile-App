@@ -2,70 +2,51 @@
 opt_out_usage
 
 platform :ios do
-  desc "Build and upload to TestFlight"
+  desc "Build and upload to TestFlight (Fastlane-managed signing)"
   lane :beta do
     setup_ci
 
+    # -----------------------------
+    # Keychain for CI
+    # -----------------------------
     create_keychain(
       name: "signing_keychain",
-      password: ENV['MATCH_KEYCHAIN_PASSWORD'],
+      password: ENV["MATCH_KEYCHAIN_PASSWORD"],
       default_keychain: true,
       unlock: true,
       timeout: 3600,
       lock_when_sleeps: false
     )
 
+    # -----------------------------
+    # App Store Connect API Key
+    # -----------------------------
     api_key = app_store_connect_api_key(
-      key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
-      issuer_id: ENV['APP_STORE_CONNECT_ISSUER_ID'],
-      key_filepath: './AuthKey.p8'
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
+      key_filepath: "./AuthKey.p8"
     )
 
+    # -----------------------------
+    # MATCH — THIS HANDLES ALL SIGNING
+    # -----------------------------
     match(
       type: "appstore",
-      keychain_name: "signing_keychain",
-      keychain_password: ENV['MATCH_KEYCHAIN_PASSWORD'],
       readonly: true,
       app_identifier: "com.wawuafrica.ojaewa",
-      git_url: ENV['MATCH_GIT_URL'],
-      git_basic_authorization: Base64.strict_encode64("#{ENV['MATCH_GIT_TOKEN']}:x-oauth-basic"),
-      storage_mode: "git",
+      git_url: ENV["MATCH_GIT_URL"],
+      git_basic_authorization: Base64.strict_encode64(
+        "#{ENV['MATCH_GIT_TOKEN']}:x-oauth-basic"
+      ),
+      keychain_name: "signing_keychain",
+      keychain_password: ENV["MATCH_KEYCHAIN_PASSWORD"],
       api_key: api_key,
-      force_for_new_devices: true,
       clone_branch_directly: true
     )
 
-    profile_name = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"]
-    
-    # Get the profile UUID from the environment variable set by match
-    profile_uuid = ENV['sigh_com.wawuafrica.ojaewa_appstore']
-    profile_path = ENV['sigh_com.wawuafrica.ojaewa_appstore_profile-path']
-    
-    UI.message("Profile Name: #{profile_name}")
-    UI.message("Profile UUID: #{profile_uuid}")
-    UI.message("Profile Path: #{profile_path}")
-    
-    # CRITICAL FIX: Copy profile to MobileDevice location where Xcode looks for it
-    UI.message("Setting Provisioning Profile type to 'app-store'")
-    
-    # Create MobileDevice directory
-    UI.message("Copying profile to MobileDevice directory...")
-    sh("mkdir -p ~/Library/MobileDevice/Provisioning\\ Profiles")
-    
-    # Copy the profile using its UUID as the filename
-    if profile_path && File.exist?(profile_path)
-      destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/#{profile_uuid}.mobileprovision")
-      sh("cp '#{profile_path}' '#{destination}'")
-      UI.success("Profile copied to: #{destination}")
-    else
-      UI.error("Profile not found at: #{profile_path}")
-    end
-
-    update_project_team(
-      path: "Runner.xcodeproj",
-      teamid: ENV['APPLE_TEAM_ID']
-    )
-
+    # -----------------------------
+    # Build number bump
+    # -----------------------------
     increment_build_number(
       build_number: latest_testflight_build_number(
         api_key: api_key,
@@ -74,68 +55,34 @@ platform :ios do
       xcodeproj: "Runner.xcodeproj"
     )
 
-    # Flutter build - change to parent directory (project root)
+    # -----------------------------
+    # Flutter build (ALLOW SIGNING)
+    # -----------------------------
     Dir.chdir("..") do
-      sh("flutter", "build", "ios", "--release", "--no-codesign")
+      sh("flutter", "build", "ios", "--release")
     end
 
-    # Modify Xcode project settings - get absolute path
-    require 'xcodeproj'
-    xcodeproj_path = File.expand_path("../Runner.xcodeproj", __dir__)
-    project = Xcodeproj::Project.open(xcodeproj_path)
-
-    project.targets.each do |target|
-      if target.name == "Runner"
-        target.build_configurations.each do |config|
-          if config.name == "Release"
-            config.build_settings["CODE_SIGN_STYLE"] = "Manual"
-            config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_name
-            config.build_settings["DEVELOPMENT_TEAM"] = ENV['APPLE_TEAM_ID']
-            config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "iPhone Distribution"
-          end
-        end
-      end
-    end
-
-    project.save
-
+    # -----------------------------
+    # Xcode archive + export
+    # -----------------------------
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
-      configuration: "Release",
       export_method: "app-store",
-      export_options: {
-        provisioningProfiles: {
-          "com.wawuafrica.ojaewa" => profile_name
-        },
-        signingStyle: "manual",
-        teamID: ENV['APPLE_TEAM_ID'],
-        signingCertificate: "iPhone Distribution",
-        uploadBitcode: false,
-        uploadSymbols: true,
-        compileBitcode: false
-      },
-      clean: true,
-      verbose: true,
-      xcargs: "-allowProvisioningUpdates",
-      output_directory: "./build/ios/ipa/",
-      silent: false
+      clean: true
     )
 
+    # -----------------------------
+    # Upload to TestFlight
+    # -----------------------------
     upload_to_testflight(
       api_key: api_key,
-      skip_waiting_for_build_processing: false,
-      skip_submission: false,
-      distribute_external: false,
-      notify_external_testers: false,
-      changelog: "Automated build from GitHub Actions"
+      skip_waiting_for_build_processing: false
     )
 
-    delete_keychain(name: "signing_keychain")
-  end
-
-  error do |lane, exception|
-    delete_keychain(name: "signing_keychain") if File.exist?(File.expand_path("~/Library/Keychains/signing_keychain-db"))
-    UI.message("Error occurred: #{exception.message}")
+  ensure
+    delete_keychain(
+      name: "signing_keychain"
+    ) if File.exist?(File.expand_path("~/Library/Keychains/signing_keychain-db"))
   end
 end
