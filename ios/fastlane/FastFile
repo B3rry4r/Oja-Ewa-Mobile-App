@@ -29,10 +29,12 @@ platform :ios do
     UI.message("--- End identities listing (pre-match) ---")
 
     # Load App Store Connect API key
+    # When fastlane runs from ios/ directory, the Fastfile is in ios/fastlane/
+    # so we need to go up one level to find AuthKey.p8 in ios/
     api_key = app_store_connect_api_key(
       key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
       issuer_id: ENV['APP_STORE_CONNECT_ISSUER_ID'],
-      key_filepath: './AuthKey.p8'
+      key_filepath: '../AuthKey.p8'
     )
 
     # Get certificates and provisioning profiles with Match
@@ -183,6 +185,7 @@ platform :ios do
     UI.message("Keychain 'signing_keychain' created and unlocked for release lane.")
 
     # Load App Store Connect API key from the JSON file created by GitHub Actions
+    # Path is relative to where fastlane is running (ios/ directory)
     api_key = app_store_connect_api_key(
       key_filepath: "fastlane/apikey.json"
     )
