@@ -58,6 +58,32 @@ class ProductDetailsScreen extends StatelessWidget {
 // 1. Header Section
 // ---------------------------------------------------------------------------
 
+/// Small square icon container used in this screen (matches design sizing).
+class _IconContainer extends StatelessWidget {
+  const _IconContainer({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFDEDEDE)),
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.transparent,
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: const Color(0xFF1E2021), size: 20),
+        padding: EdgeInsets.zero,
+        onPressed: onTap,
+      ),
+    );
+  }
+}
+
 // ---------------------------------------------------------------------------
 // 2. Hero Image Section
 // ---------------------------------------------------------------------------
