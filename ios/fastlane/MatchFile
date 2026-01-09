@@ -1,0 +1,12 @@
+git_url(ENV["MATCH_GIT_URL"])
+storage_mode("git")
+type("appstore")
+app_identifier("com.wawuafrica.ojaewa")
+
+# Use environment variable for passphrase
+git_basic_authorization(Base64.strict_encode64("#{ENV['MATCH_GIT_TOKEN']}:x-oauth-basic"))
+
+# Don't hardcode the passphrase - it will be read from MATCH_PASSWORD env var
+# The match command will automatically use ENV['MATCH_PASSWORD']
+# app_identifier("com.wawuafrica.wawu")
+# api_key_path("./apikey.json")

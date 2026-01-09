@@ -1,0 +1,313 @@
+# Fastfile
+# This file contains the fastlane configuration
+
+# Disable analytics
+opt_out_usage
+
+# Define the iOS platform
+platform :ios do
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    setup_ci
+
+    # Setup keychain for CI
+    # The password here MUST match what's in KEYCHAIN_UNLOCK_PASSWORD GitHub Secret
+    create_keychain(
+      name: "signing_keychain",
+      password: ENV['MATCH_KEYCHAIN_PASSWORD'], # Using the ENV variable from YAML
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+      lock_when_sleeps: false
+    )
+    UI.message("Keychain 'signing_keychain' created and unlocked with password from ENV.")
+
+    # Diagnostic: List identities in the new keychain immediately after creation/unlock
+    # This helps confirm the keychain is active and accessible for Fastlane's actions.
+    UI.message("--- Listing identities in the newly created keychain (pre-match) ---")
+    sh("security find-identity -p codesigning -v #{Actions.lane_context[SharedValues::KEYCHAIN_PATH]}")
+    UI.message("--- End identities listing (pre-match) ---")
+
+    # Load App Store Connect API key
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_ISSUER_ID'],
+      key_filepath: './AuthKey.p8'
+    )
+
+    # Get certificates and provisioning profiles with Match
+    # `MATCH_PASSWORD` ENV is used by match to decrypt the .p12 from your git repo
+    match(
+      type: "appstore",
+      keychain_name: "signing_keychain", # This ensures match uses the created keychain
+      keychain_password: ENV['MATCH_KEYCHAIN_PASSWORD'], # This ensures match can interact with the keychain
+      readonly: true, # Keep as true for now, assuming match repo is correct
+      app_identifier: "com.wawuafrica.wawu",
+      git_url: ENV['MATCH_GIT_URL'],
+      git_basic_authorization: Base64.strict_encode64("#{ENV['MATCH_GIT_TOKEN']}:x-oauth-basic"),
+      storage_mode: "git",
+      api_key: api_key,
+      force_for_new_devices: true,
+      clone_branch_directly: true
+    )
+    UI.message("Match completed. Certificates and profiles should now be in keychain.")
+
+    # Diagnostic: List identities again after match to confirm certificate presence
+    UI.message("--- Listing identities in the keychain (post-match) ---")
+    sh("security find-identity -p codesigning -v #{Actions.lane_context[SharedValues::KEYCHAIN_PATH]}")
+    UI.message("--- End identities listing (post-match) ---")
+
+    UI.message("Available provisioning profiles:")
+    UI.message(Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING])
+    profile_name = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.wawu"]
+    UI.message("Using profile: #{profile_name}")
+
+    # Assuming fastlane command is executed from the `ios/` directory in your GitHub Actions workflow.
+    update_project_team(
+      path: "Runner.xcodeproj", # Path relative to `ios/` directory
+      teamid: ENV['APPLE_TEAM_ID']
+    )
+    UI.message("Updated project team settings.")
+
+    # **OPTION 1: Increment build number automatically**
+    # This gets the latest build number from App Store Connect and increments it
+    increment_build_number(
+      build_number: latest_testflight_build_number(
+        api_key: api_key,
+        app_identifier: "com.wawuafrica.wawu"
+      ) + 1,
+      xcodeproj: "Runner.xcodeproj"
+    )
+    UI.message("Build number incremented to avoid TestFlight conflicts.")
+
+    # **OPTION 2: Use timestamp-based build number (alternative)**
+    # Uncomment the lines below and comment out the increment_build_number block above
+    # timestamp_build_number = Time.now.strftime("%Y%m%d%H%M")
+    # increment_build_number(
+    #   build_number: timestamp_build_number,
+    #   xcodeproj: "Runner.xcodeproj"
+    # )
+    # UI.message("Build number set to timestamp: #{timestamp_build_number}")
+
+    # **OPTION 3: Use GitHub Actions run number (alternative)**
+    # Uncomment the lines below and comment out the increment_build_number block above
+    # if ENV['GITHUB_RUN_NUMBER']
+    #   increment_build_number(
+    #     build_number: ENV['GITHUB_RUN_NUMBER'],
+    #     xcodeproj: "Runner.xcodeproj"
+    #   )
+    #   UI.message("Build number set to GitHub run number: #{ENV['GITHUB_RUN_NUMBER']}")
+    # end
+
+    # Change into the parent directory for flutter build
+    Dir.chdir("..") do
+      sh("flutter", "build", "ios", "--release", "--no-codesign")
+    end
+    UI.message("Flutter build completed (no-codesign).")
+    # After Dir.chdir block, the working directory reverts to ios/fastlane/
+
+    # Manually update Runner target settings via Xcodeproj gem
+    require 'xcodeproj'
+    project = Xcodeproj::Project.open("../Runner.xcodeproj") # Path relative to ios/fastlane/
+
+    project.targets.each do |target|
+      if target.name == "Runner"
+        target.build_configurations.each do |config|
+          if config.name == "Release"
+            config.build_settings["CODE_SIGN_STYLE"] = "Manual"
+            config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_name
+            config.build_settings["DEVELOPMENT_TEAM"] = ENV['APPLE_TEAM_ID']
+            config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "iPhone Distribution" # Must match certificate name
+          end
+        end
+      end
+    end
+
+    project.save # Crucial: Save the changes to the .xcodeproj file
+    UI.message("Updated Runner target code signing settings, leaving Pods untouched.")
+
+    # Build and sign the iOS app
+    build_app(
+      workspace: "Runner.xcworkspace", # Path relative to ios/fastlane/
+      scheme: "Runner",
+      configuration: "Release",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "com.wawuafrica.wawu" => profile_name
+        },
+        signingStyle: "manual",
+        teamID: ENV['APPLE_TEAM_ID'],
+        signingCertificate: "iPhone Distribution", # Must exactly match the certificate name in the keychain
+        uploadBitcode: false,
+        uploadSymbols: true,
+        compileBitcode: false
+      },
+      clean: true, # Clean build to avoid caching issues
+      verbose: true, # Provides more detailed xcodebuild output
+      xcargs: "-allowProvisioningUpdates", # Useful, but ensure it doesn't conflict
+      output_directory: "./build/ios/ipa/", # Relative to ios/fastlane/
+      silent: false # Set to false to see more xcodebuild output in Fastlane logs
+    )
+    UI.message("iOS app built and signed.")
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: false,
+      skip_submission: false,
+      distribute_external: false,
+      notify_external_testers: false,
+      changelog: "Automated build from GitHub Actions"
+    )
+    UI.message("Uploaded to TestFlight.")
+
+    # Clean up keychain
+    delete_keychain(name: "signing_keychain")
+    UI.message("Keychain deleted.")
+  end
+
+  desc "Deploy to App Store"
+  lane :release do
+    setup_ci
+
+    # Setup keychain for CI - FIXED: Use MATCH_KEYCHAIN_PASSWORD instead of KEYCHAIN_UNLOCK_PASSWORD
+    create_keychain(
+      name: "signing_keychain",
+      password: ENV['MATCH_KEYCHAIN_PASSWORD'], # FIXED: Changed from KEYCHAIN_UNLOCK_PASSWORD
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+      lock_when_sleeps: false
+    )
+    UI.message("Keychain 'signing_keychain' created and unlocked for release lane.")
+
+    # Load App Store Connect API key
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_ISSUER_ID'],
+      key_filepath: './AuthKey.p8'
+    )
+
+    # Get certificates and provisioning profiles with Match
+    match(
+      type: "appstore",
+      keychain_name: "signing_keychain",
+      keychain_password: ENV['MATCH_KEYCHAIN_PASSWORD'], # FIXED: Changed from KEYCHAIN_UNLOCK_PASSWORD
+      readonly: true,
+      app_identifier: "com.wawuafrica.wawu",
+      git_url: ENV['MATCH_GIT_URL'],
+      git_basic_authorization: Base64.strict_encode64("#{ENV['MATCH_GIT_TOKEN']}:x-oauth-basic"),
+      storage_mode: "git",
+      api_key: api_key,
+      force_for_new_devices: true,
+      clone_branch_directly: true
+    )
+    UI.message("Match completed for release lane.")
+
+    # Get the provisioning profile name for later use
+    profile_name = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.wawu"]
+    UI.message("Using profile for release: #{profile_name}")
+
+    # Update project team
+    update_project_team(
+      path: "Runner.xcodeproj",
+      teamid: ENV['APPLE_TEAM_ID']
+    )
+    UI.message("Updated project team settings for release.")
+
+    # Increment build number for production release too
+    increment_build_number(
+      build_number: latest_testflight_build_number(
+        api_key: api_key,
+        app_identifier: "com.wawuafrica.wawu"
+      ) + 1,
+      xcodeproj: "Runner.xcodeproj"
+    )
+    UI.message("Build number incremented for release.")
+
+    # Build Flutter app
+    Dir.chdir("..") do
+      sh("flutter", "build", "ios", "--release", "--no-codesign")
+    end
+    UI.message("Flutter build completed for release.")
+
+    # Update code signing settings
+    require 'xcodeproj'
+    project = Xcodeproj::Project.open("../Runner.xcodeproj")
+
+    project.targets.each do |target|
+      if target.name == "Runner"
+        target.build_configurations.each do |config|
+          if config.name == "Release"
+            config.build_settings["CODE_SIGN_STYLE"] = "Manual"
+            config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_name
+            config.build_settings["DEVELOPMENT_TEAM"] = ENV['APPLE_TEAM_ID']
+            config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "iPhone Distribution"
+          end
+        end
+      end
+    end
+
+    project.save
+    UI.message("Updated Runner target code signing settings for release.")
+
+    # Build and sign the iOS app
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      configuration: "Release",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "com.wawuafrica.wawu" => profile_name
+        },
+        signingStyle: "manual",
+        teamID: ENV['APPLE_TEAM_ID'],
+        signingCertificate: "iPhone Distribution",
+        uploadBitcode: false,
+        uploadSymbols: true,
+        compileBitcode: false
+      },
+      clean: true,
+      verbose: true,
+      xcargs: "-allowProvisioningUpdates",
+      output_directory: "./build/ios/ipa/",
+      silent: false
+    )
+    UI.message("iOS app built and signed for release.")
+
+    # Upload to App Store Connect and submit for review
+    deliver(
+      api_key: api_key,
+      submit_for_review: true,
+      automatic_release: true,
+      force: true,
+      skip_metadata: true,
+      skip_screenshots: true,
+      skip_binary_upload: false, # IMPORTANT: Changed to false so it uploads the binary
+      ipa: "./build/ios/ipa/Runner.ipa", # Explicitly specify the IPA path
+      precheck_include_in_app_purchases: false, # Disable in-app purchase checks
+      run_precheck_before_submit: false, # Disable precheck entirely for API key compatibility
+      submission_information: {
+        export_compliance_uses_encryption: false, # Most Flutter apps using standard HTTPS/auth are exempt
+        export_compliance_is_exempt: true, # Standard system encryption is exempt
+        export_compliance_contains_third_party_cryptography: false,
+        export_compliance_contains_proprietary_cryptography: false,
+        export_compliance_available_on_french_store: true
+      }
+    )
+    UI.message("Submitted to App Store for review.")
+
+    # Clean up keychain
+    delete_keychain(name: "signing_keychain")
+    UI.message("Keychain deleted after release.")
+  end
+
+  error do |lane, exception|
+    # Clean up keychain if there's an error
+    # Check if the keychain file actually exists before trying to delete
+    delete_keychain(name: "signing_keychain") if File.exist?(File.expand_path("~/Library/Keychains/signing_keychain-db"))
+    UI.message("Error occurred: #{exception.message}")
+  end
+end

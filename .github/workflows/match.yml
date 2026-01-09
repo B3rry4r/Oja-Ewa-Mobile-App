@@ -1,0 +1,52 @@
+name: Setup iOS Certificates with Match
+
+on:
+  workflow_dispatch: # Manual trigger only for security
+
+jobs:
+  setup-certificates:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.1'
+        bundler-cache: true
+
+    - name: Install Fastlane
+      run: gem install fastlane
+
+    - name: Setup Git credentials for Match
+      run: |
+        git config --global user.email "ci@github.com"
+        git config --global user.name "GitHub Actions"
+
+    - name: Create API key file
+      run: |
+        cd ios/fastlane
+        echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON }}" | base64 --decode > apikey.json
+        
+    - name: Run Match to create certificates
+      env:
+        MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
+        MATCH_STORAGE_MODE: git
+        MATCH_TYPE: appstore
+        MATCH_READONLY: false # Set to false to create new certificates
+        MATCH_SKIP_CONFIRMATION: true
+        MATCH_VERBOSE: true
+      run: |
+        cd ios/fastlane
+        fastlane match appstore --verbose
+        
+    - name: Clean up
+      if: always()
+      run: |
+        rm -f ios/fastlane/apikey.json
+        # Clean up any keychains created
+        security delete-keychain match_keychain || true
