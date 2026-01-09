@@ -1,5 +1,8 @@
 // sign_in_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import 'package:ojaewa/core/resources/app_assets.dart';
 
 import '../../../app/router/app_router.dart';
 
@@ -502,11 +505,10 @@ class _SignInScreenState extends State<SignInScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Placeholder until the Google logo asset is added.
-              const Icon(
-                Icons.g_mobiledata_rounded,
-                size: 24,
-                color: Color(0xFF1E2021),
+              SvgPicture.asset(
+                AppIcons.google,
+                width: 20,
+                height: 20,
               ),
               const SizedBox(width: 16),
               Text(

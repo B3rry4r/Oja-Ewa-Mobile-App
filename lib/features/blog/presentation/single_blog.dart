@@ -13,9 +13,9 @@ class BlogDetailScreen extends StatelessWidget {
           children: [
             // Top buttons
             Container(
-              height: 100,
+              height: 120,
               color: const Color(0xFF603814),
-              padding: const EdgeInsets.only(top: 32),
+              padding: const EdgeInsets.only(top: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -40,8 +40,8 @@ class BlogDetailScreen extends StatelessWidget {
                 children: [
                   // Image card
                   Container(
-                    width: 165,
-                    height: 140,
+                    width: 150,
+                    height: 100,
                     decoration: BoxDecoration(
                       color: const Color(0xFFD9D9D9),
                       borderRadius: BorderRadius.circular(8),

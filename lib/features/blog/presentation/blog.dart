@@ -191,9 +191,9 @@ class BlogScreen extends StatelessWidget {
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(vertical: 16.0),
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFCCCCCC)),
+          // border: Border.fromBorderSide(color: const Color(0xFFCCCCCC)),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(

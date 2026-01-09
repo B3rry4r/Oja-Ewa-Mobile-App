@@ -1,6 +1,8 @@
 // onboarding_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/core/resources/app_assets.dart';
+
 import '../../../app/router/app_router.dart';
 
 class OnboardingScreen extends StatelessWidget {
@@ -55,31 +57,11 @@ class OnboardingScreen extends StatelessWidget {
             bottomLeft: Radius.circular(25),
             bottomRight: Radius.circular(25),
           ),
-          child: Image.network(
-            'https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/b079d60f-eefd-485c-a04b-5025a84afaea',
+          child: Image.asset(
+            AppImages.onboarding,
             width: 375,
             height: 499,
             fit: BoxFit.cover,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Container(
-                width: 375,
-                height: 499,
-                color: const Color(0xFFFDAD40).withOpacity(0.1),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                width: 375,
-                height: 499,
-                color: const Color(0xFFFDAD40),
-                child: const Icon(
-                  Icons.spa_rounded,
-                  color: Colors.white,
-                  size: 100,
-                ),
-              );
-            },
           ),
         ),
         

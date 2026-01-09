@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import 'package:ojaewa/core/resources/app_assets.dart';
 
 class AppBottomNavBar extends StatelessWidget {
   const AppBottomNavBar({
@@ -28,32 +31,32 @@ class AppBottomNavBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _NavItem(
-                icon: Icons.home_filled,
+                iconAsset: AppIcons.home,
                 label: 'Home',
                 isActive: currentIndex == 0,
                 onTap: () => onTap(0),
               ),
               _NavItem(
-                icon: Icons.search,
+                iconAsset: AppIcons.search,
                 label: 'Search',
                 isActive: currentIndex == 1,
                 onTap: () => onTap(1),
               ),
               // Reserved for future tabs.
               _NavItem(
-                icon: Icons.favorite_border,
+                iconAsset: AppIcons.wishlist,
                 label: 'Wishlist',
                 isActive: currentIndex == 2,
                 onTap: () => onTap(2),
               ),
               _NavItem(
-                icon: Icons.article_outlined,
+                iconAsset: AppIcons.blog,
                 label: 'Blog',
                 isActive: currentIndex == 3,
                 onTap: () => onTap(3),
               ),
               _NavItem(
-                icon: Icons.person_outline,
+                iconAsset: AppIcons.account,
                 label: 'Account',
                 isActive: currentIndex == 4,
                 onTap: () => onTap(4),
@@ -68,13 +71,13 @@ class AppBottomNavBar extends StatelessWidget {
 
 class _NavItem extends StatelessWidget {
   const _NavItem({
-    required this.icon,
+    required this.iconAsset,
     required this.label,
     required this.isActive,
     required this.onTap,
   });
 
-  final IconData icon;
+  final String iconAsset;
   final String label;
   final bool isActive;
   final VoidCallback onTap;
@@ -90,7 +93,12 @@ class _NavItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 24, color: color),
+            SvgPicture.asset(
+              iconAsset,
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+            ),
             const SizedBox(height: 4),
             Text(
               label,

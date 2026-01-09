@@ -37,7 +37,7 @@ class HomeScreen extends StatelessWidget {
                       child: _buildHeroTitle(),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
 
                     // Category Grid Section with light background
                     Container(

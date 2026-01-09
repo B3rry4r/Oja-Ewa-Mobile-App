@@ -1,5 +1,8 @@
 // create_account_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import 'package:ojaewa/core/resources/app_assets.dart';
 
 import '../../../app/router/app_router.dart';
 
@@ -12,14 +15,18 @@ class CreateAccountScreen extends StatefulWidget {
 
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController(text: 'sanusimot@gmail.com');
-  final TextEditingController _phoneController = TextEditingController(text: '+234 816 765 4354');
+  final TextEditingController _emailController = TextEditingController(
+    text: 'sanusimot@gmail.com',
+  );
+  final TextEditingController _phoneController = TextEditingController(
+    text: '+234 816 765 4354',
+  );
   final TextEditingController _passwordController = TextEditingController();
-  
+
   bool _obscurePassword = true;
   bool _agreeToTerms = false;
-  
-  bool get _isFormValid => 
+
+  bool get _isFormValid =>
       _fullNameController.text.isNotEmpty &&
       _emailController.text.isNotEmpty &&
       _phoneController.text.isNotEmpty &&
@@ -46,7 +53,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       );
       return;
     }
-    
+
     // Handle account creation
     print('Creating account...');
     // Navigate to next screen (e.g., verification or home)
@@ -78,7 +85,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   child: _buildBackButton(),
                 ),
               ),
-              
+
               // Main Content Card
               _buildContentCard(),
             ],
@@ -100,10 +107,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color(0xFFDEDEDE),
-              width: 1,
-            ),
+            border: Border.all(color: const Color(0xFFDEDEDE), width: 1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: const Center(
@@ -134,12 +138,12 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 40),
-            
+
             // Welcome Icon
             _buildWelcomeIcon(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Title
             Text(
               'Create Account',
@@ -150,29 +154,29 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 color: const Color(0xFF3C230C), // #3c230c
               ),
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Full Name Input
             _buildFullNameInput(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Email Input
             _buildEmailInput(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Phone Number Input
             _buildPhoneInput(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Password Input
             _buildPasswordInput(),
-            
+
             const SizedBox(height: 8),
-            
+
             // Password Requirement Text
             Text(
               'Minimum of 8 characters',
@@ -183,32 +187,32 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 color: const Color(0xFF777F84), // #777f84
               ),
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Terms Agreement
             _buildTermsAgreement(),
-            
+
             const SizedBox(height: 40),
-            
+
             // Create Account Button
             _buildCreateAccountButton(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Divider with "or"
             _buildDivider(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Google Sign In Button
             _buildGoogleSignInButton(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Sign In Link
             _buildSignInLink(),
-            
+
             const SizedBox(height: 40),
           ],
         ),
@@ -279,9 +283,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Enter your full name',
-                      hintStyle: TextStyle(
-                        color: Color(0xFFCCCCCC),
-                      ),
+                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
                     ),
                   ),
                 ),
@@ -339,9 +341,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Enter your email',
-                      hintStyle: TextStyle(
-                        color: Color(0xFFCCCCCC),
-                      ),
+                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
                     ),
                   ),
                 ),
@@ -431,9 +431,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Phone number',
-                      hintStyle: TextStyle(
-                        color: Color(0xFFCCCCCC),
-                      ),
+                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
                     ),
                   ),
                 ),
@@ -463,11 +461,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           height: 49,
           decoration: BoxDecoration(
             border: Border.all(
-              color: _passwordController.text.isEmpty 
-                  ? const Color(0xFFCCCCCC) 
+              color: _passwordController.text.isEmpty
+                  ? const Color(0xFFCCCCCC)
                   : _passwordController.text.length >= 8
-                      ? const Color(0xFFFDAF40)
-                      : const Color(0xFFF44336),
+                  ? const Color(0xFFFDAF40)
+                  : const Color(0xFFF44336),
               width: 1.5,
             ),
             borderRadius: BorderRadius.circular(8),
@@ -495,9 +493,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Type your password',
-                      hintStyle: TextStyle(
-                        color: Color(0xFFCCCCCC),
-                      ),
+                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
                     ),
                   ),
                 ),
@@ -509,7 +505,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     });
                   },
                   icon: Icon(
-                    _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                    _obscurePassword
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
                     size: 20,
                     color: const Color(0xFF777F84),
                   ),
@@ -595,7 +593,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       width: double.infinity,
       height: 57,
       decoration: BoxDecoration(
-        color: _isFormValid ? const Color(0xFFFDAF40) : const Color(0xFFFDAF40).withOpacity(0.3),
+        color: _isFormValid
+            ? const Color(0xFFFDAF40)
+            : const Color(0xFFFDAF40).withOpacity(0.3),
         borderRadius: BorderRadius.circular(8),
         boxShadow: _isFormValid
             ? [
@@ -619,7 +619,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Campton',
-                color: _isFormValid ? const Color(0xFFFFFBF5) : const Color(0xFFFFFBF5).withOpacity(0.6),
+                color: _isFormValid
+                    ? const Color(0xFFFFFBF5)
+                    : const Color(0xFFFFFBF5).withOpacity(0.6),
               ),
             ),
           ),
@@ -631,12 +633,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   Widget _buildDivider() {
     return Row(
       children: [
-        Expanded(
-          child: Container(
-            height: 1,
-            color: const Color(0xFFB5B5B5),
-          ),
-        ),
+        Expanded(child: Container(height: 1, color: const Color(0xFFB5B5B5))),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
@@ -649,12 +646,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             ),
           ),
         ),
-        Expanded(
-          child: Container(
-            height: 1,
-            color: const Color(0xFFB5B5B5),
-          ),
-        ),
+        Expanded(child: Container(height: 1, color: const Color(0xFFB5B5B5))),
       ],
     );
   }
@@ -678,17 +670,10 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
+              SvgPicture.asset(
+                AppIcons.google,
                 width: 20,
                 height: 20,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Icon(
-                  Icons.g_mobiledata_rounded,
-                  size: 24,
-                  color: Color(0xFF1E2021),
-                ),
               ),
               const SizedBox(width: 12),
               Text(
@@ -746,4 +731,3 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     );
   }
 }
-
