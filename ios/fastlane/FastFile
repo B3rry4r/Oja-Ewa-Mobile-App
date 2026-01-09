@@ -90,7 +90,7 @@ platform :ios do
       clean: true,
       output_directory: "./build/ios/ipa/",
       # Let Xcode automatically select signing settings
-      codesign_identity: "Apple Distribution",
+      codesigning_identity: "Apple Distribution",
       skip_profile_detection: false
     )
     UI.message("iOS app built and signed.")
