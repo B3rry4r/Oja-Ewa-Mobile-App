@@ -19,7 +19,7 @@ platform :ios do
       timeout: 3600,
       lock_when_sleeps: false
     )
-    UI.message("Keychain 'signing_keychain' created and unlocked.")
+    UI.message("Keychain 'signing_keychain' created and unlocked with password from ENV.")
 
     # Load App Store Connect API key
     api_key = app_store_connect_api_key(
@@ -31,7 +31,7 @@ platform :ios do
     # Get certificates and provisioning profiles with Match
     match(
       type: "appstore",
-      keychain_name: Actions.lane_context[SharedValues::KEYCHAIN_PATH], 
+      keychain_name: "signing_keychain",
       keychain_password: ENV['MATCH_KEYCHAIN_PASSWORD'],
       readonly: true,
       app_identifier: "com.wawuafrica.ojaewa",
@@ -42,15 +42,21 @@ platform :ios do
       force_for_new_devices: true,
       clone_branch_directly: true
     )
-    UI.message("Match completed.")
+    UI.message("Match completed. Certificates and profiles should now be in keychain.")
 
-    # Get profile information from environment variables set by match
-    profile_uuid = ENV['sigh_com.wawuafrica.ojaewa_appstore']
-    certificate_name = ENV['sigh_com.wawuafrica.ojaewa_appstore_certificate-name']
-    UI.message("Profile UUID: #{profile_uuid}")
-    UI.message("Certificate: #{certificate_name}")
+    UI.message("Available provisioning profiles:")
+    UI.message(Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING])
+    profile_name = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"]
+    UI.message("Using profile: #{profile_name}")
 
-    # Increment build number
+    # Update project team
+    update_project_team(
+      path: "Runner.xcodeproj",
+      teamid: ENV['APPLE_TEAM_ID']
+    )
+    UI.message("Updated project team settings.")
+
+    # Increment build number automatically
     increment_build_number(
       build_number: latest_testflight_build_number(
         api_key: api_key,
@@ -58,15 +64,35 @@ platform :ios do
       ) + 1,
       xcodeproj: "Runner.xcodeproj"
     )
-    UI.message("Build number incremented.")
+    UI.message("Build number incremented to avoid TestFlight conflicts.")
 
-    # Build Flutter app WITHOUT signing
+    # Build Flutter app
     Dir.chdir("..") do
       sh("flutter", "build", "ios", "--release", "--no-codesign")
     end
-    UI.message("Flutter build completed.")
+    UI.message("Flutter build completed (no-codesign).")
 
-    # Build and sign - FORCE signing settings via xcargs
+    # Manually update Runner target settings via Xcodeproj gem
+    require 'xcodeproj'
+    project = Xcodeproj::Project.open("../Runner.xcodeproj")
+
+    project.targets.each do |target|
+      if target.name == "Runner"
+        target.build_configurations.each do |config|
+          if config.name == "Release"
+            config.build_settings["CODE_SIGN_STYLE"] = "Manual"
+            config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_name
+            config.build_settings["DEVELOPMENT_TEAM"] = ENV['APPLE_TEAM_ID']
+            config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "iPhone Distribution"
+          end
+        end
+      end
+    end
+
+    project.save
+    UI.message("Updated Runner target code signing settings, leaving Pods untouched.")
+
+    # Build and sign the iOS app
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
@@ -74,18 +100,20 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          "com.wawuafrica.ojaewa" => profile_uuid
+          "com.wawuafrica.ojaewa" => profile_name
         },
-        teamID: ENV['APPLE_TEAM_ID']
+        signingStyle: "manual",
+        teamID: ENV['APPLE_TEAM_ID'],
+        signingCertificate: "iPhone Distribution",
+        uploadBitcode: false,
+        uploadSymbols: true,
+        compileBitcode: false
       },
-      # Force signing settings via xcodebuild arguments
-      # Don't pass CODE_SIGN_IDENTITY - let Xcode auto-detect from profile
-      xcargs: "CODE_SIGN_STYLE=Manual " \
-              "DEVELOPMENT_TEAM=#{ENV['APPLE_TEAM_ID']} " \
-              "PROVISIONING_PROFILE_SPECIFIER=#{profile_uuid}",
-      clean: false,
+      clean: true,
+      verbose: true,
+      xcargs: "-allowProvisioningUpdates",
       output_directory: "./build/ios/ipa/",
-      skip_profile_detection: false
+      silent: false
     )
     UI.message("iOS app built and signed.")
 
@@ -103,94 +131,6 @@ platform :ios do
     # Clean up keychain
     delete_keychain(name: "signing_keychain")
     UI.message("Keychain deleted.")
-  end
-
-  desc "Deploy to App Store"
-  lane :release do
-    setup_ci
-
-    create_keychain(
-      name: "signing_keychain",
-      password: ENV['MATCH_KEYCHAIN_PASSWORD'],
-      default_keychain: true,
-      unlock: true,
-      timeout: 3600,
-      lock_when_sleeps: false
-    )
-
-    api_key = app_store_connect_api_key(
-      key_filepath: "fastlane/apikey.json"
-    )
-
-    match(
-      type: "appstore",
-      keychain_name: "signing_keychain",
-      keychain_password: ENV['MATCH_KEYCHAIN_PASSWORD'],
-      readonly: true,
-      app_identifier: "com.wawuafrica.ojaewa",
-      git_url: ENV['MATCH_GIT_URL'],
-      git_basic_authorization: Base64.strict_encode64("#{ENV['MATCH_GIT_TOKEN']}:x-oauth-basic"),
-      storage_mode: "git",
-      api_key: api_key,
-      force_for_new_devices: true,
-      clone_branch_directly: true
-    )
-
-    profile_uuid = ENV['sigh_com.wawuafrica.ojaewa_appstore']
-    certificate_name = ENV['sigh_com.wawuafrica.ojaewa_appstore_certificate-name']
-
-    increment_build_number(
-      build_number: latest_testflight_build_number(
-        api_key: api_key,
-        app_identifier: "com.wawuafrica.ojaewa"
-      ) + 1,
-      xcodeproj: "Runner.xcodeproj"
-    )
-
-    Dir.chdir("..") do
-      sh("flutter", "build", "ios", "--release", "--no-codesign")
-    end
-
-    build_app(
-      workspace: "Runner.xcworkspace",
-      scheme: "Runner",
-      configuration: "Release",
-      export_method: "app-store",
-      export_options: {
-        provisioningProfiles: {
-          "com.wawuafrica.ojaewa" => profile_uuid
-        },
-        teamID: ENV['APPLE_TEAM_ID']
-      },
-      xcargs: "CODE_SIGN_STYLE=Manual " \
-              "DEVELOPMENT_TEAM=#{ENV['APPLE_TEAM_ID']} " \
-              "PROVISIONING_PROFILE_SPECIFIER=#{profile_uuid}",
-      clean: false,
-      output_directory: "./build/ios/ipa/",
-      skip_profile_detection: false
-    )
-
-    deliver(
-      api_key: api_key,
-      submit_for_review: true,
-      automatic_release: true,
-      force: true,
-      skip_metadata: true,
-      skip_screenshots: true,
-      skip_binary_upload: false,
-      ipa: "./build/ios/ipa/Runner.ipa",
-      precheck_include_in_app_purchases: false,
-      run_precheck_before_submit: false,
-      submission_information: {
-        export_compliance_uses_encryption: false,
-        export_compliance_is_exempt: true,
-        export_compliance_contains_third_party_cryptography: false,
-        export_compliance_contains_proprietary_cryptography: false,
-        export_compliance_available_on_french_store: true
-      }
-    )
-
-    delete_keychain(name: "signing_keychain")
   end
 
   error do |lane, exception|
