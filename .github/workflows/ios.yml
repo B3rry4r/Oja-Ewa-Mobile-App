@@ -187,7 +187,7 @@ jobs:
         fi
 
         # Execute Fastlane with explicit platform
-        fastlane ios beta --api_key_path fastlane/apikey.json
+        fastlane ios beta
         # fastlane ios release
 
     # - name: Upload IPA artifact
