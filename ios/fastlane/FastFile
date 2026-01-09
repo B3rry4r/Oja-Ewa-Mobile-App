@@ -62,6 +62,25 @@ platform :ios do
     UI.message(Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING])
     profile_name = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"]
     UI.message("Using profile: #{profile_name}")
+    
+    # Get the actual profile UUID by reading the installed profile
+    UI.message("--- Looking for installed provisioning profile ---")
+    profile_path = Dir[File.expand_path("~/Library/MobileDevice/Provisioning Profiles/*.mobileprovision")].find do |path|
+      profile_content = File.read(path)
+      profile_content.include?("com.wawuafrica.ojaewa") && profile_content.include?("AppStore")
+    end
+    
+    if profile_path
+      # Extract UUID from filename (the filename IS the UUID)
+      profile_uuid = File.basename(profile_path, ".mobileprovision")
+      UI.message("Found profile at: #{profile_path}")
+      UI.message("Profile UUID: #{profile_uuid}")
+    else
+      # List all profiles for debugging
+      UI.message("All installed profiles:")
+      sh("ls -la ~/Library/MobileDevice/Provisioning\\ Profiles/")
+      UI.user_error!("Could not find provisioning profile for com.wawuafrica.ojaewa")
+    end
 
     # Assuming fastlane command is executed from the `ios/` directory in your GitHub Actions workflow.
     update_project_team(
@@ -116,9 +135,12 @@ platform :ios do
         target.build_configurations.each do |config|
           if config.name == "Release"
             config.build_settings["CODE_SIGN_STYLE"] = "Manual"
-            config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_name
+            # Use UUID instead of name for better reliability
+            config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_uuid
+            config.build_settings["PROVISIONING_PROFILE"] = profile_uuid
             config.build_settings["DEVELOPMENT_TEAM"] = ENV['APPLE_TEAM_ID']
-            config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "iPhone Distribution" # Must match certificate name
+            # Use "Apple Distribution" for modern Xcode
+            config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "Apple Distribution"
           end
         end
       end
@@ -135,18 +157,18 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          "com.wawuafrica.ojaewa" => profile_name
+          "com.wawuafrica.ojaewa" => profile_uuid  # Use UUID instead of name
         },
         signingStyle: "manual",
         teamID: ENV['APPLE_TEAM_ID'],
-        signingCertificate: "iPhone Distribution", # Must exactly match the certificate name in the keychain
+        # Use "Apple Distribution" for modern Xcode versions
+        signingCertificate: "Apple Distribution",
         uploadBitcode: false,
         uploadSymbols: true,
         compileBitcode: false
       },
       clean: true, # Clean build to avoid caching issues
       verbose: true, # Provides more detailed xcodebuild output
-      xcargs: "-allowProvisioningUpdates", # Useful, but ensure it doesn't conflict
       output_directory: "./build/ios/ipa/", # Relative to ios/fastlane/
       silent: false # Set to false to see more xcodebuild output in Fastlane logs
     )
@@ -205,9 +227,22 @@ platform :ios do
     )
     UI.message("Match completed for release lane.")
 
-    # Get the provisioning profile name for later use
+    # Get the provisioning profile name and UUID
     profile_name = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"]
     UI.message("Using profile for release: #{profile_name}")
+    
+    # Get UUID
+    profile_path = Dir[File.expand_path("~/Library/MobileDevice/Provisioning Profiles/*.mobileprovision")].find do |path|
+      profile_content = File.read(path)
+      profile_content.include?("com.wawuafrica.ojaewa") && profile_content.include?("AppStore")
+    end
+    
+    if profile_path
+      profile_uuid = File.basename(profile_path, ".mobileprovision")
+      UI.message("Profile UUID for release: #{profile_uuid}")
+    else
+      UI.user_error!("Could not find provisioning profile for com.wawuafrica.ojaewa")
+    end
 
     # Update project team
     update_project_team(
@@ -236,19 +271,16 @@ platform :ios do
     require 'xcodeproj'
     project = Xcodeproj::Project.open("../Runner.xcodeproj")
 
-    # Find the specific UUID/Name provided by match
-    profile_uuid = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"]
-
     project.targets.each do |target|
       if target.name == "Runner"
         target.build_configurations.each do |config|
           if config.name == "Release"
             config.build_settings["CODE_SIGN_STYLE"] = "Manual"
-            # Use the variable here
+            # Use UUID for both settings
             config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_uuid
             config.build_settings["PROVISIONING_PROFILE"] = profile_uuid 
             config.build_settings["DEVELOPMENT_TEAM"] = ENV['APPLE_TEAM_ID']
-            config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "iPhone Distribution"
+            config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "Apple Distribution"
           end
         end
       end
@@ -265,18 +297,17 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          "com.wawuafrica.ojaewa" => profile_name
+          "com.wawuafrica.ojaewa" => profile_uuid  # Use UUID
         },
         signingStyle: "manual",
         teamID: ENV['APPLE_TEAM_ID'],
-        signingCertificate: "iPhone Distribution",
+        signingCertificate: "Apple Distribution",
         uploadBitcode: false,
         uploadSymbols: true,
         compileBitcode: false
       },
       clean: true,
       verbose: true,
-      xcargs: "-allowProvisioningUpdates",
       output_directory: "./build/ios/ipa/",
       silent: false
     )
