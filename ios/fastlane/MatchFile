@@ -4,7 +4,7 @@ type("appstore")
 app_identifier("com.wawuafrica.ojaewa")
 
 # This is the key line
-api_key_path("./apikey.json")
+# api_key_path("./apikey.json")
 
 # Git auth
 git_basic_authorization(Base64.strict_encode64("#{ENV['MATCH_GIT_TOKEN']}:x-oauth-basic"))
