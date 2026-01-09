@@ -26,7 +26,7 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
             const SizedBox(height: 20),
             _buildProgressStepper(),
             const SizedBox(height: 32),
-            
+
             // About Business Header
             const Text(
               "About Business",
@@ -43,7 +43,7 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
             _buildInputField("Business Name", "Your City"),
             const SizedBox(height: 24),
             _buildInputField(
-              "Business Decription", 
+              "Business Decription",
               "Share Short description of your business",
               maxLines: 4,
               helperText: "100 characters required",
@@ -51,8 +51,12 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
             const SizedBox(height: 24),
             _buildDropdownField("Select Brand Category", "select"),
             const SizedBox(height: 24),
-            _buildInputField("Product  List", "List your services here", maxLines: 4),
-            
+            _buildInputField(
+              "Product  List",
+              "List your services here",
+              maxLines: 4,
+            ),
+
             const SizedBox(height: 32),
 
             // Upload Sections
@@ -79,19 +83,22 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
 
   Widget _buildProgressStepper() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _buildStep(Icons.check, "Basic\nInfo", true, isCompleted: true),
-        // connector removed (not part of final design)
-        const SizedBox(width: 8),
         _buildStep(null, "Business\nDetails", true, stepNum: "2"),
-        // connector removed (not part of final design)
-        const SizedBox(width: 8),
         _buildStep(null, "Account\non review", false, stepNum: "3"),
       ],
     );
   }
 
-  Widget _buildStep(IconData? icon, String label, bool isActive, {bool isCompleted = false, String? stepNum}) {
+  Widget _buildStep(
+    IconData? icon,
+    String label,
+    bool isActive, {
+    bool isCompleted = false,
+    String? stepNum,
+  }) {
     return Row(
       children: [
         Container(
@@ -102,13 +109,16 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
           ),
           child: Center(
-            child: icon != null 
-              ? Icon(icon, color: Colors.white, size: 16)
-              : Text(stepNum ?? "", style: TextStyle(
-                  color: isActive ? Colors.white : const Color(0xFF777F84),
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                )),
+            child: icon != null
+                ? Icon(icon, color: Colors.white, size: 16)
+                : Text(
+                    stepNum ?? "",
+                    style: TextStyle(
+                      color: isActive ? Colors.white : const Color(0xFF777F84),
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
           ),
         ),
         const SizedBox(width: 4),
@@ -126,18 +136,29 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInputField(String label, String hint, {int maxLines = 1, String? helperText}) {
+  Widget _buildInputField(
+    String label,
+    String hint, {
+    int maxLines = 1,
+    String? helperText,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+        Text(
+          label,
+          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+        ),
         const SizedBox(height: 8),
         TextField(
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Color(0xFFCCCCCC), fontSize: 16),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 16,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
@@ -152,9 +173,12 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
           const SizedBox(height: 4),
           Align(
             alignment: Alignment.centerRight,
-            child: Text(helperText, style: const TextStyle(color: Color(0xFF595F63), fontSize: 10)),
+            child: Text(
+              helperText,
+              style: const TextStyle(color: Color(0xFF595F63), fontSize: 10),
+            ),
           ),
-        ]
+        ],
       ],
     );
   }
@@ -163,7 +187,10 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+        Text(
+          label,
+          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+        ),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -174,7 +201,10 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(value, style: const TextStyle(color: Color(0xFFCCCCCC), fontSize: 16)),
+              Text(
+                value,
+                style: const TextStyle(color: Color(0xFFCCCCCC), fontSize: 16),
+              ),
               const Icon(Icons.keyboard_arrow_down, color: Color(0xFF777F84)),
             ],
           ),
@@ -183,11 +213,18 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildUploadCard({required String title, required String hintLeft, required String hintRight}) {
+  Widget _buildUploadCard({
+    required String title,
+    required String hintLeft,
+    required String hintRight,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+        Text(
+          title,
+          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+        ),
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
@@ -198,11 +235,19 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
           ),
           child: Column(
             children: [
-              const Icon(Icons.cloud_upload_outlined, color: Color(0xFF603814), size: 30),
+              const Icon(
+                Icons.cloud_upload_outlined,
+                color: Color(0xFF603814),
+                size: 30,
+              ),
               const SizedBox(height: 8),
               const Text(
                 "Browse Document",
-                style: TextStyle(fontSize: 16, color: Color(0xFF1E2021), fontWeight: FontWeight.w400),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFF1E2021),
+                  fontWeight: FontWeight.w400,
+                ),
               ),
               const SizedBox(height: 12),
               Padding(
@@ -210,8 +255,21 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(hintLeft, style: const TextStyle(color: Color(0xFF777F84), fontSize: 10)),
-                    Text(hintRight, textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFF777F84), fontSize: 10)),
+                    Text(
+                      hintLeft,
+                      style: const TextStyle(
+                        color: Color(0xFF777F84),
+                        fontSize: 10,
+                      ),
+                    ),
+                    Text(
+                      hintRight,
+                      textAlign: TextAlign.right,
+                      style: const TextStyle(
+                        color: Color(0xFF777F84),
+                        fontSize: 10,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -238,7 +296,7 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
               color: const Color(0xFFFDAF40).withOpacity(0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         child: const Center(

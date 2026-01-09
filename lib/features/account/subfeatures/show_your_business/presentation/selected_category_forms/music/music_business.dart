@@ -82,13 +82,10 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
 
   Widget _buildStepper() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _buildStep(Icons.check, "Basic\nInfo", true),
-        // connector removed (not part of final design)
-        const SizedBox(width: 8),
         _buildStep(null, "Business\nDetails", true, stepNum: "2"),
-        // connector removed (not part of final design)
-        const SizedBox(width: 8),
         _buildStep(null, "Account\non review", false, stepNum: "3"),
       ],
     );

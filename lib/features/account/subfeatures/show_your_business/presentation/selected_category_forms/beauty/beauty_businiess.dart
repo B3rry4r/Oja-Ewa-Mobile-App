@@ -93,13 +93,10 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
 
   Widget _buildStepperHeader() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _buildStep(Icons.check, "Basic\nInfo", true),
-        // connector removed (not part of final design)
-        const SizedBox(width: 8),
         _buildStep(null, "Business\nDetails", true, stepNumber: "2"),
-        // connector removed (not part of final design)
-        const SizedBox(width: 8),
         _buildStep(null, "Account\non review", false, stepNumber: "3"),
       ],
     );

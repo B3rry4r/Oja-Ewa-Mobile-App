@@ -270,7 +270,7 @@ class HomeScreen extends StatelessWidget {
           context: context,
           title: 'Market',
           color: const Color(0xFFDD995C),
-          icon: Icons.storefront_outlined,
+          iconAsset: AppIcons.market,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.market),
         ),
         // Beauty
@@ -278,7 +278,7 @@ class HomeScreen extends StatelessWidget {
           context: context,
           title: 'Beauty',
           color: const Color(0xFFA15E22),
-          icon: Icons.face_retouching_natural_outlined,
+          iconAsset: AppIcons.beauty,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.beauty),
         ),
         // Brands
@@ -286,7 +286,7 @@ class HomeScreen extends StatelessWidget {
           context: context,
           title: 'Brands',
           color: const Color(0xFFA15E22),
-          icon: Icons.branding_watermark_outlined,
+          iconAsset: AppIcons.brands,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.brands),
         ),
         // Music
@@ -294,7 +294,7 @@ class HomeScreen extends StatelessWidget {
           context: context,
           title: 'Music',
           color: const Color(0xFFEBC29D),
-          icon: Icons.music_note_outlined,
+          iconAsset: AppIcons.music,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.music),
         ),
         // Schools
@@ -302,7 +302,7 @@ class HomeScreen extends StatelessWidget {
           context: context,
           title: 'Schools',
           color: const Color(0xFFFECF8C),
-          icon: Icons.school_outlined,
+          iconAsset: AppIcons.schools,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.schools),
         ),
         // Sustainability
@@ -310,7 +310,7 @@ class HomeScreen extends StatelessWidget {
           context: context,
           title: 'Sustainability',
           color: const Color(0xFFA15E22),
-          icon: Icons.eco_outlined,
+          iconAsset: AppIcons.sustainability,
           onTap: () =>
               Navigator.of(context).pushNamed(AppRoutes.sustainability),
         ),
@@ -322,7 +322,7 @@ class HomeScreen extends StatelessWidget {
     required BuildContext context,
     required String title,
     required Color color,
-    required IconData icon,
+    required String iconAsset,
     required VoidCallback onTap,
   }) {
     return InkWell(
@@ -347,7 +347,15 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: Icon(icon, size: 80, color: Colors.white.withOpacity(0.9)),
+              child: SvgPicture.asset(
+                iconAsset,
+                width: 80,
+                height: 80,
+                colorFilter: ColorFilter.mode(
+                  Colors.white.withOpacity(0.9),
+                  BlendMode.srcIn,
+                ),
+              ),
             ),
             const SizedBox(height: 16),
           ],
