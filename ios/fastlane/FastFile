@@ -70,10 +70,12 @@ platform :ios do
       xcodeproj: "Runner.xcodeproj"
     )
 
+    # Flutter build - change to parent directory (project root)
     Dir.chdir("..") do
       sh("flutter", "build", "ios", "--release", "--no-codesign")
     end
 
+    # Modify Xcode project settings
     require 'xcodeproj'
     project = Xcodeproj::Project.open("Runner.xcodeproj")
 
