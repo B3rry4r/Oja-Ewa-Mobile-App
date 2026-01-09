@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 class MerchantProfileScreen extends StatelessWidget {
   const MerchantProfileScreen({super.key});
 
@@ -10,32 +12,11 @@ class MerchantProfileScreen extends StatelessWidget {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // 1. Fixed Header (Back button, Actions)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _IconBtn(
-                      icon: Icons.arrow_back,
-                      onTap: () {},
-                    ),
-                    Row(
-                      children: [
-                        _IconBtn(
-                          icon: Icons.search,
-                          onTap: () {},
-                        ),
-                        const SizedBox(width: 8),
-                        _IconBtn(
-                          icon: Icons.more_horiz,
-                          onTap: () {},
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+            // 1. Fixed Header
+            const SliverToBoxAdapter(
+              child: AppHeader(
+                backgroundColor: Color(0xFFFFF8F1),
+                iconColor: Color(0xFF241508),
               ),
             ),
 

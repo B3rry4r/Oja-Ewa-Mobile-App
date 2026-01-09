@@ -1,6 +1,8 @@
 // orders_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../../../../../app/router/app_router.dart';
 
 class OrdersScreen extends StatelessWidget {
@@ -13,44 +15,17 @@ class OrdersScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header with buttons and title
-            Container(
-              height: 104,
-              padding: const EdgeInsets.only(top: 32),
-              child: Stack(
-                children: [
-                  // Back button
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 16),
-                      child: _buildIconButton(Icons.arrow_back),
-                    ),
-                  ),
-
-                  // Title
-                  const Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Your Orders',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontFamily: 'Campton',
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF241508),
-                      ),
-                    ),
-                  ),
-
-                  // Right button
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: _buildIconButton(Icons.search),
-                    ),
-                  ),
-                ],
+            AppHeader(
+              backgroundColor: const Color(0xFFFFF8F1),
+              iconColor: const Color(0xFF241508),
+              title: const Text(
+                'Your Orders',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF241508),
+                ),
               ),
             ),
 

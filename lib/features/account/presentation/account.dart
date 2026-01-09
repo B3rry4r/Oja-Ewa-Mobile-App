@@ -31,6 +31,7 @@ class AccountScreen extends StatelessWidget {
                       children: [
                         HeaderIconButton(
                           asset: AppIcons.notificationSmall,
+                          iconColor: Colors.white,
                           onTap: () => Navigator.of(context).pushNamed(
                             AppRoutes.notifications,
                           ),
@@ -38,6 +39,7 @@ class AccountScreen extends StatelessWidget {
                         const SizedBox(width: 8),
                         HeaderIconButton(
                           asset: AppIcons.bag,
+                          iconColor: Colors.white,
                           onTap: () => Navigator.of(context).pushNamed(
                             AppRoutes.shoppingBag,
                           ),

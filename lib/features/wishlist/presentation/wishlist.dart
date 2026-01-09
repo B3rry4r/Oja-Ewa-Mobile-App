@@ -41,7 +41,6 @@ class WishlistScreen extends StatelessWidget {
             // Main Content
             Expanded(
               child: Container(
-                margin: const EdgeInsets.only(top: 10),
                 decoration: const BoxDecoration(
                   color: Color(0xFFFFF8F1), // #FFF8F1
                   borderRadius: BorderRadius.only(
@@ -59,29 +58,36 @@ class WishlistScreen extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
-   return Padding(
-     padding: const EdgeInsets.fromLTRB(16, 32, 16, 32),
-     child: Row(
-       mainAxisAlignment: MainAxisAlignment.end,
-       children: [
-         Row(
-           children: [
-             HeaderIconButton(
-               asset: AppIcons.notification,
-               onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
-               iconColor: Colors.white,
-             ),
-             const SizedBox(width: 16),
-             HeaderIconButton(
-               asset: AppIcons.bag,
-               onTap: () => Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
-               iconColor: Colors.white,
-             ),
-           ],
-         ),
-       ],
-     ),
-   );
+    return Container(
+      height: 104,
+      color: const Color(0xFF603814),
+      padding: const EdgeInsets.only(top: 32),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Row(
+              children: [
+                HeaderIconButton(
+                  asset: AppIcons.notification,
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.notifications),
+                  iconColor: Colors.white,
+                ),
+                const SizedBox(width: 16),
+                HeaderIconButton(
+                  asset: AppIcons.bag,
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
+                  iconColor: Colors.white,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildWishlistContent(BuildContext context) {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../../../app/router/app_router.dart';
 import '../subfeatures/product/product_listing.dart';
 import '../subfeatures/orders/orders.dart';
@@ -16,8 +18,10 @@ class ShopDashboardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 12),
-              _buildTopNavigation(),
+              const AppHeader(
+                backgroundColor: Color(0xFFFFF8F1),
+                iconColor: Color(0xFF241508),
+              ),
               const SizedBox(height: 24),
               const Text(
                 "Your Shop",
@@ -49,30 +53,6 @@ class ShopDashboardScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildTopNavigation() {
-    return Row(
-      children: [
-        _buildCircularButton(Icons.arrow_back_ios_new),
-        const Spacer(),
-        _buildCircularButton(Icons.notifications_none_outlined),
-        const SizedBox(width: 8),
-        _buildCircularButton(Icons.settings_outlined),
-      ],
-    );
-  }
-
-  Widget _buildCircularButton(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: Icon(icon, size: 20, color: Colors.black),
     );
   }
 

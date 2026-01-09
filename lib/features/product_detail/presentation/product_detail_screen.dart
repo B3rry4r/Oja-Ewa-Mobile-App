@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 class ProductDetailsScreen extends StatelessWidget {
   const ProductDetailsScreen({super.key});
 
@@ -15,7 +17,10 @@ class ProductDetailsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const _Header(),
+                const AppHeader(
+                  backgroundColor: Color(0xFFFFF8F1),
+                  iconColor: Color(0xFF241508),
+                ),
                 const SizedBox(height: 16),
                 const _HeroImageSection(),
                 const SizedBox(height: 16),
@@ -52,63 +57,6 @@ class ProductDetailsScreen extends StatelessWidget {
 // ---------------------------------------------------------------------------
 // 1. Header Section
 // ---------------------------------------------------------------------------
-
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // Back Button
-        _IconContainer(
-          icon: Icons.arrow_back,
-          onTap: () {},
-        ),
-        // Right Icons (Menu/Share)
-        Row(
-          children: [
-            _IconContainer(
-              icon: Icons.share_outlined,
-              onTap: () {},
-            ),
-            const SizedBox(width: 8),
-            _IconContainer(
-              icon: Icons.more_horiz,
-              onTap: () {},
-            ),
-          ],
-        )
-      ],
-    );
-  }
-}
-
-class _IconContainer extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _IconContainer({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.transparent, // IR shows transparent/white
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: const Color(0xFF1E2021), size: 20),
-        padding: EdgeInsets.zero,
-        onPressed: onTap,
-      ),
-    );
-  }
-}
 
 // ---------------------------------------------------------------------------
 // 2. Hero Image Section

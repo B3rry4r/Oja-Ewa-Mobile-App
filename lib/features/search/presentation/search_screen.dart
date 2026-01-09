@@ -66,21 +66,32 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+    return Container(
+      height: 104,
+      color: const Color(0xFF603814),
+      padding: const EdgeInsets.only(top: 32),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          HeaderIconButton(
-            asset: AppIcons.notification,
-            iconColor: Colors.white,
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
-          ),
-          const SizedBox(width: 16),
-          HeaderIconButton(
-            asset: AppIcons.bag,
-            iconColor: Colors.white,
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Row(
+              children: [
+                HeaderIconButton(
+                  asset: AppIcons.notification,
+                  iconColor: Colors.white,
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.notifications),
+                ),
+                const SizedBox(width: 16),
+                HeaderIconButton(
+                  asset: AppIcons.bag,
+                  iconColor: Colors.white,
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -89,7 +100,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildContent() {
     return Container(
-      margin: const EdgeInsets.only(top: 10),
       decoration: const BoxDecoration(
         color: Color(0xFFFFF8F1), // #fff8f1
         borderRadius: BorderRadius.only(

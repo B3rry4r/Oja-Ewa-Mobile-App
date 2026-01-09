@@ -80,11 +80,7 @@ class HomeScreen extends StatelessWidget {
           Row(
             children: [
               // Logo Mark
-              SvgPicture.asset(
-                AppImages.appLogoAlt,
-                width: 24,
-                height: 24,
-              ),
+              SvgPicture.asset(AppImages.appLogoAlt, width: 24, height: 24),
               const SizedBox(width: 8),
               // Brand Name
               const Row(
@@ -127,23 +123,21 @@ class HomeScreen extends StatelessWidget {
             children: [
               HeaderIconButton(
                 asset: AppIcons.shop,
-                onTap: () => Navigator.of(context).pushNamed(
-                  AppRoutes.yourShopDashboard,
-                ),
+                onTap: () => Navigator.of(
+                  context,
+                ).pushNamed(AppRoutes.yourShopDashboard),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 8),
               HeaderIconButton(
                 asset: AppIcons.notification,
-                onTap: () => Navigator.of(context).pushNamed(
-                  AppRoutes.notifications,
-                ),
+                onTap: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.notifications),
               ),
               const SizedBox(width: 8),
               HeaderIconButton(
                 asset: AppIcons.bag,
-                onTap: () => Navigator.of(context).pushNamed(
-                  AppRoutes.shoppingBag,
-                ),
+                onTap: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
               ),
             ],
           ),

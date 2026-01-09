@@ -17,6 +17,7 @@ class AppHeader extends StatelessWidget {
     required this.iconColor,
     this.showBack = true,
     this.onBack,
+    this.title,
     this.backgroundColor = const Color(0xFF603814),
     this.height = 104,
     this.topPadding = 32,
@@ -27,6 +28,7 @@ class AppHeader extends StatelessWidget {
   final bool showBack;
   final VoidCallback? onBack;
   final Color iconColor;
+  final Widget? title;
   final Color backgroundColor;
 
   final double height;
@@ -36,45 +38,56 @@ class AppHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final left = Padding(
+      padding: EdgeInsets.only(left: horizontalPadding),
+      child: showBack
+          ? HeaderIconButton(
+              asset: AppIcons.back,
+              iconColor: iconColor,
+              onTap: onBack ?? () => Navigator.of(context).maybePop(),
+            )
+          : const SizedBox(width: 40, height: 40),
+    );
+
+    final right = Padding(
+      padding: EdgeInsets.only(right: horizontalPadding),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          HeaderIconButton(
+            asset: AppIcons.notification,
+            iconColor: iconColor,
+            onTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.notifications,
+            ),
+          ),
+          SizedBox(width: gap),
+          HeaderIconButton(
+            asset: AppIcons.bag,
+            iconColor: iconColor,
+            onTap: () => Navigator.of(context).pushNamed(
+              AppRoutes.shoppingBag,
+            ),
+          ),
+        ],
+      ),
+    );
+
     return Container(
       height: height,
       color: backgroundColor,
       child: Padding(
         padding: EdgeInsets.only(top: topPadding),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Stack(
+          alignment: Alignment.center,
           children: [
-            Padding(
-              padding: EdgeInsets.only(left: horizontalPadding),
-              child: showBack
-                  ? HeaderIconButton(
-                      asset: AppIcons.back,
-                      iconColor: iconColor,
-                      onTap: onBack ?? () => Navigator.of(context).maybePop(),
-                    )
-                  : const SizedBox(width: 40, height: 40),
-            ),
-            Padding(
-              padding: EdgeInsets.only(right: horizontalPadding),
-              child: Row(
-                children: [
-                  HeaderIconButton(
-                    asset: AppIcons.notification,
-                    iconColor: iconColor,
-                    onTap: () => Navigator.of(context).pushNamed(
-                      AppRoutes.notifications,
-                    ),
-                  ),
-                  SizedBox(width: gap),
-                  HeaderIconButton(
-                    asset: AppIcons.bag,
-                    iconColor: iconColor,
-                    onTap: () => Navigator.of(context).pushNamed(
-                      AppRoutes.shoppingBag,
-                    ),
-                  ),
-                ],
-              ),
+            // Center title.
+            if (title != null) Center(child: title),
+
+            // Left + right controls.
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [left, right],
             ),
           ],
         ),

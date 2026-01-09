@@ -1,6 +1,8 @@
 // addresses_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../data/mock_addresses.dart';
 import '../domain/address.dart';
 import 'add_edit_address.dart';
@@ -18,8 +20,19 @@ class AddressesScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header
-            _buildHeader(context),
+            AppHeader(
+              backgroundColor: const Color(0xFFFFF8F1),
+              iconColor: const Color(0xFF241508),
+              title: const Text(
+                'Addresses',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF241508),
+                ),
+              ),
+            ),
 
             // Content
             Expanded(
@@ -64,39 +77,6 @@ class AddressesScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 36, 16, 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Back button
-          _buildIconButton(
-            Icons.arrow_back_ios_new_rounded,
-            onPressed: () => Navigator.of(context).maybePop(),
-          ),
-
-          // Title
-          const Text(
-            'Addresses',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
-              color: Color(0xFF241508),
-            ),
-          ),
-
-          // Close/menu button
-          _buildIconButton(
-            Icons.close_rounded,
-            onPressed: () => Navigator.of(context).maybePop(),
-          ),
-        ],
       ),
     );
   }
