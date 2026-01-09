@@ -75,9 +75,10 @@ platform :ios do
       sh("flutter", "build", "ios", "--release", "--no-codesign")
     end
 
-    # Modify Xcode project settings
+    # Modify Xcode project settings - get absolute path
     require 'xcodeproj'
-    project = Xcodeproj::Project.open("Runner.xcodeproj")
+    xcodeproj_path = File.expand_path("../Runner.xcodeproj", __dir__)
+    project = Xcodeproj::Project.open(xcodeproj_path)
 
     project.targets.each do |target|
       if target.name == "Runner"
