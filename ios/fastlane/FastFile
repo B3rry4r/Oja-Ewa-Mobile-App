@@ -40,7 +40,7 @@ platform :ios do
     # `MATCH_PASSWORD` ENV is used by match to decrypt the .p12 from your git repo
     match(
       type: "appstore",
-      keychain_name: "signing_keychain", # This ensures match uses the created keychain
+      keychain_name: Actions.lane_context[SharedValues::KEYCHAIN_PATH], 
       keychain_password: ENV['MATCH_KEYCHAIN_PASSWORD'], # This ensures match can interact with the keychain
       readonly: true, # Keep as true for now, assuming match repo is correct
       app_identifier: "com.wawuafrica.ojaewa",
@@ -236,12 +236,17 @@ platform :ios do
     require 'xcodeproj'
     project = Xcodeproj::Project.open("../Runner.xcodeproj")
 
+    # Find the specific UUID/Name provided by match
+    profile_uuid = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"]
+
     project.targets.each do |target|
       if target.name == "Runner"
         target.build_configurations.each do |config|
           if config.name == "Release"
             config.build_settings["CODE_SIGN_STYLE"] = "Manual"
-            config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_name
+            # Use the variable here
+            config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_uuid
+            config.build_settings["PROVISIONING_PROFILE"] = profile_uuid 
             config.build_settings["DEVELOPMENT_TEAM"] = ENV['APPLE_TEAM_ID']
             config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "iPhone Distribution"
           end
