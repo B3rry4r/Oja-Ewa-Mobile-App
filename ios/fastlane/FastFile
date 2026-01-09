@@ -19,7 +19,7 @@ platform :ios do
       timeout: 3600,
       lock_when_sleeps: false
     )
-    UI.message("Keychain 'signing_keychain' created and unlocked with password from ENV.")
+    UI.message("Keychain 'signing_keychain' created and unlocked.")
 
     # Load App Store Connect API key
     api_key = app_store_connect_api_key(
@@ -42,21 +42,35 @@ platform :ios do
       force_for_new_devices: true,
       clone_branch_directly: true
     )
-    UI.message("Match completed. Certificates and profiles should now be in keychain.")
+    UI.message("Match completed.")
 
-    UI.message("Available provisioning profiles:")
-    UI.message(Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING])
-    profile_name = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"]
-    UI.message("Using profile: #{profile_name}")
+    # Get profile info from match environment variables
+    profile_uuid = ENV['sigh_com.wawuafrica.ojaewa_appstore']
+    profile_path = ENV['sigh_com.wawuafrica.ojaewa_appstore_profile-path']
+    profile_name = ENV['sigh_com.wawuafrica.ojaewa_appstore_profile-name']
+    
+    UI.message("Profile UUID: #{profile_uuid}")
+    UI.message("Profile path: #{profile_path}")
+    UI.message("Profile name: #{profile_name}")
+
+    # CRITICAL: Copy profile to MobileDevice location where Xcode looks for it
+    if profile_path && File.exist?(profile_path)
+      sh("mkdir -p ~/Library/MobileDevice/Provisioning\\ Profiles")
+      mobile_device_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/#{profile_uuid}.mobileprovision")
+      sh("cp '#{profile_path}' '#{mobile_device_path}'")
+      UI.message("Copied profile to: #{mobile_device_path}")
+    else
+      UI.user_error!("Profile not found at: #{profile_path}")
+    end
 
     # Update project team
     update_project_team(
       path: "Runner.xcodeproj",
       teamid: ENV['APPLE_TEAM_ID']
     )
-    UI.message("Updated project team settings.")
+    UI.message("Updated project team.")
 
-    # Increment build number automatically
+    # Increment build number
     increment_build_number(
       build_number: latest_testflight_build_number(
         api_key: api_key,
@@ -64,15 +78,15 @@ platform :ios do
       ) + 1,
       xcodeproj: "Runner.xcodeproj"
     )
-    UI.message("Build number incremented to avoid TestFlight conflicts.")
+    UI.message("Build number incremented.")
 
     # Build Flutter app
     Dir.chdir("..") do
       sh("flutter", "build", "ios", "--release", "--no-codesign")
     end
-    UI.message("Flutter build completed (no-codesign).")
+    UI.message("Flutter build completed.")
 
-    # Manually update Runner target settings via Xcodeproj gem
+    # Update Runner target code signing settings
     require 'xcodeproj'
     project = Xcodeproj::Project.open("../Runner.xcodeproj")
 
@@ -90,7 +104,7 @@ platform :ios do
     end
 
     project.save
-    UI.message("Updated Runner target code signing settings, leaving Pods untouched.")
+    UI.message("Updated Runner target code signing settings.")
 
     # Build and sign the iOS app
     build_app(
