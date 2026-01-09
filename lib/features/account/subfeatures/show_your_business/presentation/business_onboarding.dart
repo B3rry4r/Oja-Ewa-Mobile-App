@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../../../../../app/router/app_router.dart';
 
 class BusinessOnboardingScreen extends StatelessWidget {
@@ -14,8 +16,19 @@ class BusinessOnboardingScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 28),
-              _buildHeader(),
+              const AppHeader(
+                backgroundColor: Color(0xFFFFF8F1),
+                iconColor: Color(0xFF241508),
+                title: Text(
+                  'Show',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF241508),
+                    fontFamily: 'Campton',
+                  ),
+                ),
+              ),
               const SizedBox(height: 40),
 
               // Hero Section
@@ -96,39 +109,6 @@ class BusinessOnboardingScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildIconBox(Icons.arrow_back_ios_new),
-          const Text(
-            "Show",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
-            ),
-          ),
-          _buildIconBox(Icons.close),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIconBox(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: Icon(icon, size: 20, color: const Color(0xFF241508)),
     );
   }
 

@@ -1,6 +1,8 @@
 // add_edit_address.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../domain/address.dart';
 
 class AddEditAddressScreen extends StatefulWidget {
@@ -59,37 +61,24 @@ class _AddEditAddressScreenState extends State<AddEditAddressScreen> {
           padding: const EdgeInsets.only(bottom: 40),
           child: Column(
             children: [
-              _buildHeader(context, title),
+              AppHeader(
+                backgroundColor: const Color(0xFFFFF8F1),
+                iconColor: const Color(0xFF241508),
+                title: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Campton',
+                    color: Color(0xFF241508),
+                  ),
+                ),
+              ),
               const SizedBox(height: 32),
               _buildFormFields(context, buttonText),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildIconButton(
-            icon: Icons.arrow_back_ios_new_rounded,
-            onPressed: () => Navigator.of(context).maybePop(),
-          ),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
-              color: Color(0xFF241508),
-            ),
-          ),
-          const SizedBox(width: 40),
-        ],
       ),
     );
   }
@@ -306,22 +295,6 @@ class _AddEditAddressScreenState extends State<AddEditAddressScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildIconButton({required IconData icon, required VoidCallback onPressed}) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 20),
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
       ),
     );
   }

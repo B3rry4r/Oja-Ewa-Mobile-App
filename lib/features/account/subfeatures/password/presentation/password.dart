@@ -1,6 +1,8 @@
 // change_password_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 class ChangePasswordScreen extends StatelessWidget {
   const ChangePasswordScreen({super.key});
 
@@ -12,8 +14,19 @@ class ChangePasswordScreen extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Header
-              _buildHeader(),
+              const AppHeader(
+                backgroundColor: Color(0xFFFFF8F1),
+                iconColor: Color(0xFF241508),
+                title: Text(
+                  'Change Password',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Campton',
+                    color: Color(0xFF241508),
+                  ),
+                ),
+              ),
 
               // Content
               Padding(
@@ -58,33 +71,6 @@ class ChangePasswordScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Back button
-          _buildIconButton(Icons.arrow_back_ios_new_rounded),
-
-          // Title
-          const Text(
-            'Change Password',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
-              color: Color(0xFF241508),
-            ),
-          ),
-
-          // Close button
-          _buildIconButton(Icons.close_rounded),
-        ],
       ),
     );
   }
@@ -195,22 +181,6 @@ class ChangePasswordScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildIconButton(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 20),
-        onPressed: () {},
-        padding: EdgeInsets.zero,
       ),
     );
   }

@@ -1,6 +1,8 @@
 // tracking_order_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 class TrackingOrderScreen extends StatelessWidget {
   const TrackingOrderScreen({super.key});
 
@@ -12,8 +14,19 @@ class TrackingOrderScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with buttons
-            _buildHeader(),
+            const AppHeader(
+              backgroundColor: Color(0xFFFFF8F1),
+              iconColor: Color(0xFF241508),
+              title: Text(
+                'Track Order',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Campton',
+                  color: Color(0xFF241508),
+                ),
+              ),
+            ),
 
             // Order ID
             Padding(
@@ -60,33 +73,6 @@ class TrackingOrderScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Back button
-          _buildIconButton(Icons.arrow_back_ios_new_rounded),
-
-          // Title
-          const Text(
-            'Track Order',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
-              color: Color(0xFF241508),
-            ),
-          ),
-
-          // Close button
-          _buildIconButton(Icons.close_rounded),
-        ],
       ),
     );
   }
@@ -303,22 +289,6 @@ class TrackingOrderScreen extends StatelessWidget {
           Container(width: 1, height: 26, color: const Color(0xFFD9D9D9)),
           const SizedBox(width: 29), // Space to align with next dot
         ],
-      ),
-    );
-  }
-
-  Widget _buildIconButton(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 20),
-        onPressed: () {},
-        padding: EdgeInsets.zero,
       ),
     );
   }

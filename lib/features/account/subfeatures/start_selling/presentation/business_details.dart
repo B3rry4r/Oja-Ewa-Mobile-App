@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../../../../../app/router/app_router.dart';
 class BusinessDetailsScreen extends StatelessWidget {
   const BusinessDetailsScreen({super.key});
@@ -8,64 +10,63 @@ class BusinessDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Background from IR
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16, top: 10),
-          child: _IconButton(icon: Icons.arrow_back_ios_new),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16, top: 10),
-            child: _IconButton(icon: Icons.close),
-          ),
-        ],
-      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20),
-            _buildStepper(), // Row-based stepper
-            const SizedBox(height: 32),
-
-            // --- About Business Section ---
-            _buildSectionHeader("About Business"),
-            const SizedBox(height: 16),
-            _buildTextInput("Business Name", "Your City"), // Hint from IR data
-            const SizedBox(height: 20),
-            _buildTextInput("Business Registration Number", "Your City"),
-
-            const SizedBox(height: 32),
-            _buildFileUploadSection(
-              label: "Business Certificate",
-              subtext1: "High resolution image\nPDF, JPG, PNG formats",
-              subtext2: "200 x 200px\n20kb max",
+            const AppHeader(
+              backgroundColor: Color(0xFFFFF8F1),
+              iconColor: Color(0xFF241508),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  _buildStepper(), // Row-based stepper
+                  const SizedBox(height: 32),
 
-            const SizedBox(height: 32),
-            _buildFileUploadSection(
-              label: "Business Logo",
-              subtext1: "High resolution image\nPNG format",
-              subtext2: "200 x 200px\nMust be in Black", // Specific requirement
+                  // --- About Business Section ---
+                  _buildSectionHeader("About Business"),
+                  const SizedBox(height: 16),
+                  _buildTextInput("Business Name", "Your City"), // Hint from IR data
+                  const SizedBox(height: 20),
+                  _buildTextInput(
+                    "Business Registration Number",
+                    "Your City",
+                  ),
+
+                  const SizedBox(height: 32),
+                  _buildFileUploadSection(
+                    label: "Business Certificate",
+                    subtext1: "High resolution image\nPDF, JPG, PNG formats",
+                    subtext2: "200 x 200px\n20kb max",
+                  ),
+
+                  const SizedBox(height: 32),
+                  _buildFileUploadSection(
+                    label: "Business Logo",
+                    subtext1: "High resolution image\nPNG format",
+                    subtext2: "200 x 200px\nMust be in Black", // Specific requirement
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // --- Account Details Section ---
+                  _buildSectionHeader("Account Details"),
+                  const SizedBox(height: 16),
+                  _buildTextInput("Bank Name", "Your Bank"),
+                  const SizedBox(height: 20),
+                  _buildTextInput("Account Number", "Your Account Number"),
+
+                  const SizedBox(height: 48),
+
+                  // --- Primary Action Button ---
+                  _buildPaymentButton(context),
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
-
-            const SizedBox(height: 40),
-
-            // --- Account Details Section ---
-            _buildSectionHeader("Account Details"),
-            const SizedBox(height: 16),
-            _buildTextInput("Bank Name", "Your Bank"),
-            const SizedBox(height: 20),
-            _buildTextInput("Account Number", "Your Account Number"),
-
-            const SizedBox(height: 48),
-
-            // --- Primary Action Button ---
-            _buildPaymentButton(context),
-            const SizedBox(height: 40),
           ],
         ),
       ),
@@ -264,24 +265,6 @@ class BusinessDetailsScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _IconButton extends StatelessWidget {
-  final IconData icon;
-  const _IconButton({required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: Icon(icon, size: 18, color: Colors.black),
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../../../../../app/router/app_router.dart';
 
 class SellerRegistrationScreen extends StatelessWidget {
@@ -9,76 +11,70 @@ class SellerRegistrationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Main background from IR
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 15, top: 10),
-          child: _IconButton(
-            icon: Icons.arrow_back_ios_new,
-            onTap: () => Navigator.of(context).maybePop(),
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 15, top: 10),
-            child: _IconButton(
-              icon: Icons.close,
-              onTap: () => Navigator.of(context).maybePop(),
-            ),
-          ),
-        ],
-      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20),
-            _buildStepper(),
-            const SizedBox(height: 32),
-            
-            // --- Location Section ---
-            _buildSectionHeader("Location"),
-            const SizedBox(height: 16),
-            _buildDropdownInput("Country", "Nigeria"),
-            const SizedBox(height: 20),
-            _buildDropdownInput("State", "FCT"),
-            const SizedBox(height: 20),
-            _buildTextInput("City", "Your City"),
-            const SizedBox(height: 20),
-            _buildTextInput("Address Line", "Street, house number etc"),
-            
-            const SizedBox(height: 40),
-            
-            // --- Contacts Section ---
-            _buildSectionHeader("Contacts"),
-            const SizedBox(height: 16),
-            _buildTextInput("Business Email", "sanusimot@gmail.com"),
-            const SizedBox(height: 20),
-            _buildPhoneInput("Business Phone Number", "+234", "8167654354"),
-            
-            const SizedBox(height: 40),
-            
-            // --- Social handles Section ---
-            _buildSectionHeader("Social handles"),
-            const SizedBox(height: 16),
-            _buildTextInput("Instagram", "Your Instagram URL"),
-            const SizedBox(height: 20),
-            _buildTextInput("Facebook", "Your Facebook URL"),
-            
-            const SizedBox(height: 40),
-            
-            // --- Means Identification Section ---
-            _buildSectionHeader("Means Identification"),
-            const SizedBox(height: 16),
-            _buildFileUploadSection(),
-            
-            const SizedBox(height: 40),
-            
-            // --- Save Button ---
-            _buildSubmitButton(context),
-            const SizedBox(height: 40),
+            const AppHeader(
+              backgroundColor: Color(0xFFFFF8F1),
+              iconColor: Color(0xFF241508),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  _buildStepper(),
+                  const SizedBox(height: 32),
+
+                  // --- Location Section ---
+                  _buildSectionHeader("Location"),
+                  const SizedBox(height: 16),
+                  _buildDropdownInput("Country", "Nigeria"),
+                  const SizedBox(height: 20),
+                  _buildDropdownInput("State", "FCT"),
+                  const SizedBox(height: 20),
+                  _buildTextInput("City", "Your City"),
+                  const SizedBox(height: 20),
+                  _buildTextInput("Address Line", "Street, house number etc"),
+
+                  const SizedBox(height: 40),
+
+                  // --- Contacts Section ---
+                  _buildSectionHeader("Contacts"),
+                  const SizedBox(height: 16),
+                  _buildTextInput("Business Email", "sanusimot@gmail.com"),
+                  const SizedBox(height: 20),
+                  _buildPhoneInput(
+                    "Business Phone Number",
+                    "+234",
+                    "8167654354",
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // --- Social handles Section ---
+                  _buildSectionHeader("Social handles"),
+                  const SizedBox(height: 16),
+                  _buildTextInput("Instagram", "Your Instagram URL"),
+                  const SizedBox(height: 20),
+                  _buildTextInput("Facebook", "Your Facebook URL"),
+
+                  const SizedBox(height: 40),
+
+                  // --- Means Identification Section ---
+                  _buildSectionHeader("Means Identification"),
+                  const SizedBox(height: 16),
+                  _buildFileUploadSection(),
+
+                  const SizedBox(height: 40),
+
+                  // --- Save Button ---
+                  _buildSubmitButton(context),
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -279,30 +275,6 @@ class SellerRegistrationScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-// Custom Icon Button helper for top navigation
-class _IconButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback? onTap;
-  const _IconButton({required this.icon, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFDEDEDE)),
-        ),
-        child: Icon(icon, size: 18, color: Colors.black),
       ),
     );
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../../../../../app/router/app_router.dart';
 class AccountReviewScreen extends StatelessWidget {
   const AccountReviewScreen({super.key});
@@ -8,66 +10,55 @@ class AccountReviewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Background from IR
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16, top: 10),
-          child: _IconButton(
-            icon: Icons.arrow_back_ios_new,
-            onTap: () => Navigator.of(context).maybePop(),
+      body: Column(
+        children: [
+          const AppHeader(
+            backgroundColor: Color(0xFFFFF8F1),
+            iconColor: Color(0xFF241508),
           ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16, top: 10),
-            child: _IconButton(
-              icon: Icons.close,
-              onTap: () => Navigator.of(context).maybePop(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  _buildStepper(), // Row-based stepper showing all steps complete
+
+                  const Spacer(flex: 2),
+
+                  // Success/Review Illustration Placeholder
+                  const Icon(
+                    Icons.access_time_filled_rounded,
+                    size: 80,
+                    color: Color(0xFFFDAF40),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Status Message
+                  const Text(
+                    "We are reviewing your application\nThis takes 12-24 hours.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF000000),
+                      height: 1.5,
+                    ),
+                  ),
+
+                  const Spacer(flex: 3),
+
+                  // --- Primary Action Button ---
+                  _buildGoHomeButton(context),
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
           ),
         ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            _buildStepper(), // Row-based stepper showing all steps complete
-            
-            const Spacer(flex: 2),
-            
-            // Success/Review Illustration Placeholder
-            // Based on the 'Asset' at top 980 in IR, representing a visual footer or central graphic
-            const Icon(
-              Icons.access_time_filled_rounded,
-              size: 80,
-              color: Color(0xFFFDAF40),
-            ),
-            
-            const SizedBox(height: 32),
-            
-            // Status Message
-            const Text(
-              "We are reviewing your application\nThis takes 12-24 hours.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w400,
-                color: Color(0xFF000000),
-                height: 1.5,
-              ),
-            ),
-            
-            const Spacer(flex: 3),
-            
-            // --- Primary Action Button ---
-            _buildGoHomeButton(context),
-            const SizedBox(height: 40),
-          ],
-        ),
       ),
     );
   }
@@ -151,29 +142,6 @@ class AccountReviewScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _IconButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback? onTap;
-  const _IconButton({required this.icon, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFDEDEDE)),
-        ),
-        child: Icon(icon, size: 18, color: Colors.black),
       ),
     );
   }

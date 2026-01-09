@@ -1,6 +1,8 @@
 // write_review_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 class WriteReviewScreen extends StatelessWidget {
   const WriteReviewScreen({super.key});
 
@@ -11,8 +13,7 @@ class WriteReviewScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header with buttons
-            _buildHeader(),
+            const AppHeader(iconColor: Colors.white),
 
             // Main content card (rounded top corners)
             Expanded(
@@ -89,25 +90,6 @@ class WriteReviewScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Back button
-          _buildIconButton(Icons.arrow_back_ios_new_rounded),
-
-          // There's actually a third button in the middle according to IR
-          _buildIconButton(Icons.more_vert_rounded),
-
-          // Close button
-          _buildIconButton(Icons.close_rounded),
-        ],
       ),
     );
   }
@@ -247,22 +229,6 @@ class WriteReviewScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildIconButton(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 20),
-        onPressed: () {},
-        padding: EdgeInsets.zero,
       ),
     );
   }

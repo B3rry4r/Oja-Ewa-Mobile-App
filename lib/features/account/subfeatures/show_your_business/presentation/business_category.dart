@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../../../../../app/router/app_router.dart';
 
 class BusinessCategoryScreen extends StatefulWidget {
@@ -43,8 +45,10 @@ class _BusinessCategoryScreenState extends State<BusinessCategoryScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 28),
-              _buildHeader(),
+              const AppHeader(
+                backgroundColor: Color(0xFFFFF8F1),
+                iconColor: Color(0xFF241508),
+              ),
               const SizedBox(height: 32),
               
               // Screen Title
@@ -87,28 +91,6 @@ class _BusinessCategoryScreenState extends State<BusinessCategoryScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildIconBox(Icons.arrow_back_ios_new),
-        _buildIconBox(Icons.close),
-      ],
-    );
-  }
-
-  Widget _buildIconBox(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: Icon(icon, size: 20, color: const Color(0xFF241508)),
     );
   }
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../../../../../app/router/app_router.dart';
 
 class BusinessSettingsScreen extends StatelessWidget {
@@ -14,7 +16,10 @@ class BusinessSettingsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(context),
+              const AppHeader(
+                backgroundColor: Color(0xFFFFF8F1),
+                iconColor: Color(0xFF241508),
+              ),
               const SizedBox(height: 18),
               _buildTitleAndAddButton(context),
               const SizedBox(height: 16),
@@ -22,29 +27,6 @@ class BusinessSettingsScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  /// Top Navigation Bar with circular-style buttons
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _IconButton(
-            icon: Icons.arrow_back_ios_new,
-            onTap: () => Navigator.of(context).maybePop(),
-          ),
-          Row(
-            children: [
-              _IconButton(icon: Icons.search, onTap: () {}),
-              const SizedBox(width: 4),
-              _IconButton(icon: Icons.notifications_none, onTap: () {}),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -209,31 +191,6 @@ class BusinessSettingsScreen extends StatelessWidget {
         ),
       ),
       onTap: onTap,
-    );
-  }
-}
-
-/// Reusable icon button component for the header
-class _IconButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _IconButton({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFDEDEDE)),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(icon, size: 20, color: const Color(0xFF1E2021)),
-      ),
     );
   }
 }

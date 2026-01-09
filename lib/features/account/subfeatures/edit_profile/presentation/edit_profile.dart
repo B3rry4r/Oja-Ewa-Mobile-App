@@ -1,6 +1,8 @@
 // edit_profile_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 class EditProfileScreen extends StatelessWidget {
   const EditProfileScreen({super.key});
 
@@ -29,44 +31,17 @@ class EditProfileScreen extends StatelessWidget {
             // Main content
             Column(
               children: [
-                // Header with buttons and title
-                Container(
-                  height: 104,
-                  padding: const EdgeInsets.only(top: 32),
-                  child: Stack(
-                    children: [
-                      // Back button
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 16),
-                          child: _buildIconButton(Icons.arrow_back),
-                        ),
-                      ),
-                      
-                      // Title
-                      const Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Edit Profile',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontFamily: 'Campton',
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF241508),
-                          ),
-                        ),
-                      ),
-                      
-                      // Right button
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 16),
-                          child: _buildIconButton(Icons.more_vert),
-                        ),
-                      ),
-                    ],
+                const AppHeader(
+                  backgroundColor: Color(0xFFFFF8F1),
+                  iconColor: Color(0xFF241508),
+                  title: Text(
+                    'Edit Profile',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF241508),
+                    ),
                   ),
                 ),
                 
@@ -110,22 +85,6 @@ class EditProfileScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildIconButton(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 20),
-        onPressed: () {},
-        padding: EdgeInsets.zero,
       ),
     );
   }

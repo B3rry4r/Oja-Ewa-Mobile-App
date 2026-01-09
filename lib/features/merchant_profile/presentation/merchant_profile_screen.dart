@@ -150,30 +150,30 @@ class MerchantProfileScreen extends StatelessWidget {
 // Helper Widgets
 // ---------------------------------------------------------------------------
 
-class _IconBtn extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
+// class _IconBtn extends StatelessWidget {
+//   final IconData icon;
+//   final VoidCallback onTap;
 
-  const _IconBtn({required this.icon, required this.onTap});
+//   const _IconBtn({required this.icon, required this.onTap});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-        color: Colors.transparent,
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: const Color(0xFF1E2021), size: 20),
-        padding: EdgeInsets.zero,
-        onPressed: onTap,
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       width: 40,
+//       height: 40,
+//       decoration: BoxDecoration(
+//         borderRadius: BorderRadius.circular(8),
+//         border: Border.all(color: const Color(0xFFDEDEDE)),
+//         color: Colors.transparent,
+//       ),
+//       child: IconButton(
+//         icon: Icon(icon, color: const Color(0xFF1E2021), size: 20),
+//         padding: EdgeInsets.zero,
+//         onPressed: onTap,
+//       ),
+//     );
+//   }
+// }
 
 class _StatItem extends StatelessWidget {
   final String label;

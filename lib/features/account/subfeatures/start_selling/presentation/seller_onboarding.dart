@@ -1,6 +1,8 @@
 // seller_onboarding_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../../../../../app/router/app_router.dart';
 
 class SellerOnboardingScreen extends StatelessWidget {
@@ -15,8 +17,10 @@ class SellerOnboardingScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              _buildHeader(),
+              const AppHeader(
+                backgroundColor: Color(0xFFFFF8F1),
+                iconColor: Color(0xFF241508),
+              ),
               
               // Main content
               Padding(
@@ -71,24 +75,6 @@ class SellerOnboardingScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Back button
-          _buildIconButton(Icons.arrow_back_ios_new_rounded),
-          
-          // Empty container for spacing (no title in header)
-          const SizedBox(width: 40),
-          
-          // Close button
-          _buildIconButton(Icons.close_rounded),
-        ],
-      ),
-    );
-  }
 
   Widget _buildHowItWorksSection() {
     const List<HowItWorksStep> steps = [
@@ -235,25 +221,6 @@ class SellerOnboardingScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildIconButton(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: IconButton(
-        icon: Icon(
-          icon,
-          size: 20,
-        ),
-        onPressed: () {},
-        padding: EdgeInsets.zero,
       ),
     );
   }

@@ -328,20 +328,4 @@ class AddressesScreen extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildIconButton(IconData icon, {required VoidCallback onPressed}) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 20),
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
-      ),
-    );
-  }
 }
