@@ -50,8 +50,9 @@ flutter:
   uses-material-design: true
 
   assets:
-    - ir_files/
+    - assets/
     - assets/fonts/
+    - assets/app_icon/
 
   fonts:
     - family: Campton

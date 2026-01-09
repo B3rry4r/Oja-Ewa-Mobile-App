@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../../app/router/app_router.dart';
 
@@ -76,36 +77,8 @@ class HomeScreen extends StatelessWidget {
           Row(
             children: [
               // Logo Mark (stacked lines)
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 16,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF603814),
-                      borderRadius: BorderRadius.circular(1),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    width: 16,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF603814),
-                      borderRadius: BorderRadius.circular(1),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    width: 7,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFDAF40),
-                      borderRadius: BorderRadius.circular(1),
-                    ),
-                  ),
-                ],
+              SvgPicture.asset('asset/app_icon/app_logo.svg',
+              width: 16,
               ),
               const SizedBox(width: 8),
               // Brand Name
