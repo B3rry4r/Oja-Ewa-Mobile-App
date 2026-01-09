@@ -45,16 +45,18 @@ platform :ios do
     )
 
     # -----------------------------
-    # Get the provisioning profile UUID from match
+    # Get profile UUID from the installed profile
     # -----------------------------
-    profile_env_name = "sigh_com.wawuafrica.ojaewa_appstore_profile-path"
-    profile_path = ENV[profile_env_name]
+    profile_path = ENV["sigh_com.wawuafrica.ojaewa_appstore_profile-path"]
+    UI.message("Profile path: #{profile_path}")
     
-    if profile_path.nil? || profile_path.empty?
-      UI.user_error!("Could not find provisioning profile path in environment")
-    end
+    # Extract UUID from the profile
+    require 'plist'
+    profile_plist = Plist.parse_xml(`security cms -D -i "#{profile_path}"`)
+    profile_uuid = profile_plist["UUID"]
     
-    UI.message("Provisioning profile path: #{profile_path}")
+    UI.message("Profile UUID: #{profile_uuid}")
+    UI.message("Profile Name: #{profile_plist['Name']}")
 
     # -----------------------------
     # SET TEAM ID AND PROFILE IN PROJECT
@@ -64,7 +66,7 @@ platform :ios do
       path: "Runner.xcodeproj",
       team_id: ENV["APPLE_TEAM_ID"],
       bundle_identifier: "com.wawuafrica.ojaewa",
-      profile_uuid: lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"],
+      profile_uuid: profile_uuid,
       code_sign_identity: "iPhone Distribution",
       build_configurations: ["Release"]
     )
@@ -96,7 +98,7 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          "com.wawuafrica.ojaewa" => "match AppStore com.wawuafrica.ojaewa"
+          "com.wawuafrica.ojaewa" => profile_uuid
         }
       },
       clean: true
