@@ -351,10 +351,6 @@ class HomeScreen extends StatelessWidget {
                 iconAsset,
                 width: 80,
                 height: 80,
-                colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.9),
-                  BlendMode.srcIn,
-                ),
               ),
             ),
             const SizedBox(height: 16),

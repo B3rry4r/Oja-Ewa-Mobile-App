@@ -1,6 +1,9 @@
 // category_screen.dart
 import 'package:flutter/material.dart';
-import 'package:ojaewa/features/home/presentation/widgets/filter_sheet.dart';
+
+import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/filter_sheet.dart';
 
 typedef CategoryItemTap = void Function(CategorySection section, String item);
 
@@ -138,58 +141,29 @@ class _CategoryScreenState extends State<CategoryScreen> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 32, 16, 32),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Back Button (left)
-          _buildHeaderButton(
-            icon: Icons.arrow_back_ios_new_rounded,
-            onPressed: _onBackPressed,
+          HeaderIconButton(
+            asset: AppIcons.back,
+            iconColor: Colors.white,
+            onTap: _onBackPressed,
           ),
-
-          const Spacer(),
-
-          // Right-side actions grouped together
           Row(
             children: [
-              _buildHeaderButton(
-                icon: Icons.tune_rounded,
-                onPressed: _onFilterPressed,
+              HeaderIconButton(
+                asset: AppIcons.filter,
+                iconColor: Colors.white,
+                onTap: _onFilterPressed,
               ),
               const SizedBox(width: 16),
-              _buildHeaderButton(
-                icon: Icons.settings_outlined,
-                onPressed: _onSettingsPressed,
+              HeaderIconButton(
+                asset: AppIcons.sort,
+                iconColor: Colors.white,
+                onTap: _onSettingsPressed,
               ),
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildHeaderButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return SizedBox(
-      width: 40,
-      height: 40,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: onPressed,
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFDEDEDE)),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              icon,
-              size: 20,
-              color: Colors.white,
-            ),
-          ),
-        ),
       ),
     );
   }

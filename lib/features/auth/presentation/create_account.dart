@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
 import '../../../app/router/app_router.dart';
@@ -96,29 +97,10 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   }
 
   Widget _buildBackButton() {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: () {
-          Navigator.pop(context);
-        },
-        child: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFDEDEDE), width: 1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Center(
-            child: Icon(
-              Icons.arrow_back_ios_new_rounded,
-              size: 20,
-              color: Color(0xFF1E2021),
-            ),
-          ),
-        ),
-      ),
+    return HeaderIconButton(
+      asset: AppIcons.back,
+      iconColor: Colors.white,
+      onTap: () => Navigator.of(context).maybePop(),
     );
   }
 
