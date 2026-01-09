@@ -45,18 +45,28 @@ platform :ios do
     )
 
     # -----------------------------
-    # Get profile UUID from the installed profile
+    # Get profile and team info from the installed profile
     # -----------------------------
     profile_path = ENV["sigh_com.wawuafrica.ojaewa_appstore_profile-path"]
     UI.message("Profile path: #{profile_path}")
     
-    # Extract UUID from the profile
+    # Extract team ID and UUID from the profile
     require 'plist'
     profile_plist = Plist.parse_xml(`security cms -D -i "#{profile_path}"`)
     profile_uuid = profile_plist["UUID"]
+    team_id = profile_plist["TeamIdentifier"].first
+    team_name = profile_plist["TeamName"]
     
+    UI.message("=" * 50)
     UI.message("Profile UUID: #{profile_uuid}")
     UI.message("Profile Name: #{profile_plist['Name']}")
+    UI.message("Team ID from profile: #{team_id}")
+    UI.message("Team Name from profile: #{team_name}")
+    UI.message("Team ID from ENV: #{ENV['APPLE_TEAM_ID']}")
+    UI.message("=" * 50)
+    
+    # Use the team ID from the profile instead of ENV
+    actual_team_id = team_id
 
     # -----------------------------
     # SET TEAM ID AND PROFILE IN PROJECT
@@ -64,7 +74,7 @@ platform :ios do
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "Runner.xcodeproj",
-      team_id: ENV["APPLE_TEAM_ID"],
+      team_id: actual_team_id,
       bundle_identifier: "com.wawuafrica.ojaewa",
       profile_uuid: profile_uuid,
       code_sign_identity: "iPhone Distribution",
@@ -97,6 +107,7 @@ platform :ios do
       scheme: "Runner",
       export_method: "app-store",
       export_options: {
+        teamID: actual_team_id,
         provisioningProfiles: {
           "com.wawuafrica.ojaewa" => profile_uuid
         }
