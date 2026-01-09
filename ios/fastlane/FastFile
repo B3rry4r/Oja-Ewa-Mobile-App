@@ -35,24 +35,16 @@ platform :ios do
       clone_branch_directly: true
     )
 
-    # AGGRESSIVE LOGGING
-    UI.important("="*80)
-    UI.important("PROFILE LOCATION DEBUGGING")
-    UI.important("="*80)
-    
     profile_name = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"]
-    UI.message("Profile name from match: #{profile_name}")
     
-    # Check all possible profile locations
-    UI.message("Checking profile locations:")
-    sh("ls -la ~/Library/MobileDevice/Provisioning\\ Profiles/ || echo 'MobileDevice directory not found'")
-    sh("ls -la ~/Library/Developer/Xcode/UserData/Provisioning\\ Profiles/ || echo 'UserData directory not found'")
+    # CRITICAL FIX: Copy profile to MobileDevice location where Xcode looks for it
+    profile_uuid = ENV['sigh_com.wawuafrica.ojaewa_appstore']
+    profile_path = ENV['sigh_com.wawuafrica.ojaewa_appstore_profile-path']
     
-    # List all .mobileprovision files
-    UI.message("All .mobileprovision files on system:")
-    sh("find ~ -name '*.mobileprovision' 2>/dev/null || echo 'No profiles found'")
-    
-    UI.important("="*80)
+    UI.message("Copying profile to MobileDevice directory...")
+    sh("mkdir -p ~/Library/MobileDevice/Provisioning\\ Profiles")
+    sh("cp '#{profile_path}' ~/Library/MobileDevice/Provisioning\\ Profiles/#{profile_uuid}.mobileprovision")
+    UI.message("Profile copied successfully!")
 
     update_project_team(
       path: "Runner.xcodeproj",
@@ -82,16 +74,6 @@ platform :ios do
             config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_name
             config.build_settings["DEVELOPMENT_TEAM"] = ENV['APPLE_TEAM_ID']
             config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "iPhone Distribution"
-            
-            # LOG WHAT WE SET
-            UI.important("="*80)
-            UI.important("XCODE PROJECT SETTINGS (Release)")
-            UI.important("="*80)
-            UI.message("CODE_SIGN_STYLE: #{config.build_settings['CODE_SIGN_STYLE']}")
-            UI.message("PROVISIONING_PROFILE_SPECIFIER: #{config.build_settings['PROVISIONING_PROFILE_SPECIFIER']}")
-            UI.message("DEVELOPMENT_TEAM: #{config.build_settings['DEVELOPMENT_TEAM']}")
-            UI.message("CODE_SIGN_IDENTITY: #{config.build_settings['CODE_SIGN_IDENTITY[sdk=iphoneos*]']}")
-            UI.important("="*80)
           end
         end
       end
