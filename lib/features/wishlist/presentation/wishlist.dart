@@ -1,6 +1,11 @@
 // wishlist_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
+
+import '../../../app/router/app_router.dart';
+
 import '../../product/data/mock_products.dart';
 import '../../product/presentation/widgets/product_card.dart';
 import '../../product_detail/presentation/product_detail_screen.dart';
@@ -61,46 +66,20 @@ class WishlistScreen extends StatelessWidget {
           const Spacer(),
           Row(
             children: [
-              _buildIconButton(
-                icon: Icons.favorite_border,
-                onPressed: onFilterPressed,
+              HeaderIconButton(
+                asset: AppIcons.notification,
+                onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+                iconColor: Colors.white,
               ),
               const SizedBox(width: 16),
-              _buildIconButton(
-                icon: Icons.settings_outlined,
-                onPressed: onSettingsPressed,
+              HeaderIconButton(
+                asset: AppIcons.bag,
+                onTap: () => Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
+                iconColor: Colors.white,
               ),
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildIconButton({
-    required IconData icon,
-    required VoidCallback? onPressed,
-  }) {
-    return SizedBox(
-      width: 40,
-      height: 40,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: onPressed,
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFDEDEDE)),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              icon,
-              size: 20,
-              color: Colors.white,
-            ),
-          ),
-        ),
       ),
     );
   }

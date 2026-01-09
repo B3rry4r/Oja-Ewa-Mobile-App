@@ -1,6 +1,10 @@
 // blog_content_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
+
+import '../../../app/router/app_router.dart';
 import 'single_blog.dart';
 
 class BlogScreen extends StatelessWidget {
@@ -25,7 +29,7 @@ class BlogScreen extends StatelessWidget {
                     // Left button with proper spacing
                     Padding(
                       padding: const EdgeInsets.only(left: 16),
-                      child: _buildIconButton(Icons.menu),
+                      child: const SizedBox(width: 40, height: 40),
                     ),
 
                     // Right buttons group
@@ -33,9 +37,19 @@ class BlogScreen extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 16),
                       child: Row(
                         children: [
-                          _buildIconButton(Icons.search),
-                          const SizedBox(width: 8),
-                          _buildIconButton(Icons.more_vert),
+                          HeaderIconButton(
+                            asset: AppIcons.notification,
+                            iconColor: Colors.white,
+                            onTap: () => Navigator.of(context)
+                                .pushNamed(AppRoutes.notifications),
+                          ),
+                          const SizedBox(width: 16),
+                          HeaderIconButton(
+                            asset: AppIcons.bag,
+                            iconColor: Colors.white,
+                            onTap: () => Navigator.of(context)
+                                .pushNamed(AppRoutes.shoppingBag),
+                          ),
                         ],
                       ),
                     ),
@@ -140,22 +154,6 @@ class BlogScreen extends StatelessWidget {
   }
 
   // Reusable icon button
-  Widget _buildIconButton(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 20),
-        onPressed: () {},
-        padding: EdgeInsets.zero,
-      ),
-    );
-  }
-
   // Posts list
   Widget _buildPostList(BuildContext context) {
     return Column(

@@ -1,5 +1,9 @@
 // profile_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
 
 import '../../../app/router/app_router.dart';
 
@@ -13,28 +17,31 @@ class AccountScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Top bar with three buttons
+            // Top bar (Account is a tab-root: no left/back icon)
             Container(
               height: 104,
               color: const Color(0xFF603814),
               padding: const EdgeInsets.only(top: 32),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // Menu button
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16),
-                    child: _buildIconButton(Icons.menu),
-                  ),
-
-                  // Right buttons
                   Padding(
                     padding: const EdgeInsets.only(right: 16),
                     child: Row(
                       children: [
-                        _buildIconButton(Icons.search),
+                        HeaderIconButton(
+                          asset: AppIcons.notificationSmall,
+                          onTap: () => Navigator.of(context).pushNamed(
+                            AppRoutes.notifications,
+                          ),
+                        ),
                         const SizedBox(width: 8),
-                        _buildIconButton(Icons.more_vert),
+                        HeaderIconButton(
+                          asset: AppIcons.bag,
+                          onTap: () => Navigator.of(context).pushNamed(
+                            AppRoutes.shoppingBag,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -71,35 +78,35 @@ class AccountScreen extends StatelessWidget {
                         ),
 
                         // Profile section
-                        const SizedBox(height: 45), // 181 - 120 - 16
+                        const SizedBox(height: 24),
                         _buildSectionHeader('Profile'),
                         _buildMenuItem(
-                          icon: Icons.person_outline,
+                          iconAsset: AppIcons.editYourProfile,
                           label: 'Edit your profile',
                           onTap: () => Navigator.of(context).pushNamed(AppRoutes.editProfile),
                         ),
 
                         // Orders section
-                        const SizedBox(height: 50), // 275 - 181 - 44
+                        const SizedBox(height: 24),
                         _buildSectionHeader('Orders'),
                         _buildMenuItem(
-                          icon: Icons.shopping_bag_outlined,
+                          iconAsset: AppIcons.yourOrders,
                           label: 'Your orders',
                           onTap: () => Navigator.of(context).pushNamed(AppRoutes.orders),
                         ),
 
                         // Settings section
-                        const SizedBox(height: 68), // 369 - 275 - 26
+                        const SizedBox(height: 24),
                         _buildSectionHeader('Settings'),
                         _buildSettingsList(context),
 
                         // Business section
-                        const SizedBox(height: 116), // 559 - 369 - 74
+                        const SizedBox(height: 24),
                         _buildSectionHeader('Oja Ewa Business'),
                         _buildBusinessList(context),
 
                         // Support section
-                        const SizedBox(height: 118), // 701 - 559 - 42
+                        const SizedBox(height: 24),
                         _buildSectionHeader('Support'),
                         _buildSupportList(context),
 
@@ -113,24 +120,6 @@ class AccountScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildIconButton(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 20),
-        onPressed: () {
-          // TODO: Wire these top-bar actions when designs are ready.
-        },
-        padding: EdgeInsets.zero,
       ),
     );
   }
@@ -151,7 +140,7 @@ class AccountScreen extends StatelessWidget {
   }
 
   Widget _buildMenuItem({
-    required IconData icon,
+    required String iconAsset,
     required String label,
     required VoidCallback onTap,
   }) {
@@ -175,7 +164,16 @@ class AccountScreen extends StatelessWidget {
                       color: const Color(0xFFF5E0CE),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: Icon(icon, size: 16, color: const Color(0xFF1E2021)),
+                    alignment: Alignment.center,
+                    child: SvgPicture.asset(
+                      iconAsset,
+                      width: 16,
+                      height: 16,
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFF1E2021),
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -205,17 +203,17 @@ class AccountScreen extends StatelessWidget {
     return Column(
       children: [
         _buildMenuItem(
-          icon: Icons.location_on_outlined,
+          iconAsset: AppIcons.yourAddress,
           label: 'Your Addresses',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.addresses),
         ),
         _buildMenuItem(
-          icon: Icons.notifications_outlined,
+          iconAsset: AppIcons.notification,
           label: 'Notifications',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.notificationsSettings),
         ),
         _buildMenuItem(
-          icon: Icons.lock_outline,
+          iconAsset: AppIcons.password,
           label: 'Password',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.changePassword),
         ),
@@ -227,12 +225,12 @@ class AccountScreen extends StatelessWidget {
     return Column(
       children: [
         _buildMenuItem(
-          icon: Icons.store_outlined,
+          iconAsset: AppIcons.startSelling,
           label: 'Start selling',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.sellerOnboarding),
         ),
         _buildMenuItem(
-          icon: Icons.business_outlined,
+          iconAsset: AppIcons.showYourBusiness,
           label: 'Show your business',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.businessOnboarding),
         ),
@@ -244,27 +242,27 @@ class AccountScreen extends StatelessWidget {
     return Column(
       children: [
         _buildMenuItem(
-          icon: Icons.email_outlined,
+          iconAsset: AppIcons.emailUs,
           label: 'Email Us',
           onTap: () {},
         ),
         _buildMenuItem(
-          icon: Icons.privacy_tip_outlined,
+          iconAsset: AppIcons.privacyPolicy,
           label: 'Privacy Policy',
           onTap: () {},
         ),
         _buildMenuItem(
-          icon: Icons.description_outlined,
+          iconAsset: AppIcons.termsOfService,
           label: 'Terms of Service',
           onTap: () {},
         ),
         _buildMenuItem(
-          icon: Icons.help_outline,
+          iconAsset: AppIcons.faq,
           label: 'FAQ',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.faq),
         ),
         _buildMenuItem(
-          icon: Icons.contact_support_outlined,
+          iconAsset: AppIcons.connectToUs,
           label: 'Connect to us',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.connectToUs),
         ),
@@ -289,10 +287,15 @@ class AccountScreen extends StatelessWidget {
                           color: const Color(0xFFF7E5E5),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Icon(
-                          Icons.logout_outlined,
-                          size: 16,
-                          color: Color(0xFF1E2021),
+                        alignment: Alignment.center,
+                        child: SvgPicture.asset(
+                          AppIcons.signOut,
+                          width: 16,
+                          height: 16,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFF1E2021),
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),

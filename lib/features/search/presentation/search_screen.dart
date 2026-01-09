@@ -1,6 +1,11 @@
 // search_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
+
+import '../../../app/router/app_router.dart';
+
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
@@ -79,50 +84,18 @@ class _SearchScreenState extends State<SearchScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          // Back Button
-          // _buildIconButton(
-          //   icon: Icons.arrow_back_ios_new_rounded,
-          //   onPressed: _onBackPressed,
-          // ),
-
-          // Filter Button
-          _buildIconButton(
-            icon: Icons.tune_rounded,
-            onPressed: _onFilterPressed,
+          HeaderIconButton(
+            asset: AppIcons.notification,
+            iconColor: Colors.white,
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
           ),
-
-          const SizedBox(width: 10),
-
-          // Settings Button
-          _buildIconButton(
-            icon: Icons.settings_outlined,
-            onPressed: _onSettingsPressed,
+          const SizedBox(width: 16),
+          HeaderIconButton(
+            asset: AppIcons.bag,
+            iconColor: Colors.white,
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildIconButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: onPressed,
-        child: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFDEDEDE), width: 1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Center(
-            child: Icon(icon, size: 20, color: const Color(0xFF1E2021)),
-          ),
-        ),
       ),
     );
   }
