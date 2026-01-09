@@ -1,6 +1,9 @@
 // filter_sheet.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
+
 class FilterSheet extends StatefulWidget {
   /// Callback when filters are applied
   final Function(Map<String, dynamic> filters)? onApplyFilters;
@@ -148,20 +151,10 @@ class _FilterSheetState extends State<FilterSheet> {
           ),
 
           // Close button
-          GestureDetector(
+          HeaderIconButton(
+            asset: AppIcons.back,
+            iconColor: const Color(0xFF301C0A),
             onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFDEDEDE)),
-              ),
-              child: const Icon(
-                Icons.close,
-                size: 24,
-                color: Color(0xFF301C0A),
-              ),
-            ),
           ),
         ],
       ),

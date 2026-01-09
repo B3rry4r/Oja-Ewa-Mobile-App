@@ -15,22 +15,29 @@ class NewPasswordScreen extends StatefulWidget {
 
 class _NewPasswordScreenState extends State<NewPasswordScreen> {
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-  
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
   bool _obscureNewPassword = true;
   bool _obscureConfirmPassword = true;
-  
+
   bool _hasMinLength = false;
   bool _hasUpperCase = false;
   bool _hasLowerCase = false;
   bool _hasNumber = false;
   bool _hasSpecialChar = false;
-  
-  bool get _passwordsMatch => _newPasswordController.text.isNotEmpty && 
+
+  bool get _passwordsMatch =>
+      _newPasswordController.text.isNotEmpty &&
       _newPasswordController.text == _confirmPasswordController.text;
-  
-  bool get _isPasswordValid => _hasMinLength && _hasUpperCase && _hasLowerCase && 
-      _hasNumber && _hasSpecialChar && _passwordsMatch;
+
+  bool get _isPasswordValid =>
+      _hasMinLength &&
+      _hasUpperCase &&
+      _hasLowerCase &&
+      _hasNumber &&
+      _hasSpecialChar &&
+      _passwordsMatch;
 
   @override
   void initState() {
@@ -48,7 +55,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
 
   void _validatePassword() {
     final password = _newPasswordController.text;
-    
+
     setState(() {
       _hasMinLength = password.length >= 8;
       _hasUpperCase = password.contains(RegExp(r'[A-Z]'));
@@ -71,10 +78,9 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     }
 
     // TODO: Replace with real password update.
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      AppRoutes.passwordResetSuccess,
-      (route) => false,
-    );
+    Navigator.of(
+      context,
+    ).pushNamedAndRemoveUntil(AppRoutes.passwordResetSuccess, (route) => false);
   }
 
   @override
@@ -109,7 +115,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                 ),
               ),
             ),
-            
+
             SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -117,40 +123,40 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 30),
-                    
+
                     // Back Button
                     _buildBackButton(),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Title Section
                     _buildTitleSection(),
-                    
+
                     const SizedBox(height: 30),
-                    
+
                     // Password Requirements
                     _buildRequirements(),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // New Password Input
                     _buildNewPasswordInput(),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Confirm Password Input
                     _buildConfirmPasswordInput(),
-                    
+
                     const SizedBox(height: 30),
-                    
+
                     // Password Match Check
                     _buildMatchCheck(),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Save Button
                     _buildSaveButton(),
-                    
+
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -219,7 +225,10 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
         const SizedBox(height: 8),
         _buildRequirementItem('One number (0-9)', _hasNumber),
         const SizedBox(height: 8),
-        _buildRequirementItem('One special character (!@#\$...)', _hasSpecialChar),
+        _buildRequirementItem(
+          'One special character (!@#\$...)',
+          _hasSpecialChar,
+        ),
       ],
     );
   }
@@ -264,11 +273,11 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
           height: 49,
           decoration: BoxDecoration(
             border: Border.all(
-              color: _newPasswordController.text.isEmpty 
-                  ? const Color(0xFFCCCCCC) 
-                  : _hasMinLength 
-                      ? const Color(0xFFFDAF40) 
-                      : const Color(0xFFF44336),
+              color: _newPasswordController.text.isEmpty
+                  ? const Color(0xFFCCCCCC)
+                  : _hasMinLength
+                  ? const Color(0xFFFDAF40)
+                  : const Color(0xFFF44336),
               width: 1.5,
             ),
             borderRadius: BorderRadius.circular(8),
@@ -296,9 +305,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Type your password',
-                      hintStyle: TextStyle(
-                        color: Color(0xFFCCCCCC),
-                      ),
+                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
                     ),
                   ),
                 ),
@@ -310,7 +317,9 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                     });
                   },
                   icon: Icon(
-                    _obscureNewPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                    _obscureNewPassword
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
                     size: 20,
                     color: const Color(0xFF777F84),
                   ),
@@ -341,11 +350,11 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
           height: 49,
           decoration: BoxDecoration(
             border: Border.all(
-              color: _confirmPasswordController.text.isEmpty 
-                  ? const Color(0xFFCCCCCC) 
-                  : _passwordsMatch 
-                      ? const Color(0xFF4CAF50) 
-                      : const Color(0xFFF44336),
+              color: _confirmPasswordController.text.isEmpty
+                  ? const Color(0xFFCCCCCC)
+                  : _passwordsMatch
+                  ? const Color(0xFF4CAF50)
+                  : const Color(0xFFF44336),
               width: 1.5,
             ),
             borderRadius: BorderRadius.circular(8),
@@ -373,9 +382,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Type your password',
-                      hintStyle: TextStyle(
-                        color: Color(0xFFCCCCCC),
-                      ),
+                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
                     ),
                   ),
                 ),
@@ -387,7 +394,9 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                     });
                   },
                   icon: Icon(
-                    _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                    _obscureConfirmPassword
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
                     size: 20,
                     color: const Color(0xFF777F84),
                   ),
@@ -402,13 +411,17 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
 
   Widget _buildMatchCheck() {
     if (_confirmPasswordController.text.isEmpty) return const SizedBox.shrink();
-    
+
     return Row(
       children: [
         Icon(
-          _passwordsMatch ? Icons.check_circle_rounded : Icons.error_outline_rounded,
+          _passwordsMatch
+              ? Icons.check_circle_rounded
+              : Icons.error_outline_rounded,
           size: 16,
-          color: _passwordsMatch ? const Color(0xFF4CAF50) : const Color(0xFFF44336),
+          color: _passwordsMatch
+              ? const Color(0xFF4CAF50)
+              : const Color(0xFFF44336),
         ),
         const SizedBox(width: 8),
         Text(
@@ -417,7 +430,9 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
             fontSize: 12,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: _passwordsMatch ? const Color(0xFF4CAF50) : const Color(0xFFF44336),
+            color: _passwordsMatch
+                ? const Color(0xFF4CAF50)
+                : const Color(0xFFF44336),
           ),
         ),
       ],
@@ -429,7 +444,9 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
       width: double.infinity,
       height: 57,
       decoration: BoxDecoration(
-        color: _isPasswordValid ? const Color(0xFFFDAF40) : const Color(0xFFFDAF40).withOpacity(0.3),
+        color: _isPasswordValid
+            ? const Color(0xFFFDAF40)
+            : const Color(0xFFFDAF40).withOpacity(0.3),
         borderRadius: BorderRadius.circular(8),
         boxShadow: _isPasswordValid
             ? [
@@ -453,7 +470,9 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Campton',
-                color: _isPasswordValid ? const Color(0xFFFFFBF5) : const Color(0xFFFFFBF5).withOpacity(0.6),
+                color: _isPasswordValid
+                    ? const Color(0xFFFFFBF5)
+                    : const Color(0xFFFFFBF5).withOpacity(0.6),
               ),
             ),
           ),

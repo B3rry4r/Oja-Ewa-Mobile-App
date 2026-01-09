@@ -1,5 +1,8 @@
 // product_listing_screen.dart
 import 'package:flutter/material.dart';
+
+import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/sort_sheet.dart';
 
 import '../../../product/data/mock_products.dart';
@@ -145,17 +148,10 @@ class _AppHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Back Button
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFDEDEDE)),
-            ),
-            child: IconButton(
-              onPressed: () => Navigator.of(context).maybePop(),
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
-            ),
+          HeaderIconButton(
+            asset: AppIcons.back,
+            iconColor: const Color(0xFF241508),
+            onTap: () => Navigator.of(context).maybePop(),
           ),
 
           Column(

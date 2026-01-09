@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_svg/flutter_svg.dart';
+
+import 'package:ojaewa/core/resources/app_assets.dart';
+
 class ProductFilterOverlay extends StatelessWidget {
   const ProductFilterOverlay({super.key});
 
@@ -58,11 +62,19 @@ class ProductFilterOverlay extends StatelessWidget {
               border: Border.all(color: const Color(0xFFCCCCCC)),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.filter_alt, size: 24, color: Color(0xFF241508)),
-                SizedBox(width: 16),
-                Text(
+                SvgPicture.asset(
+                  AppIcons.filter,
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF241508),
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const Text(
                   'men',
                   style: TextStyle(
                     fontFamily: 'Campton',
@@ -71,8 +83,20 @@ class ProductFilterOverlay extends StatelessWidget {
                     color: Color(0xFF241508),
                   ),
                 ),
-                SizedBox(width: 16),
-                Icon(Icons.arrow_forward_ios, size: 20, color: Color(0xFF241508)),
+                const SizedBox(width: 16),
+                // No forward-arrow SVG asset exists; reuse back.svg rotated.
+                Transform.rotate(
+                  angle: 3.141592653589793, // pi
+                  child: SvgPicture.asset(
+                    AppIcons.back,
+                    width: 20,
+                    height: 20,
+                    colorFilter: const ColorFilter.mode(
+                      Color(0xFF241508),
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

@@ -1,6 +1,8 @@
 // review_submission_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 class ReviewSubmissionScreen extends StatelessWidget {
   const ReviewSubmissionScreen({super.key});
 
@@ -11,8 +13,9 @@ class ReviewSubmissionScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header with navigation icons
-            _buildHeader(),
+            const AppHeader(
+              iconColor: Colors.white,
+            ),
             const SizedBox(height: 48),
             // Main content card
             Expanded(
@@ -22,50 +25,6 @@ class ReviewSubmissionScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Back button/left icon
-          _buildIconButton(
-            icon: Icons.arrow_back_ios_new_rounded,
-            onPressed: () {},
-          ),
-          // Right side icons
-          Row(
-            children: [
-              _buildIconButton(icon: Icons.share_outlined, onPressed: () {}),
-              const SizedBox(width: 4),
-              _buildIconButton(icon: Icons.more_vert, onPressed: () {}),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIconButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE), width: 1),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 20),
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
-        color: Colors.white,
       ),
     );
   }
