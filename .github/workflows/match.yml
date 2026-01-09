@@ -26,17 +26,13 @@ jobs:
         git config --global user.name "GitHub Actions"
 
     - name: Create API key file
-          run: |
-            cd ios/fastlane
-            cat <<EOF > apikey.json
-            {
-              "key_id": "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}",
-              "issuer_id": "${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}",
-              "key": "$(echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | base64 --decode | awk '{printf "%s\\n", $0}' | sed 's/\\n$//')",
-              "duration": 1200,
-              "in_house": false
-            }
-            EOF
+      run: |
+        mkdir -p ios/fastlane
+        cd ios/fastlane
+        printf '{\n  "key_id": "%s",\n  "issuer_id": "%s",\n  "key": "%s",\n  "duration": 1200,\n  "in_house": false\n}' \
+        "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" \
+        "${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}" \
+        "$(echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | base64 --decode | awk '{printf "%s\\n", $0}' | sed 's/\\n$//')" > apikey.json
         
     - name: Run Match to create certificates
           env:
