@@ -77,8 +77,8 @@ class HomeScreen extends StatelessWidget {
           Row(
             children: [
               // Logo Mark (stacked lines)
-              SvgPicture.asset('/app_icon/app_logo.svg',
-              width: 16,
+              SvgPicture.asset('/app_icon/app_logo2.svg',
+              width: 24,
               ),
               const SizedBox(width: 8),
               // Brand Name
@@ -94,7 +94,7 @@ class HomeScreen extends StatelessWidget {
                       color: Colors.black,
                     ),
                   ),
-                  SizedBox(width: 2),
+                  SizedBox(width: 1),
                   Text(
                     'à-ewà',
                     style: TextStyle(
