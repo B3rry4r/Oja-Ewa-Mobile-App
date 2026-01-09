@@ -33,9 +33,10 @@ platform :ios do
       key_filepath: './AuthKey.p8'
     )
 
-    # Create the provisioning profiles directory if it doesn't exist
+    # Create both possible provisioning profile directories
     sh("mkdir -p ~/Library/MobileDevice/Provisioning\\ Profiles")
-    UI.message("Ensured provisioning profiles directory exists")
+    sh("mkdir -p ~/Library/Developer/Xcode/UserData/Provisioning\\ Profiles")
+    UI.message("Ensured provisioning profiles directories exist")
 
     # Get certificates and provisioning profiles with Match
     match(
@@ -58,36 +59,24 @@ platform :ios do
     sh("security find-identity -p codesigning -v #{Actions.lane_context[SharedValues::KEYCHAIN_PATH]}")
     UI.message("--- End identities listing (post-match) ---")
 
-    # Diagnostic: Check if profiles were installed
-    UI.message("--- Checking installed provisioning profiles ---")
-    sh("ls -la ~/Library/MobileDevice/Provisioning\\ Profiles/ || echo 'Directory exists but is empty'")
-    sh("find ~/Library/MobileDevice -name '*.mobileprovision' || echo 'No mobileprovision files found'")
-    UI.message("--- End profile check ---")
-
-    # Get profile information from match
-    UI.message("Available provisioning profiles from match:")
-    UI.message(Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING])
-    profile_name = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"]
+    # Get profile information from match using the environment variable
+    profile_uuid = ENV['sigh_com.wawuafrica.ojaewa_appstore']
+    profile_path = ENV['sigh_com.wawuafrica.ojaewa_appstore_profile-path']
+    profile_name = ENV['sigh_com.wawuafrica.ojaewa_appstore_profile-name']
+    
+    UI.message("Profile UUID from match: #{profile_uuid}")
+    UI.message("Profile path from match: #{profile_path}")
     UI.message("Profile name from match: #{profile_name}")
 
-    # Since match may not install the profile in the standard location on CI,
-    # we need to use the profile that match downloaded directly
-    # Match stores profiles in the lane context
-    sigh_profile_path = Actions.lane_context[SharedValues::SIGH_PROFILE_PATH]
-    UI.message("Direct profile path from match: #{sigh_profile_path}")
-
-    # Copy the profile to the standard location if it's not there
-    if sigh_profile_path && File.exist?(sigh_profile_path)
-      profile_uuid = `grep -a -A 1 'UUID' "#{sigh_profile_path}" | grep string | sed -e 's/<string>//' -e 's/<\\/string>//' -e 's/^[[:space:]]*//'`.strip
-      UI.message("Extracted Profile UUID: #{profile_uuid}")
-      
-      # Copy to standard location
-      target_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/#{profile_uuid}.mobileprovision")
-      sh("cp '#{sigh_profile_path}' '#{target_path}'")
-      UI.message("Copied profile to: #{target_path}")
-    else
-      UI.user_error!("Could not find provisioning profile from match")
+    # Verify the profile exists
+    if profile_path.nil? || profile_path.empty? || !File.exist?(profile_path)
+      UI.user_error!("Provisioning profile not found at expected path: #{profile_path}")
     end
+
+    # Copy profile to the MobileDevice location as well (some Xcode versions look here)
+    mobile_device_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/#{profile_uuid}.mobileprovision")
+    sh("cp '#{profile_path}' '#{mobile_device_path}'")
+    UI.message("Copied profile to MobileDevice location: #{mobile_device_path}")
 
     # Update project team
     update_project_team(
@@ -193,8 +182,9 @@ platform :ios do
       key_filepath: "fastlane/apikey.json"
     )
 
-    # Create provisioning profiles directory
+    # Create provisioning profile directories
     sh("mkdir -p ~/Library/MobileDevice/Provisioning\\ Profiles")
+    sh("mkdir -p ~/Library/Developer/Xcode/UserData/Provisioning\\ Profiles")
 
     # Get certificates and provisioning profiles with Match
     match(
@@ -212,20 +202,22 @@ platform :ios do
     )
     UI.message("Match completed for release lane.")
 
-    # Get profile path and UUID
-    profile_name = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]["com.wawuafrica.ojaewa"]
-    sigh_profile_path = Actions.lane_context[SharedValues::SIGH_PROFILE_PATH]
+    # Get profile information from environment variables
+    profile_uuid = ENV['sigh_com.wawuafrica.ojaewa_appstore']
+    profile_path = ENV['sigh_com.wawuafrica.ojaewa_appstore_profile-path']
+    profile_name = ENV['sigh_com.wawuafrica.ojaewa_appstore_profile-name']
     
-    if sigh_profile_path && File.exist?(sigh_profile_path)
-      profile_uuid = `grep -a -A 1 'UUID' "#{sigh_profile_path}" | grep string | sed -e 's/<string>//' -e 's/<\\/string>//' -e 's/^[[:space:]]*//'`.strip
-      UI.message("Profile UUID for release: #{profile_uuid}")
-      
-      target_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/#{profile_uuid}.mobileprovision")
-      sh("cp '#{sigh_profile_path}' '#{target_path}'")
-      UI.message("Copied profile to: #{target_path}")
-    else
-      UI.user_error!("Could not find provisioning profile for release")
+    UI.message("Profile UUID for release: #{profile_uuid}")
+    UI.message("Profile path for release: #{profile_path}")
+    
+    if profile_path.nil? || profile_path.empty? || !File.exist?(profile_path)
+      UI.user_error!("Provisioning profile not found for release")
     end
+
+    # Copy to MobileDevice location
+    mobile_device_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/#{profile_uuid}.mobileprovision")
+    sh("cp '#{profile_path}' '#{mobile_device_path}'")
+    UI.message("Copied profile to: #{mobile_device_path}")
 
     # Update project team
     update_project_team(
