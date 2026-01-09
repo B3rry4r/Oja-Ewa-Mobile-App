@@ -150,12 +150,16 @@ jobs:
         path: ~/Library/Logs/gym/Runner-Runner.log
         retention-days: 7
 
-    # NEW STEP - Display last 200 lines of the log in GitHub Actions output
+    # Display last 500 lines instead of 200 to see the actual error
     - name: Display xcodebuild error log
       if: failure()
       run: |
-        echo "=== LAST 200 LINES OF XCODEBUILD LOG ==="
-        tail -n 200 ~/Library/Logs/gym/Runner-Runner.log || echo "Log file not found"
+        echo "=== LAST 500 LINES OF XCODEBUILD LOG ==="
+        tail -n 500 ~/Library/Logs/gym/Runner-Runner.log || echo "Log file not found"
+        
+        echo ""
+        echo "=== SEARCHING FOR ACTUAL ERROR ==="
+        grep -i "error:" ~/Library/Logs/gym/Runner-Runner.log | tail -n 50 || echo "No errors found in grep"
 
     - name: Clean up
       if: always()
