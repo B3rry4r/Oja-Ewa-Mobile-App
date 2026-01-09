@@ -83,7 +83,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   onTap: () =>
                       Navigator.of(context).pushNamed(AppRoutes.notifications),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 8),
                 HeaderIconButton(
                   asset: AppIcons.bag,
                   iconColor: Colors.white,

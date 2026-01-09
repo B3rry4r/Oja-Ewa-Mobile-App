@@ -84,9 +84,11 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
     return Row(
       children: [
         _buildStep(Icons.check, "Basic\nInfo", true),
-        _buildConnector(true),
+        // connector removed (not part of final design)
+        const SizedBox(width: 8),
         _buildStep(null, "Business\nDetails", true, stepNum: "2"),
-        _buildConnector(false),
+        // connector removed (not part of final design)
+        const SizedBox(width: 8),
         _buildStep(null, "Account\non review", false, stepNum: "3"),
       ],
     );
@@ -120,16 +122,6 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
           ),
         )
       ],
-    );
-  }
-
-  Widget _buildConnector(bool active) {
-    return Expanded(
-      child: Container(
-        height: 2,
-        margin: const EdgeInsets.only(bottom: 24),
-        color: active ? const Color(0xFF603814) : const Color(0xFFE9E9E9),
-      ),
     );
   }
 
@@ -243,7 +235,8 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
 
   Widget _buildPaymentButton(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.of(context).pushNamed(AppRoutes.businessSettings),
+      onTap: () =>
+          Navigator.of(context).pushNamed(AppRoutes.businessAccountReview),
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,

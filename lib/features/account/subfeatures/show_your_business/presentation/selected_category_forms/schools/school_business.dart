@@ -85,9 +85,11 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
     return Row(
       children: [
         _buildStep(Icons.check, "Basic\nInfo", true),
-        _buildConnector(true),
+        // connector removed (not part of final design)
+        const SizedBox(width: 8),
         _buildStep(null, "Business\nDetails", true, stepNumber: "2"),
-        _buildConnector(false),
+        // connector removed (not part of final design)
+        const SizedBox(width: 8),
         _buildStep(null, "Account\non review", false, stepNumber: "3"),
       ],
     );
@@ -121,16 +123,6 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
           ),
         )
       ],
-    );
-  }
-
-  Widget _buildConnector(bool isActive) {
-    return Expanded(
-      child: Container(
-        height: 2,
-        margin: const EdgeInsets.only(bottom: 24),
-        color: isActive ? const Color(0xFF603814) : const Color(0xFFE9E9E9),
-      ),
     );
   }
 
@@ -250,7 +242,8 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
 
   Widget _buildPaymentButton(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.of(context).pushNamed(AppRoutes.businessSettings),
+      onTap: () =>
+          Navigator.of(context).pushNamed(AppRoutes.businessAccountReview),
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,

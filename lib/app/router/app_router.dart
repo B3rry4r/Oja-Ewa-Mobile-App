@@ -24,6 +24,7 @@ import '../../features/account/subfeatures/password/presentation/password.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/business_category.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/business_onboarding.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/business_setting.dart';
+import '../../features/account/subfeatures/show_your_business/presentation/business_account_review.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/deactivate_shop.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/manage_payment.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/selected_category_forms/business_seller_registration.dart';
@@ -88,6 +89,7 @@ abstract class AppRoutes {
   static const businessSchoolsForm = '/business-schools-form';
   static const businessMusicForm = '/business-music-form';
   static const businessSettings = '/business-settings';
+  static const businessAccountReview = '/business-account-review';
   static const deactivateShop = '/deactivate-shop';
   static const managePayment = '/manage-payment';
 
@@ -290,6 +292,12 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const BusinessSettingsScreen(),
+        );
+
+      case AppRoutes.businessAccountReview:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const BusinessAccountReviewScreen(),
         );
 
       case AppRoutes.deactivateShop:

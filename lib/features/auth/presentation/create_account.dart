@@ -19,7 +19,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     text: 'sanusimot@gmail.com',
   );
   final TextEditingController _phoneController = TextEditingController(
-    text: '+234 816 765 4354',
+    text: '816 765 4354',
   );
   final TextEditingController _passwordController = TextEditingController();
 
@@ -373,32 +373,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-                // Country flag/icon placeholder
-                Container(
-                  width: 44,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF241508).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.flag_outlined,
-                        size: 16,
-                        color: Color(0xFF241508),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.arrow_drop_down_rounded,
-                        size: 16,
-                        color: const Color(0xFF241508),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 16),
                 // Country code
                 Text(
                   '+234',
@@ -409,7 +383,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     color: const Color(0xFF241508), // #241508
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 // Phone number input
                 Expanded(
                   child: TextField(

@@ -81,9 +81,11 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
     return Row(
       children: [
         _buildStep(Icons.check, "Basic\nInfo", true, isCompleted: true),
-        _buildDivider(true),
+        // connector removed (not part of final design)
+        const SizedBox(width: 8),
         _buildStep(null, "Business\nDetails", true, stepNum: "2"),
-        _buildDivider(false),
+        // connector removed (not part of final design)
+        const SizedBox(width: 8),
         _buildStep(null, "Account\non review", false, stepNum: "3"),
       ],
     );
@@ -121,16 +123,6 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildDivider(bool active) {
-    return Expanded(
-      child: Container(
-        height: 2,
-        margin: const EdgeInsets.only(bottom: 24),
-        color: active ? const Color(0xFF603814) : const Color(0xFFE9E9E9),
-      ),
     );
   }
 
@@ -232,7 +224,8 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
 
   Widget _buildSubmitButton(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.of(context).pushNamed(AppRoutes.businessSettings),
+      onTap: () =>
+          Navigator.of(context).pushNamed(AppRoutes.businessAccountReview),
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,

@@ -167,7 +167,7 @@ class _SignInScreenState extends State<SignInScreen> {
       width: 41.6,
       height: 61.89,
       child: SvgPicture.asset(
-        AppImages.appLogo,
+        AppImages.appLogoAlt,
         fit: BoxFit.contain,
       ),
     );

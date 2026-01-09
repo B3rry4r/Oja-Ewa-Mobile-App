@@ -75,7 +75,7 @@ class WishlistScreen extends StatelessWidget {
                       Navigator.of(context).pushNamed(AppRoutes.notifications),
                   iconColor: Colors.white,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 8),
                 HeaderIconButton(
                   asset: AppIcons.bag,
                   onTap: () =>
