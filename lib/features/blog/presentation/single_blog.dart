@@ -14,9 +14,7 @@ class BlogDetailScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const AppHeader(
-              iconColor: Colors.white,
-            ),
+            const AppHeader(iconColor: Colors.white),
 
             // Header section - Image and Text in a Row
             Container(
@@ -27,7 +25,7 @@ class BlogDetailScreen extends StatelessWidget {
                 children: [
                   // Image card
                   Container(
-                    width: 150,
+                    width: 165,
                     height: 100,
                     decoration: BoxDecoration(
                       color: const Color(0xFFD9D9D9),
@@ -42,11 +40,10 @@ class BlogDetailScreen extends StatelessWidget {
 
                   // Spacing between image and text
                   const SizedBox(width: 8), // 191 - 165 - 18 = 8
-
                   // Text column
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         // Date
                         const SizedBox(height: 17), // 117 - 100 = 17
@@ -61,7 +58,7 @@ class BlogDetailScreen extends StatelessWidget {
                         ),
 
                         // Title
-                        const SizedBox(height: 18), // 147 - 117 - 12 = 18
+                        const SizedBox(height: 8), // 147 - 117 - 12 = 18
                         Text(
                           'Fashion in current age: Role of parents in fashions',
                           style: const TextStyle(
@@ -129,7 +126,7 @@ Fendi’s signature Baguette bags come in different sizes — all in the jeweler
 
 Fendi’s signature Baguette bags come in different sizes — all in the jeweler’s signature Tiffany Blue color. The accessories also feature a variety of fabrics and finishes like croc-effect leathers, silk, and even a special one-of-a-kind Baguette in sterling silver.
     ''';
-    
+
     return Text(
       articleText,
       style: const TextStyle(
