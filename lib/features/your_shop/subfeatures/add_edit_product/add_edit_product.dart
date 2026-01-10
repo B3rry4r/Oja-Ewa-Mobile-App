@@ -384,14 +384,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
     );
   }
 
-  Widget _tinyText(String text) {
-    return Text(
-      text,
-      textAlign: TextAlign.center,
-      style: const TextStyle(fontSize: 10, color: Color(0xFF777F84)),
-    );
-  }
-
   Widget _buildSizeSelector() {
     final sizes = ["XS", "S", "M", "L", "XL"];
     return Row(

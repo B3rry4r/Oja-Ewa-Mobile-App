@@ -15,53 +15,55 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF603814),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
-        ),
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(16),
+        topRight: Radius.circular(16),
       ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 70,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavItem(
-                iconAsset: AppIcons.home,
-                label: 'Home',
-                isActive: currentIndex == 0,
-                onTap: () => onTap(0),
-              ),
-              _NavItem(
-                iconAsset: AppIcons.search,
-                label: 'Search',
-                isActive: currentIndex == 1,
-                onTap: () => onTap(1),
-              ),
-              // Reserved for future tabs.
-              _NavItem(
-                iconAsset: AppIcons.wishlist,
-                label: 'Wishlist',
-                isActive: currentIndex == 2,
-                onTap: () => onTap(2),
-              ),
-              _NavItem(
-                iconAsset: AppIcons.blog,
-                label: 'Blog',
-                isActive: currentIndex == 3,
-                onTap: () => onTap(3),
-              ),
-              _NavItem(
-                iconAsset: AppIcons.account,
-                label: 'Account',
-                isActive: currentIndex == 4,
-                onTap: () => onTap(4),
-              ),
-            ],
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF603814),
+        ),
+        child: SafeArea(
+          top: false,
+          child: SizedBox(
+            height: 70,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _NavItem(
+                  iconAsset: AppIcons.home,
+                  label: 'Home',
+                  isActive: currentIndex == 0,
+                  onTap: () => onTap(0),
+                ),
+                _NavItem(
+                  iconAsset: AppIcons.search,
+                  label: 'Search',
+                  isActive: currentIndex == 1,
+                  onTap: () => onTap(1),
+                ),
+                // Reserved for future tabs.
+                _NavItem(
+                  iconAsset: AppIcons.wishlist,
+                  label: 'Wishlist',
+                  isActive: currentIndex == 2,
+                  onTap: () => onTap(2),
+                ),
+                _NavItem(
+                  iconAsset: AppIcons.blog,
+                  label: 'Blog',
+                  isActive: currentIndex == 3,
+                  onTap: () => onTap(3),
+                ),
+                _NavItem(
+                  iconAsset: AppIcons.account,
+                  label: 'Account',
+                  isActive: currentIndex == 4,
+                  onTap: () => onTap(4),
+                ),
+              ],
+            ),
           ),
         ),
       ),
