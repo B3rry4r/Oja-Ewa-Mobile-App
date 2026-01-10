@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
 class AppBottomNavBar extends StatelessWidget {
+  static const double height = 70;
   const AppBottomNavBar({
     super.key,
     required this.currentIndex,
@@ -27,7 +28,7 @@ class AppBottomNavBar extends StatelessWidget {
         child: SafeArea(
           top: false,
           child: SizedBox(
-            height: 70,
+            height: AppBottomNavBar.height,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [

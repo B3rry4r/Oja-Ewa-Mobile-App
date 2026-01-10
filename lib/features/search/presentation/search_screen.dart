@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
 import '../../../app/router/app_router.dart';
@@ -52,6 +53,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF603814), // #603814
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             // Header with buttons
@@ -108,6 +110,7 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
       child: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: AppBottomNavBar.height),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(

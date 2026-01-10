@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
 import '../../../app/router/app_router.dart';
@@ -33,6 +34,7 @@ class WishlistScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF603814), // #603814
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             // Header with buttons
@@ -48,7 +50,12 @@ class WishlistScreen extends StatelessWidget {
                     topRight: Radius.circular(28),
                   ),
                 ),
-                child: _buildWishlistContent(context),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: AppBottomNavBar.height,
+                  ),
+                  child: _buildWishlistContent(context),
+                ),
               ),
             ),
           ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
 import '../../../app/router/app_router.dart';
@@ -60,6 +61,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       child: _buildCategoryGrid(context),
                     ),
+                    const SizedBox(height: AppBottomNavBar.height),
                   ],
                 ),
               ),

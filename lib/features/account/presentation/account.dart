@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
 import '../../../app/router/app_router.dart';
@@ -15,6 +16,7 @@ class AccountScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF603814),
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             // Top bar (Account is a tab-root: no left/back icon)
@@ -62,6 +64,7 @@ class AccountScreen extends StatelessWidget {
                   ),
                 ),
                 child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: AppBottomNavBar.height),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Column(

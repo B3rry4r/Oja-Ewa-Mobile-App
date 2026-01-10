@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
 import '../../../app/router/app_router.dart';
@@ -15,6 +16,7 @@ class BlogScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF603814),
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             // Top section with buttons - using semantic grouping
@@ -64,7 +66,12 @@ class BlogScreen extends StatelessWidget {
                 ),
                 child: SingleChildScrollView(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.fromLTRB(
+                      16,
+                      0,
+                      16,
+                      AppBottomNavBar.height,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
