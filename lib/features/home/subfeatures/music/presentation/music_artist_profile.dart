@@ -21,44 +21,43 @@ class MusicArtistProfileScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 104), // Space for standard header
-                  
                   // Artist Header with Image
                   _buildArtistHeader(),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Biography Section
                   _buildBiographySection(),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Contact Details Section
                   _buildContactSection(),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Albums Section
                   _buildAlbumsSection(),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Reviews Section
                   _buildReviewsSection(context),
-                  
+
                   const SizedBox(height: 180), // Space for bottom card
                 ],
               ),
             ),
-            
+
             // Fixed Top App Bar
             const AppHeader(
               backgroundColor: Color(0xFFFFF8F1),
               iconColor: Color(0xFF241508),
             ),
-            
+
             // Fixed Bottom Contact Card
             _buildBottomContactCard(context),
-            
+
             // Floating Add Review Button
             _buildFloatingReviewButton(),
           ],
@@ -74,14 +73,10 @@ class MusicArtistProfileScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Artist Image
-          const AppImagePlaceholder(
-            width: 168,
-            height: 198,
-            borderRadius: 8,
-          ),
-          
+          const AppImagePlaceholder(width: 168, height: 198, borderRadius: 8),
+
           const SizedBox(width: 7),
-          
+
           // Artist Info
           Expanded(
             child: Column(
@@ -97,9 +92,9 @@ class MusicArtistProfileScreen extends StatelessWidget {
                     height: 1.2,
                   ),
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // Rating
                 Row(
                   children: [
@@ -202,9 +197,9 @@ class MusicArtistProfileScreen extends StatelessWidget {
               color: Color(0xFF1E2021),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Address
           _buildContactItem(
             icon: Icons.location_on,
@@ -215,27 +210,27 @@ class MusicArtistProfileScreen extends StatelessWidget {
               // Open maps
             },
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Phone
           _buildContactItem(
             icon: Icons.phone,
             title: 'Phone Number',
             content: '+234 8068 2833 23\n+234 9124 2344 21',
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Email
           _buildContactItem(
             icon: Icons.email,
             title: 'Email Address',
             content: 'rasheedkelani@gmail.com',
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Working Hours
           _buildContactItem(
             icon: Icons.access_time,
@@ -264,15 +259,11 @@ class MusicArtistProfileScreen extends StatelessWidget {
             color: const Color(0xFF603814),
             borderRadius: BorderRadius.circular(4),
           ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: Colors.white,
-          ),
+          child: Icon(icon, size: 18, color: Colors.white),
         ),
-        
+
         const SizedBox(width: 8),
-        
+
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,17 +340,17 @@ class MusicArtistProfileScreen extends StatelessWidget {
               color: Color(0xFF1E2021),
             ),
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Album List
           _buildAlbumItem(
             title: 'Kelewa',
             streamingLinks: 'Apple Music, Spotify, Youtube',
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           _buildAlbumItem(
             title: 'Baba L\'oke',
             streamingLinks: 'Apple Music, Spotify, Youtube',
@@ -393,9 +384,9 @@ class MusicArtistProfileScreen extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-            
+
             const SizedBox(width: 8),
-            
+
             Expanded(
               child: Text(
                 title,
@@ -409,9 +400,9 @@ class MusicArtistProfileScreen extends StatelessWidget {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Streaming Links
         Padding(
           padding: const EdgeInsets.only(left: 40),
@@ -433,76 +424,77 @@ class MusicArtistProfileScreen extends StatelessWidget {
   Widget _buildReviewsSection(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const ReviewsScreen()),
-      ),
+      onTap: () => Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => const ReviewsScreen())),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Review Header
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Reviews (4)',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1E2021),
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFFDEDEDE)),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Review Header
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Reviews (4)',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1E2021),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 9),
-              Row(
-                children: [
-                  const Text(
-                    '4.0',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1E2021),
+                const SizedBox(height: 9),
+                Row(
+                  children: [
+                    const Text(
+                      '4.0',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontFamily: 'Campton',
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1E2021),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 4),
-                  Container(
-                    width: 12,
-                    height: 12,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFFFDB80),
-                      shape: BoxShape.circle,
+                    const SizedBox(width: 4),
+                    Container(
+                      width: 12,
+                      height: 12,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFFDB80),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.star,
+                        size: 8,
+                        color: Color(0xFFFDAF40),
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.star,
-                      size: 8,
-                      color: Color(0xFFFDAF40),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Individual Review
-          _buildReviewItem(
-            name: 'Lennox Len',
-            date: 'Aug 19, 2023',
-            rating: 5,
-            title: 'So good',
-            review: 'Good customer service, I was at the Spa some times back, the receptionist is ok and their agents are so good at what they do. Will use them again',
-          ),
-        ],
+                  ],
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 24),
+
+            // Individual Review
+            _buildReviewItem(
+              name: 'Lennox Len',
+              date: 'Aug 19, 2023',
+              rating: 5,
+              title: 'So good',
+              review:
+                  'Good customer service, I was at the Spa some times back, the receptionist is ok and their agents are so good at what they do. Will use them again',
+            ),
+          ],
+        ),
       ),
-    ),
     );
   }
 
@@ -540,9 +532,9 @@ class MusicArtistProfileScreen extends StatelessWidget {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 8),
-        
+
         // Star rating
         Row(
           children: List.generate(
@@ -557,9 +549,9 @@ class MusicArtistProfileScreen extends StatelessWidget {
             ),
           ),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Review title
         Text(
           title,
@@ -570,9 +562,9 @@ class MusicArtistProfileScreen extends StatelessWidget {
             color: Color(0xFF1E2021),
           ),
         ),
-        
+
         const SizedBox(height: 8),
-        
+
         // Review text
         Text(
           review,
@@ -618,11 +610,7 @@ class MusicArtistProfileScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Icon(
-                      Icons.phone,
-                      size: 20,
-                      color: Color(0xFFFDAF40),
-                    ),
+                    Icon(Icons.phone, size: 20, color: Color(0xFFFDAF40)),
                     SizedBox(width: 4),
                     Text(
                       'Call',
@@ -637,9 +625,9 @@ class MusicArtistProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(width: 8),
-            
+
             // WhatsApp Button
             Expanded(
               flex: 3,
@@ -716,5 +704,4 @@ class MusicArtistProfileScreen extends StatelessWidget {
       ),
     );
   }
-
 }
