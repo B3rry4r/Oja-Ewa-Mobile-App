@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:ojaewa/features/home/presentation/screens/category_screen.dart';
 import 'package:ojaewa/features/product/presentation/screens/product_listing_screen.dart';
+import 'package:ojaewa/features/home/subfeatures/schools/presentation/school_detail.dart';
 
 class SchoolsScreen extends StatelessWidget {
   const SchoolsScreen({super.key});
@@ -59,6 +60,13 @@ class SchoolsScreen extends StatelessWidget {
               pageTitle: item == 'View All' ? section.title : item,
               breadcrumb: 'Schools • ${section.title}',
               showBusinessTypeFilter: false,
+              onProductTap: (context) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const SchoolDetailScreen(),
+                  ),
+                );
+              },
             ),
           ),
         );

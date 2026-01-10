@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ojaewa/features/home/presentation/screens/category_screen.dart';
 import 'package:ojaewa/features/product/presentation/screens/product_listing_screen.dart';
+import 'package:ojaewa/features/home/subfeatures/beauty/presentation/business_profile_beauty.dart';
 
 class BrandsScreen extends StatelessWidget {
   const BrandsScreen({super.key});
@@ -31,6 +32,13 @@ class BrandsScreen extends StatelessWidget {
               pageTitle: item == 'View All' ? section.title : item,
               breadcrumb: 'Brands • ${section.title}',
               showBusinessTypeFilter: false,
+              onProductTap: (context) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const BusinessProfileBeautyScreen(),
+                  ),
+                );
+              },
             ),
           ),
         );
