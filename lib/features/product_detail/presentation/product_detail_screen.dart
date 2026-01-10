@@ -4,7 +4,10 @@ import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
+import 'package:ojaewa/core/widgets/info_bottom_sheet.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
+import 'package:ojaewa/features/product_detail/presentation/seller_profile.dart';
+import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({super.key});
@@ -141,10 +144,62 @@ class _ProductDetailScreenState extends State<ProductDetailsScreen> {
                       const SizedBox(height: 24),
 
                       // Expandable sections
-                      _buildExpandableSection('Description', Icons.add),
-                      _buildExpandableSection('Return Policy', Icons.add),
+                      _buildExpandableSection(
+                        'Description',
+                        Icons.add,
+                        onTap: () {
+                          InfoBottomSheet.show(
+                            context,
+                            title: 'Description',
+                            content: const Text(
+                              'Fully lined agbada\n'
+                              'Made from quality ankara fabric\n'
+                              'Neat Finishing\n'
+                              'Safe to wash\n'
+                              'Weight 20g',
+                              style: TextStyle(
+                                fontFamily: 'Campton',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF3C4042),
+                                height: 1.6,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildExpandableSection(
+                        'Return Policy',
+                        Icons.add,
+                        onTap: () {
+                          InfoBottomSheet.show(
+                            context,
+                            title: 'Return Policy',
+                            content: const Text(
+                              'Returns are accepted within the stated return window.\n'
+                              'Items must be unused and in original condition.\n'
+                              'Contact support to initiate a return.',
+                              style: TextStyle(
+                                fontFamily: 'Campton',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF3C4042),
+                                height: 1.6,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                       _buildReviewsSection(),
-                      _buildExpandableSection('About Seller', Icons.add),
+                      _buildExpandableSection(
+                        'About Seller',
+                        Icons.add,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const SellerProfileScreen(),
+                          ),
+                        ),
+                      ),
 
                       const SizedBox(height: 28),
 
@@ -407,43 +462,58 @@ class _ProductDetailScreenState extends State<ProductDetailsScreen> {
     );
   }
 
-  Widget _buildExpandableSection(String title, IconData icon) {
-    return Container(
+  Widget _buildExpandableSection(
+    String title,
+    IconData icon, {
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
       margin: const EdgeInsets.only(bottom: 1),
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: const BoxDecoration(
         border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE))),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2021),
-            ),
-          ),
-          Icon(icon, size: 20),
-        ],
-      ),
-    );
+       child: Row(
+         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+         children: [
+           Text(
+             title,
+             style: const TextStyle(
+               fontSize: 16,
+               fontWeight: FontWeight.w600,
+               color: Color(0xFF1E2021),
+             ),
+           ),
+           Icon(icon, size: 20),
+         ],
+       ),
+     ),
+   );
   }
 
   Widget _buildReviewsSection() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 1),
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE))),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const ReviewsScreen(),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 1),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE))),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -532,11 +602,12 @@ class _ProductDetailScreenState extends State<ProductDetailsScreen> {
                 style: TextStyle(fontSize: 14, color: Color(0xFF1E2021)),
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
+           ),
+         ],
+       ),
+     ),
+   );
+ }
 
   Widget _buildRelatedProducts() {
     // Using the shared ProductCard extracted from this design.

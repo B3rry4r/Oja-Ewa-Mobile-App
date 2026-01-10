@@ -13,16 +13,10 @@ class ReviewSubmissionScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const AppHeader(
-              iconColor: Colors.white,
-            ),
+            const AppHeader(iconColor: Colors.white),
             const SizedBox(height: 48),
             // Main content card
-            Expanded(
-              child: SingleChildScrollView(
-                child: _buildContentCard(),
-              ),
-            ),
+            Expanded(child: SingleChildScrollView(child: _buildContentCard())),
           ],
         ),
       ),
