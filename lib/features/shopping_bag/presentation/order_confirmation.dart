@@ -1,7 +1,29 @@
 import 'package:flutter/material.dart';
 
-class OrderConfirmationScreen extends StatelessWidget {
-  const OrderConfirmationScreen({super.key});
+import 'package:ojaewa/app/router/app_router.dart';
+import 'package:ojaewa/app/widgets/app_header.dart';
+
+class OrderConfirmationScreen extends StatefulWidget {
+  const OrderConfirmationScreen({super.key, this.hasAddress = true});
+
+  /// Whether there is a selected address (used for empty state vs selected state).
+  final bool hasAddress;
+
+  @override
+  State<OrderConfirmationScreen> createState() => _OrderConfirmationScreenState();
+}
+
+class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
+  static const _returnArgKey = 'returnTo';
+  static const _returnToOrderConfirmation = 'orderConfirmation';
+
+  late bool _hasAddress;
+
+  @override
+  void initState() {
+    super.initState();
+    _hasAddress = widget.hasAddress;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,35 +33,20 @@ class OrderConfirmationScreen extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            // Top navigation bar
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFDEDEDE)),
-                    ),
-                    child: const Icon(Icons.arrow_back, size: 20),
-                  ),
-                  const Expanded(
-                    child: Center(
-                      child: Text(
-                        'Order confirmation',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF241508),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 40), // Spacer to balance the title
-                ],
+            AppHeader(
+              backgroundColor: const Color(0xFFFFF8F1),
+              iconColor: const Color(0xFF241508),
+              showActions: false,
+              title: const Text(
+                'Order confirmation',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Campton',
+                  color: Color(0xFF241508),
+                ),
               ),
+              onBack: () => Navigator.of(context).maybePop(),
             ),
 
             // Scrollable content
@@ -52,7 +59,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // Address section
-                    _buildAddressSection(),
+                    _buildAddressSection(context),
 
                     const SizedBox(height: 32),
 
@@ -78,7 +85,7 @@ class OrderConfirmationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAddressSection() {
+  Widget _buildAddressSection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -91,38 +98,83 @@ class OrderConfirmationScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Expanded(
-                child: Text(
-                  'Sanusi Sulat 08102718764\nRoyal Anchor, Abuja, FCT, \nNigeria 900187',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF3C4042),
-                    height: 1.5,
+
+        if (!_hasAddress)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFCCCCCC)),
+            ),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'No address selected yet',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF777F84),
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                width: 28,
-                height: 28,
-                padding: const EdgeInsets.all(4),
-                child: const Icon(
-                  Icons.edit_outlined,
-                  size: 20,
-                  color: Color(0xFF3C4042),
+                TextButton(
+                  onPressed: () async {
+                    final updated = await Navigator.of(context).pushNamed(
+                      AppRoutes.addEditAddress,
+                      arguments: {
+                        _returnArgKey: _returnToOrderConfirmation,
+                      },
+                    );
+                    if (updated == true) {
+                      setState(() => _hasAddress = true);
+                    }
+                  },
+                  child: const Text('Add address'),
                 ),
+              ],
+            ),
+          )
+        else
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () async {
+              final updated = await Navigator.of(context).pushNamed(
+                AppRoutes.addresses,
+                arguments: {
+                  _returnArgKey: _returnToOrderConfirmation,
+                },
+              );
+              if (updated == true) {
+                setState(() => _hasAddress = true);
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFCCCCCC)),
               ),
-            ],
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'Sanusi Sulat 08102718764\nRoyal Anchor, Abuja, FCT, \nNigeria 900187',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF3C4042),
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                  const Icon(
+                    Icons.keyboard_arrow_right,
+                    color: Color(0xFF777F84),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
       ],
     );
   }

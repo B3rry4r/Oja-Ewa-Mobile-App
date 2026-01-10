@@ -42,6 +42,7 @@ import '../../features/account/subfeatures/your_order/presentation/tracking_orde
 import '../../features/account/subfeatures/your_order/presentation/your_order.dart';
 import '../../features/notifications/presentation/notifications.dart';
 import '../../features/shopping_bag/presentation/shopping_bag_screen.dart';
+import '../../features/shopping_bag/presentation/order_confirmation.dart';
 import '../../features/review_submission/presentation/review_submission.dart';
 import '../../features/your_shop/presentation/shop_dashboard.dart';
 import '../../features/your_shop/subfeatures/manage_shop/manage_shop.dart';
@@ -104,6 +105,7 @@ abstract class AppRoutes {
   static const trackingOrder = '/tracking-order';
   static const notifications = '/notifications';
   static const reviewSubmission = '/review-submission';
+  static const orderConfirmation = '/order-confirmation';
   static const yourShopDashboard = '/your-shop-dashboard';
   static const manageShop = '/manage-shop';
   static const editBusiness = '/edit-business';
@@ -364,6 +366,12 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const ShoppingBagScreen(),
+        );
+
+      case AppRoutes.orderConfirmation:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const OrderConfirmationScreen(),
         );
 
       case AppRoutes.reviewSubmission:

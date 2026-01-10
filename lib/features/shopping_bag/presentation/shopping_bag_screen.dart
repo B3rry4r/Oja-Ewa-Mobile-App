@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/shopping_bag/presentation/widgets/size_selection_bottom_sheet.dart';
+import 'package:ojaewa/app/router/app_router.dart';
 
 class ShoppingBagScreen extends StatefulWidget {
   const ShoppingBagScreen({super.key});
@@ -321,7 +322,7 @@ class _ShoppingBagScreenState extends State<ShoppingBagScreen> {
               // Checkout button
               GestureDetector(
                 onTap: () {
-                  // Handle checkout
+                  Navigator.of(context).pushNamed(AppRoutes.orderConfirmation);
                 },
                 child: Container(
                   width: double.infinity,

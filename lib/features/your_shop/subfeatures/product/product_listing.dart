@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/sort_sheet.dart';
 import '../add_edit_product/add_edit_product.dart';
 import 'data/mock_shop_products.dart';
@@ -168,9 +170,17 @@ class ProductListingsScreen extends StatelessWidget {
           border: Border.all(color: const Color(0xFFCCCCCC)),
         ),
         child: Row(
-          children: const [
-            Icon(Icons.sort, size: 16, color: Color(0xFF241508)),
-            SizedBox(width: 4),
+          children: [
+            SvgPicture.asset(
+              AppIcons.sort,
+              width: 16,
+              height: 16,
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF241508),
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(width: 4),
             Text(
               "Sort",
               style: TextStyle(fontSize: 14, color: Color(0xFF241508)),

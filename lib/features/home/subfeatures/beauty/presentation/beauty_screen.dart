@@ -1,7 +1,8 @@
 // beauty_screen.dart
 import 'package:flutter/material.dart';
 import 'package:ojaewa/features/home/presentation/screens/category_screen.dart';
-import 'package:ojaewa/features/home/presentation/screens/product_listing.dart';
+import 'package:ojaewa/features/product/presentation/screens/product_listing_screen.dart';
+import 'package:ojaewa/features/home/subfeatures/beauty/presentation/business_profile_beauty.dart';
 
 class BeautyScreen extends StatelessWidget {
   const BeautyScreen({super.key});
@@ -70,6 +71,13 @@ class BeautyScreen extends StatelessWidget {
               pageTitle: item == 'View All' ? section.title : item,
               breadcrumb: 'Beauty • ${section.title}',
               showBusinessTypeFilter: true,
+              onProductTap: (context) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const BusinessProfileBeautyScreen(),
+                  ),
+                );
+              },
             ),
           ),
         );

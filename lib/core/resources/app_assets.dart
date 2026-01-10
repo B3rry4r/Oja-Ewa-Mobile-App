@@ -23,6 +23,8 @@ abstract class AppIcons {
   static const String notification = 'assets/icons/notification.svg';
   static const String notificationSmall = 'assets/icons/notification_small.svg';
   static const String password = 'assets/icons/password.svg';
+  static const String phone = 'assets/icons/phone.svg';
+  static const String whatsapp = 'assets/icons/whatsapp.svg';
   static const String privacyPolicy = 'assets/icons/privacy_policy.svg';
   static const String schools = 'assets/icons/schools.svg';
   static const String shop = 'assets/icons/shop.svg';

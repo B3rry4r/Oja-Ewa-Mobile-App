@@ -279,7 +279,15 @@ class _AddEditAddressScreenState extends State<AddEditAddressScreen> {
           borderRadius: BorderRadius.circular(8),
           onTap: () {
             // TODO: Persist later.
-            Navigator.of(context).maybePop();
+            final args = ModalRoute.of(context)?.settings.arguments;
+            final returnToOrderConfirmation = args is Map &&
+                args['returnTo'] == 'orderConfirmation';
+
+            if (returnToOrderConfirmation) {
+              Navigator.of(context).pop(true);
+            } else {
+              Navigator.of(context).maybePop();
+            }
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 20),

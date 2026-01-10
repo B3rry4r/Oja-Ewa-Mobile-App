@@ -1,6 +1,10 @@
 // connect_to_us_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
 class ConnectToUsScreen extends StatelessWidget {
   const ConnectToUsScreen({super.key});
 
@@ -12,8 +16,10 @@ class ConnectToUsScreen extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Header
-              _buildHeader(),
+              const AppHeader(
+                backgroundColor: Color(0xFFFFF8F1),
+                iconColor: Color(0xFF241508),
+              ),
               
               // Social media connections
               _buildSocialConnections(),
@@ -38,51 +44,24 @@ class ConnectToUsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Back button
-          _buildIconButton(Icons.arrow_back_ios_new_rounded),
-          
-          // Title
-          const Text(
-            'Connect to Us',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
-              color: Color(0xFF241508),
-            ),
-          ),
-          
-          // Close button
-          _buildIconButton(Icons.close_rounded),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSocialConnections() {
     final List<SocialConnection> connections = [
       SocialConnection(
-        platform: 'Instagram',
-        username: '@oja_ewa',
-        icon: Icons.camera_alt_outlined,
+        platform: 'WhatsApp',
+        username: '+234 000 000 0000',
+        iconAsset: AppIcons.whatsapp,
         color: Color(0xFFF5E0CE),
       ),
       SocialConnection(
-        platform: 'Facebook',
-        username: 'Oja Ewa',
-        icon: Icons.facebook,
+        platform: 'Phone',
+        username: '+234 000 000 0000',
+        iconAsset: AppIcons.phone,
         color: Color(0xFFF5E0CE),
       ),
       SocialConnection(
-        platform: 'Twitter',
-        username: 'Oja_Ewa',
-        icon: Icons.flutter_dash, // Using flutter_dash as placeholder for Twitter/X
+        platform: 'Email',
+        username: 'support@ojaewa.com',
+        iconAsset: AppIcons.emailUs,
         color: Color(0xFFF5E0CE),
       ),
     ];
@@ -116,10 +95,15 @@ class ConnectToUsScreen extends StatelessWidget {
                   color: connection.color,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Icon(
-                  connection.icon,
-                  size: 16,
-                  color: const Color(0xFF1E2021),
+                alignment: Alignment.center,
+                child: SvgPicture.asset(
+                  connection.iconAsset,
+                  width: 16,
+                  height: 16,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF1E2021),
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -157,36 +141,18 @@ class ConnectToUsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildIconButton(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: IconButton(
-        icon: Icon(
-          icon,
-          size: 20,
-        ),
-        onPressed: () {},
-        padding: EdgeInsets.zero,
-      ),
-    );
-  }
 }
 
 class SocialConnection {
   final String platform;
   final String username;
-  final IconData icon;
+  final String iconAsset;
   final Color color;
 
   SocialConnection({
     required this.platform,
     required this.username,
-    required this.icon,
+    required this.iconAsset,
     required this.color,
   });
 }

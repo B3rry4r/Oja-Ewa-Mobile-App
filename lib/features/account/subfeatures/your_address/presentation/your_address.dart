@@ -168,13 +168,25 @@ class AddressesScreen extends StatelessWidget {
 
               // Edit button with icon
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(
+                onTap: () async {
+                  final args = ModalRoute.of(context)?.settings.arguments;
+                  final returnToOrderConfirmation = args is Map &&
+                      args['returnTo'] == 'orderConfirmation';
+
+                  final updated = await Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) =>
-                          AddEditAddressScreen(initialAddress: address),
+                      builder: (_) => AddEditAddressScreen(initialAddress: address),
+                      settings: RouteSettings(
+                        arguments: returnToOrderConfirmation
+                            ? {'returnTo': 'orderConfirmation'}
+                            : null,
+                      ),
                     ),
                   );
+
+                  if (returnToOrderConfirmation && updated == true) {
+                    Navigator.of(context).pop(true);
+                  }
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -258,10 +270,25 @@ class AddressesScreen extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const AddEditAddressScreen()),
+          onTap: () async {
+            final args = ModalRoute.of(context)?.settings.arguments;
+            final returnToOrderConfirmation = args is Map &&
+                args['returnTo'] == 'orderConfirmation';
+
+            final updated = await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const AddEditAddressScreen(),
+                settings: RouteSettings(
+                  arguments: returnToOrderConfirmation
+                      ? {'returnTo': 'orderConfirmation'}
+                      : null,
+                ),
+              ),
             );
+
+            if (returnToOrderConfirmation && updated == true) {
+              Navigator.of(context).pop(true);
+            }
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 32),
