@@ -9,14 +9,31 @@ class ReviewSubmissionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF603814), // Dark brown background
+      backgroundColor: const Color(0xFF603814),
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
-            const AppHeader(iconColor: Colors.white),
-            const SizedBox(height: 48),
-            // Main content card
-            Expanded(child: SingleChildScrollView(child: _buildContentCard())),
+            const AppHeader(
+              iconColor: Colors.white,
+            ),
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFF8F1),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(28),
+                    topRight: Radius.circular(28),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: _buildContentCard(),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -24,72 +41,66 @@ class ReviewSubmissionScreen extends StatelessWidget {
   }
 
   Widget _buildContentCard() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF8F1), // Light cream background
-        borderRadius: BorderRadius.circular(28),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Title
-          const Text(
-            'Write a review',
-            style: TextStyle(
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w600,
-              fontSize: 33,
-              height: 1.2,
-              letterSpacing: -1,
-              color: Color(0xFF241508),
-            ),
-            textAlign: TextAlign.center,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Title
+        const Text(
+          'Write a review',
+          style: TextStyle(
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w600,
+            fontSize: 33,
+            height: 1.2,
+            letterSpacing: -1,
+            color: Color(0xFF241508),
           ),
-          const SizedBox(height: 24),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 24),
 
-          // Rating section
-          const Text(
-            'Rating',
-            style: TextStyle(
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w600,
-              fontSize: 22,
-              height: 1.2,
-              color: Color(0xFF3C4042),
-            ),
+        // Rating section
+        const Text(
+          'Rating',
+          style: TextStyle(
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w600,
+            fontSize: 22,
+            height: 1.2,
+            color: Color(0xFF3C4042),
           ),
-          const SizedBox(height: 12),
+        ),
+        const SizedBox(height: 12),
 
-          // Star rating
-          _buildStarRating(),
-          const SizedBox(height: 24),
+        // Star rating
+        _buildStarRating(),
+        const SizedBox(height: 24),
 
-          // Email input section
-          _buildEmailInput(),
-          const SizedBox(
-            height: 169,
-          ), // Space for missing multi-line text input
-          // Character count reminder
-          const Text(
-            '100 characters required',
-            style: TextStyle(
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w400,
-              fontSize: 10,
-              height: 1.2,
-              color: Color(0xFF595F63),
-            ),
-            textAlign: TextAlign.center,
+        // Headline input
+        _buildEmailInput(),
+        const SizedBox(height: 24),
+
+        // Description input
+        _buildDescriptionInput(),
+        const SizedBox(height: 8),
+
+        // Character count reminder
+        const Text(
+          '100 characters required',
+          style: TextStyle(
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w400,
+            fontSize: 10,
+            height: 1.2,
+            color: Color(0xFF595F63),
           ),
-          const SizedBox(height: 24),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 24),
 
-          // Submit button
-          _buildSubmitButton(),
-          const SizedBox(height: 80), // Space for bottom navigation overlap
-        ],
-      ),
+        // Submit button
+        _buildSubmitButton(),
+      ],
     );
   }
 
@@ -138,6 +149,50 @@ class ReviewSubmissionScreen extends StatelessWidget {
               fontSize: 16,
               height: 1.5,
               color: Color(0xFFCCCCCC),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDescriptionInput() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Description',
+          style: TextStyle(
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w400,
+            fontSize: 14,
+            height: 1.3,
+            color: Color(0xFF777F84),
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          maxLines: 4,
+          decoration: InputDecoration(
+            hintText: 'Share details of your experience',
+            hintStyle: const TextStyle(
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w400,
+              fontSize: 16,
+              height: 1.5,
+              color: Color(0xFFCCCCCC),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 16,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFCCCCCC), width: 1),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFCCCCCC), width: 1),
             ),
           ),
         ),

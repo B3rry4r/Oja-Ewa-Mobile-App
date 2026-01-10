@@ -23,7 +23,7 @@ class AppHeader extends StatelessWidget {
     this.height = 104,
     this.topPadding = 32,
     this.horizontalPadding = 16,
-    this.gap = 16,
+    this.gap = 8,
   });
 
   final bool showBack;
