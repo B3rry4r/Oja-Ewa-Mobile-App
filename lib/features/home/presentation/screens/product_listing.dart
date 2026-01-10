@@ -6,7 +6,7 @@ import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/sort_sheet.dart';
 
 import '../../../product/data/mock_products.dart';
-import '../../../product/presentation/widgets/product_card.dart';
+import 'package:ojaewa/core/widgets/product_card.dart';
 import '../../../product_detail/presentation/product_detail_screen.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/filter_sheet.dart';
 

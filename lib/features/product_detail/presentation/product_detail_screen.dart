@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/router/app_router.dart';
+import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/widgets/product_card.dart';
+import 'package:ojaewa/features/product/domain/product.dart';
+
 class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({super.key});
 
@@ -184,38 +190,22 @@ class _ProductDetailScreenState extends State<ProductDetailsScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFDEDEDE)),
-                color: Colors.white,
-              ),
-              child: const Icon(Icons.arrow_back, size: 20),
+            HeaderIconButton(
+              asset: AppIcons.back,
+              onTap: () => Navigator.of(context).maybePop(),
             ),
             Row(
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFDEDEDE)),
-                    color: Colors.white,
-                  ),
-                  child: const Icon(Icons.share, size: 20),
+                HeaderIconButton(
+                  asset: AppIcons.notification,
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.notifications),
                 ),
                 const SizedBox(width: 8),
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFDEDEDE)),
-                    color: Colors.white,
-                  ),
-                  child: const Icon(Icons.shopping_bag_outlined, size: 20),
+                HeaderIconButton(
+                  asset: AppIcons.bag,
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
                 ),
               ],
             ),
@@ -547,92 +537,39 @@ class _ProductDetailScreenState extends State<ProductDetailsScreen> {
   }
 
   Widget _buildRelatedProducts() {
+    // Using the shared ProductCard extracted from this design.
+    const products = [
+      // TODO: Replace with API-driven related products.
+      Product(
+        id: 'related1',
+        title: 'Agbada in Voue',
+        priceLabel: 'From N20,000',
+        rating: 4.0,
+        reviewCount: 8,
+        imageColor: 0xFFD9D9D9,
+      ),
+      Product(
+        id: 'related2',
+        title: 'Agbada in Voue',
+        priceLabel: 'From N20,000',
+        rating: 4.0,
+        reviewCount: 8,
+        imageColor: 0xFFF5E0CE,
+      ),
+    ];
+
     return SizedBox(
       height: 240,
-      child: ListView.builder(
+      child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: 2,
+        itemCount: products.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
-          return Container(
-            width: 168,
-            margin: EdgeInsets.only(right: index == 0 ? 8 : 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 152,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD9D9D9),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Stack(
-                    children: [
-                      const Center(
-                        child: Icon(
-                          Icons.image,
-                          size: 60,
-                          color: Colors.white54,
-                        ),
-                      ),
-                      Positioned(
-                        right: 12,
-                        bottom: 12,
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFDAF40),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.shopping_bag_outlined,
-                            size: 20,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Agbada in Voue',
-                  style: TextStyle(fontSize: 16, color: Color(0xFF241508)),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'From N20,000',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF241508),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Container(
-                      width: 12,
-                      height: 12,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFFDB80),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Text(
-                      '4.0',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF241508)),
-                    ),
-                    const SizedBox(width: 4),
-                    const Text(
-                      '(8)',
-                      style: TextStyle(fontSize: 10, color: Color(0xFF777F84)),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+          final product = products[index];
+          return ProductCard(
+            product: product,
+            onTap: () {},
+            onFavoriteTap: () {},
           );
         },
       ),

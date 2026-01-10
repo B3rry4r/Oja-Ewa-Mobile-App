@@ -8,7 +8,7 @@ import 'package:ojaewa/core/resources/app_assets.dart';
 import '../../../app/router/app_router.dart';
 
 import '../../product/data/mock_products.dart';
-import '../../product/presentation/widgets/product_card.dart';
+import 'package:ojaewa/core/widgets/product_card.dart';
 import '../../product_detail/presentation/product_detail_screen.dart';
 
 class WishlistScreen extends StatelessWidget {
