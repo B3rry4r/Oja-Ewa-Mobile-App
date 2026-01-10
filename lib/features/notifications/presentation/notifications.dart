@@ -15,6 +15,7 @@ class NotificationsScreen extends StatelessWidget {
           children: [
             const AppHeader(
               iconColor: Colors.white,
+              showActions: false,
             ),
             // Main content card
             Expanded(

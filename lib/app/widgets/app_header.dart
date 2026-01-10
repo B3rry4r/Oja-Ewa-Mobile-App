@@ -16,6 +16,7 @@ class AppHeader extends StatelessWidget {
     super.key,
     required this.iconColor,
     this.showBack = true,
+    this.showActions = true,
     this.onBack,
     this.title,
     this.backgroundColor = const Color(0xFF603814),
@@ -26,6 +27,7 @@ class AppHeader extends StatelessWidget {
   });
 
   final bool showBack;
+  final bool showActions;
   final VoidCallback? onBack;
   final Color iconColor;
   final Widget? title;
@@ -51,26 +53,28 @@ class AppHeader extends StatelessWidget {
 
     final right = Padding(
       padding: EdgeInsets.only(right: horizontalPadding),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          HeaderIconButton(
-            asset: AppIcons.notification,
-            iconColor: iconColor,
-            onTap: () => Navigator.of(context).pushNamed(
-              AppRoutes.notifications,
-            ),
-          ),
-          SizedBox(width: gap),
-          HeaderIconButton(
-            asset: AppIcons.bag,
-            iconColor: iconColor,
-            onTap: () => Navigator.of(context).pushNamed(
-              AppRoutes.shoppingBag,
-            ),
-          ),
-        ],
-      ),
+      child: showActions
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                HeaderIconButton(
+                  asset: AppIcons.notification,
+                  iconColor: iconColor,
+                  onTap: () => Navigator.of(context).pushNamed(
+                    AppRoutes.notifications,
+                  ),
+                ),
+                SizedBox(width: gap),
+                HeaderIconButton(
+                  asset: AppIcons.bag,
+                  iconColor: iconColor,
+                  onTap: () => Navigator.of(context).pushNamed(
+                    AppRoutes.shoppingBag,
+                  ),
+                ),
+              ],
+            )
+          : const SizedBox(width: 40, height: 40),
     );
 
     return Container(

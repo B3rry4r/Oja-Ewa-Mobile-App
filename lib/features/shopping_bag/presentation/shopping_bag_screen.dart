@@ -14,7 +14,10 @@ class ShoppingBagScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const AppHeader(iconColor: Colors.white),
+            const AppHeader(
+              iconColor: Colors.white,
+              showActions: false,
+            ),
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(

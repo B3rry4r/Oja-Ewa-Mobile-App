@@ -43,10 +43,10 @@ class BlogDetailScreen extends StatelessWidget {
                   // Text column
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         // Date
-                        const SizedBox(height: 17), // 117 - 100 = 17
                         Text(
                           '18th March, 2023',
                           style: TextStyle(
