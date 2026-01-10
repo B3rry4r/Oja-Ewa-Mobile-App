@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/widgets/image_placeholder.dart';
 
 class BlogDetailScreen extends StatelessWidget {
   const BlogDetailScreen({super.key});
@@ -32,7 +33,11 @@ class BlogDetailScreen extends StatelessWidget {
                       color: const Color(0xFFD9D9D9),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Placeholder(),
+                    child: const AppImagePlaceholder(
+                      width: 150,
+                      height: 100,
+                      borderRadius: 8,
+                    ),
                   ),
 
                   // Spacing between image and text

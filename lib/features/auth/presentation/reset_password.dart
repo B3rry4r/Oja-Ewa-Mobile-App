@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import '../../../app/router/app_router.dart';
 
 class ResetPasswordScreen extends StatelessWidget {
@@ -181,21 +182,11 @@ class ResetPasswordScreen extends StatelessWidget {
   Widget _buildBackgroundImage() {
     return Opacity(
       opacity: 0.03, // 3% opacity as per IR
-      child: SizedBox(
+      child: const AppImagePlaceholder(
         width: 234,
         height: 347,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: Color(0xFFFDAF40),
-          ),
-          child: Center(
-            child: Icon(
-              Icons.image_not_supported_outlined,
-              color: Color(0xFF603814),
-              size: 40,
-            ),
-          ),
-        ),
+        borderRadius: 0,
+        backgroundColor: Colors.transparent,
       ),
     );
   }

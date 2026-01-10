@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/widgets/image_placeholder.dart';
 
 class EditProfileScreen extends StatelessWidget {
   const EditProfileScreen({super.key});
@@ -20,14 +21,16 @@ class EditProfileScreen extends StatelessWidget {
               child: Opacity(
                 opacity: 0.03,
                 child: Container(
-                  width: 234,
-                  height: 347,
-                  color: Colors.grey[300], // Placeholder for image
-                  child: const Placeholder(),
+                  child: const AppImagePlaceholder(
+                    width: 234,
+                    height: 347,
+                    borderRadius: 0,
+                    backgroundColor: Colors.transparent,
+                  ),
                 ),
               ),
             ),
-            
+
             // Main content
             Column(
               children: [
@@ -44,7 +47,7 @@ class EditProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 // Form content
                 Expanded(
                   child: SingleChildScrollView(
@@ -58,7 +61,7 @@ class EditProfileScreen extends StatelessWidget {
                           value: 'sanusimot@gmail.com',
                           isEmail: true,
                         ),
-                        
+
                         // Email field
                         const SizedBox(height: 19), // 194 - 100 - 75
                         _buildFormField(
@@ -66,15 +69,15 @@ class EditProfileScreen extends StatelessWidget {
                           value: 'sanusimot@gmail.com',
                           isEmail: true,
                         ),
-                        
+
                         // Phone Number field
                         const SizedBox(height: 19), // 288 - 194 - 75
                         _buildPhoneField(),
-                        
+
                         // Save button
                         const SizedBox(height: 60), // 423 - 288 - 75
                         _buildSaveButton(),
-                        
+
                         // Bottom spacing
                         const SizedBox(height: 100),
                       ],
@@ -122,7 +125,9 @@ class EditProfileScreen extends StatelessWidget {
                 fontSize: 16,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: isEmail ? const Color(0xFFCCCCCC) : const Color(0xFF241508),
+                color: isEmail
+                    ? const Color(0xFFCCCCCC)
+                    : const Color(0xFF241508),
               ),
             ),
           ),
@@ -171,14 +176,11 @@ class EditProfileScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     // Dropdown arrow
-                    const Icon(
-                      Icons.arrow_drop_down,
-                      size: 20,
-                    ),
+                    const Icon(Icons.arrow_drop_down, size: 20),
                   ],
                 ),
               ),
-              
+
               // Phone number
               Expanded(
                 child: Row(

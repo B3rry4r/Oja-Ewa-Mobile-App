@@ -29,15 +29,19 @@ class NotificationsScreen extends StatelessWidget {
 
   Widget _buildNotificationContent() {
     return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF8F1),
-        borderRadius: BorderRadius.circular(28),
+      decoration: const BoxDecoration(
+        color: Color(0xFFFFF8F1),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(28),
+          topRight: Radius.circular(28),
+        ),
       ),
       child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             const Padding(
               padding: EdgeInsets.only(left: 18, top: 16, bottom: 20),
               child: Text(
@@ -60,7 +64,8 @@ class NotificationsScreen extends StatelessWidget {
               isUnread: false,
             ),
             // Add more notification items as needed
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -71,7 +76,7 @@ class NotificationsScreen extends StatelessWidget {
     required bool isUnread,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xFFCCCCCC)),

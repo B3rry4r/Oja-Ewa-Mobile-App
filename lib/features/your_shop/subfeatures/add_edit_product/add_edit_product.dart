@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/your_shop/subfeatures/add_edit_product/tribe_picker_sheet.dart';
 
 import '../product/domain/shop_product.dart';
@@ -371,28 +373,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
           style: BorderStyle.solid,
         ),
       ),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.cloud_upload_outlined,
-            size: 32,
-            color: Color(0xFF89858A),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            "Browse Document",
-            style: TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _tinyText("High resolution image\nPDF, JPG, PNG formats"),
-              const SizedBox(width: 20),
-              _tinyText("200 x 200px\n20kb max"),
-            ],
-          ),
-        ],
+      child: const Center(
+        child: AppImagePlaceholder(
+          width: 96,
+          height: 96,
+          borderRadius: 0,
+          backgroundColor: Colors.transparent,
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/widgets/image_placeholder.dart';
 
 import '../data/mock_addresses.dart';
 import '../domain/address.dart';
@@ -58,12 +59,11 @@ class AddressesScreen extends StatelessWidget {
                         alignment: Alignment.centerRight,
                         child: Opacity(
                           opacity: 0.03,
-                          child: SizedBox(
+                          child: const AppImagePlaceholder(
                             width: 234,
                             height: 347,
-                            child: const Icon(
-                              Icons.image_not_supported_outlined,
-                            ),
+                            borderRadius: 0,
+                            backgroundColor: Colors.transparent,
                           ),
                         ),
                       ),

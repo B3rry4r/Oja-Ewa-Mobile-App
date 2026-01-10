@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/widgets/image_placeholder.dart';
 
 class ShoppingBagScreen extends StatelessWidget {
   const ShoppingBagScreen({super.key});
@@ -9,70 +10,66 @@ class ShoppingBagScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF603814), // Main background color
-      body: SingleChildScrollView(
+      backgroundColor: const Color(0xFF603814),
+      body: SafeArea(
         child: Column(
           children: [
-            const AppHeader(
-              iconColor: Colors.white,
-            ),
+            const AppHeader(iconColor: Colors.white),
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFF8F1),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(28),
+                    topRight: Radius.circular(28),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // "My Bag" title
+                        const Padding(
+                          padding: EdgeInsets.fromLTRB(17, 16, 16, 16),
+                          child: Text(
+                            'My Bag',
+                            style: TextStyle(
+                              fontFamily: 'Campton',
+                              fontSize: 33,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF241508),
+                              letterSpacing: -1,
+                              height: 1.2,
+                            ),
+                          ),
+                        ),
 
-            const SizedBox(height: 24),
+                        _buildProductItem(
+                          productName: 'Agbada in Voue',
+                          price: 'N20,000',
+                          quantity: 1,
+                          size: 'XS',
+                          isFirstItem: true,
+                        ),
+                        _buildProductItem(
+                          productName: 'Agbada in Voue',
+                          price: 'N20,000',
+                          quantity: 1,
+                          size: 'XS',
+                          isFirstItem: false,
+                        ),
 
-            // Main content card
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF8F1), // Cream background
-                borderRadius: BorderRadius.circular(28),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // "My Bag" title
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(17, 16, 16, 16),
-                    child: Text(
-                      'My Bag',
-                      style: TextStyle(
-                        fontFamily: 'Campton',
-                        fontSize: 33,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF241508),
-                        letterSpacing: -1,
-                        height: 1.2,
-                      ),
+                        _buildSummarySection(),
+                        _buildCheckoutSection(),
+                        const SizedBox(height: 32),
+                      ],
                     ),
                   ),
-
-                  // First product item
-                  _buildProductItem(
-                    productName: 'Agbada in Voue',
-                    price: 'N20,000',
-                    quantity: 1,
-                    size: 'XS',
-                    isFirstItem: true,
-                  ),
-
-                  // Second product item
-                  _buildProductItem(
-                    productName: 'Agbada in Voue',
-                    price: 'N20,000',
-                    quantity: 1,
-                    size: 'XS',
-                    isFirstItem: false,
-                  ),
-
-                  // Summary section
-                  _buildSummarySection(),
-
-                  // Checkout button section
-                  _buildCheckoutSection(),
-                ],
+                ),
               ),
             ),
-
-            const SizedBox(height: 32), // Bottom padding
           ],
         ),
       ),
@@ -110,9 +107,11 @@ class ShoppingBagScreen extends StatelessWidget {
               color: const Color(0xFFD9D9D9),
               borderRadius: BorderRadius.circular(8),
             ),
-            // In a real app, this would be an actual image
-            child:
-                const Placeholder(), // Replace with Image.network or AssetImage
+            child: const AppImagePlaceholder(
+              width: 122,
+              height: 152,
+              borderRadius: 8,
+            ),
           ),
 
           const SizedBox(width: 12),
