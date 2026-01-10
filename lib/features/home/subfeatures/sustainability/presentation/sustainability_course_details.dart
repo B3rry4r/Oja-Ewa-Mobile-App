@@ -53,9 +53,6 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
             
             // Fixed Bottom Action Card
             _buildBottomActionCard(context),
-            
-            // Floating Add Review Button
-            _buildFloatingReviewButton(),
           ],
         ),
       ),
@@ -439,38 +436,6 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFloatingReviewButton() {
-    return Positioned(
-      bottom: 130,
-      right: 22,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: IconButton(
-          icon: const Icon(
-            Icons.add_circle_outline,
-            size: 20,
-            color: Color(0xFF603814),
-          ),
-          padding: EdgeInsets.zero,
-          onPressed: () {
-            // Handle add review
-          },
-        ),
-      ),
-    );
-  }
 
   void _showLearnMoreDialog(BuildContext context) {
     showDialog(
