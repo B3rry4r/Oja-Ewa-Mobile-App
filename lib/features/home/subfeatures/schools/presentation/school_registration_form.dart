@@ -296,37 +296,39 @@ class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScr
           ),
           child: Row(
             children: [
-              // Country Flag and Code
-              Padding(
-                padding: const EdgeInsets.only(left: 20),
-                child: Row(
-                  children: [
-                    // Flag placeholder (you can use actual flag asset)
-                    Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(2),
+              // Country code selector
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () async {
+                  await SelectionBottomSheet.show(
+                    context,
+                    title: 'Country code',
+                    options: const ['+234', '+233', '+254', '+27'],
+                    selected: '+234',
+                  );
+                  // TODO: store selected code when API wiring starts.
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 8),
+                  child: Row(
+                    children: const [
+                      Text(
+                        '+234',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Campton',
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF241508),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 20,
-                      color: Color(0xFF1E2021),
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      '+234',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'Campton',
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF241508),
+                      SizedBox(width: 4),
+                      Icon(
+                        Icons.keyboard_arrow_down,
+                        size: 20,
+                        color: Color(0xFF1E2021),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               
@@ -373,7 +375,6 @@ class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScr
                 ),
               ),
               
-              const SizedBox(width: 20),
             ],
           ),
         ),

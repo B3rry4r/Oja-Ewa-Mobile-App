@@ -502,6 +502,7 @@ class MusicArtistProfileScreen extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 
