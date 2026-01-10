@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ojaewa/features/home/presentation/screens/category_screen.dart';
 import 'package:ojaewa/features/product/presentation/screens/product_listing_screen.dart';
+import 'package:ojaewa/features/home/subfeatures/music/presentation/music_artist_profile.dart';
 
 class MusicScreen extends StatelessWidget {
   const MusicScreen({super.key});
@@ -27,6 +28,13 @@ class MusicScreen extends StatelessWidget {
               pageTitle: item == 'View All' ? section.title : item,
               breadcrumb: 'Music • ${section.title}',
               showBusinessTypeFilter: false,
+              onProductTap: (context) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const MusicArtistProfileScreen(),
+                  ),
+                );
+              },
             ),
           ),
         );

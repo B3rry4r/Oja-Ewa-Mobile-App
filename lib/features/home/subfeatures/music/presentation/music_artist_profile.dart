@@ -4,9 +4,9 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
 
-/// Sustainability Course Detail Screen - Shows information about a course/event
-class SustainabilityCourseDetailScreen extends StatelessWidget {
-  const SustainabilityCourseDetailScreen({super.key});
+/// Music Artist Profile Screen - Shows detailed information about a music artist
+class MusicArtistProfileScreen extends StatelessWidget {
+  const MusicArtistProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,25 +22,30 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 104), // Space for standard header
                   
-                  // Course Header with Image
-                  _buildCourseHeader(),
+                  // Artist Header with Image
+                  _buildArtistHeader(),
                   
                   const SizedBox(height: 20),
                   
-                  // Description Section
-                  _buildDescriptionSection(),
+                  // Biography Section
+                  _buildBiographySection(),
                   
                   const SizedBox(height: 16),
                   
-                  // Speakers Section
-                  _buildSpeakersSection(),
+                  // Contact Details Section
+                  _buildContactSection(),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Albums Section
+                  _buildAlbumsSection(),
                   
                   const SizedBox(height: 16),
                   
                   // Reviews Section
                   _buildReviewsSection(context),
                   
-                  const SizedBox(height: 180), // Space for bottom card and button
+                  const SizedBox(height: 180), // Space for bottom card
                 ],
               ),
             ),
@@ -51,8 +56,8 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
               iconColor: Color(0xFF241508),
             ),
             
-            // Fixed Bottom Action Card
-            _buildBottomActionCard(context),
+            // Fixed Bottom Contact Card
+            _buildBottomContactCard(context),
             
             // Floating Add Review Button
             _buildFloatingReviewButton(),
@@ -62,13 +67,13 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCourseHeader() {
+  Widget _buildArtistHeader() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Course Image
+          // Artist Image
           const AppImagePlaceholder(
             width: 168,
             height: 198,
@@ -77,13 +82,13 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
           
           const SizedBox(width: 7),
           
-          // Course Info
+          // Artist Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Managing\nFinances',
+                  'Rasheed\nKelani',
                   style: TextStyle(
                     fontSize: 20,
                     fontFamily: 'Campton',
@@ -93,7 +98,7 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
                   ),
                 ),
                 
-                const SizedBox(height: 30),
+                const SizedBox(height: 12),
                 
                 // Rating
                 Row(
@@ -141,7 +146,7 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDescriptionSection() {
+  Widget _buildBiographySection() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -153,7 +158,7 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Description',
+            'Biography',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
@@ -177,7 +182,7 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSpeakersSection() {
+  Widget _buildContactSection() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -189,7 +194,7 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Speakers',
+            'Contact Details',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
@@ -198,35 +203,230 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
             ),
           ),
           
-          const SizedBox(height: 12),
-          
-          // Speaker 1
-          const Text(
-            'Lennox Emanuel \n(Strategist)',
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF1E2021),
-              height: 1.25,
-            ),
-          ),
-          
           const SizedBox(height: 16),
           
-          // Speaker 2
-          const Text(
-            'Lennox Emanuel \n(Strategist)',
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF1E2021),
-              height: 1.25,
-            ),
+          // Address
+          _buildContactItem(
+            icon: Icons.location_on,
+            title: 'Address',
+            content: '345 Ralph Shodeinde Street, Central Area Abuja, 9001',
+            actionText: 'Get Direction',
+            onActionTap: () {
+              // Open maps
+            },
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // Phone
+          _buildContactItem(
+            icon: Icons.phone,
+            title: 'Phone Number',
+            content: '+234 8068 2833 23\n+234 9124 2344 21',
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // Email
+          _buildContactItem(
+            icon: Icons.email,
+            title: 'Email Address',
+            content: 'rasheedkelani@gmail.com',
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // Working Hours
+          _buildContactItem(
+            icon: Icons.access_time,
+            title: 'Working hours',
+            content: 'Monday to Friday: 9am - 6pm\nSaturday - Sunday: Closed',
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildContactItem({
+    required IconData icon,
+    required String title,
+    required String content,
+    String? actionText,
+    VoidCallback? onActionTap,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: const Color(0xFF603814),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Icon(
+            icon,
+            size: 18,
+            color: Colors.white,
+          ),
+        ),
+        
+        const SizedBox(width: 8),
+        
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF1E2021),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                content,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black,
+                  height: 1.5,
+                ),
+              ),
+              if (actionText != null && onActionTap != null) ...[
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: onActionTap,
+                  child: Row(
+                    children: [
+                      Text(
+                        actionText,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontFamily: 'Campton',
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF3C4042),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.arrow_forward,
+                        size: 14,
+                        color: Color(0xFF3C4042),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAlbumsSection() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFCCCCCC)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Albums',
+            style: TextStyle(
+              fontSize: 16,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1E2021),
+            ),
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // Album List
+          _buildAlbumItem(
+            title: 'Kelewa',
+            streamingLinks: 'Apple Music, Spotify, Youtube',
+          ),
+          
+          const SizedBox(height: 20),
+          
+          _buildAlbumItem(
+            title: 'Baba L\'oke',
+            streamingLinks: 'Apple Music, Spotify, Youtube',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAlbumItem({
+    required String title,
+    required String streamingLinks,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Album Title with Play Button
+        Row(
+          children: [
+            // Play Button
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: const Color(0xFF603814),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Icon(
+                Icons.play_arrow,
+                size: 20,
+                color: Colors.white,
+              ),
+            ),
+            
+            const SizedBox(width: 8),
+            
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF1E2021),
+                ),
+              ),
+            ),
+          ],
+        ),
+        
+        const SizedBox(height: 12),
+        
+        // Streaming Links
+        Padding(
+          padding: const EdgeInsets.only(left: 40),
+          child: Text(
+            streamingLinks,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF777F84),
+              height: 1.4,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -237,7 +437,7 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
         MaterialPageRoute(builder: (_) => const ReviewsScreen()),
       ),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xFFDEDEDE)),
@@ -302,7 +502,7 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
           ),
         ],
       ),
-    ));
+    );
   }
 
   Widget _buildReviewItem({
@@ -387,7 +587,7 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomActionCard(BuildContext context) {
+  Widget _buildBottomContactCard(BuildContext context) {
     return Positioned(
       bottom: 0,
       left: 0,
@@ -397,20 +597,54 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
           color: Color(0xFF603814),
           borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
         ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 36),
+        child: Row(
           children: [
-            const SizedBox(height: 38), // Extra padding at top
+            // Call Button
+            Expanded(
+              flex: 1,
+              child: OutlinedButton(
+                onPressed: () {
+                  // Handle call action
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Color(0xFFFDAF40), width: 1.5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(
+                      Icons.phone,
+                      size: 20,
+                      color: Color(0xFFFDAF40),
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'Call',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Campton',
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFFDAF40),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             
-            // Learn More Button
-            SizedBox(
-              width: double.infinity,
-              height: 57,
+            const SizedBox(width: 8),
+            
+            // WhatsApp Button
+            Expanded(
+              flex: 3,
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle learn more action
-                  _showLearnMoreDialog(context);
+                  // Handle WhatsApp action
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFDAF40),
@@ -419,20 +653,30 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
                   ),
                   elevation: 8,
                   shadowColor: const Color(0xFFFDAF40).withOpacity(0.3),
+                  padding: const EdgeInsets.symmetric(vertical: 18),
                 ),
-                child: const Text(
-                  'Learn More',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Campton',
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFFFFFBF5),
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(
+                      Icons.chat_bubble_outline,
+                      size: 20,
+                      color: Color(0xFFFFFBF5),
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'Whatsapp',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Campton',
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFFFFBF5),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            
-            const SizedBox(height: 8),
           ],
         ),
       ),
@@ -441,7 +685,7 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
 
   Widget _buildFloatingReviewButton() {
     return Positioned(
-      bottom: 130,
+      bottom: 165,
       right: 22,
       child: Container(
         width: 40,
@@ -472,60 +716,4 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
     );
   }
 
-  void _showLearnMoreDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        title: const Text(
-          'Course Information',
-          style: TextStyle(
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        content: const Text(
-          'Would you like to enroll in this course or get more details?',
-          style: TextStyle(
-            fontFamily: 'Campton',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text(
-              'Cancel',
-              style: TextStyle(
-                fontFamily: 'Campton',
-                color: Color(0xFF777F84),
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // Navigate to enrollment or details screen
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFDAF40),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text(
-              'Enroll Now',
-              style: TextStyle(
-                fontFamily: 'Campton',
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

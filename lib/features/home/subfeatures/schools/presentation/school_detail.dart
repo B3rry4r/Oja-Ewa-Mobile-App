@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
+import 'package:ojaewa/features/home/subfeatures/schools/presentation/school_registration_form.dart';
 
 /// School Detail Screen - Shows detailed information about a training school/institution
 class SchoolDetailScreen extends StatelessWidget {
@@ -546,7 +547,11 @@ class SchoolDetailScreen extends StatelessWidget {
               height: 57,
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle registration via Oja Ewa
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const SchoolRegistrationFormScreen(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFDAF40),

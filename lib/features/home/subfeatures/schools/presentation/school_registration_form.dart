@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/widgets/selection_bottom_sheet.dart';
+
 /// School Registration Form Screen - Collects user details for school enrollment
 class SchoolRegistrationFormScreen extends StatefulWidget {
   const SchoolRegistrationFormScreen({super.key});
@@ -38,7 +41,20 @@ class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScr
         child: Column(
           children: [
             // Top App Bar
-            _buildTopAppBar(),
+            const AppHeader(
+              backgroundColor: Color(0xFFFFF8F1),
+              iconColor: Color(0xFF241508),
+              showActions: false,
+              title: Text(
+                'Register',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF241508),
+                ),
+              ),
+            ),
             
             // Scrollable Form Content
             Expanded(
@@ -71,7 +87,7 @@ class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScr
                         items: ['Nigeria', 'Ghana', 'Kenya', 'South Africa'],
                         onChanged: (value) {
                           setState(() {
-                            selectedCountry = value!;
+                            selectedCountry = value;
                           });
                         },
                       ),
@@ -99,7 +115,7 @@ class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScr
                         items: ['FCT', 'Lagos', 'Rivers', 'Kano'],
                         onChanged: (value) {
                           setState(() {
-                            selectedState = value!;
+                            selectedState = value;
                           });
                         },
                       ),
@@ -139,59 +155,11 @@ class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScr
     );
   }
 
-  Widget _buildTopAppBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      child: Row(
-        children: [
-          // Back Button
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFDEDEDE)),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new,
-                size: 20,
-                color: Color(0xFF241508),
-              ),
-              padding: EdgeInsets.zero,
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ),
-          
-          const Spacer(),
-          
-          // Title
-          const Text(
-            'Form',
-            style: TextStyle(
-              fontSize: 22,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
-            ),
-          ),
-          
-          const Spacer(),
-          
-          // Placeholder for symmetry
-          const SizedBox(width: 40),
-        ],
-      ),
-    );
-  }
-
   Widget _buildDropdownField({
     required String label,
     required String value,
     required List<String> items,
-    required ValueChanged<String?> onChanged,
+    required ValueChanged<String> onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,33 +174,43 @@ class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScr
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: value,
-              isExpanded: true,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              icon: const Icon(
-                Icons.keyboard_arrow_down,
-                color: Color(0xFF1E2021),
-              ),
-              style: const TextStyle(
-                fontSize: 16,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w400,
-                color: Color(0xFF1E2021),
-              ),
-              items: items.map((String item) {
-                return DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                );
-              }).toList(),
-              onChanged: onChanged,
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () async {
+            final selected = await SelectionBottomSheet.show(
+              context,
+              title: label,
+              options: items,
+              selected: value,
+            );
+            if (selected != null && selected != value) {
+              onChanged(selected);
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFFCCCCCC)),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF1E2021),
+                    ),
+                  ),
+                ),
+                const Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Color(0xFF1E2021),
+                ),
+              ],
             ),
           ),
         ),

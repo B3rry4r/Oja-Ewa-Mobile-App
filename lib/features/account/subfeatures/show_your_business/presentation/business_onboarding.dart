@@ -56,8 +56,6 @@ class BusinessOnboardingScreen extends StatelessWidget {
                         fontFamily: 'Campton',
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    _buildPrimaryButton(context, "Get Started"),
                   ],
                 ),
               ),

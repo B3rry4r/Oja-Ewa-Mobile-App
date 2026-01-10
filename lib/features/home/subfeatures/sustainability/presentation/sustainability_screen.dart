@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:ojaewa/features/home/presentation/screens/category_screen.dart';
 import 'package:ojaewa/features/product/presentation/screens/product_listing_screen.dart';
+import 'package:ojaewa/features/home/subfeatures/sustainability/presentation/sustainability_course_details.dart';
 
 class SustainabilityScreen extends StatelessWidget {
   const SustainabilityScreen({super.key});
@@ -84,6 +85,13 @@ class SustainabilityScreen extends StatelessWidget {
               pageTitle: item == 'View All' ? section.title : item,
               breadcrumb: 'Sustainability • ${section.title}',
               showBusinessTypeFilter: false,
+              onProductTap: (context) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const SustainabilityCourseDetailScreen(),
+                  ),
+                );
+              },
             ),
           ),
         );
