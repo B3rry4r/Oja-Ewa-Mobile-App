@@ -14,59 +14,62 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Container(
-        decoration: BoxDecoration(color: const Color(0xFFFFF8F1)),
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 25),
+      body: SafeArea(
+        bottom: false,
+        child: Container(
+          decoration: const BoxDecoration(color: Color(0xFFFFF8F1)),
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 25),
 
-                    // Header
-                    _buildHeader(context),
+                      // Header
+                      _buildHeader(context),
 
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    // Promo Cards (Horizontal Scroll)
-                    _buildPromoCardsSection(),
+                      // Promo Cards (Horizontal Scroll)
+                      _buildPromoCardsSection(),
 
-                    const SizedBox(height: 32),
+                      const SizedBox(height: 32),
 
-                    // Hero Title
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      child: _buildHeroTitle(),
-                    ),
+                      // Hero Title
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        child: _buildHeroTitle(),
+                      ),
 
-                    const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                    // Category Grid Section with light background
-                    Container(
-                      width: double.infinity,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFFF8F1),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(25),
-                          topRight: Radius.circular(25),
+                      // Category Grid Section with light background
+                      Container(
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFFFF8F1),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25),
+                          ),
                         ),
+                        padding: const EdgeInsets.only(
+                          top: 24,
+                          left: 16,
+                          right: 16,
+                          bottom: 32,
+                        ),
+                        child: _buildCategoryGrid(context),
                       ),
-                      padding: const EdgeInsets.only(
-                        top: 24,
-                        left: 16,
-                        right: 16,
-                        bottom: 32,
-                      ),
-                      child: _buildCategoryGrid(context),
-                    ),
-                    const SizedBox(height: AppBottomNavBar.height),
-                  ],
+                      const SizedBox(height: AppBottomNavBar.height),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
