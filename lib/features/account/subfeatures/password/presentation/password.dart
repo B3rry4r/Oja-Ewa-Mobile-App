@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
 
 class ChangePasswordScreen extends StatelessWidget {
   const ChangePasswordScreen({super.key});
@@ -58,7 +59,7 @@ class ChangePasswordScreen extends StatelessWidget {
                       child: Opacity(
                         opacity: 0.03,
                         child: Image.asset(
-                          'assets/images/password_decoration.png',
+                          AppImages.logoOutline,
                           width: 234,
                           height: 347,
                           fit: BoxFit.contain,

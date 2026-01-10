@@ -1,9 +1,7 @@
 // category_screen.dart
 import 'package:flutter/material.dart';
 
-import 'package:ojaewa/app/widgets/header_icon_button.dart';
-import 'package:ojaewa/core/resources/app_assets.dart';
-import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/filter_sheet.dart';
+import 'package:ojaewa/app/widgets/app_header.dart';
 
 typedef CategoryItemTap = void Function(CategorySection section, String item);
 
@@ -70,36 +68,9 @@ class CategorySection {
 class _CategoryScreenState extends State<CategoryScreen> {
   Map<String, bool> _expandedSections = {};
 
-  void _onBackPressed() {
-    Navigator.pop(context);
-  }
-
-  void _onFilterPressed() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.transparent,
-      builder: (context) => FilterSheet(
-        showBusinessType: widget.showBusinessTypeFilter,
-        initialFilters: {
-          'location': 'Ghana',
-          'businessType': 'Freelancer',
-          'reviewRange': '5-4',
-        },
-        onApplyFilters: (filters) {
-          print('Applied filters: $filters');
-        },
-        onClearFilters: () {
-          print('Filters cleared');
-        },
-      ),
-    );
-  }
-
-  void _onSettingsPressed() {
-    print('Settings button pressed');
-  }
+  // void _onBackPressed() {
+  //   Navigator.pop(context);
+  // }
 
   void _toggleSectionExpansion(String sectionTitle) {
     setState(() {
@@ -112,15 +83,15 @@ class _CategoryScreenState extends State<CategoryScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF603814),
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             // Header with buttons
-            if (widget.showHeaderButtons) _buildHeader(),
+            if (widget.showHeaderButtons) _buildHeader(context),
             
             // Main Content
             Expanded(
               child: Container(
-                margin: const EdgeInsets.only(top: 10),
                 decoration: const BoxDecoration(
                   color: Color(0xFFFFF8F1),
                   borderRadius: BorderRadius.only(
@@ -137,34 +108,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 32, 16, 32),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          HeaderIconButton(
-            asset: AppIcons.back,
-            iconColor: Colors.white,
-            onTap: _onBackPressed,
-          ),
-          Row(
-            children: [
-              HeaderIconButton(
-                asset: AppIcons.filter,
-                iconColor: Colors.white,
-                onTap: _onFilterPressed,
-              ),
-              const SizedBox(width: 16),
-              HeaderIconButton(
-                asset: AppIcons.sort,
-                iconColor: Colors.white,
-                onTap: _onSettingsPressed,
-              ),
-            ],
-          ),
-        ],
-      ),
+  Widget _buildHeader(BuildContext context) {
+    return const AppHeader(
+      iconColor: Colors.white,
     );
   }
 

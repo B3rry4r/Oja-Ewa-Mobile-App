@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:ojaewa/app/router/app_router.dart';
-import 'package:ojaewa/app/widgets/header_icon_button.dart';
+// import 'package:ojaewa/app/router/app_router.dart';
+import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/filter_sheet.dart';
+import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/sort_sheet.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
 import 'package:ojaewa/features/product_detail/presentation/product_detail_screen.dart';
@@ -42,7 +44,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
           children: [
             // Top App Bar
             _buildTopAppBar(),
-            
+
             // Main Content Card
             Expanded(
               child: Container(
@@ -69,7 +71,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
                           ),
                         ),
                       ),
-                      
+
                       // Breadcrumb
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -88,17 +90,17 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
 
                       // Category Pills
                       _buildCategoryPills(),
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       // Sort and Filter Buttons
                       _buildSortFilterButtons(),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Product Grid
                       _buildProductGrid(),
-                      
+
                       const SizedBox(height: 100), // Bottom padding for nav bar
                     ],
                   ),
@@ -112,37 +114,12 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
   }
 
   Widget _buildTopAppBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      child: Row(
-        children: [
-          HeaderIconButton(
-            asset: AppIcons.back,
-            iconColor: Colors.white,
-            onTap: () => Navigator.of(context).maybePop(),
-          ),
-          const Spacer(),
-          HeaderIconButton(
-            asset: AppIcons.search,
-            iconColor: Colors.white,
-            onTap: () {
-              // TODO: wire search
-            },
-          ),
-          const SizedBox(width: 8),
-          HeaderIconButton(
-            asset: AppIcons.bag,
-            iconColor: Colors.white,
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
-          ),
-        ],
-      ),
-    );
+    return const AppHeader(iconColor: Colors.white);
   }
 
   Widget _buildCategoryPills() {
     final categories = ['All', 'Dress', 'Skirts and Blouse', 'Blouses'];
-    
+
     return SizedBox(
       height: 42,
       child: ListView.separated(
@@ -153,7 +130,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
         itemBuilder: (context, index) {
           final category = categories[index];
           final isSelected = category == selectedCategory;
-          
+
           return GestureDetector(
             onTap: () {
               setState(() {
@@ -163,9 +140,11 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFFA15E22) : Colors.transparent,
-                border: isSelected 
-                    ? null 
+                color: isSelected
+                    ? const Color(0xFFA15E22)
+                    : Colors.transparent,
+                border: isSelected
+                    ? null
                     : Border.all(color: const Color(0xFFCCCCCC)),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -176,8 +155,8 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
                     fontSize: 14,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
-                    color: isSelected 
-                        ? const Color(0xFFFBFBFB) 
+                    color: isSelected
+                        ? const Color(0xFFFBFBFB)
                         : const Color(0xFF301C0A),
                   ),
                 ),
@@ -199,18 +178,28 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
             iconAsset: AppIcons.sort,
             label: 'Sort',
             onTap: () {
-              // Handle sort
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const SortOverlay(),
+              );
             },
           ),
-          
+
           const Spacer(),
-          
+
           // Filter Button
           _buildActionButton(
             iconAsset: AppIcons.filter,
             label: 'Filters',
             onTap: () {
-              // Handle filters
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const FilterSheet(),
+              );
             },
           ),
         ],
@@ -290,9 +279,9 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Second Row
           Row(
             children: [
@@ -349,9 +338,7 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
           handler(context);
         } else {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const ProductDetailsScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const ProductDetailsScreen()),
           );
         }
       },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
 
@@ -15,49 +16,9 @@ class BusinessProfileBeautyScreen extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            // Top navigation bar
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFDEDEDE)),
-                    ),
-                    child: const Icon(Icons.arrow_back, size: 20),
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFDEDEDE)),
-                        ),
-                        child: const Icon(Icons.share, size: 20),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFDEDEDE)),
-                        ),
-                        child: const Icon(
-                          Icons.shopping_bag_outlined,
-                          size: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            const AppHeader(
+              backgroundColor: Color(0xFFFFF8F1),
+              iconColor: Color(0xFF241508),
             ),
 
             // Scrollable content

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
 
 class NotificationsSettingsScreen extends StatelessWidget {
   const NotificationsSettingsScreen({super.key});
@@ -56,7 +57,7 @@ class NotificationsSettingsScreen extends StatelessWidget {
                       child: Opacity(
                         opacity: 0.03,
                         child: Image.asset(
-                          'assets/images/notifications_decoration.png',
+                          AppImages.logoOutline,
                           width: 234,
                           height: 347,
                           fit: BoxFit.contain,

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
 
 class TrackingOrderScreen extends StatelessWidget {
   const TrackingOrderScreen({super.key});
@@ -60,7 +61,7 @@ class TrackingOrderScreen extends StatelessWidget {
                       child: Opacity(
                         opacity: 0.03,
                         child: Image.asset(
-                          'assets/images/tracking_decoration.png',
+                          AppImages.logoOutline,
                           width: 234,
                           height: 347,
                           fit: BoxFit.contain,

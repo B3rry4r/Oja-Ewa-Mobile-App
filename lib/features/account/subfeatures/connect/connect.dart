@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/widgets/background_logo_watermark.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ConnectToUsScreen extends StatelessWidget {
@@ -13,32 +14,24 @@ class ConnectToUsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const AppHeader(
-                backgroundColor: Color(0xFFFFF8F1),
-                iconColor: Color(0xFF241508),
-              ),
-              
-              // Social media connections
-              _buildSocialConnections(),
-              
-              // Decorative background image
-              Align(
-                alignment: Alignment.centerRight,
-                child: Opacity(
-                  opacity: 0.03,
-                  child: Image.asset(
-                    'assets/images/connect_decoration.png',
-                    width: 234,
-                    height: 347,
-                    fit: BoxFit.contain,
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  const AppHeader(
+                    backgroundColor: Color(0xFFFFF8F1),
+                    iconColor: Color(0xFF241508),
                   ),
-                ),
+
+                  // Social media connections
+                  _buildSocialConnections(),
+                  const SizedBox(height: 40),
+                ],
               ),
-            ],
-          ),
+            ),
+            const BackgroundLogoWatermark(),
+          ],
         ),
       ),
     );
