@@ -186,6 +186,8 @@ class _ProductDetailScreenState extends State<ProductDetailsScreen> {
       left: 0,
       right: 0,
       child: Container(
+        height: 104,
+        color: const Color(0xFFFFF8F1),
         padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -567,6 +569,7 @@ class _ProductDetailScreenState extends State<ProductDetailsScreen> {
         itemBuilder: (context, index) {
           final product = products[index];
           return ProductCard(
+            width: 168,
             product: product,
             onTap: () {},
             onFavoriteTap: () {},

@@ -13,6 +13,7 @@ class ProductCard extends StatelessWidget {
     required this.product,
     required this.onTap,
     required this.onFavoriteTap,
+    this.width,
   });
 
   final Product product;
@@ -22,17 +23,17 @@ class ProductCard extends StatelessWidget {
   /// In this design it maps to the bag/action button.
   final VoidCallback onFavoriteTap;
 
+  /// Optional fixed width for horizontal lists.
+  /// When null, the card expands to fit parent constraints (responsive).
+  final double? width;
+
   @override
   Widget build(BuildContext context) {
     final imageColor = Color(product.imageColor ?? 0xFFD9D9D9);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        width: 168,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    final Widget content = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
             Container(
               height: 152,
               decoration: BoxDecoration(
@@ -129,9 +130,12 @@ class ProductCard extends StatelessWidget {
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+      ],
+    );
+
+    return GestureDetector(
+      onTap: onTap,
+      child: width == null ? content : SizedBox(width: width, child: content),
     );
   }
 }
