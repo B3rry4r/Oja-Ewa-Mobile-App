@@ -351,7 +351,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Expanded(child: SvgPicture.asset(iconAsset, width: 80, height: 80)),
+            Expanded(child: SvgPicture.asset(iconAsset)),
             const SizedBox(height: 16),
           ],
         ),

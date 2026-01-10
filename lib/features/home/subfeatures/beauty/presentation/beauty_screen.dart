@@ -1,7 +1,7 @@
 // beauty_screen.dart
 import 'package:flutter/material.dart';
-import 'package:ojaewa/features/home/presentation/widgets/category_screen.dart';
-import 'package:ojaewa/features/home/presentation/widgets/product_listing.dart';
+import 'package:ojaewa/features/home/presentation/screens/category_screen.dart';
+import 'package:ojaewa/features/home/presentation/screens/product_listing.dart';
 
 class BeautyScreen extends StatelessWidget {
   const BeautyScreen({super.key});
