@@ -3,9 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 
 import '../../../../../../../app/router/app_router.dart';
+import '../service_list_editor.dart';
 
-class BrandBusinessDetailsScreen extends StatelessWidget {
+class BrandBusinessDetailsScreen extends StatefulWidget {
   const BrandBusinessDetailsScreen({super.key});
+
+  @override
+  State<BrandBusinessDetailsScreen> createState() => _BrandBusinessDetailsScreenState();
+}
+
+class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen> {
+  String _selectedOffering = 'Selling Product';
+  final TextEditingController _professionalTitleController = TextEditingController();
+  final List<ServiceListItem> _services = [ServiceListItem()];
+
+  @override
+  void dispose() {
+    _professionalTitleController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,22 +56,49 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Form Fields
-            _buildInputField("Business Name", "Your City"),
+            _buildInputField("Business Name", "Enter business name"),
             const SizedBox(height: 24),
             _buildInputField(
-              "Business Decription",
-              "Share Short description of your business",
+              "Business Description",
+              "Share short description of your business",
               maxLines: 4,
               helperText: "100 characters required",
             ),
             const SizedBox(height: 24),
-            _buildDropdownField("Select Brand Category", "select"),
-            const SizedBox(height: 24),
-            _buildInputField(
-              "Product  List",
-              "List your services here",
-              maxLines: 4,
+
+            // Offering type
+            const Text(
+              "Select type of offering",
+              style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
             ),
+            const SizedBox(height: 12),
+            _buildOfferingOption("Selling Product", Icons.shopping_bag_outlined),
+            const SizedBox(height: 8),
+            _buildOfferingOption("Providing Service", Icons.build_circle_outlined),
+            const SizedBox(height: 24),
+
+            if (_selectedOffering == 'Providing Service') ...[
+              _buildInputField(
+                "Professional Title",
+                "e.g. Fashion Designer",
+                controller: _professionalTitleController,
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                "Service List",
+                style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
+              ),
+              const SizedBox(height: 8),
+              ServiceListEditor(items: _services),
+              const SizedBox(height: 24),
+            ] else ...[
+              _buildInputField(
+                "Product List",
+                "List your products here",
+                maxLines: 4,
+              ),
+              const SizedBox(height: 24),
+            ],
 
             const SizedBox(height: 32),
 
@@ -141,6 +184,7 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
     String hint, {
     int maxLines = 1,
     String? helperText,
+    TextEditingController? controller,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,6 +195,12 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         TextField(
+          controller: controller,
+          style: const TextStyle(
+            fontFamily: 'Campton',
+            fontSize: 16,
+            color: Color(0xFF1E2021),
+          ),
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hint,
@@ -180,6 +230,31 @@ class BrandBusinessDetailsScreen extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildOfferingOption(String title, IconData icon) {
+    final isSelected = _selectedOffering == title;
+    return InkWell(
+      onTap: () => setState(() => _selectedOffering = title),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border.all(color: isSelected ? const Color(0xFFA15E22) : const Color(0xFFCCCCCC)),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+              color: isSelected ? const Color(0xFFA15E22) : const Color(0xFF777F84),
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Text(title, style: const TextStyle(fontSize: 16, color: Color(0xFF241508))),
+          ],
+        ),
+      ),
     );
   }
 

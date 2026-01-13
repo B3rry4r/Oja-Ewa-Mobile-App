@@ -5,8 +5,35 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 import '../../../../../../app/router/app_router.dart';
 
 
-class BusinessSellerRegistrationScreen extends StatelessWidget {
+import 'business_registration_draft.dart';
+
+class BusinessSellerRegistrationScreen extends StatefulWidget {
   const BusinessSellerRegistrationScreen({super.key});
+
+  @override
+  State<BusinessSellerRegistrationScreen> createState() => _BusinessSellerRegistrationScreenState();
+}
+
+class _BusinessSellerRegistrationScreenState extends State<BusinessSellerRegistrationScreen> {
+  final _cityController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _emailController = TextEditingController(text: 'sanusimot@gmail.com');
+  final _phoneController = TextEditingController();
+  final _websiteController = TextEditingController(text: 'https://example.com');
+  final _instagramController = TextEditingController();
+  final _facebookController = TextEditingController();
+
+  @override
+  void dispose() {
+    _cityController.dispose();
+    _addressController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _websiteController.dispose();
+    _instagramController.dispose();
+    _facebookController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,29 +62,41 @@ class BusinessSellerRegistrationScreen extends StatelessWidget {
             const SizedBox(height: 20),
             _buildDropdownInput("State", "FCT"),
             const SizedBox(height: 20),
-            _buildTextInput("City", "Your City"),
+            _buildTextInput("City", "Your City", controller: _cityController),
             const SizedBox(height: 20),
-            _buildTextInput("Address Line", "Street, house number etc"),
+            _buildTextInput("Address Line", "Street, house number etc", controller: _addressController),
             
             const SizedBox(height: 40),
             
             // --- Contacts Section ---
             _buildSectionHeader("Contacts"),
             const SizedBox(height: 16),
-            _buildTextInput("Business Email", "sanusimot@gmail.com"),
+            _buildTextInput("Business Email", "you@example.com", controller: _emailController),
             const SizedBox(height: 20),
-            _buildPhoneInput("Business Phone Number", "+234", "8167654354"),          
+            _buildPhoneInput(
+              "Business Phone Number",
+              "+234",
+              controller: _phoneController,
+            ),          
             const SizedBox(height: 20),
-            _buildTextInput("Website URL", "https://example.com"),
+            _buildTextInput("Website URL", "https://example.com", controller: _websiteController),
+
+            // Music only: platform links (required: at least one of youtube/spotify)
+            if (((ModalRoute.of(context)?.settings.arguments as String?) ?? 'Beauty') == 'Music') ...[
+              const SizedBox(height: 20),
+              _buildTextInput('YouTube', 'Paste your YouTube link', controller: TextEditingController()),
+              const SizedBox(height: 20),
+              _buildTextInput('Spotify', 'Paste your Spotify link', controller: TextEditingController()),
+            ],
             
             const SizedBox(height: 40),
             
             // --- Social handles Section ---
             _buildSectionHeader("Social handles"),
             const SizedBox(height: 16),
-            _buildTextInput("Instagram", "Your Instagram URL"),
+            _buildTextInput("Instagram", "Your Instagram URL", controller: _instagramController),
             const SizedBox(height: 20),
-            _buildTextInput("Facebook", "Your Facebook URL"),
+            _buildTextInput("Facebook", "Your Facebook URL", controller: _facebookController),
             
             const SizedBox(height: 40),
             
@@ -131,13 +170,19 @@ class BusinessSellerRegistrationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextInput(String label, String hint) {
+  Widget _buildTextInput(String label, String hint, {TextEditingController? controller}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
         const SizedBox(height: 8),
         TextFormField(
+          controller: controller,
+          style: const TextStyle(
+            fontFamily: 'Campton',
+            fontSize: 16,
+            color: Color(0xFF1E2021),
+          ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Color(0xFFCCCCCC)),
@@ -178,26 +223,44 @@ class BusinessSellerRegistrationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPhoneInput(String label, String code, String number) {
+  Widget _buildPhoneInput(String label, String code, {required TextEditingController controller}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
         const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          height: 49,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFCCCCCC)),
           ),
+          alignment: Alignment.center,
           child: Row(
             children: [
-              const Icon(Icons.flag, size: 20), // Placeholder for flag asset
-              const SizedBox(width: 8),
-              Text(code, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(
+                code,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF241508),
+                ),
+              ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(number, style: const TextStyle(fontSize: 16, color: Color(0xFFCCCCCC))),
+                child: TextFormField(
+                  controller: controller,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                    hintText: 'Enter phone number',
+                    hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
+                  ),
+                  style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+                ),
               ),
             ],
           ),
@@ -248,6 +311,19 @@ class BusinessSellerRegistrationScreen extends StatelessWidget {
       onTap: () {
         final selectedCategory = (ModalRoute.of(context)?.settings.arguments as String?) ?? 'Beauty';
 
+        final draft = BusinessRegistrationDraft(
+          categoryLabel: selectedCategory,
+          country: 'Nigeria',
+          state: 'FCT',
+          city: _cityController.text.trim(),
+          address: _addressController.text.trim(),
+          businessEmail: _emailController.text.trim(),
+          businessPhoneNumber: _phoneController.text.trim(),
+          websiteUrl: _websiteController.text.trim(),
+          instagram: _instagramController.text.trim(),
+          facebook: _facebookController.text.trim(),
+        );
+
         final route = switch (selectedCategory) {
           'Beauty' => AppRoutes.businessBeautyForm,
           'Brands' => AppRoutes.businessBrandsForm,
@@ -256,7 +332,7 @@ class BusinessSellerRegistrationScreen extends StatelessWidget {
           _ => AppRoutes.businessBeautyForm,
         };
 
-        Navigator.of(context).pushNamed(route);
+        Navigator.of(context).pushNamed(route, arguments: draft.toJson());
       },
       borderRadius: BorderRadius.circular(8),
       child: Container(

@@ -8,12 +8,24 @@ class MusicBusinessDetailsScreen extends StatefulWidget {
   const MusicBusinessDetailsScreen({super.key});
 
   @override
-  State<MusicBusinessDetailsScreen> createState() => _MusicBusinessDetailsScreenState();
+  State<MusicBusinessDetailsScreen> createState() =>
+      _MusicBusinessDetailsScreenState();
 }
 
-class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen> {
-  // Set "Music" as the default selected type based on this screen's purpose
-  String _selectedCategory = "Music";
+class _MusicBusinessDetailsScreenState
+    extends State<MusicBusinessDetailsScreen> {
+  // UI label values
+  String _selectedCategoryLabel = "DJ";
+
+  // Backend enum values (dj|artist|producer)
+  String get _musicCategoryValue {
+    switch (_selectedCategoryLabel) {
+      case 'Artiste':
+        return 'artist';
+      default:
+        return _selectedCategoryLabel.toLowerCase();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +46,7 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
             const SizedBox(height: 20),
             _buildStepper(),
             const SizedBox(height: 32),
-            
+
             const Text(
               "About Business",
               style: TextStyle(
@@ -59,16 +71,23 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
             ),
             const SizedBox(height: 12),
             _buildCategoryGrid(),
-            
+
             const SizedBox(height: 24),
             _buildInputField(
-              "Biography", 
+              "Biography",
               "Describe your music services or school",
               maxLines: 4,
               helperText: "100 characters required",
             ),
-            
+
+            const SizedBox(height: 24),
+            _buildInputField("YouTube", "Paste your YouTube link"),
+            const SizedBox(height: 24),
+            _buildInputField("Spotify", "Paste your Spotify link"),
+
             const SizedBox(height: 32),
+            _buildUploadSection("Identity Document"),
+            const SizedBox(height: 24),
             _buildUploadSection("Business Logo"),
 
             const SizedBox(height: 40),
@@ -91,7 +110,12 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
     );
   }
 
-  Widget _buildStep(IconData? icon, String label, bool isActive, {String? stepNum}) {
+  Widget _buildStep(
+    IconData? icon,
+    String label,
+    bool isActive, {
+    String? stepNum,
+  }) {
     return Row(
       children: [
         Container(
@@ -102,9 +126,15 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
             borderRadius: BorderRadius.circular(4),
           ),
           child: Center(
-            child: icon != null 
-              ? Icon(icon, color: Colors.white, size: 16)
-              : Text(stepNum ?? "", style: TextStyle(color: isActive ? Colors.white : const Color(0xFF777F84), fontSize: 10)),
+            child: icon != null
+                ? Icon(icon, color: Colors.white, size: 16)
+                : Text(
+                    stepNum ?? "",
+                    style: TextStyle(
+                      color: isActive ? Colors.white : const Color(0xFF777F84),
+                      fontSize: 10,
+                    ),
+                  ),
           ),
         ),
         const SizedBox(width: 4),
@@ -117,25 +147,29 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
             color: isActive ? const Color(0xFF603814) : const Color(0xFF777F84),
             fontWeight: isActive ? FontWeight.w500 : FontWeight.w400,
           ),
-        )
+        ),
       ],
     );
   }
 
   Widget _buildCategoryGrid() {
     final categories = ["DJ", "Artiste", "Producer"];
+
     return Wrap(
       spacing: 12,
       runSpacing: 12,
       children: categories.map((cat) {
-        final isSelected = _selectedCategory == cat;
+        final isSelected = _selectedCategoryLabel == cat;
+
         return InkWell(
-          onTap: () => setState(() => _selectedCategory = cat),
+          onTap: () => setState(() => _selectedCategoryLabel = cat),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               border: Border.all(
-                color: isSelected ? const Color(0xFFA15E22) : const Color(0xFFCCCCCC),
+                color: isSelected
+                    ? const Color(0xFFA15E22)
+                    : const Color(0xFFCCCCCC),
                 width: 1.5,
               ),
               borderRadius: BorderRadius.circular(25),
@@ -146,7 +180,9 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
                 Icon(
                   isSelected ? Icons.check_circle : Icons.add_circle_outline,
                   size: 18,
-                  color: isSelected ? const Color(0xFFA15E22) : const Color(0xFF777F84),
+                  color: isSelected
+                      ? const Color(0xFFA15E22)
+                      : const Color(0xFF777F84),
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -166,13 +202,26 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
     );
   }
 
-  Widget _buildInputField(String label, String hint, {int maxLines = 1, String? helperText}) {
+  Widget _buildInputField(
+    String label,
+    String hint, {
+    int maxLines = 1,
+    String? helperText,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+        Text(
+          label,
+          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+        ),
         const SizedBox(height: 8),
         TextField(
+          style: const TextStyle(
+            fontFamily: 'Campton',
+            fontSize: 16,
+            color: Color(0xFF1E2021),
+          ),
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hint,
@@ -188,12 +237,15 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
             ),
           ),
         ),
-        if (helperText != null) 
+        if (helperText != null)
           Align(
             alignment: Alignment.centerRight,
             child: Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Text(helperText, style: const TextStyle(fontSize: 10, color: Color(0xFF595F63))),
+              child: Text(
+                helperText,
+                style: const TextStyle(fontSize: 10, color: Color(0xFF595F63)),
+              ),
             ),
           ),
       ],
@@ -204,20 +256,33 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+        Text(
+          title,
+          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+        ),
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 24),
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFF89858A), style: BorderStyle.solid),
+            border: Border.all(
+              color: const Color(0xFF89858A),
+              style: BorderStyle.solid,
+            ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: const Column(
             children: [
-              Icon(Icons.cloud_upload_outlined, color: Color(0xFF603814), size: 30),
+              Icon(
+                Icons.cloud_upload_outlined,
+                color: Color(0xFF603814),
+                size: 30,
+              ),
               SizedBox(height: 8),
-              Text("Browse Document", style: TextStyle(fontSize: 16, color: Color(0xFF1E2021))),
+              Text(
+                "Browse Document",
+                style: TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+              ),
               SizedBox(height: 8),
               Text(
                 "PNG, JPG formats (200x200px recommended)",
@@ -246,7 +311,7 @@ class _MusicBusinessDetailsScreenState extends State<MusicBusinessDetailsScreen>
               color: const Color(0xFFFDAF40).withOpacity(0.35),
               blurRadius: 15,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         child: const Center(

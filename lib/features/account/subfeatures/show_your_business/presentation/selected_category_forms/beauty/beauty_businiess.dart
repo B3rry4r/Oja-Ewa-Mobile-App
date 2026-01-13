@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 
 import '../../../../../../../app/router/app_router.dart';
+import '../service_list_editor.dart';
 
 class BeautyBusinessDetailsScreen extends StatefulWidget {
   const BeautyBusinessDetailsScreen({super.key});
@@ -13,6 +14,15 @@ class BeautyBusinessDetailsScreen extends StatefulWidget {
 
 class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScreen> {
   String _selectedOffering = "Selling Product";
+
+  final TextEditingController _professionalTitleController = TextEditingController();
+  final List<ServiceListItem> _services = [ServiceListItem()];
+
+  @override
+  void dispose() {
+    _professionalTitleController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,8 +67,22 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
             _buildOfferingOption("Providing Service", Icons.build_circle_outlined),
             
             const SizedBox(height: 24),
-            _buildDropdownField("Select Product Category", "select"),
-            const SizedBox(height: 24),
+            if (_selectedOffering == 'Providing Service') ...[
+              _buildInputField(
+                "Professional Title",
+                "e.g. Makeup Artist",
+                maxLines: 1,
+                controller: _professionalTitleController,
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                "Service List",
+                style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
+              ),
+              const SizedBox(height: 8),
+              ServiceListEditor(items: _services),
+              const SizedBox(height: 24),
+            ],
             _buildInputField(
               "Business Description", 
               "Share Short description of your business", 
@@ -191,13 +215,19 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
     );
   }
 
-  Widget _buildInputField(String label, String hint, {int maxLines = 1, String? helperText}) {
+  Widget _buildInputField(String label, String hint, {int maxLines = 1, String? helperText, TextEditingController? controller}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
         const SizedBox(height: 8),
         TextField(
+          controller: controller,
+          style: const TextStyle(
+            fontFamily: 'Campton',
+            fontSize: 16,
+            color: Color(0xFF1E2021),
+          ),
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hint,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 
 import '../../../../../../../app/router/app_router.dart';
+import '../classes_offered_editor.dart';
 
 class SchoolBusinessDetailsScreen extends StatefulWidget {
   const SchoolBusinessDetailsScreen({super.key});
@@ -13,6 +14,8 @@ class SchoolBusinessDetailsScreen extends StatefulWidget {
 
 class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScreen> {
   String _selectedSchoolType = "Fashion";
+
+  final List<ClassOfferedItem> _classes = [ClassOfferedItem()];
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +70,16 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
               helperText: "100 characters required",
             ),
             const SizedBox(height: 24),
-            _buildInputField("Classes offered", "List your classes here", maxLines: 3),
+            const Text(
+              "Classes offered",
+              style: TextStyle(
+                fontSize: 14,
+                fontFamily: 'Campton',
+                color: Color(0xFF777F84),
+              ),
+            ),
+            const SizedBox(height: 8),
+            ClassesOfferedEditor(items: _classes),
             
             const SizedBox(height: 32),
             _buildLogoUploadSection(),
@@ -174,6 +186,11 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
         Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
         const SizedBox(height: 8),
         TextField(
+          style: const TextStyle(
+            fontFamily: 'Campton',
+            fontSize: 16,
+            color: Color(0xFF1E2021),
+          ),
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hint,

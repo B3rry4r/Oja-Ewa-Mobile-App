@@ -110,10 +110,8 @@ class BusinessAccountReviewScreen extends StatelessWidget {
   Widget _buildContinueButton(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          AppRoutes.businessSettings,
-          (route) => false,
-        );
+        // Return user to the main app flow.
+        Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
       },
       borderRadius: BorderRadius.circular(8),
       child: Container(
