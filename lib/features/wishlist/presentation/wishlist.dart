@@ -179,7 +179,7 @@ class WishlistScreen extends ConsumerWidget {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => const ProductDetailsScreen(),
+                      builder: (_) => ProductDetailsScreen(productId: int.tryParse(product.id) ?? 0),
                     ),
                   );
                 },

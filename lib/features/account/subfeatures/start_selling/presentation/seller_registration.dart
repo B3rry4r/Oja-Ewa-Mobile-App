@@ -6,6 +6,7 @@ import '../../../../../app/router/app_router.dart';
 
 import 'draft_utils.dart';
 import 'seller_registration_draft.dart';
+import 'package:ojaewa/core/files/pick_file.dart';
 
 class SellerRegistrationScreen extends StatefulWidget {
   const SellerRegistrationScreen({super.key});
@@ -16,6 +17,7 @@ class SellerRegistrationScreen extends StatefulWidget {
 
 class _SellerRegistrationScreenState extends State<SellerRegistrationScreen> {
   final _cityController = TextEditingController();
+  String? _identityDocumentLocalPath;
   final _addressController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -261,39 +263,58 @@ class _SellerRegistrationScreenState extends State<SellerRegistrationScreen> {
   }
 
   Widget _buildFileUploadSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("Upload Document", style: TextStyle(color: Color(0xFF777F84), fontSize: 14)),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          height: 140,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(11),
-            border: Border.all(color: const Color(0xFF89858A), style: BorderStyle.solid), // IR indicates dashed-like border
+    return InkWell(
+      onTap: () async {
+        final path = await pickSingleFilePath();
+        if (path == null) return;
+        setState(() => _identityDocumentLocalPath = path);
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Upload Document',
+            style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.cloud_upload_outlined, size: 24, color: Color(0xFF777F84)),
-              const SizedBox(height: 12),
-              const Text("Browse Document", style: TextStyle(fontSize: 16, color: Color(0xFF1E2021))),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text("High resolution image\nPDF, JPG, PNG formats", 
-                    textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: Color(0xFF777F84))),
-                  SizedBox(width: 20),
-                  Text("200 x 200px\n20kb max", 
-                    textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: Color(0xFF777F84))),
-                ],
-              )
-            ],
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            height: 140,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: const Color(0xFF89858A)),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.cloud_upload_outlined, size: 24, color: Color(0xFF777F84)),
+                const SizedBox(height: 12),
+                Text(
+                  _identityDocumentLocalPath == null ? 'Browse Document' : 'Document selected',
+                  style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+                ),
+                const SizedBox(height: 8),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'High resolution image\nPDF, JPG, PNG formats',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 10, color: Color(0xFF777F84)),
+                    ),
+                    SizedBox(width: 20),
+                    Text(
+                      '200 x 200px\n20kb max',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 10, color: Color(0xFF777F84)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -308,7 +329,8 @@ class _SellerRegistrationScreenState extends State<SellerRegistrationScreen> {
           ..businessEmail = _emailController.text.trim()
           ..businessPhoneNumber = _phoneController.text.trim()
           ..instagram = _instagramController.text.trim()
-          ..facebook = _facebookController.text.trim();
+          ..facebook = _facebookController.text.trim()
+          ..identityDocumentPath = _identityDocumentLocalPath;
 
         Navigator.of(context).pushNamed(AppRoutes.businessDetails, arguments: draft.toJson());
       },

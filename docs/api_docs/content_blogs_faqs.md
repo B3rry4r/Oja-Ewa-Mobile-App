@@ -499,13 +499,24 @@ type: string (required, enum: market|beauty|brand|school|sustainability|music)
 **Endpoint:** `GET /api/categories/{type}/{slug}/items`  
 **Controller:** `CategoryController@items`  
 **Middleware:** None (Public)  
-**Description:** Get items (products/businesses) for a category
+**Description:** Get items (products/businesses/initiatives) for a category with full details and pagination
 
 #### URL Parameters
 - `type`: Category type (string, enum: market|beauty|brand|school|sustainability|music)
 - `slug`: Category slug (string)
 
-#### Success Response (200)
+#### Query Parameters
+```
+per_page: integer (optional, default: 15, max: 50)
+page: integer (optional, default: 1)
+```
+
+#### Request Example
+```bash
+GET /api/categories/market/women/items?per_page=10&page=1
+```
+
+#### Success Response (200) - Market Category (Products)
 ```json
 {
   "status": "success",
@@ -513,11 +524,143 @@ type: string (required, enum: market|beauty|brand|school|sustainability|music)
     "category": {
       "id": 1,
       "type": "market",
-      "name": "Traditional Wear",
-      "slug": "traditional-wear",
-      "description": "Traditional Nigerian clothing"
+      "name": "Women",
+      "slug": "women",
+      "description": "Women's clothing and accessories"
     },
-    "items": [1, 3, 5, 7, 9, 12, 15, 18, 21, 24]
+    "items": {
+      "current_page": 1,
+      "data": [
+        {
+          "id": 3,
+          "seller_profile_id": 2,
+          "name": "Ankara Print Dress",
+          "gender": "female",
+          "style": "Modern",
+          "tribe": "Yoruba",
+          "description": "Beautiful Ankara dress",
+          "image": "https://...",
+          "size": "S, M, L, XL",
+          "processing_time_type": "normal",
+          "processing_days": 7,
+          "price": "18000.00",
+          "status": "approved",
+          "seller_profile": {
+            "id": 2,
+            "business_name": "Fashion House",
+            "business_email": "fashion@example.com",
+            "city": "Lagos",
+            "state": "Lagos"
+          },
+          "avg_rating": 4.5
+        }
+      ],
+      "first_page_url": "...",
+      "from": 1,
+      "last_page": 3,
+      "last_page_url": "...",
+      "links": [...],
+      "next_page_url": "...",
+      "path": "...",
+      "per_page": 15,
+      "prev_page_url": null,
+      "to": 15,
+      "total": 45
+    }
+  }
+}
+```
+
+#### Success Response (200) - Beauty/Brand/School/Music Category (Businesses)
+```json
+{
+  "status": "success",
+  "data": {
+    "category": {
+      "id": 5,
+      "type": "beauty",
+      "name": "Beauty Services",
+      "slug": "beauty-services",
+      "description": "Professional beauty services"
+    },
+    "items": {
+      "current_page": 1,
+      "data": [
+        {
+          "id": 1,
+          "user_id": 5,
+          "business_name": "Glam Beauty Studio",
+          "category": "beauty",
+          "offering_type": "providing_service",
+          "business_description": "Professional beauty services",
+          "business_logo": "https://...",
+          "business_email": "beauty@example.com",
+          "business_phone_number": "+2348012345678",
+          "store_status": "approved",
+          "country": "Nigeria",
+          "state": "Lagos",
+          "city": "Ikeja",
+          "address": "123 Beauty Street",
+          "website_url": "https://glam.com",
+          "instagram": "@glambeauty",
+          "facebook": "glambeauty",
+          "user": {
+            "id": 5,
+            "firstname": "Jane",
+            "lastname": "Doe"
+          }
+        }
+      ],
+      "links": [...],
+      "per_page": 15,
+      "total": 12
+    }
+  }
+}
+```
+
+#### Success Response (200) - Sustainability Category (Initiatives)
+```json
+{
+  "status": "success",
+  "data": {
+    "category": {
+      "id": 8,
+      "type": "sustainability",
+      "name": "Green Initiatives",
+      "slug": "green-initiatives",
+      "description": "Environmental sustainability projects"
+    },
+    "items": {
+      "current_page": 1,
+      "data": [
+        {
+          "id": 1,
+          "title": "Zero Waste Fashion Initiative",
+          "description": "Promoting sustainable fashion practices",
+          "image_url": "https://...",
+          "category": "environmental",
+          "status": "active",
+          "target_amount": "1000000.00",
+          "current_amount": "350000.00",
+          "progress_percentage": 35.00,
+          "impact_metrics": "200 artisans trained",
+          "start_date": "2024-01-01",
+          "end_date": "2024-12-31",
+          "partners": ["NGO Partner", "Government"],
+          "participant_count": 150,
+          "progress_notes": "Great progress...",
+          "admin": {
+            "id": 1,
+            "firstname": "Admin",
+            "lastname": "User"
+          }
+        }
+      ],
+      "links": [...],
+      "per_page": 15,
+      "total": 5
+    }
   }
 }
 ```
@@ -530,11 +673,21 @@ type: string (required, enum: market|beauty|brand|school|sustainability|music)
 }
 ```
 
+#### Error Response (404)
+```json
+{
+  "message": "No query results for model [App\\Models\\Category]"
+}
+```
+
 #### Business Logic Notes
-- For 'market': Returns approved product IDs (max 20)
-- For business categories (beauty/brand/school/music): Returns approved business profile IDs (max 20)
-- Items returned as array of IDs only
-- Client should fetch full details separately
+- **For 'market'**: Returns full approved product objects with seller profile relationship
+- **For business categories (beauty/brand/school/music)**: Returns full approved business profile objects with user relationship
+- **For 'sustainability'**: Returns full active sustainability initiative objects with admin relationship
+- All responses include pagination metadata (current_page, per_page, total, links)
+- Items are ordered by most recent first (created_at desc)
+- Default per_page is 15, maximum is 50
+- Returns full object details - no need for additional API calls
 
 ---
 

@@ -9,6 +9,8 @@ import 'package:ojaewa/core/ui/ui_error_message.dart';
 
 import '../domain/seller_profile_payload.dart';
 import 'controllers/seller_profile_controller.dart';
+import '../data/seller_profile_upload_repository_impl.dart';
+import 'package:ojaewa/core/files/multipart_utils.dart';
 import 'draft_utils.dart';
 import 'seller_registration_draft.dart';
 
@@ -146,11 +148,36 @@ class AccountReviewScreen extends ConsumerWidget {
               );
 
               try {
+                // 1) Create profile
                 await ref.read(sellerProfileControllerProvider.notifier).submit(payload);
+
+                // 2) Upload files (best effort; these endpoints also update profile fields)
+                final uploadRepo = ref.read(sellerProfileUploadRepositoryProvider);
+                if ((draft.identityDocumentPath ?? '').isNotEmpty) {
+                  await uploadRepo.upload(
+                    type: 'identity_document',
+                    file: multipartFromPath(draft.identityDocumentPath!),
+                  );
+                }
+
+                if ((draft.businessCertificatePath ?? '').isNotEmpty) {
+                  await uploadRepo.upload(
+                    type: 'business_certificate',
+                    file: multipartFromPath(draft.businessCertificatePath!),
+                  );
+                }
+
+                if ((draft.businessLogoPath ?? '').isNotEmpty) {
+                  await uploadRepo.upload(
+                    type: 'business_logo',
+                    file: multipartFromPath(draft.businessLogoPath!),
+                  );
+                }
+
                 if (!context.mounted) return;
                 AppSnackbars.showSuccess(context, 'Seller application submitted');
                 Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
-              } catch (e) {
+              } catch (e) {  
                 if (!context.mounted) return;
                 AppSnackbars.showError(context, UiErrorMessage.from(e));
               }

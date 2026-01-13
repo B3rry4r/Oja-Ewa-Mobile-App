@@ -13,6 +13,8 @@ import 'package:ojaewa/core/ui/ui_error_message.dart';
 
 import '../domain/business_profile_payload.dart';
 import 'controllers/business_profile_controller.dart';
+import '../data/business_profile_repository_impl.dart';
+import 'package:ojaewa/core/files/multipart_utils.dart';
 import 'selected_category_forms/draft_utils.dart';
 import 'selected_category_forms/business_registration_draft.dart';
 
@@ -160,7 +162,44 @@ class BusinessAccountReviewScreen extends ConsumerWidget {
               );
 
               try {
-                await ref.read(businessProfileControllerProvider.notifier).submit(payload);
+                final res = await ref.read(businessProfileControllerProvider.notifier).submit(payload);
+
+                // Extract business id if present
+                final data = res['data'];
+                final businessId = (data is Map<String, dynamic>) ? data['id'] : null;
+                if (businessId is int) {
+                  final api = ref.read(businessProfileApiProvider);
+
+                  if ((draft.identityDocumentPath ?? '').isNotEmpty) {
+                    await api.uploadFile(
+                      businessId: businessId,
+                      fileType: 'identity_document',
+                      file: multipartFromPath(draft.identityDocumentPath!),
+                    );
+                  }
+
+                  if ((draft.businessLogoPath ?? '').isNotEmpty) {
+                    await api.uploadFile(
+                      businessId: businessId,
+                      fileType: 'business_logo',
+                      file: multipartFromPath(draft.businessLogoPath!),
+                    );
+                  }
+
+                  // business_certificates file_type expects a single file per call per docs
+                  if ((draft.businessCertificates ?? []).isNotEmpty) {
+                    final first = draft.businessCertificates!.first;
+                    final path = first['path'];
+                    if (path is String && path.isNotEmpty) {
+                      await api.uploadFile(
+                        businessId: businessId,
+                        fileType: 'business_certificates',
+                        file: multipartFromPath(path),
+                      );
+                    }
+                  }
+                }
+
                 if (!context.mounted) return;
                 AppSnackbars.showSuccess(context, 'Business submitted for review');
                 Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
