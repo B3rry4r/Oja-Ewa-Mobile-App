@@ -80,11 +80,6 @@ class _MusicBusinessDetailsScreenState
               helperText: "100 characters required",
             ),
 
-            const SizedBox(height: 24),
-            _buildInputField("YouTube", "Paste your YouTube link"),
-            const SizedBox(height: 24),
-            _buildInputField("Spotify", "Paste your Spotify link"),
-
             const SizedBox(height: 32),
             _buildUploadSection("Identity Document"),
             const SizedBox(height: 24),

@@ -22,6 +22,8 @@ class _BusinessSellerRegistrationScreenState extends State<BusinessSellerRegistr
   final _websiteController = TextEditingController(text: 'https://example.com');
   final _instagramController = TextEditingController();
   final _facebookController = TextEditingController();
+  final _youtubeController = TextEditingController();
+  final _spotifyController = TextEditingController();
 
   @override
   void dispose() {
@@ -32,11 +34,16 @@ class _BusinessSellerRegistrationScreenState extends State<BusinessSellerRegistr
     _websiteController.dispose();
     _instagramController.dispose();
     _facebookController.dispose();
+    _youtubeController.dispose();
+    _spotifyController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final arg = ModalRoute.of(context)?.settings.arguments;
+    final selectedCategory = (arg is String) ? arg : (arg is Map ? (arg['categoryLabel'] as String?) : null);
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Main background from IR
       appBar: const PreferredSize(
@@ -81,22 +88,22 @@ class _BusinessSellerRegistrationScreenState extends State<BusinessSellerRegistr
             const SizedBox(height: 20),
             _buildTextInput("Website URL", "https://example.com", controller: _websiteController),
 
-            // Music only: platform links (required: at least one of youtube/spotify)
-            if (((ModalRoute.of(context)?.settings.arguments as String?) ?? 'Beauty') == 'Music') ...[
-              const SizedBox(height: 20),
-              _buildTextInput('YouTube', 'Paste your YouTube link', controller: TextEditingController()),
-              const SizedBox(height: 20),
-              _buildTextInput('Spotify', 'Paste your Spotify link', controller: TextEditingController()),
-            ],
-            
             const SizedBox(height: 40),
-            
+
             // --- Social handles Section ---
             _buildSectionHeader("Social handles"),
             const SizedBox(height: 16),
             _buildTextInput("Instagram", "Your Instagram URL", controller: _instagramController),
             const SizedBox(height: 20),
             _buildTextInput("Facebook", "Your Facebook URL", controller: _facebookController),
+
+            // Music only: platform links (required: at least one of youtube/spotify)
+            if ((selectedCategory ?? 'Beauty') == 'Music') ...[
+              const SizedBox(height: 20),
+              _buildTextInput('YouTube', 'Paste your YouTube link', controller: _youtubeController),
+              const SizedBox(height: 20),
+              _buildTextInput('Spotify', 'Paste your Spotify link', controller: _spotifyController),
+            ],
             
             const SizedBox(height: 40),
             
@@ -322,6 +329,8 @@ class _BusinessSellerRegistrationScreenState extends State<BusinessSellerRegistr
           websiteUrl: _websiteController.text.trim(),
           instagram: _instagramController.text.trim(),
           facebook: _facebookController.text.trim(),
+          youtube: _youtubeController.text.trim(),
+          spotify: _spotifyController.text.trim(),
         );
 
         final route = switch (selectedCategory) {

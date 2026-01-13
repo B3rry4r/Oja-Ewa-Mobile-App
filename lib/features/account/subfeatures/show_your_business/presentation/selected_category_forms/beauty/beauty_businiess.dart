@@ -53,7 +53,7 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
               ),
             ),
             const SizedBox(height: 16),
-            _buildInputField("Business Name", "Your City"),
+            _buildInputField("Business Name", "Enter business name"),
             const SizedBox(height: 24),
             
             // Type of Offering Section

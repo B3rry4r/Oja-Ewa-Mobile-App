@@ -13,6 +13,8 @@ class BusinessRegistrationDraft {
     this.websiteUrl,
     this.instagram,
     this.facebook,
+    this.youtube,
+    this.spotify,
     this.identityDocumentPath,
   });
 
@@ -31,6 +33,10 @@ class BusinessRegistrationDraft {
   String? instagram;
   String? facebook;
 
+  // Music fields (required: at least one of youtube/spotify when category=music)
+  String? youtube;
+  String? spotify;
+
   /// Placeholder until upload is implemented.
   String? identityDocumentPath;
 
@@ -45,6 +51,8 @@ class BusinessRegistrationDraft {
         'websiteUrl': websiteUrl,
         'instagram': instagram,
         'facebook': facebook,
+        'youtube': youtube,
+        'spotify': spotify,
         'identityDocumentPath': identityDocumentPath,
       };
 
@@ -60,6 +68,8 @@ class BusinessRegistrationDraft {
       websiteUrl: json['websiteUrl'] as String?,
       instagram: json['instagram'] as String?,
       facebook: json['facebook'] as String?,
+      youtube: json['youtube'] as String?,
+      spotify: json['spotify'] as String?,
       identityDocumentPath: json['identityDocumentPath'] as String?,
     );
   }
