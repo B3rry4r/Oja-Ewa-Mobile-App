@@ -1,204 +1,160 @@
 // blog_detail_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/ui/ui_error_message.dart';
+import 'package:ojaewa/features/blog/presentation/controllers/blog_controller.dart';
+import 'package:ojaewa/features/blog/presentation/controllers/blog_favorites_controller.dart';
 
-class BlogDetailScreen extends StatelessWidget {
-  const BlogDetailScreen({super.key});
+class BlogDetailScreen extends ConsumerWidget {
+  const BlogDetailScreen({super.key, required this.blogSlug});
+
+  final String blogSlug;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final blog = ref.watch(blogBySlugProvider(blogSlug));
+
     return Scaffold(
       backgroundColor: const Color(0xFF603814),
       body: SafeArea(
-        child: Column(
-          children: [
-            const AppHeader(iconColor: Colors.white),
+        child: blog.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, st) => Center(child: Text('Failed to load blog.\n$e')),
+          data: (post) {
+            final dateText = post.createdAt?.toIso8601String().split('T').first ?? '';
 
-            // Header section - Image and Text in a Row
-            Container(
-              color: const Color(0xFF603814),
-              padding: const EdgeInsets.only(left: 18, right: 16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Image card
-                  Container(
-                    width: 165,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFD9D9D9),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const AppImagePlaceholder(
-                      width: 150,
-                      height: 100,
-                      borderRadius: 8,
-                    ),
-                  ),
+            final isFav = ref.watch(isBlogFavoritedProvider(post.id));
 
-                  // Spacing between image and text
-                  const SizedBox(width: 8), // 191 - 165 - 18 = 8
-                  // Text column
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        // Date
-                        Text(
-                          '18th March, 2023',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontFamily: 'Campton',
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xFFF4F4F4).withOpacity(0.8),
-                          ),
-                        ),
-
-                        // Title
-                        const SizedBox(height: 8), // 147 - 117 - 12 = 18
-                        Text(
-                          'Fashion in current age: Role of parents in fashions',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontFamily: 'Campton',
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFFFFF8F1),
-                            height: 1.2,
-                          ),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Main content card
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFF8F1),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
-                  ),
-                ),
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-                        _buildArticleContent(),
-                        const SizedBox(height: 40),
-                        const Text(
-                          'Related Posts',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontFamily: 'Campton',
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF241508),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        _buildRelatedPosts(),
-                      ],
+            return Column(
+              children: [
+                const AppHeader(iconColor: Colors.white),
+                Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      onPressed: () async {
+                        try {
+                          if (isFav) {
+                            await ref.read(blogFavoritesActionsProvider.notifier).remove(post.id);
+                            if (!context.mounted) return;
+                            AppSnackbars.showSuccess(context, 'Removed from favorites');
+                          } else {
+                            await ref.read(blogFavoritesActionsProvider.notifier).add(post.id);
+                            if (!context.mounted) return;
+                            AppSnackbars.showSuccess(context, 'Added to favorites');
+                          }
+                        } catch (e) {
+                          if (!context.mounted) return;
+                          AppSnackbars.showError(context, UiErrorMessage.from(e));
+                        }
+                      },
+                      icon: Icon(isFav ? Icons.favorite : Icons.favorite_border, color: const Color(0xFFFDAF40)),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ],
+
+                // Header section
+                Container(
+                  color: const Color(0xFF603814),
+                  padding: const EdgeInsets.only(left: 18, right: 16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Image card
+                      Container(
+                        width: 165,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFD9D9D9),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const AppImagePlaceholder(
+                          width: 150,
+                          height: 100,
+                          borderRadius: 8,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              dateText,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontFamily: 'Campton',
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xFFF4F4F4).withOpacity(0.8),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              post.title,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontFamily: 'Campton',
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFFFFF8F1),
+                                height: 1.2,
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Main content
+                Expanded(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFFF8F1),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(28),
+                        topRight: Radius.circular(28),
+                      ),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 20),
+                            _buildArticleContent(post.content),
+                            const SizedBox(height: 32),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildArticleContent() {
-    const articleText = '''
-Fendi’s signature Baguette bags come in different sizes — all in the jeweler’s signature Tiffany Blue color. The accessories also feature a variety of fabrics and finishes like croc-effect leathers, silk, and even a special one-of-a-kind Baguette in sterling silver. (The latter was made by Tiffany & Co. artisans over a period of four months and are engraved with lilies and roses — the national flowers of Italy and New York State, respectively.)
-
-Fendi’s signature Baguette bags come in different sizes — all in the jeweler’s signature Tiffany Blue color. The accessories also feature a variety of fabrics and finishes like croc-effect leathers, silk, and even a special one-of-a-kind Baguette in sterling silver.
-    ''';
-
+  Widget _buildArticleContent(String content) {
     return Text(
-      articleText,
+      content.isEmpty ? 'No content' : content,
       style: const TextStyle(
         fontSize: 16,
         fontFamily: 'Campton',
         fontWeight: FontWeight.w400,
         color: Colors.black,
         height: 1.6,
-      ),
-    );
-  }
-
-  Widget _buildRelatedPosts() {
-    return Column(
-      children: [
-        _buildRelatedPostCard(),
-        const SizedBox(height: 16),
-        _buildRelatedPostCard(),
-        const SizedBox(height: 32),
-      ],
-    );
-  }
-
-  Widget _buildRelatedPostCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 59,
-            height: 69,
-            decoration: BoxDecoration(
-              color: const Color(0xFFD9D9D9),
-              borderRadius: BorderRadius.circular(5),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Fashion in current age: Role of parents in fashion',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Campton',
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E2021),
-                    height: 1.2,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '18th March, 2023',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontFamily: 'Campton',
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xFF777F84),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

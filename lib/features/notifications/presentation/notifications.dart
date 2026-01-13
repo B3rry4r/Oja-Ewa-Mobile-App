@@ -1,13 +1,19 @@
 // notifications_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/ui/ui_error_message.dart';
+import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 
-class NotificationsScreen extends StatelessWidget {
+class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifications = ref.watch(notificationsListProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFF603814), // Main background color
       body: SafeArea(
@@ -19,7 +25,7 @@ class NotificationsScreen extends StatelessWidget {
             ),
             // Main content card
             Expanded(
-              child: _buildNotificationContent(),
+              child: _buildNotificationContent(context, ref, notifications),
             ),
           ],
         ),
@@ -28,7 +34,11 @@ class NotificationsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationContent() {
+  Widget _buildNotificationContent(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue notifications,
+  ) {
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFFFFF8F1),
@@ -43,28 +53,40 @@ class NotificationsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 18, top: 16, bottom: 20),
-              child: Text(
-                'Notifications',
-                style: TextStyle(
-                  fontSize: 33,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
+            const SizedBox(height: 16),
+            // Notification list
+            notifications.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation(Color(0xFFFDAF40)),
+                  ),
                 ),
               ),
+              error: (e, st) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  AppSnackbars.showError(context, UiErrorMessage.from(e));
+                });
+                return const SizedBox.shrink();
+              },
+
+              data: (items) {
+                return Column(
+                  children: [
+                    for (final n in items) _buildNotificationItem(
+                      context: context,
+                      ref: ref,
+                      id: n.id,
+                      title: (n.title.isEmpty ? n.body : n.title),
+                      body: n.body,
+                      timeAgo: n.createdAt?.toIso8601String().split('T').first ?? '',
+                      isUnread: !n.isRead,
+                    ),
+                  ],
+                );
+              },
             ),
-            // Notification list
-            _buildNotificationItem(
-              timeAgo: '1 week ago',
-              isUnread: true,
-            ),
-            _buildNotificationItem(
-              timeAgo: '23 Feb, 2023',
-              isUnread: false,
-            ),
-            // Add more notification items as needed
             ],
           ),
         ),
@@ -73,6 +95,11 @@ class NotificationsScreen extends StatelessWidget {
   }
 
   Widget _buildNotificationItem({
+    required BuildContext context,
+    required WidgetRef ref,
+    required int id,
+    required String title,
+    required String body,
     required String timeAgo,
     required bool isUnread,
   }) {
@@ -101,8 +128,8 @@ class NotificationsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Discount! Agbad in vogue new year sales is up. Order now and get 20% discount',
+                Text(
+                  body.isEmpty ? title : body,
                   style: TextStyle(
                     fontSize: 16,
                     fontFamily: 'Campton',
@@ -136,7 +163,15 @@ class NotificationsScreen extends StatelessWidget {
               color: isUnread ? Colors.orange.withOpacity(0.1) : Colors.transparent,
             ),
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                ref
+                    .read(notificationsActionsProvider.notifier)
+                    .markAsRead(id)
+                    .catchError((e) {
+                  if (!context.mounted) return;
+                  AppSnackbars.showError(context, UiErrorMessage.from(e));
+                });
+              },
               icon: Icon(
                 Icons.more_horiz,
                 color: isUnread ? Colors.orange : Colors.grey,

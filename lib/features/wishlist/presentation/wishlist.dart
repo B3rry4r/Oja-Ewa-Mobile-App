@@ -1,17 +1,22 @@
 // wishlist_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/ui/ui_error_message.dart';
 
 import '../../../app/router/app_router.dart';
 
-import '../../product/data/mock_products.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
 import '../../product_detail/presentation/product_detail_screen.dart';
+import '../domain/wishlist_item.dart';
+import 'controllers/wishlist_controller.dart';
+import '_wishlist_adapter.dart';
 
-class WishlistScreen extends StatelessWidget {
+class WishlistScreen extends ConsumerWidget {
   final VoidCallback? onBackPressed;
   final VoidCallback? onFilterPressed;
   final VoidCallback? onSettingsPressed;
@@ -26,11 +31,14 @@ class WishlistScreen extends StatelessWidget {
   });
 
   void _defaultKeepShoppingPressed() {
-    print('Keep Shopping button pressed');
+    // no-op (kept to preserve existing behavior)
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final wishlist = ref.watch(wishlistProvider);
+    final actions = ref.watch(wishlistActionsProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFF603814), // #603814
       body: SafeArea(
@@ -54,7 +62,25 @@ class WishlistScreen extends StatelessWidget {
                   padding: const EdgeInsets.only(
                     bottom: AppBottomNavBar.height,
                   ),
-                  child: _buildWishlistContent(context),
+                  child: wishlist.when(
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(Color(0xFFFDAF40)),
+                      ),
+                    ),
+                    error: (e, st) => Center(
+                      child: Text(
+                        UiErrorMessage.from(e),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    data: (items) => _buildWishlistContent(
+                      context,
+                      ref,
+                      items,
+                      actions.isLoading,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -97,10 +123,17 @@ class WishlistScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWishlistContent(BuildContext context) {
-    // Mock: treat "wishlist" as the subset of mock products marked favorite.
-    // Later, replace with stored wishlist items from backend/local storage.
-    final wishlistProducts = mockProducts.where((p) => p.isFavorite).toList();
+  Widget _buildWishlistContent(
+    BuildContext context,
+    WidgetRef ref,
+    List<WishlistItem> items,
+    bool isBusy,
+  ) {
+    // Map backend wishlist items to existing ProductCard UI.
+    final wishlistProducts = items
+        .where((w) => w.type == WishlistableType.product)
+        .map(toUiProduct)
+        .toList();
 
     if (wishlistProducts.isEmpty) {
       return _buildEmptyStateContent();
@@ -150,14 +183,48 @@ class WishlistScreen extends StatelessWidget {
                     ),
                   );
                 },
-                onFavoriteTap: () {
-                  // TODO: Remove from wishlist later.
-                },
+                onFavoriteTap: isBusy
+                    ? () {}
+                    : () {
+                        // Remove from wishlist
+                        try {
+                          ref
+                              .read(wishlistActionsProvider.notifier)
+                              .removeItem(
+                                type: WishlistableType.product,
+                                id: int.tryParse(product.id) ?? 0,
+                              )
+                              .then((_) {
+                                if (!context.mounted) return;
+                                AppSnackbars.showSuccess(
+                                  context,
+                                  'Removed from wishlist',
+                                );
+                              })
+                              .catchError((e) {
+                                if (!context.mounted) return;
+                                AppSnackbars.showError(
+                                  context,
+                                  UiErrorMessage.from(e),
+                                );
+                              });
+                          if (!context.mounted) return;
+                          AppSnackbars.showSuccess(
+                            context,
+                            'Removed from wishlist',
+                          );
+                        } catch (e) {
+                          if (!context.mounted) return;
+                          AppSnackbars.showError(
+                            context,
+                            UiErrorMessage.from(e),
+                          );
+                        }
+                      },
               );
             },
           ),
         ),
-
       ],
     );
   }
@@ -169,7 +236,7 @@ class WishlistScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 30),
-            
+
             // Screen Title
             const Align(
               alignment: Alignment.centerLeft,
@@ -183,22 +250,22 @@ class WishlistScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 60),
-            
+
             // Empty state illustration area
             _buildEmptyStateIllustration(),
-            
+
             const SizedBox(height: 70),
-            
+
             // Empty state messages
             _buildEmptyStateMessages(),
-            
+
             const SizedBox(height: 48),
-            
+
             // CTA Button
             _buildKeepShoppingButton(),
-            
+
             const SizedBox(height: 40),
           ],
         ),
@@ -220,7 +287,7 @@ class WishlistScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-          
+
           // Heart icon (using Flutter icon since no asset provided)
           Container(
             width: 105,
@@ -255,9 +322,9 @@ class WishlistScreen extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-        
+
         SizedBox(height: 12),
-        
+
         // Sub message
         Text(
           'Your saved items drop here',
@@ -288,10 +355,7 @@ class WishlistScreen extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 32,
-              vertical: 20,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
           ),
           child: const Text(
             'Keep Shopping',

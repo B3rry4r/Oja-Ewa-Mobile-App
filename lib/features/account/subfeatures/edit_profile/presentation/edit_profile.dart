@@ -1,14 +1,47 @@
 // edit_profile_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
+import 'package:ojaewa/features/account/presentation/controllers/profile_controller.dart';
 
-class EditProfileScreen extends StatelessWidget {
+import '_error_state.dart';
+
+class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
 
   @override
+  ConsumerState<EditProfileScreen> createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final profile = ref.watch(userProfileProvider);
+    final actions = ref.watch(profileActionsProvider);
+
+    ref.listen(userProfileProvider, (prev, next) {
+      next.whenData((u) {
+        // Populate once; avoid overwriting user edits.
+        if (_nameController.text.isEmpty) _nameController.text = u.fullName;
+        if (_emailController.text.isEmpty) _emailController.text = u.email;
+        if (_phoneController.text.isEmpty) _phoneController.text = u.phone ?? '';
+      });
+    });
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
@@ -47,41 +80,33 @@ class EditProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                // Form content
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      children: [
-                        // Full Name field
-                        const SizedBox(height: 20), // 100 - 104 + 16
-                        _buildFormField(
-                          label: 'Full Name',
-                          value: 'sanusimot@gmail.com',
-                          isEmail: true,
-                        ),
-
-                        // Email field
-                        const SizedBox(height: 19), // 194 - 100 - 75
-                        _buildFormField(
-                          label: 'Email',
-                          value: 'sanusimot@gmail.com',
-                          isEmail: true,
-                        ),
-
-                        // Phone Number field
-                        const SizedBox(height: 19), // 288 - 194 - 75
-                        _buildPhoneField(),
-
-                        // Save button
-                        const SizedBox(height: 60), // 423 - 288 - 75
-                        _buildSaveButton(),
-
-                        // Bottom spacing
-                        const SizedBox(height: 100),
-                      ],
+                  child: profile.when(
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, st) => ErrorStateView(
+                      title: 'Could not load your profile',
+                      message: 'Please check your connection and try again.',
+                      details: e,
+                      onRetry: () => ref.invalidate(userProfileProvider),
                     ),
+                    data: (_) {
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            _buildTextField(label: 'Full Name', controller: _nameController),
+                            const SizedBox(height: 19),
+                            _buildTextField(label: 'Email', controller: _emailController, keyboardType: TextInputType.emailAddress),
+                            const SizedBox(height: 19),
+                            _buildTextField(label: 'Phone Number', controller: _phoneController, keyboardType: TextInputType.phone),
+                            const SizedBox(height: 60),
+                            _buildSaveButton(context, actions),
+                            const SizedBox(height: 100),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -92,10 +117,10 @@ class EditProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFormField({
+  Widget _buildTextField({
     required String label,
-    required String value,
-    bool isEmail = false,
+    required TextEditingController controller,
+    TextInputType? keyboardType,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,25 +135,27 @@ class EditProfileScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
+        SizedBox(
           height: 49,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-          ),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w400,
-                color: isEmail
-                    ? const Color(0xFFCCCCCC)
-                    : const Color(0xFF241508),
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
               ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
+              ),
+            ),
+            style: const TextStyle(
+              fontSize: 16,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF241508),
             ),
           ),
         ),
@@ -136,87 +163,7 @@ class EditProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPhoneField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Phone Number',
-          style: TextStyle(
-            fontSize: 14,
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w400,
-            color: Color(0xFF777F84),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          height: 49,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-          ),
-          child: Row(
-            children: [
-              // Country flag and code
-              Container(
-                width: 44,
-                alignment: Alignment.centerLeft,
-                child: Row(
-                  children: [
-                    // Country flag placeholder
-                    Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    // Dropdown arrow
-                    const Icon(Icons.arrow_drop_down, size: 20),
-                  ],
-                ),
-              ),
-
-              // Phone number
-              Expanded(
-                child: Row(
-                  children: [
-                    const Text(
-                      '+234',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'Campton',
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF241508),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        '8167654354',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'Campton',
-                          fontWeight: FontWeight.w400,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSaveButton() {
+  Widget _buildSaveButton(BuildContext context, AsyncValue<void> actions) {
     return Container(
       height: 57,
       decoration: BoxDecoration(
@@ -233,18 +180,46 @@ class EditProfileScreen extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {},
+          onTap: actions.isLoading
+              ? null
+              : () async {
+                  await ref.read(profileActionsProvider.notifier).updateProfile(
+                        name: _nameController.text.trim(),
+                        email: _emailController.text.trim(),
+                        phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
+                      );
+                  if (!mounted) return;
+                  if (ref.read(profileActionsProvider).hasError) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(ref.read(profileActionsProvider).error.toString()),
+                        backgroundColor: const Color(0xFFFDAF40),
+                      ),
+                    );
+                    return;
+                  }
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Profile updated')),
+                  );
+                },
           borderRadius: BorderRadius.circular(8),
-          child: const Center(
-            child: Text(
-              'Save Changes',
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w600,
-                color: Color(0xFFFFFBF5),
-              ),
-            ),
+          child: Center(
+            child: actions.isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFFFBF5)),
+                  )
+                : const Text(
+                    'Save Changes',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFFFFBF5),
+                    ),
+                  ),
           ),
         ),
       ),

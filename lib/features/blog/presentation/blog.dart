@@ -1,34 +1,50 @@
 // blog_content_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
+import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/ui/ui_error_message.dart';
 
-import '../../../app/router/app_router.dart';
+import '../domain/blog_post.dart';
+import 'controllers/blog_controller.dart';
+import 'controllers/blog_favorites_controller.dart';
 import 'single_blog.dart';
 
-class BlogScreen extends StatelessWidget {
+class BlogScreen extends ConsumerStatefulWidget {
   const BlogScreen({super.key});
 
   @override
+  ConsumerState<BlogScreen> createState() => _BlogScreenState();
+}
+
+class _BlogScreenState extends ConsumerState<BlogScreen> {
+  bool _showFavorites = false;
+
+  @override
   Widget build(BuildContext context) {
+    final recent = ref.watch(blogListProvider);
+    final favorites = ref.watch(blogFavoritesProvider);
+
+    final list = _showFavorites ? favorites : recent;
+
     return Scaffold(
       backgroundColor: const Color(0xFF603814),
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
-            // Top section with buttons - using semantic grouping
             Container(
-              height: 104, // Based on content card position
+              height: 104,
               color: const Color(0xFF603814),
               child: Padding(
                 padding: const EdgeInsets.only(top: 32),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // Right buttons group
                     Padding(
                       padding: const EdgeInsets.only(right: 16),
                       child: Row(
@@ -36,15 +52,13 @@ class BlogScreen extends StatelessWidget {
                           HeaderIconButton(
                             asset: AppIcons.notification,
                             iconColor: Colors.white,
-                            onTap: () => Navigator.of(context)
-                                .pushNamed(AppRoutes.notifications),
+                            onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
                           ),
                           const SizedBox(width: 8),
                           HeaderIconButton(
                             asset: AppIcons.bag,
                             iconColor: Colors.white,
-                            onTap: () => Navigator.of(context)
-                                .pushNamed(AppRoutes.shoppingBag),
+                            onTap: () => Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
                           ),
                         ],
                       ),
@@ -53,8 +67,6 @@ class BlogScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Main content card
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
@@ -66,16 +78,10 @@ class BlogScreen extends StatelessWidget {
                 ),
                 child: SingleChildScrollView(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      16,
-                      0,
-                      16,
-                      AppBottomNavBar.height,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, AppBottomNavBar.height),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Blog title section
                         const SizedBox(height: 16),
                         const Text(
                           'Blog',
@@ -86,62 +92,57 @@ class BlogScreen extends StatelessWidget {
                             color: Color(0xFF241508),
                           ),
                         ),
-
-                        // Category tabs with visual grouping
-                        const SizedBox(height: 44), // Visual spacing
+                        const SizedBox(height: 44),
                         Row(
                           children: [
-                            // Active tab
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFA15E22),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Text(
-                                'Recent Posts',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: 'Campton',
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFFFBFBFB),
-                                ),
-                              ),
+                            _tabButton(
+                              label: 'Recent Posts',
+                              active: !_showFavorites,
+                              onTap: () => setState(() => _showFavorites = false),
                             ),
-
                             const SizedBox(width: 8),
-
-                            // Inactive tab
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: const Color(0xFFCCCCCC),
-                                ),
-                              ),
-                              child: const Text(
-                                'Favorite Posts',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: 'Campton',
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF301C0A),
-                                ),
-                              ),
+                            _tabButton(
+                              label: 'Favorite Posts',
+                              active: _showFavorites,
+                              onTap: () => setState(() => _showFavorites = true),
                             ),
                           ],
                         ),
-
-                        // Posts list with semantic grouping
                         const SizedBox(height: 24),
-                        _buildPostList(context),
+                        list.when(
+                          loading: () => const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 24),
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation(Color(0xFFFDAF40)),
+                              ),
+                            ),
+                          ),
+                          error: (e, st) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 24),
+                            child: Center(child: Text(UiErrorMessage.from(e), textAlign: TextAlign.center)),
+                          ),
+                          data: (items) {
+                            if (items.isEmpty) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 24),
+                                child: Center(
+                                  child: Text(_showFavorites ? 'No favorite posts yet.' : 'No posts found.'),
+                                ),
+                              );
+                            }
+
+                            return Column(
+                              children: [
+                                for (final post in items) ...[
+                                  _BlogPostCard(post: post),
+                                  const SizedBox(height: 16),
+                                ],
+                                const SizedBox(height: 32),
+                              ],
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -154,96 +155,108 @@ class BlogScreen extends StatelessWidget {
     );
   }
 
-  // Reusable icon button
-  // Posts list
-  Widget _buildPostList(BuildContext context) {
-    return Column(
-      children: [
-        _buildPostCard(
-          context,
-          title: 'Fashion in current age: Role of parents in fashion',
-          date: '18th March, 2023',
+  Widget _tabButton({required String label, required bool active, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        decoration: BoxDecoration(
+          color: active ? const Color(0xFFA15E22) : null,
+          borderRadius: BorderRadius.circular(8),
+          border: active ? null : Border.all(color: const Color(0xFFCCCCCC)),
         ),
-        const SizedBox(height: 16),
-        _buildPostCard(
-          context,
-          title: 'Fashion in current age: Role of parents in fashion',
-          date: '18th March, 2023',
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w400,
+            color: active ? const Color(0xFFFBFBFB) : const Color(0xFF301C0A),
+          ),
         ),
-        const SizedBox(height: 32), // Bottom spacing
-      ],
+      ),
     );
   }
+}
 
-  // Individual post card
-  Widget _buildPostCard(
-    BuildContext context, {
-    required String title,
-    required String date,
-  }) {
+class _BlogPostCard extends ConsumerWidget {
+  const _BlogPostCard({required this.post});
+
+  final BlogPost post;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isFav = ref.watch(isBlogFavoritedProvider(post.id));
+
     return InkWell(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const BlogDetailScreen()),
+          MaterialPageRoute(builder: (_) => BlogDetailScreen(blogSlug: post.slug)),
         );
       },
       borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: 16.0),
-        decoration: BoxDecoration(
-          // border: Border.fromBorderSide(color: const Color(0xFFCCCCCC)),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image placeholder
-            Container(
-              width: 59,
-              height: 69,
-              decoration: BoxDecoration(
-                color: const Color(0xFFD9D9D9),
-                borderRadius: BorderRadius.circular(5),
-              ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 59,
+            height: 69,
+            decoration: BoxDecoration(
+              color: const Color(0xFFD9D9D9),
+              borderRadius: BorderRadius.circular(5),
             ),
-
-            const SizedBox(width: 16),
-
-            // Content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1E2021),
-                      height: 1.2,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  post.title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1E2021),
+                    height: 1.2,
                   ),
-
-                  const SizedBox(height: 8),
-
-                  Text(
-                    date,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF777F84),
-                    ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  post.createdAt?.toIso8601String().split('T').first ?? '',
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF777F84),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          IconButton(
+            onPressed: () async {
+              try {
+                if (isFav) {
+                  await ref.read(blogFavoritesActionsProvider.notifier).remove(post.id);
+                  if (!context.mounted) return;
+                  AppSnackbars.showSuccess(context, 'Removed from favorites');
+                } else {
+                  await ref.read(blogFavoritesActionsProvider.notifier).add(post.id);
+                  if (!context.mounted) return;
+                  AppSnackbars.showSuccess(context, 'Added to favorites');
+                }
+              } catch (e) {
+                if (!context.mounted) return;
+                AppSnackbars.showError(context, UiErrorMessage.from(e));
+              }
+            },
+            icon: Icon(isFav ? Icons.favorite : Icons.favorite_border, color: const Color(0xFFA15E22)),
+          ),
+        ],
       ),
     );
   }

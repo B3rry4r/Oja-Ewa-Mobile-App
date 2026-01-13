@@ -1,0 +1,244 @@
+╭─ Response ───────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Below is a start-to-finish Google Sign-In setup using Google Cloud Console only (no Firebase). This covers: GCP      │
+│ project → consent screen → OAuth clients (Android + iOS) → local platform steps → what your backend must verify.     │
+│                                                                                                                      │
+│ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │
+│                                                                                                                      │
+│                                     A. Create/prepare your Google Cloud project                                      │
+│                                                                                                                      │
+│  1 Go to Google Cloud Console                                                                                        │
+│                                                                                                                      │
+│  • https://console.cloud.google.com/                                                                                 │
+│                                                                                                                      │
+│  2 Create a project (or select an existing one)                                                                      │
+│                                                                                                                      │
+│  • Top bar → project dropdown → New Project                                                                          │
+│  • Name it (e.g. OjaEwa Mobile)                                                                                      │
+│                                                                                                                      │
+│  3 Configure the OAuth consent screen                                                                                │
+│                                                                                                                      │
+│  • Left menu → APIs & Services → OAuth consent screen                                                                │
+│  • Choose User Type                                                                                                  │
+│     • External (most apps)                                                                                           │
+│  • Fill in:                                                                                                          │
+│     • App name                                                                                                       │
+│     • User support email                                                                                             │
+│     • Developer contact email(s)                                                                                     │
+│  • Scopes                                                                                                            │
+│     • For basic Google sign-in you usually only need:                                                                │
+│        • openid                                                                                                      │
+│        • email                                                                                                       │
+│        • profile                                                                                                     │
+│     • The google_sign_in plugin will effectively request what it needs for an ID token.                              │
+│  • Test users                                                                                                        │
+│     • While in “Testing” mode, add your Gmail accounts here                                                          │
+│  • Publish status:                                                                                                   │
+│     • You can start in Testing then move to Production later                                                         │
+│                                                                                                                      │
+│ Important: If you leave the app in Testing, only test users can sign in.                                             │
+│                                                                                                                      │
+│ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │
+│                                                                                                                      │
+│                                      B. Create OAuth Client IDs (Android + iOS)                                      │
+│                                                                                                                      │
+│ You will create separate OAuth clients:                                                                              │
+│                                                                                                                      │
+│  • Android client ID                                                                                                 │
+│  • iOS client ID                                                                                                     │
+│                                                                                                                      │
+│ Go to:                                                                                                               │
+│                                                                                                                      │
+│  • APIs & Services → Credentials                                                                                     │
+│  • Click Create Credentials → OAuth client ID                                                                        │
+│                                                                                                                      │
+│                                          B1) Create Android OAuth Client ID                                          │
+│                                                                                                                      │
+│ Choose Application type: Android.                                                                                    │
+│                                                                                                                      │
+│ You must provide:                                                                                                    │
+│                                                                                                                      │
+│  1 Package name                                                                                                      │
+│     • Find it in your Android build config:                                                                          │
+│        • android/app/build.gradle.kts → applicationId (most authoritative)                                           │
+│        • or android/app/src/main/AndroidManifest.xml (sometimes)                                                     │
+│     • Example: com.wawuafrica.ojaewa                                                                                 │
+│  2 SHA-1 certificate fingerprint You need at least the debug SHA-1 for local dev, and later the release SHA-1 for    │
+│    production.                                                                                                       │
+│                                                                                                                      │
+│                                         Get Debug SHA-1 (local development)                                          │
+│                                                                                                                      │
+│ Run:                                                                                                                 │
+│                                                                                                                      │
+│                                                                                                                      │
+│  cd android                                                                                                          │
+│  ./gradlew signingReport                                                                                             │
+│                                                                                                                      │
+│                                                                                                                      │
+│ Look for SHA1: under the debug variant.                                                                              │
+│                                                                                                                      │
+│ Copy that SHA-1 and paste into GCP.                                                                                  │
+│                                                                                                                      │
+│                                            Get Release SHA-1 (production)                                            │
+│                                                                                                                      │
+│ This depends on how you sign:                                                                                        │
+│                                                                                                                      │
+│  • If you use your own keystore locally/CI: get SHA-1 from that keystore                                             │
+│  • If you use Google Play App Signing: you must use App Signing certificate SHA-1 from Play Console (not your upload │
+│    key)                                                                                                              │
+│                                                                                                                      │
+│ Create the Android client after entering package + SHA-1.                                                            │
+│                                                                                                                      │
+│                                            B2) Create iOS OAuth Client ID                                            │
+│                                                                                                                      │
+│ Choose Application type: iOS.                                                                                        │
+│                                                                                                                      │
+│ You must provide:                                                                                                    │
+│                                                                                                                      │
+│  1 Bundle ID                                                                                                         │
+│                                                                                                                      │
+│  • In iOS: ios/Runner.xcodeproj settings or ios/Runner/Info.plist                                                    │
+│  • Example: com.wawuafrica.ojaewa                                                                                    │
+│                                                                                                                      │
+│ Create the iOS client.                                                                                               │
+│                                                                                                                      │
+│ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │
+│                                                                                                                      │
+│                                  C. Platform configuration (without Firebase files)                                  │
+│                                                                                                                      │
+│                                     C1) Android (no google-services.json needed)                                     │
+│                                                                                                                      │
+│ If you’re using only google_sign_in and not Firebase, you typically do not need google-services.json.                │
+│                                                                                                                      │
+│ But you MUST have:                                                                                                   │
+│                                                                                                                      │
+│  • Correct package name                                                                                              │
+│  • Correct SHA-1 registered in the Android OAuth client                                                              │
+│                                                                                                                      │
+│ That’s it for many cases.                                                                                            │
+│                                                                                                                      │
+│ Common Android gotchas                                                                                               │
+│                                                                                                                      │
+│  • Wrong package name (debug builds use different applicationId sometimes)                                           │
+│  • SHA-1 mismatch                                                                                                    │
+│  • Release SHA differs from debug SHA (normal)                                                                       │
+│                                                                                                                      │
+│                                     C2) iOS: add URL scheme (REVERSED_CLIENT_ID)                                     │
+│                                                                                                                      │
+│ Even without Firebase, iOS still needs a URL scheme to return back to the app.                                       │
+│                                                                                                                      │
+│                                          Get the iOS Client ID you created                                           │
+│                                                                                                                      │
+│ It will look like: 1234567890-abc123def456.apps.googleusercontent.com                                                │
+│                                                                                                                      │
+│                                            Compute the REVERSED client id                                            │
+│                                                                                                                      │
+│ Reverse the parts around the dots: com.googleusercontent.apps.1234567890-abc123def456                                │
+│                                                                                                                      │
+│ Add it to ios/Runner/Info.plist under CFBundleURLTypes.                                                              │
+│                                                                                                                      │
+│ Example:                                                                                                             │
+│                                                                                                                      │
+│                                                                                                                      │
+│  <key>CFBundleURLTypes</key>                                                                                         │
+│  <array>                                                                                                             │
+│    <dict>                                                                                                            │
+│      <key>CFBundleTypeRole</key>                                                                                     │
+│      <string>Editor</string>                                                                                         │
+│      <key>CFBundleURLSchemes</key>                                                                                   │
+│      <array>                                                                                                         │
+│        <string>com.googleusercontent.apps.1234567890-abc123def456</string>                                           │
+│      </array>                                                                                                        │
+│    </dict>                                                                                                           │
+│  </array>                                                                                                            │
+│                                                                                                                      │
+│                                                                                                                      │
+│ Common iOS gotchas                                                                                                   │
+│                                                                                                                      │
+│  • Missing URL scheme                                                                                                │
+│  • Wrong reversed client id                                                                                          │
+│  • Bundle ID mismatch vs the iOS OAuth client                                                                        │
+│                                                                                                                      │
+│ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │
+│                                                                                                                      │
+│                                        D. What you must do in the Flutter app                                        │
+│                                                                                                                      │
+│ You already have:                                                                                                    │
+│                                                                                                                      │
+│  • google_sign_in dependency                                                                                         │
+│  • GoogleSignInService.signInAndGetIdToken()                                                                         │
+│  • UI calling backend POST /api/auth/google                                                                          │
+│                                                                                                                      │
+│ But for iOS specifically, sometimes you must provide the iOS client id explicitly (depends on plugin behavior and    │
+│ project setup). If you hit “no idToken returned” on iOS even after URL scheme setup, we can update:                  │
+│                                                                                                                      │
+│                                                                                                                      │
+│  GoogleSignIn(                                                                                                       │
+│    clientId: '<YOUR_IOS_CLIENT_ID>',                                                                                 │
+│    scopes: ['email', 'profile'],                                                                                     │
+│  )                                                                                                                   │
+│                                                                                                                      │
+│                                                                                                                      │
+│ For Android you usually don’t pass a clientId.                                                                       │
+│                                                                                                                      │
+│ I didn’t hardcode client IDs yet because we were aiming for standard config; with pure GCP-only setups, explicitly   │
+│ setting iOS clientId is sometimes required. We can add it via --dart-define=GOOGLE_IOS_CLIENT_ID=... to avoid        │
+│ committing secrets.                                                                                                  │
+│                                                                                                                      │
+│ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │
+│                                                                                                                      │
+│                                   E. Backend verification requirements (critical)                                    │
+│                                                                                                                      │
+│ Your Laravel endpoint /api/auth/google must verify the id_token properly.                                            │
+│                                                                                                                      │
+│                                  E1) Your backend must accept the correct audiences                                  │
+│                                                                                                                      │
+│ ID tokens differ by platform:                                                                                        │
+│                                                                                                                      │
+│  • Android ID token aud might be Android client id                                                                   │
+│  • iOS ID token aud might be iOS client id                                                                           │
+│                                                                                                                      │
+│ Your backend should allow both client IDs as valid audiences.                                                        │
+│                                                                                                                      │
+│                                              E2) Verification checklist                                              │
+│                                                                                                                      │
+│ On backend verify:                                                                                                   │
+│                                                                                                                      │
+│  • signature (Google public certs)                                                                                   │
+│  • iss is https://accounts.google.com or accounts.google.com                                                         │
+│  • aud matches one of your allowed client IDs (Android/iOS)                                                          │
+│  • token not expired                                                                                                 │
+│                                                                                                                      │
+│ If your backend expects a single web client id but the app uses platform client ids, it will fail unless you handle  │
+│ multiple.                                                                                                            │
+│                                                                                                                      │
+│ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │
+│                                                                                                                      │
+│                                     F. Production checklist (before publishing)                                      │
+│                                                                                                                      │
+│                                                  Android production                                                  │
+│                                                                                                                      │
+│  • If using Play App Signing:                                                                                        │
+│     • Add Play Console App signing SHA-1 to the Android OAuth client (or create another Android OAuth client with    │
+│       that SHA-1)                                                                                                    │
+│  • Ensure the package name is exactly production applicationId                                                       │
+│                                                                                                                      │
+│                                                    iOS production                                                    │
+│                                                                                                                      │
+│  • Bundle ID must match App Store bundle id                                                                          │
+│  • URL scheme must remain correct                                                                                    │
+│                                                                                                                      │
+│                                                    Consent screen                                                    │
+│                                                                                                                      │
+│  • Switch from Testing → Production when ready                                                                       │
+│  • Complete verification if Google requests it (depends on scopes/brand)                                             │
+│                                                                                                                      │
+│ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │
+│                                                                                                                      │
+│                               G. Two questions to tailor this exactly to your project                                │
+│                                                                                                                      │
+│  1 What is your Android applicationId (from android/app/build.gradle.kts) and your iOS bundle id?                    │
+│  2 Is your Laravel /api/auth/google currently verifying tokens against one client ID or can it accept Android + iOS  │
+│    audiences?                                                                                                        │
+│                                                                                                                      │
+│ If you paste those IDs (no secrets), I can tell you exactly which OAuth clients you need to create and what your     │
+│ backend should whitelist. 

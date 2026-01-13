@@ -18,7 +18,7 @@ lib/
     - network/              (dio client, interceptors)
     - storage/              (secure storage, hive, drift)
     - utils/                (helpers, extensions)
-    - widgets/              (reusable UI primitives)
+    - widgets/              (reusable UI primitives)and 
 
   features/
     <feature_name>/

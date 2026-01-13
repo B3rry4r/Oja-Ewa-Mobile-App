@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../shell/app_shell.dart';
-import '../../features/auth/presentation/create_account.dart';
-import '../../features/auth/presentation/onboarding.dart';
-import '../../features/auth/presentation/password_reset_success.dart';
-import '../../features/auth/presentation/new_password.dart';
-import '../../features/auth/presentation/reset_password.dart';
-import '../../features/auth/presentation/sign_in.dart';
-import '../../features/auth/presentation/verification_code.dart';
-import '../../features/auth/presentation/splash_screen.dart';
+import '../../features/auth/presentation/screens/create_account_screen.dart';
+import '../../features/auth/presentation/screens/onboarding_screen.dart';
+import '../../features/auth/presentation/screens/password_reset_success_screen.dart';
+import '../../features/auth/presentation/screens/new_password_screen.dart';
+import '../../features/auth/presentation/screens/reset_password_screen.dart';
+import '../../features/auth/presentation/screens/sign_in_screen.dart';
+import '../../features/auth/presentation/screens/verification_code_screen.dart';
+import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/home/subfeatures/beauty/presentation/beauty_screen.dart';
 import '../../features/home/subfeatures/brands/presentation/brands_screen.dart';
 import '../../features/home/subfeatures/market/presentation/market_screen.dart';

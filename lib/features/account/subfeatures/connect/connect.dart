@@ -1,151 +1,104 @@
 // connect_to_us_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
-import 'package:ojaewa/core/resources/app_assets.dart';
-import 'package:ojaewa/core/widgets/background_logo_watermark.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/ui/ui_error_message.dart';
 
-class ConnectToUsScreen extends StatelessWidget {
+import 'presentation/controllers/connect_controller.dart';
+
+class ConnectToUsScreen extends ConsumerWidget {
   const ConnectToUsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final info = ref.watch(connectInfoProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
-        child: Stack(
+        child: Column(
           children: [
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  const AppHeader(
-                    backgroundColor: Color(0xFFFFF8F1),
-                    iconColor: Color(0xFF241508),
-                  ),
-
-                  // Social media connections
-                  _buildSocialConnections(),
-                  const SizedBox(height: 40),
-                ],
+            const AppHeader(
+              backgroundColor: Color(0xFFFFF8F1),
+              iconColor: Color(0xFF241508),
+              title: Text(
+                'Connect to us',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Campton',
+                  color: Color(0xFF241508),
+                ),
               ),
             ),
-            const BackgroundLogoWatermark(),
+            Expanded(
+              child: info.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, st) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    AppSnackbars.showError(context, UiErrorMessage.from(e));
+                  });
+                  return Center(
+                    child: ElevatedButton(
+                      onPressed: () => ref.invalidate(connectInfoProvider),
+                      child: const Text('Retry'),
+                    ),
+                  );
+                },
+                data: (data) {
+                  return ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      _section('Social', data.socialLinks),
+                      const SizedBox(height: 12),
+                      _section('Contact', data.contact),
+                      const SizedBox(height: 12),
+                      _section('App links', data.appLinks),
+                    ],
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSocialConnections() {
-    final List<SocialConnection> connections = [
-      SocialConnection(
-        platform: 'WhatsApp',
-        username: '+234 000 000 0000',
-        iconAsset: AppIcons.whatsapp,
-        color: Color(0xFFF5E0CE),
-      ),
-      SocialConnection(
-        platform: 'Phone',
-        username: '+234 000 000 0000',
-        iconAsset: AppIcons.phone,
-        color: Color(0xFFF5E0CE),
-      ),
-      SocialConnection(
-        platform: 'Email',
-        username: 'support@ojaewa.com',
-        iconAsset: AppIcons.emailUs,
-        color: Color(0xFFF5E0CE),
-      ),
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 100, 16, 162),
-      child: Column(
-        children: [
-          for (var connection in connections)
-            _buildSocialConnectionItem(connection),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSocialConnectionItem(SocialConnection connection) {
+  Widget _section(String title, Map<String, String> items) {
     return Container(
-      height: 48,
-      margin: const EdgeInsets.only(bottom: 0), // No bottom margin, items are stacked
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFDEDEDE)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Left side: Icon and username
-          Row(
-            children: [
-              // Social media icon
-              Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: connection.color,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                alignment: Alignment.center,
-                child: SvgPicture.asset(
-                  connection.iconAsset,
-                  width: 16,
-                  height: 16,
-                  colorFilter: const ColorFilter.mode(
-                    Color(0xFF1E2021),
-                    BlendMode.srcIn,
-                  ),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w700, fontFamily: 'Campton'),
+          ),
+          const SizedBox(height: 8),
+          if (items.isEmpty)
+            const Text('No data')
+          else
+            for (final entry in items.entries)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(width: 110, child: Text(entry.key)),
+                    Expanded(child: Text(entry.value)),
+                  ],
                 ),
               ),
-              const SizedBox(width: 8),
-              
-              // Username
-              Text(
-                connection.username,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Campton',
-                  color: Color(0xFF1E2021),
-                ),
-              ),
-            ],
-          ),
-          
-          // Right side: Link/External icon
-          IconButton(
-            icon: const Icon(
-              Icons.open_in_new_rounded,
-              size: 16,
-              color: Color(0xFF1E2021),
-            ),
-            onPressed: () {
-              // Open social media link
-            },
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(
-              minWidth: 24,
-              minHeight: 24,
-            ),
-          ),
         ],
       ),
     );
   }
-
-}
-
-class SocialConnection {
-  final String platform;
-  final String username;
-  final String iconAsset;
-  final Color color;
-
-  SocialConnection({
-    required this.platform,
-    required this.username,
-    required this.iconAsset,
-    required this.color,
-  });
 }

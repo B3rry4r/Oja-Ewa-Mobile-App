@@ -1,18 +1,28 @@
 // profile_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
-import '../../../app/router/app_router.dart';
+import 'package:ojaewa/app/router/app_router.dart';
+import 'package:ojaewa/features/account/presentation/controllers/profile_controller.dart';
+import 'package:ojaewa/features/auth/presentation/controllers/auth_controller.dart';
 
-class AccountScreen extends StatelessWidget {
+class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(userProfileProvider);
+
+    ref.listen(authFlowControllerProvider, (prev, next) {
+      if (prev?.isLoading == true && next.hasValue) {
+        Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.onboarding, (r) => false);
+      }
+    });
     return Scaffold(
       backgroundColor: const Color(0xFF603814),
       body: SafeArea(
@@ -72,15 +82,35 @@ class AccountScreen extends StatelessWidget {
                       children: [
                         // User greeting
                         const SizedBox(height: 16), // 120 - 104
-                        const Text(
-                          'Hello Sanusi',
-                          style: TextStyle(
-                            fontSize: 33,
-                            fontFamily: 'Campton',
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF241508),
+                        profile.when(
+                          loading: () => const Text(
+                            'Hello',
+                            style: TextStyle(
+                              fontSize: 33,
+                              fontFamily: 'Campton',
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF241508),
+                            ),
                           ),
-                        ),
+                          error: (e, st) => const Text(
+                            'Hello',
+                            style: TextStyle(
+                              fontSize: 33,
+                              fontFamily: 'Campton',
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF241508),
+                            ),
+                          ),
+                          data: (u) => Text(
+                           'Hello ${u.fullName}',
+                           style: const TextStyle(
+                             fontSize: 33,
+                             fontFamily: 'Campton',
+                             fontWeight: FontWeight.w600,
+                             color: Color(0xFF241508),
+                           ),
+                         ),
+                       ),
 
                         // Profile section
                         const SizedBox(height: 24),
@@ -113,7 +143,7 @@ class AccountScreen extends StatelessWidget {
                         // Support section
                         const SizedBox(height: 24),
                         _buildSectionHeader('Support'),
-                        _buildSupportList(context),
+                        _buildSupportList(context, ref),
 
                         // Bottom spacing
                         const SizedBox(height: 32),
@@ -243,7 +273,7 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSupportList(BuildContext context) {
+  Widget _buildSupportList(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
         _buildMenuItem(
@@ -278,7 +308,9 @@ class AccountScreen extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () {},
+              onTap: () async {
+                await ref.read(authFlowControllerProvider.notifier).logout();
+              },
               borderRadius: BorderRadius.circular(8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

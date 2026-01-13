@@ -1,30 +1,30 @@
 // addresses_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 
-import '../data/mock_addresses.dart';
 import '../domain/address.dart';
 import 'add_edit_address.dart';
+import 'controllers/address_controller.dart';
 
-class AddressesScreen extends StatelessWidget {
+class AddressesScreen extends ConsumerWidget {
   const AddressesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Mock state for now.
-    final addresses = mockAddresses;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final addresses = ref.watch(addressesProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
         child: Column(
           children: [
-            AppHeader(
-              backgroundColor: const Color(0xFFFFF8F1),
-              iconColor: const Color(0xFF241508),
-              title: const Text(
+            const AppHeader(
+              backgroundColor: Color(0xFFFFF8F1),
+              iconColor: Color(0xFF241508),
+              title: Text(
                 'Addresses',
                 style: TextStyle(
                   fontSize: 22,
@@ -34,44 +34,53 @@ class AddressesScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Content
             Expanded(
               child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (addresses.isEmpty) ...[
-                      _buildEmptyState(context),
-                    ] else ...[
-                      // Address Card (current design)
-                      _buildAddressCard(context, addresses.first),
-                      const SizedBox(height: 40),
+                child: addresses.when(
+                  loading: () => const Padding(
+                    padding: EdgeInsets.only(top: 48),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  error: (e, st) => Padding(
+                    padding: const EdgeInsets.only(top: 48),
+                    child: Center(child: Text('Failed to load addresses.\n$e')),
+                  ),
+                  data: (items) {
+                    if (items.isEmpty) {
+                      return _buildEmptyState(context);
+                    }
 
-                      // Add New Address Button
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        child: _buildAddAddressButton(context),
-                      ),
+                    final defaultAddress = items.firstWhere(
+                      (a) => a.isDefault,
+                      orElse: () => items.first,
+                    );
 
-                      // Decorative background (placeholder until asset exists)
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Opacity(
-                          opacity: 0.03,
-                          child: const AppImagePlaceholder(
-                            width: 234,
-                            height: 347,
-                            borderRadius: 0,
-                            backgroundColor: Colors.transparent,
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildAddressCard(context, defaultAddress),
+                        const SizedBox(height: 40),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          child: _buildAddAddressButton(context),
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Opacity(
+                            opacity: 0.03,
+                            child: const AppImagePlaceholder(
+                              width: 234,
+                              height: 347,
+                              borderRadius: 0,
+                              backgroundColor: Colors.transparent,
+                            ),
                           ),
                         ),
-                      ),
-
-                      // Summary section at bottom
-                      _buildSummarySection(),
-                    ],
-                  ],
+                        // Keeping existing summary section (static)
+                        _buildSummarySection(),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),
@@ -93,7 +102,6 @@ class AddressesScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Name
           Text(
             address.fullName,
             style: const TextStyle(
@@ -104,26 +112,21 @@ class AddressesScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 28),
-
-          // Address and phone number with edit icon
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Address text
               Expanded(
                 child: Text(
                   '${address.phone}\n${address.addressLine}, ${address.city}, ${address.state},\n${address.country} ${address.postCode}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontFamily: 'Campton',
-                    color: const Color(0xFF3C4042),
+                    color: Color(0xFF3C4042),
                     height: 1.5,
                   ),
                 ),
               ),
               const SizedBox(width: 48),
-
-              // Default/selected indicator (not an edit icon)
               Container(
                 width: 40,
                 height: 40,
@@ -144,69 +147,51 @@ class AddressesScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 40),
-
-          // Default address tag and edit button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Default address tag
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                 decoration: BoxDecoration(
                   border: Border.all(color: const Color(0xFFCCCCCC)),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Text(
-                  'Default Address',
-                  style: TextStyle(
+                child: Text(
+                  address.isDefault ? 'Default Address' : 'Address',
+                  style: const TextStyle(
                     fontSize: 12,
                     fontFamily: 'Campton',
                     color: Color(0xFF3C4042),
                   ),
                 ),
               ),
-
-              // Edit button with icon
               InkWell(
                 onTap: () async {
-                  final args = ModalRoute.of(context)?.settings.arguments;
-                  final returnToOrderConfirmation = args is Map &&
-                      args['returnTo'] == 'orderConfirmation';
-
                   final updated = await Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => AddEditAddressScreen(initialAddress: address),
-                      settings: RouteSettings(
-                        arguments: returnToOrderConfirmation
-                            ? {'returnTo': 'orderConfirmation'}
-                            : null,
-                      ),
                     ),
                   );
 
-                  if (returnToOrderConfirmation && updated == true) {
-                    Navigator.of(context).pop(true);
+                  if (updated == true && context.mounted) {
+                    // Pop back to order confirmation flow if needed.
+                    final args = ModalRoute.of(context)?.settings.arguments;
+                    final returnToOrderConfirmation = args is Map && args['returnTo'] == 'orderConfirmation';
+                    if (returnToOrderConfirmation) Navigator.of(context).pop(true);
                   }
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 8,
-                  ),
-                  child: Row(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  child: const Row(
                     children: [
-                      const Icon(
-                        Icons.edit_outlined,
-                        size: 20,
-                        color: Color(0xFF3C4042),
-                      ),
-                      const SizedBox(width: 9),
+                      Icon(Icons.edit_outlined, size: 20, color: Color(0xFF3C4042)),
+                      SizedBox(width: 9),
                       Text(
                         'Edit',
                         style: TextStyle(
                           fontSize: 12,
                           fontFamily: 'Campton',
-                          color: const Color(0xFF3C4042),
+                          color: Color(0xFF3C4042),
                         ),
                       ),
                     ],
@@ -271,23 +256,14 @@ class AddressesScreen extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
           onTap: () async {
-            final args = ModalRoute.of(context)?.settings.arguments;
-            final returnToOrderConfirmation = args is Map &&
-                args['returnTo'] == 'orderConfirmation';
-
             final updated = await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => const AddEditAddressScreen(),
-                settings: RouteSettings(
-                  arguments: returnToOrderConfirmation
-                      ? {'returnTo': 'orderConfirmation'}
-                      : null,
-                ),
-              ),
+              MaterialPageRoute(builder: (_) => const AddEditAddressScreen()),
             );
 
-            if (returnToOrderConfirmation && updated == true) {
-              Navigator.of(context).pop(true);
+            if (updated == true && context.mounted) {
+              final args = ModalRoute.of(context)?.settings.arguments;
+              final returnToOrderConfirmation = args is Map && args['returnTo'] == 'orderConfirmation';
+              if (returnToOrderConfirmation) Navigator.of(context).pop(true);
             }
           },
           child: Container(
@@ -311,11 +287,10 @@ class AddressesScreen extends StatelessWidget {
   Widget _buildSummarySection() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      color: const Color(0xFF603814), // Dark brown background
+      color: const Color(0xFF603814),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Delivery text (IR shows position at top: 806)
           const Text(
             'Delivery',
             style: TextStyle(
@@ -325,12 +300,11 @@ class AddressesScreen extends StatelessWidget {
               color: Color(0xFFFBFBFB),
             ),
           ),
-          const SizedBox(height: 60), // Spacing between Delivery and Total
-          // Total row
+          const SizedBox(height: 60),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
+            children: const [
+              Text(
                 'Total',
                 style: TextStyle(
                   fontSize: 14,
@@ -339,10 +313,9 @@ class AddressesScreen extends StatelessWidget {
                   color: Color(0xFFFBFBFB),
                 ),
               ),
-
               Text(
                 'N44,000',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,

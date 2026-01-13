@@ -1,14 +1,19 @@
 // notifications_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/features/notifications/domain/notification_preferences.dart';
+import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 
-class NotificationsSettingsScreen extends StatelessWidget {
+class NotificationsSettingsScreen extends ConsumerWidget {
   const NotificationsSettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final prefs = ref.watch(notificationPreferencesProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
@@ -27,14 +32,11 @@ class NotificationsSettingsScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Notifications content
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.only(bottom: 40),
                 child: Column(
                   children: [
-                    // Notifications title
                     const Padding(
                       padding: EdgeInsets.only(top: 42),
                       child: Text(
@@ -47,11 +49,7 @@ class NotificationsSettingsScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-
-                    // Notifications list
-                    _buildNotificationsList(),
-
-                    // Decorative background image
+                    _buildNotificationsList(context, ref, prefs),
                     Align(
                       alignment: Alignment.centerRight,
                       child: Opacity(
@@ -74,101 +72,126 @@ class NotificationsSettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationsList() {
-    final List<NotificationItem> notifications = [
-      NotificationItem(title: 'Allow Push Notifications', isEnabled: false),
-      NotificationItem(title: 'New Products', isEnabled: false),
-      NotificationItem(title: 'Discount and Sales', isEnabled: false),
-      NotificationItem(title: 'New Blog Posts', isEnabled: false),
-      NotificationItem(title: 'New Orders', isEnabled: false),
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          const SizedBox(height: 16),
-
-          for (var notification in notifications)
-            _buildNotificationItem(notification),
-        ],
+  Widget _buildNotificationsList(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<NotificationPreferences> prefs,
+  ) {
+    return prefs.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 24),
+        child: Center(child: CircularProgressIndicator()),
       ),
-    );
-  }
+      error: (e, st) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        child: Center(child: Text('Failed to load preferences.\n$e')),
+      ),
+      data: (p) {
+        final items = <_PrefItem>[
+          _PrefItem(
+            title: 'Allow Push Notifications',
+            value: p.allowPushNotifications,
+            updater: (v) => p.copyWith(allowPushNotifications: v),
+          ),
+          _PrefItem(
+            title: 'New Products',
+            value: p.newProducts,
+            updater: (v) => p.copyWith(newProducts: v),
+          ),
+          _PrefItem(
+            title: 'Discount and Sales',
+            value: p.discountAndSales,
+            updater: (v) => p.copyWith(discountAndSales: v),
+          ),
+          _PrefItem(
+            title: 'New Blog Posts',
+            value: p.newBlogPosts,
+            updater: (v) => p.copyWith(newBlogPosts: v),
+          ),
+          _PrefItem(
+            title: 'New Orders',
+            value: p.newOrders,
+            updater: (v) => p.copyWith(newOrders: v),
+          ),
+        ];
 
-  Widget _buildNotificationItem(NotificationItem item) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return Container(
-          height: 54,
-          margin: const EdgeInsets.only(bottom: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
             children: [
-              // Notification title with padding
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                child: Text(
-                  item.title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Campton',
-                    color: Color(0xFF1E2021),
-                  ),
-                ),
-              ),
-
-              // Toggle switch
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    item.isEnabled = !item.isEnabled;
-                  });
-                },
-                child: Container(
-                  width: 62,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE9E9E9),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: AnimatedAlign(
-                    duration: const Duration(milliseconds: 200),
-                    alignment: item.isEnabled
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 3),
-                      child: Container(
-                        width: 31,
-                        height: 31,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFBFBFB),
-                          borderRadius: BorderRadius.circular(15.5),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              const SizedBox(height: 16),
+              for (final item in items) _buildPrefRow(ref: ref, item: item),
             ],
           ),
         );
       },
     );
   }
+
+  Widget _buildPrefRow({required WidgetRef ref, required _PrefItem item}) {
+    return Container(
+      height: 54,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            child: Text(
+              item.title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontFamily: 'Campton',
+                color: Color(0xFF1E2021),
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () async {
+              final updated = item.updater(!item.value);
+              await ref.read(notificationsActionsProvider.notifier).updatePreferences(updated);
+            },
+            child: Container(
+              width: 62,
+              height: 38,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE9E9E9),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: AnimatedAlign(
+                duration: const Duration(milliseconds: 200),
+                alignment: item.value ? Alignment.centerRight : Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: Container(
+                    width: 31,
+                    height: 31,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFBFBFB),
+                      borderRadius: BorderRadius.circular(15.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-class NotificationItem {
-  String title;
-  bool isEnabled;
+class _PrefItem {
+  _PrefItem({required this.title, required this.value, required this.updater});
 
-  NotificationItem({required this.title, required this.isEnabled});
+  final String title;
+  final bool value;
+  final NotificationPreferences Function(bool) updater;
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'bootstrap/app_bootstrap.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 
@@ -15,6 +16,11 @@ class App extends ConsumerWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.system,
+      builder: (context, child) {
+        // Ensure we load token from storage once at startup.
+        // This keeps initial screens simple and avoids duplicated boot logic.
+        return AppBootstrap(child: child ?? const SizedBox.shrink());
+      },
       onGenerateRoute: AppRouter.onGenerateRoute,
       initialRoute: AppRoutes.splash,
     );

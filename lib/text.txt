@@ -1,0 +1,53 @@
+                                                                                                           │
+│                 Business profile registration: valid inputs per category + offering_type (from docs)                 │
+│                                                                                                                      │
+│ From docs/api_docs/business_seller.md → “Create Business Profile” (POST /api/business)                               │
+│                                                                                                                      │
+│                                       Common required fields (ALL categories)                                        │
+│                                                                                                                      │
+│  • category: enum beauty|brand|school|music                                                                          │
+│  • country (max 100)                                                                                                 │
+│  • state (max 100)                                                                                                   │
+│  • city (max 100)                                                                                                    │
+│  • address (max 255)                                                                                                 │
+│  • business_email (email, max 100)                                                                                   │
+│  • business_phone_number (max 20)                                                                                    │
+│  • business_name (max 100)                                                                                           │
+│  • business_description (max 1000)                                                                                   │
+│                                                                                                                      │
+│                                                Common optional fields                                                │
+│                                                                                                                      │
+│  • website_url (url, max 255)                                                                                        │
+│  • instagram (max 100)                                                                                               │
+│  • facebook (max 100)                                                                                                │
+│  • business_logo (max 255)                                                                                           │
+│  • identity_document (optional generally — BUT required for music, see below)                                        │
+│                                                                                                                      │
+│                           offering_type (optional, but if provided triggers requirements)                            │
+│                                                                                                                      │
+│  • offering_type: enum selling_product|providing_service                                                             │
+│                                                                                                                      │
+│                                If offering_type = providing_service (required fields)                                │
+│                                                                                                                      │
+│  • service_list: required json                                                                                       │
+│  • professional_title: required string max 100                                                                       │
+│                                                                                                                      │
+│                                 If offering_type = selling_product (required fields)                                 │
+│                                                                                                                      │
+│  • product_list: required json                                                                                       │
+│  • business_certificates: required json                                                                              │
+│                                                                                                                      │
+│                                          Category-specific required fields                                           │
+│                                                                                                                      │
+│                                                 If category = school                                                 │
+│                                                                                                                      │
+│  • school_type: required enum fashion|music|catering|beauty                                                          │
+│  • school_biography: required string max 1000                                                                        │
+│  • classes_offered: required json                                                                                    │
+│                                                                                                                      │
+│                                                 If category = music                                                  │
+│                                                                                                                      │
+│  • music_category: required enum dj|artist|producer                                                                  │
+│  • identity_document: required string max 255                                                                        │
+│  • youtube OR spotify: at least one must be provided                                                                 │
+│                                                                     

@@ -1,0 +1,40 @@
+import 'package:flutter/foundation.dart';
+
+@immutable
+class AppNotification {
+  const AppNotification({
+    required this.id,
+    required this.title,
+    required this.body,
+    required this.isRead,
+    this.createdAt,
+  });
+
+  final int id;
+  final String title;
+  final String body;
+  final bool isRead;
+  final DateTime? createdAt;
+
+  static AppNotification fromJson(Map<String, dynamic> json) {
+    final id = (json['id'] as num?)?.toInt() ?? 0;
+    final title = (json['title'] as String?) ??
+        (json['subject'] as String?) ??
+        (json['type'] as String?) ??
+        '';
+    final body = (json['message'] as String?) ?? (json['body'] as String?) ?? '';
+    final isRead = (json['is_read'] as bool?) ?? (json['read'] as bool?) ?? false;
+
+    DateTime? createdAt;
+    final createdAtRaw = json['created_at'];
+    if (createdAtRaw is String) createdAt = DateTime.tryParse(createdAtRaw);
+
+    return AppNotification(
+      id: id,
+      title: title,
+      body: body,
+      isRead: isRead,
+      createdAt: createdAt,
+    );
+  }
+}

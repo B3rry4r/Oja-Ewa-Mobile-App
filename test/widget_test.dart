@@ -3,12 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ojaewa/app/app.dart';
+import 'package:ojaewa/core/network/network_providers.dart';
 
 void main() {
   testWidgets('App builds', (tester) async {
     await tester.pumpWidget(
-      const ProviderScope(
-        child: App(),
+      ProviderScope(
+        overrides: [
+          // Avoid waiting on secure storage / bootstrap during widget tests.
+          authBootstrapProvider.overrideWith((ref) async {}),
+        ],
+        child: const App(),
       ),
     );
     await tester.pumpAndSettle();

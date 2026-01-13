@@ -1,0 +1,194 @@
+Backend Agent API Audit (Source of truth: docs/api_docs/*.md)
+Generated: 2026-01-13
+
+Purpose
+- Identify gaps/inconsistencies in the documented API that block or complicate Flutter app screens.
+- Provide backend changes that make the API directly consumable: consistent response shapes, pagination, clear filters/sorting, and public browse flows.
+
+Scope
+- Based ONLY on docs/api_docs/*.md (authentication.md, user_management.md, products.md, orders_payments.md, notifications.md, content_blogs_faqs.md, business_seller.md).
+- Screens referenced are from the Flutter app routes and feature folders.
+
+============================================================
+1) CRITICAL: Category → Listing flow is not directly consumable (items returns IDs only)
+============================================================
+Doc: docs/api_docs/content_blogs_faqs.md
+Endpoint: GET /api/categories/{type}/{slug}/items (Public)
+Docs explicitly state:
+- items returned as array of IDs only
+- client should fetch full details separately
+
+Affected app screens
+- Category browsing screens: Market/Beauty/Brands/Music/Schools/Sustainability
+- Product listing screens: ProductListingScreen (and any "category listing" UI)
+
+Why this blocks the app UX
+- Listing screens require full objects to render (name/title, price, image, rating/review_count, etc.).
+- Returning only IDs prevents standard pagination and forces client-side extra work.
+
+Backend action (required)
+Change THIS SAME endpoint to return full items + pagination (do NOT return IDs-only).
+- Keep URL the same.
+- Return a paginated collection under `items`.
+- `items.data[]` must contain the fields needed for cards.
+
+Recommended response shape
+{
+  "status": "success",
+  "data": {
+    "category": { "id": 1, "type": "market", "name": "Traditional Wear", "slug": "traditional-wear" },
+    "items": {
+      "data": [
+        {
+          "id": 3,
+          "kind": "product",                 // product | business_profile
+          "name": "Ankara Print Dress",
+          "price": 18000,
+          "image": "https://...",
+          "avg_rating": 4.8,
+          "reviews_count": 12
+        }
+      ],
+      "links": { ... },
+      "meta": { "current_page": 1, "per_page": 20, "total": 120 }
+    }
+  }
+}
+
+Add query params for pagination and sort
+- page
+- per_page
+- sort
+
+============================================================
+2) CRITICAL: Business profiles are auth-protected but category browsing is public
+============================================================
+Docs conflict:
+- content_blogs_faqs.md: category items endpoint is Public and can return business profile IDs (beauty/brand/school/music)
+- business_seller.md: GET /api/business/{id} is auth:sanctum and "user can only view their own business profiles"
+
+Affected app screens
+- Beauty/Brands/Music/Schools category flows (public browsing)
+
+Why this blocks the app UX
+- If public category listing is allowed, the client must be able to fetch public/approved business profile details.
+- Current docs only allow authenticated owners to fetch business profile details.
+
+Backend action (required)
+Provide a PUBLIC read endpoint for approved business profiles used for marketplace browsing.
+Recommended:
+- Keep existing owner-only endpoint as-is.
+- Add public endpoint(s):
+  - GET /api/business/public/{id}
+  - GET /api/business/public (list/search approved)
+
+OR (preferred combined approach)
+- Implement section (1) so `/api/categories/{type}/{slug}/items` returns the full business profile objects for public listing.
+
+============================================================
+3) CRITICAL: User logout endpoint missing
+============================================================
+Doc: docs/api_docs/authentication.md
+- Admin logout exists: POST /api/admin/logout
+- No user logout endpoint is documented.
+
+Affected app screens
+- Account → Sign out
+
+Backend action (required)
+- Add and document: POST /api/logout (auth:sanctum)
+- Implementation: revoke current token (Sanctum currentAccessToken()->delete())
+
+============================================================
+4) Products: buyer browse vs seller-only listing ambiguity
+============================================================
+Doc: docs/api_docs/products.md
+- GET /api/products is documented as "List Seller's Products" with auth:sanctum.
+- Buyer listing appears to rely on GET /api/products/search.
+
+Backend action:
+- Clarify and document a public buyer listing endpoint.
+Options:
+A) Make GET /api/products return approved products publicly (with seller filter optional), and document seller-specific listing under /api/seller/products
+B) Keep /api/products as seller-only but document a dedicated buyer list endpoint: GET /api/products/browse
+
+============================================================
+5) Filters & sorting: docs do not fully support filter/sort UI
+============================================================
+App UI:
+- Product filter overlay + sort overlay exist.
+
+Docs:
+- products.md documents filters for /api/products/search and /api/products/suggestions.
+- Sorting keys are not clearly documented for /api/products/search.
+- No endpoint provides filter facets (valid tribes list, styles list, size list, min/max price ranges, etc.).
+
+Backend action:
+A) Document supported sort values for /api/products/search:
+- sort=price_asc|price_desc|newest|most_reviewed|rating
+B) Provide a filter metadata endpoint so UI can be dynamic:
+- GET /api/products/filters
+  returns: { tribes:[], styles:[], sizes:[], genders:[], price_range:{min,max} }
+
+============================================================
+6) Cart/Shopping bag endpoints missing
+============================================================
+App UI has ShoppingBagScreen.
+Docs/api_docs has NO cart/bag endpoints.
+
+Backend action:
+- Either document that bag is local-only (no server cart), OR add cart endpoints:
+  GET /api/cart
+  POST /api/cart/items
+  PATCH /api/cart/items/{id}
+  DELETE /api/cart/items/{id}
+
+============================================================
+7) Orders: cancellation/returns endpoints not documented
+============================================================
+Doc: docs/api_docs/orders_payments.md
+- Tracking section includes a "cancelled" status example.
+- But there is no documented endpoint for user to cancel an order.
+
+Backend action:
+- If supported: add and document
+  POST /api/orders/{order}/cancel
+  or PATCH /api/orders/{order}/status (user-limited)
+- If not supported: remove "cancelled" example or clarify cancellation is admin-only.
+
+============================================================
+8) Wishlist: documented correctly, but note required request body for DELETE
+============================================================
+Doc: docs/api_docs/content_blogs_faqs.md
+- wishlistable_type enum is explicitly defined: product|business_profile
+- DELETE /api/wishlist requires JSON body with wishlistable_type + wishlistable_id.
+
+Backend action:
+- Ensure backend supports DELETE with JSON body (some clients/proxies drop body on DELETE).
+Alternative:
+- Provide DELETE /api/wishlist/{id}
+  OR DELETE /api/wishlist?wishlistable_type=...&wishlistable_id=...
+
+============================================================
+9) Blog favorites: delete uses request body
+============================================================
+Doc: docs/api_docs/content_blogs_faqs.md
+- DELETE /api/blogs/favorites requires { blog_id } in body.
+
+Same concern as wishlist DELETE-body.
+Backend action:
+- Consider DELETE /api/blogs/favorites/{blog_id}
+
+============================================================
+10) Deep links in notifications vs mobile routes
+============================================================
+Doc: docs/api_docs/notifications.md
+- Notifications include deep_link examples like /blogs/{slug} and /business/{id}
+
+Backend action:
+- Ensure deep_link routes map to real mobile routes OR document mapping contract.
+
+============================================================
+Appendix: Documented endpoints inventory
+============================================================
+See docs/api_docs/*.md for full list; this report focuses on gaps/changes needed.
