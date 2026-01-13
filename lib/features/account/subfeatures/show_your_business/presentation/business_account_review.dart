@@ -7,11 +7,25 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 ///
 /// IMPORTANT: This is intentionally separate from the Start Selling flow's
 /// `AccountReviewScreen` so we don't change its navigation behavior.
-class BusinessAccountReviewScreen extends StatelessWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/ui/ui_error_message.dart';
+
+import '../domain/business_profile_payload.dart';
+import 'controllers/business_profile_controller.dart';
+import 'selected_category_forms/draft_utils.dart';
+import 'selected_category_forms/business_registration_draft.dart';
+
+class BusinessAccountReviewScreen extends ConsumerWidget {
   const BusinessAccountReviewScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) { 
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final draft = draftFromArgs(args, categoryLabelFallback: 'Beauty');
+
+    final state = ref.watch(businessProfileControllerProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: Column(
@@ -47,7 +61,7 @@ class BusinessAccountReviewScreen extends StatelessWidget {
                     ),
                   ),
                   const Spacer(flex: 3),
-                  _buildContinueButton(context),
+                  _buildContinueButton(context, ref, draft, state.isLoading),
                   const SizedBox(height: 40),
                 ],
               ),
@@ -107,12 +121,54 @@ class BusinessAccountReviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContinueButton(BuildContext context) {
+  Widget _buildContinueButton(
+    BuildContext context,
+    WidgetRef ref,
+    BusinessRegistrationDraft draft,
+    bool isLoading,
+  ) {
     return InkWell(
-      onTap: () {
-        // Return user to the main app flow.
-        Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
-      },
+      onTap: isLoading
+          ? null
+          : () async {
+              // Map draft -> API payload
+              final payload = BusinessProfilePayload(
+                category: mapCategoryLabelToEnum(draft.categoryLabel),
+                country: draft.country ?? '',
+                state: draft.state ?? '',
+                city: draft.city ?? '',
+                address: draft.address ?? '',
+                businessEmail: draft.businessEmail ?? '',
+                businessPhoneNumber: draft.businessPhoneNumber ?? '',
+                websiteUrl: draft.websiteUrl,
+                instagram: draft.instagram,
+                facebook: draft.facebook,
+                identityDocument: draft.identityDocumentPath,
+                businessName: draft.businessName ?? '',
+                businessDescription: draft.businessDescription ?? '',
+                offeringType: draft.offeringType,
+                productList: parseProductListText(draft.productListText),
+                serviceList: draft.serviceList,
+                businessCertificates: draft.businessCertificates,
+                professionalTitle: draft.professionalTitle,
+                schoolType: draft.schoolType,
+                schoolBiography: draft.schoolBiography,
+                classesOffered: draft.classesOffered,
+                musicCategory: draft.musicCategory,
+                youtube: draft.youtube,
+                spotify: draft.spotify,
+              );
+
+              try {
+                await ref.read(businessProfileControllerProvider.notifier).submit(payload);
+                if (!context.mounted) return;
+                AppSnackbars.showSuccess(context, 'Business submitted for review');
+                Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+              } catch (e) {
+                if (!context.mounted) return;
+                AppSnackbars.showError(context, UiErrorMessage.from(e));
+              }
+            },
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,

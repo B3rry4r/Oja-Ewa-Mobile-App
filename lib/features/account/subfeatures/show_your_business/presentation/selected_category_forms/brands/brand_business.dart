@@ -4,6 +4,7 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 
 import '../../../../../../../app/router/app_router.dart';
 import '../service_list_editor.dart';
+import '../draft_utils.dart';
 
 class BrandBusinessDetailsScreen extends StatefulWidget {
   const BrandBusinessDetailsScreen({super.key});
@@ -14,11 +15,18 @@ class BrandBusinessDetailsScreen extends StatefulWidget {
 
 class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen> {
   String _selectedOffering = 'Selling Product';
+
+  final _businessNameController = TextEditingController();
+  final _businessDescriptionController = TextEditingController();
+  final _productListController = TextEditingController();
   final TextEditingController _professionalTitleController = TextEditingController();
   final List<ServiceListItem> _services = [ServiceListItem()];
 
   @override
   void dispose() {
+    _businessNameController.dispose();
+    _businessDescriptionController.dispose();
+    _productListController.dispose();
     _professionalTitleController.dispose();
     super.dispose();
   }
@@ -56,13 +64,14 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
             const SizedBox(height: 20),
 
             // Form Fields
-            _buildInputField("Business Name", "Enter business name"),
+            _buildInputField("Business Name", "Enter business name", controller: _businessNameController),
             const SizedBox(height: 24),
             _buildInputField(
               "Business Description",
               "Share short description of your business",
               maxLines: 4,
               helperText: "100 characters required",
+              controller: _businessDescriptionController,
             ),
             const SizedBox(height: 24),
 
@@ -96,6 +105,7 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
                 "Product List",
                 "List your products here",
                 maxLines: 4,
+                controller: _productListController,
               ),
               const SizedBox(height: 24),
             ],
@@ -357,8 +367,24 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
 
   Widget _buildSubmitButton(BuildContext context) {
     return InkWell(
-      onTap: () =>
-          Navigator.of(context).pushNamed(AppRoutes.businessAccountReview),
+      onTap: () {
+        final draft = draftFromArgs(
+            ModalRoute.of(context)?.settings.arguments,
+            categoryLabelFallback: 'Brands',
+          );
+          final updated = draft
+            ..businessName = _businessNameController.text.trim()
+            ..businessDescription = _businessDescriptionController.text.trim()
+            ..offeringType = mapOfferingLabelToEnum(_selectedOffering)
+            ..productListText = _productListController.text
+            ..professionalTitle = _professionalTitleController.text.trim()
+            ..serviceList = _services;
+
+          Navigator.of(context).pushNamed(
+            AppRoutes.businessAccountReview,
+            arguments: updated.toJson(),
+          );
+      },
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,

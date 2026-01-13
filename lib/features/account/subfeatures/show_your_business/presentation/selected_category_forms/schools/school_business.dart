@@ -4,6 +4,7 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 
 import '../../../../../../../app/router/app_router.dart';
 import '../classes_offered_editor.dart';
+import '../draft_utils.dart';
 
 class SchoolBusinessDetailsScreen extends StatefulWidget {
   const SchoolBusinessDetailsScreen({super.key});
@@ -15,7 +16,16 @@ class SchoolBusinessDetailsScreen extends StatefulWidget {
 class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScreen> {
   String _selectedSchoolType = "Fashion";
 
+  final _schoolNameController = TextEditingController();
+  final _schoolBiographyController = TextEditingController();
   final List<ClassOfferedItem> _classes = [ClassOfferedItem()];
+
+  @override
+  void dispose() {
+    _schoolNameController.dispose();
+    _schoolBiographyController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -179,7 +189,7 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
     );
   }
 
-  Widget _buildInputField(String label, String hint, {int maxLines = 1, String? helperText}) {
+  Widget _buildInputField(String label, String hint, {int maxLines = 1, String? helperText, TextEditingController? controller}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -256,8 +266,23 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
 
   Widget _buildPaymentButton(BuildContext context) {
     return InkWell(
-      onTap: () =>
-          Navigator.of(context).pushNamed(AppRoutes.businessAccountReview),
+      onTap: () {
+        final draft = draftFromArgs(
+            ModalRoute.of(context)?.settings.arguments,
+            categoryLabelFallback: 'Schools',
+          );
+          final updated = draft
+            ..businessName = _schoolNameController.text.trim()
+            ..businessDescription = _schoolBiographyController.text.trim()
+            ..schoolType = _selectedSchoolType.toLowerCase()
+            ..schoolBiography = _schoolBiographyController.text.trim()
+            ..classesOffered = _classes;
+
+          Navigator.of(context).pushNamed(
+            AppRoutes.businessAccountReview,
+            arguments: updated.toJson(),
+          );
+      },
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,

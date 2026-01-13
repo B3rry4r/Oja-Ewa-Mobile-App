@@ -1,15 +1,38 @@
+// business_details_screen.dart
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 
 import '../../../../../app/router/app_router.dart';
-class BusinessDetailsScreen extends StatelessWidget {
+import 'draft_utils.dart';
+import 'seller_registration_draft.dart';
+
+class BusinessDetailsScreen extends StatefulWidget {
   const BusinessDetailsScreen({super.key});
+
+  @override
+  State<BusinessDetailsScreen> createState() => _BusinessDetailsScreenState();
+}
+
+class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
+  final _businessNameController = TextEditingController();
+  final _registrationNumberController = TextEditingController();
+  final _bankNameController = TextEditingController();
+  final _accountNumberController = TextEditingController();
+
+  @override
+  void dispose() {
+    _businessNameController.dispose();
+    _registrationNumberController.dispose();
+    _bankNameController.dispose();
+    _accountNumberController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // Background from IR
+      backgroundColor: const Color(0xFFFFF8F1),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -20,49 +43,47 @@ class BusinessDetailsScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 20),
-                  _buildStepper(), // Row-based stepper
-                  const SizedBox(height: 32),
+                  _buildStepper(),
+                  const SizedBox(height: 40),
 
-                  // --- About Business Section ---
+                  // About Business
                   _buildSectionHeader("About Business"),
                   const SizedBox(height: 16),
-                  _buildTextInput("Business Name", "Your City"), // Hint from IR data
+                  _buildTextInput(
+                    "Business Name",
+                    "Enter business name",
+                    controller: _businessNameController,
+                  ),
                   const SizedBox(height: 20),
                   _buildTextInput(
                     "Business Registration Number",
-                    "Your City",
-                  ),
-
-                  const SizedBox(height: 32),
-                  _buildFileUploadSection(
-                    label: "Business Certificate",
-                    subtext1: "High resolution image\nPDF, JPG, PNG formats",
-                    subtext2: "200 x 200px\n20kb max",
-                  ),
-
-                  const SizedBox(height: 32),
-                  _buildFileUploadSection(
-                    label: "Business Logo",
-                    subtext1: "High resolution image\nPNG format",
-                    subtext2: "200 x 200px\nMust be in Black", // Specific requirement
+                    "Enter registration number",
+                    controller: _registrationNumberController,
                   ),
 
                   const SizedBox(height: 40),
 
-                  // --- Account Details Section ---
+                  // Account Details
                   _buildSectionHeader("Account Details"),
                   const SizedBox(height: 16),
-                  _buildTextInput("Bank Name", "Your Bank"),
+                  _buildTextInput(
+                    "Bank Name",
+                    "Your Bank",
+                    controller: _bankNameController,
+                  ),
                   const SizedBox(height: 20),
-                  _buildTextInput("Account Number", "Your Account Number"),
+                  _buildTextInput(
+                    "Account Number",
+                    "Your Account Number",
+                    controller: _accountNumberController,
+                  ),
 
                   const SizedBox(height: 48),
 
-                  // --- Primary Action Button ---
-                  _buildPaymentButton(context),
+                  _buildSubmitButton(context),
                   const SizedBox(height: 40),
                 ],
               ),
@@ -73,7 +94,6 @@ class BusinessDetailsScreen extends StatelessWidget {
     );
   }
 
-  // Row-based Stepper to match your UI update
   Widget _buildStepper() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -92,7 +112,9 @@ class BusinessDetailsScreen extends StatelessWidget {
     required bool isActive,
   }) {
     final Color activeColor = const Color(0xFF603814);
-    final Color inactiveColor = const Color(0xFFE9E9E9);
+    final Color inactiveColor = const Color(0xFFCCCCCC);
+
+    final Color boxColor = isActive || isComplete ? activeColor : inactiveColor;
 
     return Row(
       children: [
@@ -100,7 +122,7 @@ class BusinessDetailsScreen extends StatelessWidget {
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: (isActive || isComplete) ? activeColor : inactiveColor,
+            color: boxColor,
             borderRadius: BorderRadius.circular(4),
           ),
           alignment: Alignment.center,
@@ -121,12 +143,8 @@ class BusinessDetailsScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             height: 1.2,
-            color: (isActive || isComplete)
-                ? activeColor
-                : const Color(0xFF777F84),
-            fontWeight: (isActive || isComplete)
-                ? FontWeight.w500
-                : FontWeight.w400,
+            color: isActive || isComplete ? activeColor : inactiveColor,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
@@ -134,31 +152,48 @@ class BusinessDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildSectionHeader(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: Color(0xFF3C4042),
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontFamily: 'Campton',
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF241508),
+        ),
       ),
     );
   }
 
-  Widget _buildTextInput(String label, String hint) {
+  Widget _buildTextInput(
+    String label,
+    String hint, {
+    TextEditingController? controller,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+          style: const TextStyle(
+            fontSize: 14,
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF777F84),
+          ),
         ),
         const SizedBox(height: 8),
         TextFormField(
+          controller: controller,
+          style: const TextStyle(
+            fontFamily: 'Campton',
+            fontSize: 16,
+            color: Color(0xFF1E2021),
+          ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Color(0xFFCCCCCC)),
-            filled: true,
-            fillColor: Colors.transparent,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 20,
               vertical: 16,
@@ -167,84 +202,37 @@ class BusinessDetailsScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
             ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFFDAF40)),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildFileUploadSection({
-    required String label,
-    required String subtext1,
-    required String subtext2,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          height: 137,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(11),
-            border: Border.all(color: const Color(0xFF89858A)),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.cloud_upload_outlined,
-                size: 24,
-                color: Color(0xFF777F84),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Browse Document",
-                style: TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    subtext1,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: Color(0xFF777F84),
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  Text(
-                    subtext2,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: Color(0xFF777F84),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPaymentButton(BuildContext context) {
+  Widget _buildSubmitButton(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.of(context).pushNamed(AppRoutes.accountReview),
+      onTap: () {
+        final draft =
+            sellerDraftFromArgs(ModalRoute.of(context)?.settings.arguments)
+              ..businessName = _businessNameController.text.trim()
+              ..businessRegistrationNumber = _registrationNumberController.text
+                  .trim()
+              ..bankName = _bankNameController.text.trim()
+              ..accountNumber = _accountNumberController.text.trim();
+
+        Navigator.of(
+          context,
+        ).pushNamed(AppRoutes.accountReview, arguments: draft.toJson());
+      },
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,
         height: 57,
         decoration: BoxDecoration(
-          color: const Color(0xFFFDAF40), // Primary Orange
+          color: const Color(0xFFFDAF40),
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
@@ -256,10 +244,11 @@ class BusinessDetailsScreen extends StatelessWidget {
         ),
         child: const Center(
           child: Text(
-            "Make Payment", // Button text from Step 2 IR
+            "Continue",
             style: TextStyle(
               color: Color(0xFFFFFBF5),
               fontSize: 16,
+              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
             ),
           ),

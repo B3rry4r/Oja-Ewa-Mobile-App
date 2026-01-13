@@ -1,6 +1,9 @@
 /// Carries data collected across the multi-step "Show Your Business" flow.
 ///
 /// This is UI-only for now (API wiring will come later).
+import 'service_list_editor.dart';
+import 'classes_offered_editor.dart';
+
 class BusinessRegistrationDraft {
   BusinessRegistrationDraft({
     required this.categoryLabel,
@@ -16,6 +19,20 @@ class BusinessRegistrationDraft {
     this.youtube,
     this.spotify,
     this.identityDocumentPath,
+
+    // Step 2 fields
+    this.businessName,
+    this.businessDescription,
+    this.offeringType,
+    this.productListText,
+    this.professionalTitle,
+    this.serviceList,
+    this.schoolType,
+    this.schoolBiography,
+    this.classesOffered,
+    this.musicCategory,
+    this.businessLogoPath,
+    this.businessCertificates,
   });
 
   /// The UI label coming from category picker (e.g. Beauty/Brands/Schools/Music).
@@ -40,6 +57,32 @@ class BusinessRegistrationDraft {
   /// Placeholder until upload is implemented.
   String? identityDocumentPath;
 
+  // Step 2 common
+  String? businessName;
+  String? businessDescription;
+
+  /// backend enum: selling_product|providing_service
+  String? offeringType;
+
+  /// UI free-text list; will be converted to canonical JSON on submit
+  String? productListText;
+
+  /// providing_service
+  String? professionalTitle;
+  List<ServiceListItem>? serviceList;
+
+  /// school
+  String? schoolType;
+  String? schoolBiography;
+  List<ClassOfferedItem>? classesOffered;
+
+  /// music
+  String? musicCategory; // dj|artist|producer
+
+  /// uploads placeholders
+  String? businessLogoPath;
+  List<Map<String, dynamic>>? businessCertificates;
+
   Map<String, dynamic> toJson() => {
         'categoryLabel': categoryLabel,
         'country': country,
@@ -54,6 +97,18 @@ class BusinessRegistrationDraft {
         'youtube': youtube,
         'spotify': spotify,
         'identityDocumentPath': identityDocumentPath,
+        'businessName': businessName,
+        'businessDescription': businessDescription,
+        'offeringType': offeringType,
+        'productListText': productListText,
+        'professionalTitle': professionalTitle,
+        'serviceList': serviceList?.map((e) => e.toJson()).toList(),
+        'schoolType': schoolType,
+        'schoolBiography': schoolBiography,
+        'classesOffered': classesOffered?.map((e) => e.toJson()).toList(),
+        'musicCategory': musicCategory,
+        'businessLogoPath': businessLogoPath,
+        'businessCertificates': businessCertificates,
       };
 
   static BusinessRegistrationDraft fromJson(Map<String, dynamic> json) {
@@ -71,6 +126,36 @@ class BusinessRegistrationDraft {
       youtube: json['youtube'] as String?,
       spotify: json['spotify'] as String?,
       identityDocumentPath: json['identityDocumentPath'] as String?,
+      businessName: json['businessName'] as String?,
+      businessDescription: json['businessDescription'] as String?,
+      offeringType: json['offeringType'] as String?,
+      productListText: json['productListText'] as String?,
+      professionalTitle: json['professionalTitle'] as String?,
+      serviceList: (json['serviceList'] is List)
+          ? (json['serviceList'] as List)
+              .whereType<Map<String, dynamic>>()
+              .map((e) => ServiceListItem(
+                    name: (e['name'] as String?) ?? '',
+                    priceRange: (e['price_range'] as String?) ?? '',
+                  ))
+              .toList()
+          : null,
+      schoolType: json['schoolType'] as String?,
+      schoolBiography: json['schoolBiography'] as String?,
+      classesOffered: (json['classesOffered'] is List)
+          ? (json['classesOffered'] as List)
+              .whereType<Map<String, dynamic>>()
+              .map((e) => ClassOfferedItem(
+                    name: (e['name'] as String?) ?? '',
+                    duration: (e['duration'] as String?) ?? '',
+                  ))
+              .toList()
+          : null,
+      musicCategory: json['musicCategory'] as String?,
+      businessLogoPath: json['businessLogoPath'] as String?,
+      businessCertificates: (json['businessCertificates'] is List)
+          ? (json['businessCertificates'] as List).whereType<Map<String, dynamic>>().toList()
+          : null,
     );
   }
 }

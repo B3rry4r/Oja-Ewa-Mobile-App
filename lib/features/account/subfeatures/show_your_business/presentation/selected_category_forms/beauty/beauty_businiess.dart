@@ -4,6 +4,7 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 
 import '../../../../../../../app/router/app_router.dart';
 import '../service_list_editor.dart';
+import '../draft_utils.dart';
 
 class BeautyBusinessDetailsScreen extends StatefulWidget {
   const BeautyBusinessDetailsScreen({super.key});
@@ -15,11 +16,18 @@ class BeautyBusinessDetailsScreen extends StatefulWidget {
 class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScreen> {
   String _selectedOffering = "Selling Product";
 
+  final _businessNameController = TextEditingController();
+  final _businessDescriptionController = TextEditingController();
+  final _productListController = TextEditingController();
+
   final TextEditingController _professionalTitleController = TextEditingController();
   final List<ServiceListItem> _services = [ServiceListItem()];
 
   @override
   void dispose() {
+    _businessNameController.dispose();
+    _businessDescriptionController.dispose();
+    _productListController.dispose();
     _professionalTitleController.dispose();
     super.dispose();
   }
@@ -53,7 +61,7 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
               ),
             ),
             const SizedBox(height: 16),
-            _buildInputField("Business Name", "Enter business name"),
+            _buildInputField("Business Name", "Enter business name", controller: _businessNameController),
             const SizedBox(height: 24),
             
             // Type of Offering Section
@@ -88,9 +96,10 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
               "Share Short description of your business", 
               maxLines: 3,
               helperText: "100 characters required",
+              controller: _businessDescriptionController,
             ),
             const SizedBox(height: 24),
-            _buildInputField("Product List", "List your products here", maxLines: 3),
+            _buildInputField("Product List", "List your products here", maxLines: 3, controller: _productListController),
             
             const SizedBox(height: 32),
             _buildUploadSection(
@@ -264,8 +273,24 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
 
   Widget _buildSubmitButton() {
     return InkWell(
-      onTap: () =>
-          Navigator.of(context).pushNamed(AppRoutes.businessAccountReview),
+      onTap: () {
+        final draft = draftFromArgs(
+            ModalRoute.of(context)?.settings.arguments,
+            categoryLabelFallback: 'Beauty',
+          );
+          final updated = draft
+            ..businessName = _businessNameController.text.trim()
+            ..businessDescription = _businessDescriptionController.text.trim()
+            ..offeringType = mapOfferingLabelToEnum(_selectedOffering)
+            ..productListText = _productListController.text
+            ..professionalTitle = _professionalTitleController.text.trim()
+            ..serviceList = _services;
+
+          Navigator.of(context).pushNamed(
+            AppRoutes.businessAccountReview,
+            arguments: updated.toJson(),
+          );
+      },
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,

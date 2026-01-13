@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 
 import '../../../../../../../app/router/app_router.dart';
+import '../draft_utils.dart';
 
 class MusicBusinessDetailsScreen extends StatefulWidget {
   const MusicBusinessDetailsScreen({super.key});
@@ -25,6 +26,16 @@ class _MusicBusinessDetailsScreenState
       default:
         return _selectedCategoryLabel.toLowerCase();
     }
+  }
+
+  final _businessNameController = TextEditingController();
+  final _businessDescriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _businessNameController.dispose();
+    _businessDescriptionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -58,7 +69,7 @@ class _MusicBusinessDetailsScreenState
             ),
             const SizedBox(height: 16),
 
-            _buildInputField("Music School/Studio Name", "Enter name"),
+            _buildInputField("Music School/Studio Name", "Enter name", controller: _businessNameController),
             const SizedBox(height: 24),
 
             const Text(
@@ -74,10 +85,11 @@ class _MusicBusinessDetailsScreenState
 
             const SizedBox(height: 24),
             _buildInputField(
-              "Biography",
+              "Business Description",
               "Describe your music services or school",
               maxLines: 4,
               helperText: "100 characters required",
+              controller: _businessDescriptionController,
             ),
 
             const SizedBox(height: 32),
@@ -202,7 +214,9 @@ class _MusicBusinessDetailsScreenState
     String hint, {
     int maxLines = 1,
     String? helperText,
-  }) {
+    TextEditingController? controller,
+  }) { 
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -212,6 +226,7 @@ class _MusicBusinessDetailsScreenState
         ),
         const SizedBox(height: 8),
         TextField(
+          controller: controller,
           style: const TextStyle(
             fontFamily: 'Campton',
             fontSize: 16,
@@ -292,8 +307,21 @@ class _MusicBusinessDetailsScreenState
 
   Widget _buildPaymentButton(BuildContext context) {
     return InkWell(
-      onTap: () =>
-          Navigator.of(context).pushNamed(AppRoutes.businessAccountReview),
+      onTap: () {
+        final draft = draftFromArgs(
+            ModalRoute.of(context)?.settings.arguments,
+            categoryLabelFallback: 'Music',
+          );
+          final updated = draft
+            ..businessName = _businessNameController.text.trim()
+            ..businessDescription = _businessDescriptionController.text.trim()
+            ..musicCategory = _musicCategoryValue;
+
+          Navigator.of(context).pushNamed(
+            AppRoutes.businessAccountReview,
+            arguments: updated.toJson(),
+          );
+      },
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,

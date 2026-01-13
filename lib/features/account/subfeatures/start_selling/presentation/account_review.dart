@@ -3,11 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 
 import '../../../../../app/router/app_router.dart';
-class AccountReviewScreen extends StatelessWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/ui/ui_error_message.dart';
+
+import '../domain/seller_profile_payload.dart';
+import 'controllers/seller_profile_controller.dart';
+import 'draft_utils.dart';
+import 'seller_registration_draft.dart';
+
+class AccountReviewScreen extends ConsumerWidget {
   const AccountReviewScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final draft = sellerDraftFromArgs(args);
+    final state = ref.watch(sellerProfileControllerProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Background from IR
       body: Column(
@@ -52,7 +65,7 @@ class AccountReviewScreen extends StatelessWidget {
                   const Spacer(flex: 3),
 
                   // --- Primary Action Button ---
-                  _buildGoHomeButton(context),
+                  _buildGoHomeButton(context, ref, draft, state.isLoading),
                   const SizedBox(height: 40),
                 ],
               ),
@@ -109,14 +122,39 @@ class AccountReviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGoHomeButton(BuildContext context) {
+  Widget _buildGoHomeButton(BuildContext context, WidgetRef ref, SellerRegistrationDraft draft, bool isLoading) {
     return InkWell(
-      onTap: () {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          AppRoutes.home,
-          (route) => false,
-        );
-      },
+      onTap: isLoading
+          ? null
+          : () async {
+              final payload = SellerProfilePayload(
+                country: draft.country ?? '',
+                state: draft.state ?? '',
+                city: draft.city ?? '',
+                address: draft.address ?? '',
+                businessEmail: draft.businessEmail ?? '',
+                businessPhoneNumber: draft.businessPhoneNumber ?? '',
+                instagram: draft.instagram,
+                facebook: draft.facebook,
+                identityDocument: draft.identityDocumentPath,
+                businessName: draft.businessName ?? '',
+                businessRegistrationNumber: draft.businessRegistrationNumber ?? '',
+                businessCertificate: draft.businessCertificatePath,
+                businessLogo: draft.businessLogoPath,
+                bankName: draft.bankName ?? '',
+                accountNumber: draft.accountNumber ?? '',
+              );
+
+              try {
+                await ref.read(sellerProfileControllerProvider.notifier).submit(payload);
+                if (!context.mounted) return;
+                AppSnackbars.showSuccess(context, 'Seller application submitted');
+                Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+              } catch (e) {
+                if (!context.mounted) return;
+                AppSnackbars.showError(context, UiErrorMessage.from(e));
+              }
+            },
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,
