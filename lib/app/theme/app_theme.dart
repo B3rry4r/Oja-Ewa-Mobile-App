@@ -10,7 +10,10 @@ abstract class AppTheme {
       useMaterial3: true,
       // Default typography for the whole app.
       fontFamily: 'Campton',
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1E88E5)),
+      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFDAF40)),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: Color(0xFFFDAF40),
+      ),
     );
 
     return base;
@@ -23,8 +26,11 @@ abstract class AppTheme {
       // Default typography for the whole app.
       fontFamily: 'Campton',
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF1E88E5),
+        seedColor: const Color(0xFFFDAF40),
         brightness: Brightness.dark,
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: Color(0xFFFDAF40),
       ),
     );
 

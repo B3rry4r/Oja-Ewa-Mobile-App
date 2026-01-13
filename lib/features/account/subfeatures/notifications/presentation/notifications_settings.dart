@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/ui/ui_error_message.dart';
 import 'package:ojaewa/features/notifications/domain/notification_preferences.dart';
 import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 
@@ -37,18 +39,7 @@ class NotificationsSettingsScreen extends ConsumerWidget {
                 padding: const EdgeInsets.only(bottom: 40),
                 child: Column(
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 42),
-                      child: Text(
-                        'Notifications',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Campton',
-                          color: Color(0xFF241508),
-                        ),
-                      ),
-                    ),
+                    const SizedBox(height: 24),
                     _buildNotificationsList(context, ref, prefs),
                     Align(
                       alignment: Alignment.centerRight,
@@ -80,12 +71,24 @@ class NotificationsSettingsScreen extends ConsumerWidget {
     return prefs.when(
       loading: () => const Padding(
         padding: EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation(Color(0xFFFDAF40)),
+          ),
+        ),
       ),
-      error: (e, st) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: Text('Failed to load preferences.\n$e')),
-      ),
+      error: (e, st) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          AppSnackbars.showError(context, UiErrorMessage.from(e));
+        });
+        return Center(
+          child: ElevatedButton(
+            onPressed: () => ref.invalidate(notificationPreferencesProvider),
+            child: const Text('Retry'),
+          ),
+        );
+      },
+
       data: (p) {
         final items = <_PrefItem>[
           _PrefItem(
@@ -120,7 +123,7 @@ class NotificationsSettingsScreen extends ConsumerWidget {
           child: Column(
             children: [
               const SizedBox(height: 16),
-              for (final item in items) _buildPrefRow(ref: ref, item: item),
+              for (final item in items) _buildPrefRow(context: context, ref: ref, item: item),
             ],
           ),
         );
@@ -128,7 +131,11 @@ class NotificationsSettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPrefRow({required WidgetRef ref, required _PrefItem item}) {
+  Widget _buildPrefRow({
+    required BuildContext context,
+    required WidgetRef ref,
+    required _PrefItem item,
+  }) {
     return Container(
       height: 54,
       margin: const EdgeInsets.only(bottom: 8),
@@ -147,9 +154,15 @@ class NotificationsSettingsScreen extends ConsumerWidget {
             ),
           ),
           GestureDetector(
-            onTap: () async {
+            onTap: () {
               final updated = item.updater(!item.value);
-              await ref.read(notificationsActionsProvider.notifier).updatePreferences(updated);
+              ref
+                  .read(notificationsActionsProvider.notifier)
+                  .updatePreferences(updated)
+                  .catchError((e) {
+                if (!context.mounted) return;
+                AppSnackbars.showError(context, UiErrorMessage.from(e));
+              });
             },
             child: Container(
               width: 62,

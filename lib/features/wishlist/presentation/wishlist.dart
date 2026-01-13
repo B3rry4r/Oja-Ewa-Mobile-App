@@ -208,11 +208,6 @@ class WishlistScreen extends ConsumerWidget {
                                   UiErrorMessage.from(e),
                                 );
                               });
-                          if (!context.mounted) return;
-                          AppSnackbars.showSuccess(
-                            context,
-                            'Removed from wishlist',
-                          );
                         } catch (e) {
                           if (!context.mounted) return;
                           AppSnackbars.showError(

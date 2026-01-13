@@ -84,7 +84,13 @@ class ConnectToUsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           if (items.isEmpty)
-            const Text('No data')
+            const Text(
+              'No data',
+              style: TextStyle(
+                fontFamily: 'Campton',
+                color: Color(0xFF777F84),
+              ),
+            )
           else
             for (final entry in items.entries)
               Padding(
@@ -92,8 +98,26 @@ class ConnectToUsScreen extends ConsumerWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(width: 110, child: Text(entry.key)),
-                    Expanded(child: Text(entry.value)),
+                    SizedBox(
+                      width: 110,
+                      child: Text(
+                        entry.key,
+                        style: const TextStyle(
+                          fontFamily: 'Campton',
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF241508),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        entry.value,
+                        style: const TextStyle(
+                          fontFamily: 'Campton',
+                          color: Color(0xFF241508),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

@@ -49,10 +49,14 @@ class NotificationsActionsController extends AsyncNotifier<void> {
 
   Future<void> updatePreferences(NotificationPreferences prefs) async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
+    try {
       await ref.read(notificationsRepositoryProvider).updatePreferences(prefs);
       ref.invalidate(notificationPreferencesProvider);
-    });
+      state = const AsyncData(null);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
   }
 }
 

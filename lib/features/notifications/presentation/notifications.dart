@@ -47,13 +47,28 @@ class NotificationsScreen extends ConsumerWidget {
           topRight: Radius.circular(28),
         ),
       ),
-      child: SingleChildScrollView(
-        child: Padding(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            const SizedBox(height: 16),
+            const Padding(
+              padding: EdgeInsets.only(left: 18, top: 16, bottom: 20),
+              child: Text(
+                'Notifications',
+                style: TextStyle(
+                  fontSize: 33,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF241508),
+                ),
+              ),
+            ),
             // Notification list
             notifications.when(
               loading: () => const Padding(
@@ -68,10 +83,47 @@ class NotificationsScreen extends ConsumerWidget {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   AppSnackbars.showError(context, UiErrorMessage.from(e));
                 });
-                return const SizedBox.shrink();
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Center(child: Text('Failed to load notifications.')),
+                );
               },
 
               data: (items) {
+                if (items.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 48),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'You have no notifications',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontFamily: 'Campton',
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF241508),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'We\'ll let you know when something important happens.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Campton',
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF777F84),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
                 return Column(
                   children: [
                     for (final n in items) _buildNotificationItem(
@@ -89,7 +141,10 @@ class NotificationsScreen extends ConsumerWidget {
             ),
             ],
           ),
-        ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -164,10 +219,7 @@ class NotificationsScreen extends ConsumerWidget {
             ),
             child: IconButton(
               onPressed: () {
-                ref
-                    .read(notificationsActionsProvider.notifier)
-                    .markAsRead(id)
-                    .catchError((e) {
+                ref.read(notificationsActionsProvider.notifier).markAsRead(id).catchError((e) {
                   if (!context.mounted) return;
                   AppSnackbars.showError(context, UiErrorMessage.from(e));
                 });
