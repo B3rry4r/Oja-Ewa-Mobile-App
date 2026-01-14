@@ -1,16 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
+import 'package:ojaewa/features/business_details/presentation/controllers/business_details_controller.dart';
 import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
 import 'package:ojaewa/features/home/subfeatures/schools/presentation/school_registration_form.dart';
 
 /// School Detail Screen - Shows detailed information about a training school/institution
-class SchoolDetailScreen extends StatelessWidget {
-  const SchoolDetailScreen({super.key});
+class SchoolDetailScreen extends ConsumerWidget {
+  const SchoolDetailScreen({super.key, this.businessId});
+
+  final int? businessId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (businessId != null) {
+      final detailsAsync = ref.watch(businessDetailsProvider(businessId!));
+      return detailsAsync.when(
+        loading: () => const Scaffold(
+          backgroundColor: Color(0xFFFFF8F1),
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        error: (e, _) => Scaffold(
+          backgroundColor: const Color(0xFFFFF8F1),
+          appBar: AppBar(
+            backgroundColor: const Color(0xFFFFF8F1),
+            foregroundColor: const Color(0xFF241508),
+          ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Failed to load school'),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => ref.invalidate(businessDetailsProvider(businessId!)),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
+        data: (business) => _buildContent(context, business),
+      );
+    }
+    return _buildContent(context, null);
+  }
+
+  Widget _buildContent(BuildContext context, BusinessDetails? business) {
+    final schoolName = business?.businessName ?? 'Beauty Academy';
+    // Use school_biography if available, otherwise fall back to business_description
+    final biography = business?.schoolBiography ?? business?.businessDescription ?? 'Beauty Academy is a premier institution dedicated to training the next generation of beauty professionals. We offer comprehensive courses in makeup artistry, hair styling, skincare...';
+    final classes = business?.classesOffered.isNotEmpty == true ? business!.classesOffered : ['Makeup Artistry', 'Hair Styling', 'Skincare', 'Nail Technology'];
+    final email = business?.businessEmail ?? 'info@beautyacademy.com';
+    final phone = business?.businessPhone ?? '+234 8123 456 789';
+    final location = business?.fullAddress ?? '123 Fashion Street, Victoria Island, Lagos';
+    final websiteUrl = business?.websiteUrl;
+    final imageUrl = business?.imageUrl;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
@@ -23,22 +72,22 @@ class SchoolDetailScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 104), // Space for standard header
                   // School Header Card with Image
-                  _buildSchoolHeader(),
+                  _buildSchoolHeader(schoolName, imageUrl),
 
                   const SizedBox(height: 20),
 
                   // School Biography Section
-                  _buildBiographySection(),
+                  _buildBiographySection(biography),
 
                   const SizedBox(height: 16),
 
                   // Classes Section
-                  _buildClassesSection(),
+                  _buildClassesSection(classes),
 
                   const SizedBox(height: 16),
 
                   // Contact Details Section
-                  _buildContactSection(),
+                  _buildContactSection(email, phone, location),
 
                   const SizedBox(height: 16),
 
@@ -57,21 +106,33 @@ class SchoolDetailScreen extends StatelessWidget {
             ),
 
             // Fixed Bottom Registration Card
-            _buildBottomRegistrationCard(context),
+            _buildBottomRegistrationCard(context, websiteUrl, businessId),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSchoolHeader() {
+  Widget _buildSchoolHeader(String schoolName, String? imageUrl) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // School Image
-          const AppImagePlaceholder(width: 168, height: 198, borderRadius: 8),
+          if (imageUrl != null && imageUrl.isNotEmpty)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                imageUrl,
+                width: 168,
+                height: 198,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const AppImagePlaceholder(width: 168, height: 198, borderRadius: 8),
+              ),
+            )
+          else
+            const AppImagePlaceholder(width: 168, height: 198, borderRadius: 8),
 
           const SizedBox(width: 7),
 
@@ -80,9 +141,9 @@ class SchoolDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Cream De la\nCream',
-                  style: TextStyle(
+                Text(
+                  schoolName,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
@@ -139,7 +200,7 @@ class SchoolDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBiographySection() {
+  Widget _buildBiographySection(String biography) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -147,10 +208,10 @@ class SchoolDetailScreen extends StatelessWidget {
         border: Border.all(color: const Color(0xFFCCCCCC)),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'School Biography',
             style: TextStyle(
               fontSize: 16,
@@ -159,10 +220,10 @@ class SchoolDetailScreen extends StatelessWidget {
               color: Color(0xFF1E2021),
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
-            'We are Spa, Beauty and wellness company offering, Spa pampering services, skincare solutions and haircare services',
-            style: TextStyle(
+            biography,
+            style: const TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
@@ -175,7 +236,7 @@ class SchoolDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildClassesSection() {
+  Widget _buildClassesSection(List<String> classes) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -183,10 +244,10 @@ class SchoolDetailScreen extends StatelessWidget {
         border: Border.all(color: const Color(0xFFCCCCCC)),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Classes',
             style: TextStyle(
               fontSize: 16,
@@ -195,10 +256,10 @@ class SchoolDetailScreen extends StatelessWidget {
               color: Color(0xFF1E2021),
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
-            'Full face Beat\nPerfect Eye Brows',
-            style: TextStyle(
+            classes.join('\n'),
+            style: const TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
@@ -211,7 +272,7 @@ class SchoolDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContactSection() {
+  Widget _buildContactSection(String email, String phone, String location) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -238,7 +299,7 @@ class SchoolDetailScreen extends StatelessWidget {
           _buildContactItem(
             icon: Icons.location_on,
             title: 'Address',
-            content: '121 Queens Drive,\nNew Road, Edo State,\nNigeria',
+            content: location,
           ),
 
           const SizedBox(height: 20),
@@ -247,7 +308,7 @@ class SchoolDetailScreen extends StatelessWidget {
           _buildContactItem(
             icon: Icons.phone,
             title: 'Phone Number',
-            content: '+234 8068 2833 23\n+234 9124 2344 21',
+            content: phone,
           ),
 
           const SizedBox(height: 20),
@@ -256,7 +317,7 @@ class SchoolDetailScreen extends StatelessWidget {
           _buildContactItem(
             icon: Icons.email,
             title: 'Email Address',
-            content: 'creamdelacream@gmail.com',
+            content: email,
           ),
 
           const SizedBox(height: 20),
@@ -501,7 +562,7 @@ class SchoolDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomRegistrationCard(BuildContext context) {
+  Widget _buildBottomRegistrationCard(BuildContext context, String? websiteUrl, int? schoolBusinessId) {
     return Positioned(
       bottom: 0,
       left: 0,
@@ -549,7 +610,9 @@ class SchoolDetailScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => const SchoolRegistrationFormScreen(),
+                      builder: (_) => SchoolRegistrationFormScreen(
+                        businessId: schoolBusinessId,
+                      ),
                     ),
                   );
                 },
@@ -580,14 +643,15 @@ class SchoolDetailScreen extends StatelessWidget {
               width: double.infinity,
               height: 57,
               child: OutlinedButton(
-                onPressed: () {
-                  // Handle visit school
-                },
+                onPressed: websiteUrl != null && websiteUrl.isNotEmpty
+                    ? () => _launchWebsite(websiteUrl)
+                    : null,
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Color(0xFFFDAF40), width: 1.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
+                  disabledForegroundColor: const Color(0xFFFDAF40).withOpacity(0.5),
                 ),
                 child: const Text(
                   'Visit School',
@@ -606,5 +670,16 @@ class SchoolDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _launchWebsite(String url) async {
+    String finalUrl = url;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      finalUrl = 'https://$url';
+    }
+    final uri = Uri.parse(finalUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 }

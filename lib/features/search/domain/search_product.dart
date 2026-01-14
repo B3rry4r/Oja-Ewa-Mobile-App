@@ -28,6 +28,15 @@ class SearchProduct {
 
   static SearchProduct fromJson(Map<String, dynamic> json) {
     final seller = json['seller_profile'];
+    
+    // Price can be string "250.00" or num - handle both
+    num? parsePrice(dynamic value) {
+      if (value == null) return null;
+      if (value is num) return value;
+      if (value is String) return num.tryParse(value);
+      return null;
+    }
+
     return SearchProduct(
       id: (json['id'] as num?)?.toInt() ?? 0,
       name: (json['name'] as String?) ?? '',
@@ -35,9 +44,9 @@ class SearchProduct {
       gender: json['gender'] as String?,
       style: json['style'] as String?,
       tribe: json['tribe'] as String?,
-      price: json['price'] as num?,
+      price: parsePrice(json['price']),
       image: json['image'] as String?,
-      avgRating: json['avg_rating'] as num?,
+      avgRating: parsePrice(json['avg_rating']),
       businessName: seller is Map<String, dynamic> ? seller['business_name'] as String? : null,
     );
   }

@@ -40,15 +40,17 @@ class SearchApi {
       final payload = data['data'];
       if (payload is! Map<String, dynamic>) throw const FormatException('Unexpected response');
 
+      // Items are in payload['data'] (nested)
       final itemsRaw = payload['data'];
       final items = (itemsRaw is List)
           ? itemsRaw.whereType<Map<String, dynamic>>().map(SearchProduct.fromJson).toList()
           : const <SearchProduct>[];
 
-      final meta = payload['meta'];
-      final currentPage = (meta is Map<String, dynamic>) ? (meta['current_page'] as num?)?.toInt() ?? page : page;
-      final per = (meta is Map<String, dynamic>) ? (meta['per_page'] as num?)?.toInt() ?? perPage : perPage;
-      final total = (meta is Map<String, dynamic>) ? (meta['total'] as num?)?.toInt() ?? items.length : items.length;
+      // Pagination fields are directly in payload, NOT in a nested 'meta' object
+      // API returns: { data: { current_page, data: [...], per_page, total, ... } }
+      final currentPage = (payload['current_page'] as num?)?.toInt() ?? page;
+      final per = (payload['per_page'] as num?)?.toInt() ?? perPage;
+      final total = (payload['total'] as num?)?.toInt() ?? items.length;
 
       return SearchResultPage(items: items, currentPage: currentPage, perPage: per, total: total);
     } catch (e) {

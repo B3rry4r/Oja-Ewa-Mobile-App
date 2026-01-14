@@ -1,15 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
+import 'package:ojaewa/features/business_details/presentation/controllers/business_details_controller.dart';
 import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
 
 /// Music Artist Profile Screen - Shows detailed information about a music artist
-class MusicArtistProfileScreen extends StatelessWidget {
-  const MusicArtistProfileScreen({super.key});
+class MusicArtistProfileScreen extends ConsumerWidget {
+  const MusicArtistProfileScreen({super.key, this.businessId});
+
+  final int? businessId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // If businessId provided, fetch from API
+    if (businessId != null) {
+      final detailsAsync = ref.watch(businessDetailsProvider(businessId!));
+      return detailsAsync.when(
+        loading: () => const Scaffold(
+          backgroundColor: Color(0xFFFFF8F1),
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        error: (e, _) => Scaffold(
+          backgroundColor: const Color(0xFFFFF8F1),
+          appBar: AppBar(
+            backgroundColor: const Color(0xFFFFF8F1),
+            foregroundColor: const Color(0xFF241508),
+          ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Failed to load artist'),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => ref.invalidate(businessDetailsProvider(businessId!)),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
+        data: (business) => _buildContent(context, business),
+      );
+    }
+    return _buildContent(context, null);
+  }
+
+  Widget _buildContent(BuildContext context, BusinessDetails? business) {
+    final artistName = business?.businessName ?? 'Vika Alagha';
+    final biography = business?.businessDescription ?? 'Vika Alagha is a passionate and dynamic artist hailing from Lagos, Nigeria, whose music is deeply rooted in her vibrant cultural heritage. Growing up in the bustling city of Lagos, Vika was surrounded by the rich sounds of Afrobeat, Highlife, and Juju music...';
+    final email = business?.businessEmail ?? 'vikaalagha@gmail.com';
+    final phone = business?.businessPhone ?? '08106628782';
+    final location = business?.fullAddress ?? '345 Ralph Shodeinde Street, Central Area Abuja, 9001';
+    final instagram = business?.instagram ?? '@vikaalagha';
+    final facebook = business?.facebook ?? 'Vika Alagha';
+    final youtube = business?.youtube;
+    final spotify = business?.spotify;
+    final imageUrl = business?.imageUrl;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
@@ -22,22 +73,22 @@ class MusicArtistProfileScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 104), // Space for standard header
                   // Artist Header with Image
-                  _buildArtistHeader(),
+                  _buildArtistHeader(artistName, imageUrl),
 
                   const SizedBox(height: 20),
 
                   // Biography Section
-                  _buildBiographySection(),
+                  _buildBiographySection(biography),
 
                   const SizedBox(height: 16),
 
                   // Contact Details Section
-                  _buildContactSection(),
+                  _buildContactSection(email, phone, location),
 
                   const SizedBox(height: 16),
 
-                  // Albums Section
-                  _buildAlbumsSection(),
+                  // Social Links Section (YouTube & Spotify for music, plus Instagram & Facebook)
+                  _buildSocialLinksSection(instagram, facebook, youtube, spotify),
 
                   const SizedBox(height: 16),
 
@@ -56,7 +107,7 @@ class MusicArtistProfileScreen extends StatelessWidget {
             ),
 
             // Fixed Bottom Contact Card
-            _buildBottomContactCard(context),
+            _buildBottomContactCard(context, phone),
 
             // Floating Add Review Button
             _buildFloatingReviewButton(),
@@ -66,14 +117,26 @@ class MusicArtistProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildArtistHeader() {
+  Widget _buildArtistHeader(String artistName, String? imageUrl) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Artist Image
-          const AppImagePlaceholder(width: 168, height: 198, borderRadius: 8),
+          if (imageUrl != null && imageUrl.isNotEmpty)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                imageUrl,
+                width: 168,
+                height: 198,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const AppImagePlaceholder(width: 168, height: 198, borderRadius: 8),
+              ),
+            )
+          else
+            const AppImagePlaceholder(width: 168, height: 198, borderRadius: 8),
 
           const SizedBox(width: 7),
 
@@ -82,9 +145,9 @@ class MusicArtistProfileScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Rasheed\nKelani',
-                  style: TextStyle(
+                Text(
+                  artistName,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
@@ -141,7 +204,7 @@ class MusicArtistProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBiographySection() {
+  Widget _buildBiographySection(String biography) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -149,10 +212,10 @@ class MusicArtistProfileScreen extends StatelessWidget {
         border: Border.all(color: const Color(0xFFCCCCCC)),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Biography',
             style: TextStyle(
               fontSize: 16,
@@ -161,10 +224,10 @@ class MusicArtistProfileScreen extends StatelessWidget {
               color: Color(0xFF1E2021),
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
-            'We are Spa, Beauty and wellness company offering, Spa pampering services, skincare solutions and haircare services',
-            style: TextStyle(
+            biography,
+            style: const TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
@@ -177,7 +240,7 @@ class MusicArtistProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContactSection() {
+  Widget _buildContactSection(String email, String phone, String location) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -204,7 +267,7 @@ class MusicArtistProfileScreen extends StatelessWidget {
           _buildContactItem(
             icon: Icons.location_on,
             title: 'Address',
-            content: '345 Ralph Shodeinde Street, Central Area Abuja, 9001',
+            content: location,
             actionText: 'Get Direction',
             onActionTap: () {
               // Open maps
@@ -217,7 +280,7 @@ class MusicArtistProfileScreen extends StatelessWidget {
           _buildContactItem(
             icon: Icons.phone,
             title: 'Phone Number',
-            content: '+234 8068 2833 23\n+234 9124 2344 21',
+            content: phone,
           ),
 
           const SizedBox(height: 20),
@@ -226,7 +289,7 @@ class MusicArtistProfileScreen extends StatelessWidget {
           _buildContactItem(
             icon: Icons.email,
             title: 'Email Address',
-            content: 'rasheedkelani@gmail.com',
+            content: email,
           ),
 
           const SizedBox(height: 20),
@@ -320,7 +383,7 @@ class MusicArtistProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAlbumsSection() {
+  Widget _buildSocialLinksSection(String instagram, String facebook, String? youtube, String? spotify) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -332,7 +395,7 @@ class MusicArtistProfileScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Albums',
+            'Social Links',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
@@ -343,81 +406,125 @@ class MusicArtistProfileScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // Album List
-          _buildAlbumItem(
-            title: 'Kelewa',
-            streamingLinks: 'Apple Music, Spotify, Youtube',
+          // YouTube (Music-specific)
+          if (youtube != null && youtube.isNotEmpty) ...[
+            _buildSocialLinkItem(
+              icon: Icons.play_circle_outline,
+              platform: 'YouTube',
+              handle: youtube,
+              onTap: () => _launchUrl(youtube),
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // Spotify (Music-specific)
+          if (spotify != null && spotify.isNotEmpty) ...[
+            _buildSocialLinkItem(
+              icon: Icons.music_note_outlined,
+              platform: 'Spotify',
+              handle: spotify,
+              onTap: () => _launchUrl(spotify),
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // Instagram
+          _buildSocialLinkItem(
+            icon: Icons.camera_alt_outlined,
+            platform: 'Instagram',
+            handle: instagram,
+            onTap: () => _launchUrl('https://instagram.com/${instagram.replaceAll('@', '')}'),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
-          _buildAlbumItem(
-            title: 'Baba L\'oke',
-            streamingLinks: 'Apple Music, Spotify, Youtube',
+          // Facebook
+          _buildSocialLinkItem(
+            icon: Icons.facebook_outlined,
+            platform: 'Facebook',
+            handle: facebook,
+            onTap: () => _launchUrl('https://facebook.com/$facebook'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAlbumItem({
-    required String title,
-    required String streamingLinks,
+  Future<void> _launchUrl(String url) async {
+    String finalUrl = url;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      finalUrl = 'https://$url';
+    }
+    final uri = Uri.parse(finalUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Widget _buildSocialLinkItem({
+    required IconData icon,
+    required String platform,
+    required String handle,
+    VoidCallback? onTap,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Album Title with Play Button
-        Row(
-          children: [
-            // Play Button
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: const Color(0xFF603814),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Icon(
-                Icons.play_arrow,
-                size: 20,
-                color: Colors.white,
-              ),
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Row(
+        children: [
+          // Icon
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: const Color(0xFF603814),
+              borderRadius: BorderRadius.circular(4),
             ),
-
-            const SizedBox(width: 8),
-
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF1E2021),
-                ),
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 12),
-
-        // Streaming Links
-        Padding(
-          padding: const EdgeInsets.only(left: 40),
-          child: Text(
-            streamingLinks,
-            style: const TextStyle(
-              fontSize: 14,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF777F84),
-              height: 1.4,
+            child: Icon(
+              icon,
+              size: 18,
+              color: Colors.white,
             ),
           ),
-        ),
-      ],
+
+          const SizedBox(width: 12),
+
+          // Platform and handle
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  platform,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1E2021),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  handle,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFFA15E22),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Arrow icon
+          const Icon(
+            Icons.arrow_forward_ios,
+            size: 14,
+            color: Color(0xFF777F84),
+          ),
+        ],
+      ),
     );
   }
 
@@ -580,7 +687,7 @@ class MusicArtistProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomContactCard(BuildContext context) {
+  Widget _buildBottomContactCard(BuildContext context, String phone) {
     return Positioned(
       bottom: 0,
       left: 0,
@@ -597,9 +704,7 @@ class MusicArtistProfileScreen extends StatelessWidget {
             Expanded(
               flex: 1,
               child: OutlinedButton(
-                onPressed: () {
-                  // Handle call action
-                },
+                onPressed: () => _makePhoneCall(phone),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Color(0xFFFDAF40), width: 1.5),
                   shape: RoundedRectangleBorder(
@@ -632,9 +737,7 @@ class MusicArtistProfileScreen extends StatelessWidget {
             Expanded(
               flex: 3,
               child: ElevatedButton(
-                onPressed: () {
-                  // Handle WhatsApp action
-                },
+                onPressed: () => _openWhatsApp(phone),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFDAF40),
                   shape: RoundedRectangleBorder(
@@ -670,6 +773,29 @@ class MusicArtistProfileScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+    final uri = Uri.parse('tel:$cleanNumber');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  Future<void> _openWhatsApp(String phoneNumber) async {
+    // Clean phone number and ensure it has country code
+    String cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+    // If Nigerian number without country code, add it
+    if (cleanNumber.startsWith('0')) {
+      cleanNumber = '234${cleanNumber.substring(1)}';
+    } else if (!cleanNumber.startsWith('234') && cleanNumber.length == 10) {
+      cleanNumber = '234$cleanNumber';
+    }
+    final uri = Uri.parse('https://wa.me/$cleanNumber');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 
   Widget _buildFloatingReviewButton() {

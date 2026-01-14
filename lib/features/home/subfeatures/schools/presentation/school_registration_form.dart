@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/auth/auth_controller.dart';
+import 'package:ojaewa/core/auth/auth_state.dart';
 import 'package:ojaewa/core/widgets/selection_bottom_sheet.dart';
+import 'package:ojaewa/features/home/subfeatures/schools/presentation/controllers/school_registration_controller.dart';
 
 /// School Registration Form Screen - Collects user details for school enrollment
-class SchoolRegistrationFormScreen extends StatefulWidget {
-  const SchoolRegistrationFormScreen({super.key});
+class SchoolRegistrationFormScreen extends ConsumerStatefulWidget {
+  const SchoolRegistrationFormScreen({super.key, this.businessId});
+
+  /// The business ID of the school being registered for
+  final int? businessId;
 
   @override
-  State<SchoolRegistrationFormScreen> createState() => _SchoolRegistrationFormScreenState();
+  ConsumerState<SchoolRegistrationFormScreen> createState() => _SchoolRegistrationFormScreenState();
 }
 
-class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScreen> {
+class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistrationFormScreen> {
   final _formKey = GlobalKey<FormState>();
   
   // Form controllers
@@ -23,6 +31,7 @@ class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScr
   
   String selectedCountry = 'Nigeria';
   String selectedState = 'FCT';
+  String selectedCountryCode = '+234';
   
   @override
   void dispose() {
@@ -300,29 +309,33 @@ class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScr
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () async {
-                  await SelectionBottomSheet.show(
+                  final selected = await SelectionBottomSheet.show(
                     context,
                     title: 'Country code',
                     options: const ['+234', '+233', '+254', '+27'],
-                    selected: '+234',
+                    selected: selectedCountryCode,
                   );
-                  // TODO: store selected code when API wiring starts.
+                  if (selected != null && selected != selectedCountryCode) {
+                    setState(() {
+                      selectedCountryCode = selected;
+                    });
+                  }
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20, right: 8),
                   child: Row(
-                    children: const [
+                    children: [
                       Text(
-                        '+234',
-                        style: TextStyle(
+                        selectedCountryCode,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontFamily: 'Campton',
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF241508),
                         ),
                       ),
-                      SizedBox(width: 4),
-                      Icon(
+                      const SizedBox(width: 4),
+                      const Icon(
                         Icons.keyboard_arrow_down,
                         size: 20,
                         color: Color(0xFF1E2021),
@@ -383,63 +396,139 @@ class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScr
   }
 
   Widget _buildPaymentButton() {
+    final registrationState = ref.watch(schoolRegistrationProvider);
+    final isLoading = registrationState.isSubmitting || registrationState.isGeneratingPaymentLink;
+
     return SizedBox(
       width: double.infinity,
       height: 57,
       child: ElevatedButton(
-        onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            // Process payment
-            _handlePayment();
-          }
-        },
+        onPressed: isLoading
+            ? null
+            : () {
+                if (_formKey.currentState!.validate()) {
+                  _handlePayment();
+                }
+              },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFFDAF40),
+          disabledBackgroundColor: const Color(0xFFFDAF40).withAlpha(150),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
           elevation: 8,
-          shadowColor: const Color(0xFFFDAF40).withOpacity(0.3),
+          shadowColor: const Color(0xFFFDAF40).withAlpha(77),
         ),
-        child: const Text(
-          'Make Payment',
-          style: TextStyle(
-            fontSize: 16,
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w600,
-            color: Color(0xFFFFFBF5),
-          ),
-        ),
+        child: isLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFFBF5)),
+                ),
+              )
+            : const Text(
+                'Make Payment',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFFFFFBF5),
+                ),
+              ),
       ),
     );
   }
 
-  void _handlePayment() {
-    // Show success dialog or navigate to payment screen
-    showDialog(
+  Future<void> _handlePayment() async {
+    final notifier = ref.read(schoolRegistrationProvider.notifier);
+    
+    // Build full phone number
+    final fullPhoneNumber = '$selectedCountryCode${_phoneController.text}';
+
+    // Step 1: Submit registration
+    final success = await notifier.submitRegistration(
+      country: selectedCountry,
+      fullName: _nameController.text,
+      phoneNumber: fullPhoneNumber,
+      userState: selectedState,
+      city: _cityController.text,
+      address: _addressController.text,
+      businessId: widget.businessId,
+    );
+
+    if (!success) {
+      if (!mounted) return;
+      _showErrorSnackbar('Failed to submit registration. Please try again.');
+      return;
+    }
+
+    // Step 2: Check if user is authenticated for payment link
+    final authState = ref.read(authControllerProvider);
+    final isAuthenticated = authState is AuthAuthenticated;
+    if (!isAuthenticated) {
+      if (!mounted) return;
+      _showPaymentConfirmationDialog(requiresLogin: true);
+      return;
+    }
+
+    // Step 3: Generate payment link - prompt for email since we don't store it in auth state
+    if (!mounted) return;
+    final email = await _promptForEmail();
+    if (email == null || email.isEmpty) {
+      return;
+    }
+
+    final paymentUrl = await notifier.createPaymentLink(email: email);
+
+    if (paymentUrl != null) {
+      if (!mounted) return;
+      _openPaymentUrl(paymentUrl);
+    } else {
+      if (!mounted) return;
+      _showErrorSnackbar('Failed to generate payment link. Please try again.');
+    }
+  }
+
+  Future<String?> _promptForEmail() async {
+    final emailController = TextEditingController();
+    return showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
         title: const Text(
-          'Proceed to Payment',
+          'Enter Your Email',
           style: TextStyle(
             fontFamily: 'Campton',
             fontWeight: FontWeight.w600,
           ),
         ),
-        content: const Text(
-          'Your registration details have been submitted. Proceed to payment?',
-          style: TextStyle(
-            fontFamily: 'Campton',
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'We need your email to send payment confirmation.',
+              style: TextStyle(fontFamily: 'Campton'),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                hintText: 'email@example.com',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+            onPressed: () => Navigator.of(context).pop(null),
             child: const Text(
               'Cancel',
               style: TextStyle(
@@ -450,8 +539,10 @@ class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScr
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop();
-              // Navigate to payment screen
+              final email = emailController.text.trim();
+              if (email.isNotEmpty && email.contains('@')) {
+                Navigator.of(context).pop(email);
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFDAF40),
@@ -460,7 +551,7 @@ class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScr
               ),
             ),
             child: const Text(
-              'Proceed',
+              'Continue',
               style: TextStyle(
                 fontFamily: 'Campton',
                 color: Colors.white,
@@ -470,5 +561,114 @@ class _SchoolRegistrationFormScreenState extends State<SchoolRegistrationFormScr
         ],
       ),
     );
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  void _showPaymentConfirmationDialog({required bool requiresLogin}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        title: const Text(
+          'Registration Submitted',
+          style: TextStyle(
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          requiresLogin
+              ? 'Your registration has been submitted. Please log in to complete payment (₦500).'
+              : 'Your registration has been submitted successfully.',
+          style: const TextStyle(
+            fontFamily: 'Campton',
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop(); // Go back to school detail
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFDAF40),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                fontFamily: 'Campton',
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openPaymentUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!mounted) return;
+      // Show success dialog after opening payment
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: const Text(
+            'Payment Initiated',
+            style: TextStyle(
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: const Text(
+            'Complete the payment in your browser. The registration fee is ₦500.',
+            style: TextStyle(
+              fontFamily: 'Campton',
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Go back to school detail
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFDAF40),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Done',
+                style: TextStyle(
+                  fontFamily: 'Campton',
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      _showErrorSnackbar('Could not open payment page.');
+    }
   }
 }

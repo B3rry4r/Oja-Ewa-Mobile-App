@@ -71,9 +71,9 @@ class BrandsScreen extends ConsumerWidget {
                   pageTitle: item == 'View All' ? section.title : item,
                   breadcrumb: 'Brands • ${section.title}',
                   showBusinessTypeFilter: false,
-                  onProductTap: (context) {
+                  onProductTap: (context, businessId) {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const BusinessProfileBeautyScreen()),
+                      MaterialPageRoute(builder: (_) => BusinessProfileBeautyScreen(businessId: businessId)),
                     );
                   },
                 ),

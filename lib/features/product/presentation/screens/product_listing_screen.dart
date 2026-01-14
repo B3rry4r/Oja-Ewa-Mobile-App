@@ -8,7 +8,6 @@ import 'package:ojaewa/core/widgets/product_card.dart';
 import 'package:ojaewa/features/categories/domain/category_items.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
-import 'package:ojaewa/features/product/domain/product_filters.dart';
 import 'package:ojaewa/features/product/presentation/controllers/product_filters_controller.dart';
 import 'package:ojaewa/features/product/presentation/controllers/filtered_products_controller.dart';
 import 'package:ojaewa/features/product_detail/presentation/product_detail_screen.dart';
@@ -16,7 +15,6 @@ import 'package:ojaewa/features/business_details/presentation/screens/business_d
 import 'package:ojaewa/features/sustainability_details/presentation/screens/sustainability_details_screen.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/filter_sheet.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/sort_sheet.dart';
-import 'package:ojaewa/features/search/domain/search_product.dart';
 
 /// Product listing screen used for category browsing.
 ///
@@ -42,7 +40,9 @@ class ProductListingScreen extends ConsumerStatefulWidget {
 
   /// Allows callers to override what happens when a card is tapped.
   /// If null, defaults to navigating to Product Details.
-  final void Function(BuildContext context)? onProductTap;
+  /// Callback when a product/business/initiative is tapped.
+  /// Receives context and the item ID for navigation.
+  final void Function(BuildContext context, int itemId)? onProductTap;
 
   @override
   ConsumerState<ProductListingScreen> createState() =>
@@ -264,7 +264,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                                 onTap: (context, tapped) {
                                   final handler = widget.onProductTap;
                                   if (handler != null) {
-                                    handler(context);
+                                    handler(context, tapped.id);
                                     return;
                                   }
 

@@ -1,15 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
+import 'package:ojaewa/features/sustainability_details/presentation/controllers/sustainability_details_controller.dart';
 
 /// Sustainability Course Detail Screen - Shows information about a course/event
-class SustainabilityCourseDetailScreen extends StatelessWidget {
-  const SustainabilityCourseDetailScreen({super.key});
+class SustainabilityCourseDetailScreen extends ConsumerWidget {
+  const SustainabilityCourseDetailScreen({super.key, required this.initiativeId});
+
+  final int initiativeId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final detailsAsync = ref.watch(sustainabilityDetailsProvider(initiativeId));
+
+    return detailsAsync.when(
+      loading: () => const Scaffold(
+        backgroundColor: Color(0xFFFFF8F1),
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => Scaffold(
+        backgroundColor: const Color(0xFFFFF8F1),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFFFFF8F1),
+          foregroundColor: const Color(0xFF241508),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Failed to load initiative'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => ref.invalidate(sustainabilityDetailsProvider(initiativeId)),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      ),
+      data: (initiative) => _buildContent(context, initiative),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, SustainabilityDetails initiative) {
+    final title = initiative.title;
+    final description = initiative.description ?? 'No description available';
+    final category = initiative.category ?? 'General';
+    final status = initiative.status ?? 'Active';
+    final progress = initiative.progressPercentage?.toInt() ?? 0;
+    final imageUrl = initiative.imageUrl;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
@@ -23,17 +66,17 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
                   const SizedBox(height: 104), // Space for standard header
                   
                   // Course Header with Image
-                  _buildCourseHeader(),
+                  _buildCourseHeader(title, imageUrl),
                   
                   const SizedBox(height: 20),
                   
                   // Description Section
-                  _buildDescriptionSection(),
+                  _buildDescriptionSection(description),
                   
                   const SizedBox(height: 16),
                   
-                  // Speakers Section
-                  _buildSpeakersSection(),
+                  // Event Details Section
+                  _buildEventDetailsSection(category, status, progress),
                   
                   const SizedBox(height: 16),
                   
@@ -59,18 +102,34 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCourseHeader() {
+  Widget _buildCourseHeader(String title, String? imageUrl) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Course Image
-          const AppImagePlaceholder(
-            width: 168,
-            height: 198,
-            borderRadius: 8,
-          ),
+          if (imageUrl != null && imageUrl.isNotEmpty)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                imageUrl,
+                width: 168,
+                height: 198,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const AppImagePlaceholder(
+                  width: 168,
+                  height: 198,
+                  borderRadius: 8,
+                ),
+              ),
+            )
+          else
+            const AppImagePlaceholder(
+              width: 168,
+              height: 198,
+              borderRadius: 8,
+            ),
           
           const SizedBox(width: 7),
           
@@ -79,9 +138,9 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Managing\nFinances',
-                  style: TextStyle(
+                Text(
+                  title,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
@@ -138,7 +197,7 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDescriptionSection() {
+  Widget _buildDescriptionSection(String description) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -146,10 +205,10 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
         border: Border.all(color: const Color(0xFFCCCCCC)),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Description',
             style: TextStyle(
               fontSize: 16,
@@ -158,10 +217,10 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
               color: Color(0xFF1E2021),
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
-            'We are Spa, Beauty and wellness company offering, Spa pampering services, skincare solutions and haircare services',
-            style: TextStyle(
+            description,
+            style: const TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
@@ -174,7 +233,15 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSpeakersSection() {
+  Widget _buildEventDetailsSection(String category, String status, int progress) {
+    // Capitalize first letter of category
+    final displayCategory = category.isNotEmpty 
+        ? '${category[0].toUpperCase()}${category.substring(1)}'
+        : 'General';
+    final displayStatus = status.isNotEmpty 
+        ? '${status[0].toUpperCase()}${status.substring(1)}'
+        : 'Active';
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -186,7 +253,7 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Speakers',
+            'Initiative Details',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
@@ -195,35 +262,70 @@ class SustainabilityCourseDetailScreen extends StatelessWidget {
             ),
           ),
           
-          const SizedBox(height: 12),
-          
-          // Speaker 1
-          const Text(
-            'Lennox Emanuel \n(Strategist)',
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF1E2021),
-              height: 1.25,
-            ),
-          ),
-          
           const SizedBox(height: 16),
           
-          // Speaker 2
-          const Text(
-            'Lennox Emanuel \n(Strategist)',
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF1E2021),
-              height: 1.25,
-            ),
+          // Category
+          _buildEventDetailRow(
+            icon: Icons.category_outlined,
+            label: 'Category',
+            value: displayCategory,
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Status
+          _buildEventDetailRow(
+            icon: Icons.check_circle_outline,
+            label: 'Status',
+            value: displayStatus,
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Progress
+          _buildEventDetailRow(
+            icon: Icons.trending_up,
+            label: 'Progress',
+            value: '$progress%',
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildEventDetailRow({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 20,
+          color: const Color(0xFFA15E22),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF777F84),
+          ),
+        ),
+        const Spacer(),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF1E2021),
+          ),
+        ),
+      ],
     );
   }
 

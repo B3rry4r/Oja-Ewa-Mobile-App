@@ -10,7 +10,9 @@ final productFiltersApiProvider = Provider<ProductFiltersApi>((ref) {
 });
 
 /// Fetches available filters from the API (public endpoint)
+/// Uses keepAlive to cache the result and prevent repeated calls
 final availableFiltersProvider = FutureProvider<ProductFilters>((ref) async {
+  ref.keepAlive();
   return ref.read(productFiltersApiProvider).getFilters();
 });
 

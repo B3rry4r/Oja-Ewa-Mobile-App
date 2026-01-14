@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 sealed class CategoryItem {
   const CategoryItem();
 
+  /// Unique identifier for the item (product id, business id, or initiative id)
+  int get id;
+
   String get kind;
 }
 
@@ -17,6 +20,7 @@ class CategoryProductItem extends CategoryItem {
     required this.avgRating,
   });
 
+  @override
   final int id;
   final String name;
   final String? image;
@@ -50,6 +54,7 @@ class CategoryBusinessItem extends CategoryItem {
     required this.storeStatus,
   });
 
+  @override
   final int id;
   final String businessName;
   final String category;
@@ -86,6 +91,7 @@ class CategoryInitiativeItem extends CategoryItem {
     this.status,
   });
 
+  @override
   final int id;
   final String title;
   final String description;

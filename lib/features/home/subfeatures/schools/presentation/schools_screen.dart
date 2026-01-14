@@ -72,9 +72,9 @@ class SchoolsScreen extends ConsumerWidget {
                   pageTitle: item == 'View All' ? section.title : item,
                   breadcrumb: 'Schools • ${section.title}',
                   showBusinessTypeFilter: false,
-                  onProductTap: (context) {
+                  onProductTap: (context, businessId) {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const SchoolDetailScreen()),
+                      MaterialPageRoute(builder: (_) => SchoolDetailScreen(businessId: businessId)),
                     );
                   },
                 ),

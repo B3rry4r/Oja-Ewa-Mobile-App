@@ -72,9 +72,9 @@ class SustainabilityScreen extends ConsumerWidget {
                   pageTitle: item == 'View All' ? section.title : item,
                   breadcrumb: 'Sustainability • ${section.title}',
                   showBusinessTypeFilter: false,
-                  onProductTap: (context) {
+                  onProductTap: (context, initiativeId) {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const SustainabilityCourseDetailScreen()),
+                      MaterialPageRoute(builder: (_) => SustainabilityCourseDetailScreen(initiativeId: initiativeId)),
                     );
                   },
                 ),

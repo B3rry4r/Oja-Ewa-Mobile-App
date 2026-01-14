@@ -1,15 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/features/business_details/presentation/controllers/business_details_controller.dart';
 import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
 
-class BusinessProfileBeautyScreen extends StatelessWidget {
-  const BusinessProfileBeautyScreen({super.key});
+class BusinessProfileBeautyScreen extends ConsumerWidget {
+  const BusinessProfileBeautyScreen({super.key, this.businessId});
+
+  /// If provided, fetches data from API. Otherwise shows placeholder data.
+  final int? businessId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // If businessId is provided, fetch from API
+    if (businessId != null) {
+      final detailsAsync = ref.watch(businessDetailsProvider(businessId!));
+      return detailsAsync.when(
+        loading: () => const Scaffold(
+          backgroundColor: Color(0xFFFFF8F1),
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        error: (e, _) => Scaffold(
+          backgroundColor: const Color(0xFFFFF8F1),
+          appBar: AppBar(
+            backgroundColor: const Color(0xFFFFF8F1),
+            foregroundColor: const Color(0xFF241508),
+          ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Failed to load business'),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => ref.invalidate(businessDetailsProvider(businessId!)),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
+        data: (business) => _buildContent(context, business),
+      );
+    }
+    
+    // Fallback to placeholder data (for backward compatibility)
+    return _buildContent(context, null);
+  }
+
+  Widget _buildContent(BuildContext context, BusinessDetails? business) {
+    // Use API data if available, otherwise fallback to placeholders
+    final businessName = business?.businessName ?? 'Cream De la\nCream';
+    final description = business?.businessDescription ?? 'Cream de la cream, is a beauty academy providing some of the best beauty related services like hair making, makeup, brow services e.t.c...';
+    final services = business?.serviceList ?? ['Makeup', 'Hair Styling', 'Skincare', 'Nail Art'];
+    final email = business?.businessEmail ?? 'creamlacream@gmail.com';
+    final phone = business?.businessPhone ?? '08106628782';
+    final location = business?.fullAddress ?? '33rd Street, New York';
+    final instagram = business?.instagram;
+    final facebook = business?.facebook;
+    final website = business?.websiteUrl;
+    final imageUrl = business?.imageUrl;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
@@ -35,13 +90,22 @@ class BusinessProfileBeautyScreen extends StatelessWidget {
                         color: const Color(0xFFF5E0CE),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.image,
-                          size: 80,
-                          color: Colors.white54,
-                        ),
-                      ),
+                      child: imageUrl != null && imageUrl.isNotEmpty
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                imageUrl,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: 198,
+                                errorBuilder: (_, __, ___) => const Center(
+                                  child: Icon(Icons.image, size: 80, color: Colors.white54),
+                                ),
+                              ),
+                            )
+                          : const Center(
+                              child: Icon(Icons.image, size: 80, color: Colors.white54),
+                            ),
                     ),
 
                     const SizedBox(height: 8),
@@ -52,9 +116,9 @@ class BusinessProfileBeautyScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Cream De la\nCream',
-                            style: TextStyle(
+                          Text(
+                            businessName,
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w700,
                               color: Color(0xFF241508),
@@ -99,18 +163,25 @@ class BusinessProfileBeautyScreen extends StatelessWidget {
                     // Description section
                     _buildSection(
                       title: 'Description',
-                      content:
-                          'We are Spa, Beauty and wellness company offering, Spa pampering services, skincare solutions and haircare services',
+                      content: description,
                     ),
 
-                    // Products section
-                    _buildSection(
-                      title: 'Products',
-                      content: 'Hand Creams\nBody Creams',
-                    ),
+                    // Services section
+                    if (services.isNotEmpty)
+                      _buildSection(
+                        title: 'Services',
+                        content: services.join('\n'),
+                      ),
 
                     // Contact Details section
-                    _buildContactDetailsSection(),
+                    _buildContactDetailsSection(
+                      address: location,
+                      email: email,
+                      phone: phone,
+                      website: website,
+                      instagram: instagram,
+                      facebook: facebook,
+                    ),
 
                     const SizedBox(height: 20),
 
@@ -124,7 +195,7 @@ class BusinessProfileBeautyScreen extends StatelessWidget {
             ),
 
             // Bottom action bar
-            _buildBottomActionBar(),
+            _buildBottomActionBar(phone),
           ],
         ),
       ),
@@ -162,7 +233,14 @@ class BusinessProfileBeautyScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContactDetailsSection() {
+  Widget _buildContactDetailsSection({
+    required String address,
+    required String email,
+    required String phone,
+    String? website,
+    String? instagram,
+    String? facebook,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
@@ -185,7 +263,7 @@ class BusinessProfileBeautyScreen extends StatelessWidget {
           _buildContactItem(
             icon: Icons.location_on,
             title: 'Address',
-            content: '345 Ralph Shodeinde Street, Central Area Abuja, 9001',
+            content: address,
             actionText: 'Get Direction',
             hasAction: true,
           ),
@@ -196,19 +274,20 @@ class BusinessProfileBeautyScreen extends StatelessWidget {
           _buildContactItem(
             icon: Icons.email_outlined,
             title: 'Email',
-            content: 'creamdelatcream@gmail.com',
+            content: email,
             hasAction: true,
           ),
 
-          const SizedBox(height: 20),
-
-          // Website
-          _buildContactItem(
-            icon: Icons.language,
-            title: 'Website',
-            content: 'www. delacreame.com',
-            hasAction: true,
-          ),
+          if (website != null && website.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            // Website
+            _buildContactItem(
+              icon: Icons.language,
+              title: 'Website',
+              content: website,
+              hasAction: true,
+            ),
+          ],
 
           const SizedBox(height: 20),
 
@@ -499,7 +578,7 @@ class BusinessProfileBeautyScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomActionBar() {
+  Widget _buildBottomActionBar(String phone) {
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFF603814),
@@ -514,34 +593,37 @@ class BusinessProfileBeautyScreen extends StatelessWidget {
               // Call button
               Expanded(
                 flex: 1,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFFDAF40)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        AppIcons.phone,
-                        width: 24,
-                        height: 24,
-                        colorFilter: const ColorFilter.mode(
-                          Color(0xFFFDAF40),
-                          BlendMode.srcIn,
+                child: GestureDetector(
+                  onTap: () => _makePhoneCall(phone),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFFDAF40)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          AppIcons.phone,
+                          width: 24,
+                          height: 24,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFFFDAF40),
+                            BlendMode.srcIn,
+                          ),
                         ),
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        'Call',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFFFDAF40),
+                        const SizedBox(width: 4),
+                        const Text(
+                          'Call',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFFDAF40),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -551,41 +633,44 @@ class BusinessProfileBeautyScreen extends StatelessWidget {
               // WhatsApp button
               Expanded(
                 flex: 3,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFDAF40),
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFFDAF40).withOpacity(0.3),
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        AppIcons.whatsapp,
-                        width: 24,
-                        height: 24,
-                        colorFilter: const ColorFilter.mode(
-                          Color(0xFFFFFBF5),
-                          BlendMode.srcIn,
+                child: GestureDetector(
+                  onTap: () => _openWhatsApp(phone),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFDAF40),
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFFDAF40).withOpacity(0.3),
+                          blurRadius: 16,
+                          offset: const Offset(0, 8),
                         ),
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        'Whatsapp',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFFFFFBF5),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          AppIcons.whatsapp,
+                          width: 24,
+                          height: 24,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFFFFFBF5),
+                            BlendMode.srcIn,
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 4),
+                        const Text(
+                          'Whatsapp',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFFFFBF5),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -594,5 +679,28 @@ class BusinessProfileBeautyScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+    final uri = Uri.parse('tel:$cleanNumber');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  Future<void> _openWhatsApp(String phoneNumber) async {
+    // Clean phone number and ensure it has country code
+    String cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+    // If Nigerian number without country code, add it
+    if (cleanNumber.startsWith('0')) {
+      cleanNumber = '234${cleanNumber.substring(1)}';
+    } else if (!cleanNumber.startsWith('234') && cleanNumber.length == 10) {
+      cleanNumber = '234$cleanNumber';
+    }
+    final uri = Uri.parse('https://wa.me/$cleanNumber');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 }
