@@ -23,7 +23,14 @@ class NotificationsApi {
       final res = await _dio.get('/api/notifications/unread-count');
       final data = res.data;
       if (data is Map<String, dynamic>) {
-        final count = data['count'] ?? data['data']?['count'];
+        // Handle: {"status":"success","data":{"unread_count":7}}
+        final innerData = data['data'];
+        if (innerData is Map<String, dynamic>) {
+          final count = innerData['unread_count'] ?? innerData['count'];
+          if (count is num) return count.toInt();
+        }
+        // Fallback to direct count field
+        final count = data['unread_count'] ?? data['count'];
         if (count is num) return count.toInt();
       }
       return 0;
@@ -78,7 +85,11 @@ class NotificationsApi {
 
 List<AppNotification> _extractList(dynamic data) {
   if (data is Map<String, dynamic>) {
-    final list = data['data'];
+    var list = data['data'];
+    // Handle paginated response: {"status":"success","data":{"current_page":1,"data":[...]}}
+    if (list is Map<String, dynamic>) {
+      list = list['data'];
+    }
     if (list is List) {
       return list.whereType<Map<String, dynamic>>().map(AppNotification.fromJson).toList();
     }

@@ -25,15 +25,15 @@ class SchoolDetailScreen extends ConsumerWidget {
         message: 'Failed to load school details',
         onRetry: () => ref.invalidate(businessDetailsProvider(businessId)),
       ),
-      data: (business) => _buildContent(context, business),
+      data: (business) => _buildContent(context, ref, business),
     );
   }
 
-  Widget _buildContent(BuildContext context, BusinessDetails business) {
+  Widget _buildContent(BuildContext context, WidgetRef ref, BusinessDetails business) {
     final schoolName = business.businessName;
     // Use school_biography if available, otherwise fall back to business_description
     final biography = business.schoolBiography ?? business.businessDescription ?? '';
-    final classes = business.classesOffered;
+    final classes = business.classesOffered; // List<ClassItem>
     final email = business.businessEmail ?? '';
     final phone = business.businessPhone ?? '';
     final location = business.fullAddress;
@@ -72,9 +72,9 @@ class SchoolDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
 
                   // Reviews Section
-                  _buildReviewsSection(context),
+                  _buildReviewsSection(context, ref),
 
-                  const SizedBox(height: 100), // Space for bottom card
+                  const SizedBox(height: 280), // Space for bottom registration card
                 ],
               ),
             ),
@@ -216,7 +216,7 @@ class SchoolDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildClassesSection(List<String> classes) {
+  Widget _buildClassesSection(List<ClassItem> classes) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -237,16 +237,37 @@ class SchoolDetailScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-            classes.join('\n'),
-            style: const TextStyle(
-              fontSize: 16,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF1E2021),
-              height: 1.4,
+          ...classes.map((classItem) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    classItem.name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF1E2021),
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+                if (classItem.duration != null && classItem.duration!.isNotEmpty)
+                  Text(
+                    classItem.duration!,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF603814),
+                    ),
+                  ),
+              ],
             ),
-          ),
+          )),
         ],
       ),
     );
@@ -364,12 +385,22 @@ class SchoolDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildReviewsSection(BuildContext context) {
+  Widget _buildReviewsSection(BuildContext context, WidgetRef ref) {
+    final reviewsPage = ref.watch(reviewsProvider((type: 'business', id: businessId))).maybeWhen(
+          data: (d) => d,
+          orElse: () => null,
+        );
+
+    final reviewCount = reviewsPage?.total ?? 0;
+    final avgRating = reviewsPage?.entity.avgRating?.toStringAsFixed(1) ?? '0.0';
+    final firstReview = (reviewsPage?.items.isNotEmpty ?? false) ? reviewsPage!.items.first : null;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (_) => const ReviewsScreen())),
+      onTap: () => Navigator.of(context).pushNamed(
+        AppRoutes.reviews,
+        arguments: {'type': 'business', 'id': businessId},
+      ),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -387,9 +418,9 @@ class SchoolDetailScreen extends ConsumerWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Reviews (4)',
-                      style: TextStyle(
+                    Text(
+                      'Reviews ($reviewCount)',
+                      style: const TextStyle(
                         fontSize: 16,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
@@ -399,9 +430,9 @@ class SchoolDetailScreen extends ConsumerWidget {
                     const SizedBox(height: 9),
                     Row(
                       children: [
-                        const Text(
-                          '4.0',
-                          style: TextStyle(
+                        Text(
+                          avgRating,
+                          style: const TextStyle(
                             fontSize: 12,
                             fontFamily: 'Campton',
                             fontWeight: FontWeight.w700,
@@ -443,21 +474,28 @@ class SchoolDetailScreen extends ConsumerWidget {
               ],
             ),
 
-            const SizedBox(height: 24),
+            if (firstReview != null) ...[
+              const SizedBox(height: 24),
 
-            // Individual Review
-            _buildReviewItem(
-              name: 'Lennox Len',
-              date: 'Aug 19, 2023',
-              rating: 5,
-              title: 'So good',
-              review:
-                  'Good customer service, I was at the Spa some times back, the receptionist is ok and their agents are so good at what they do. Will use them again',
-            ),
+              // First review from API
+              _buildReviewItem(
+                name: firstReview.user?.displayName ?? '',
+                date: firstReview.createdAt != null ? _formatDate(firstReview.createdAt!) : '',
+                rating: firstReview.rating ?? 0,
+                title: firstReview.headline ?? '',
+                review: firstReview.body ?? '',
+              ),
+            ],
           ],
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime dt) {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    final m = months[(dt.month - 1).clamp(0, 11)];
+    return '$m ${dt.day}, ${dt.year}';
   }
 
   Widget _buildReviewItem({
@@ -512,32 +550,36 @@ class SchoolDetailScreen extends ConsumerWidget {
           ),
         ),
 
-        const SizedBox(height: 12),
+        if (title.isNotEmpty) ...[
+          const SizedBox(height: 12),
 
-        // Review title
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF1E2021),
+          // Review title
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF1E2021),
+            ),
           ),
-        ),
+        ],
 
-        const SizedBox(height: 8),
+        if (review.isNotEmpty) ...[
+          const SizedBox(height: 8),
 
-        // Review text
-        Text(
-          review,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w400,
-            color: Color(0xFF1E2021),
-            height: 1.5,
+          // Review text
+          Text(
+            review,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF1E2021),
+              height: 1.5,
+            ),
           ),
-        ),
+        ],
       ],
     );
   }

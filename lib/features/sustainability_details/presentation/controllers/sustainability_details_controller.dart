@@ -31,7 +31,7 @@ class SustainabilityDetails {
       id: (payload['id'] as num?)?.toInt() ?? 0,
       title: (payload['title'] as String?) ?? '',
       description: payload['description'] as String?,
-      imageUrl: payload['image_url'] as String?,
+      imageUrl: payload['image_url'] as String? ?? payload['image'] as String?,
       category: payload['category'] as String?,
       status: payload['status'] as String?,
       progressPercentage: payload['progress_percentage'] as num?,

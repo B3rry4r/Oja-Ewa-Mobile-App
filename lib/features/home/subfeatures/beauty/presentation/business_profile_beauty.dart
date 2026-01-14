@@ -8,6 +8,7 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/widgets/error_state_widget.dart';
 import 'package:ojaewa/features/business_details/presentation/controllers/business_details_controller.dart';
+// ServiceItem is exported from the controller file
 import 'package:ojaewa/features/reviews/presentation/controllers/reviews_controller.dart';
 
 class BusinessProfileBeautyScreen extends ConsumerWidget {
@@ -31,7 +32,7 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
   Widget _buildContent(BuildContext context, WidgetRef ref, BusinessDetails business) {
     final businessName = business.businessName;
     final description = business.businessDescription ?? '';
-    final services = business.serviceList;
+    final services = business.serviceList; // List<ServiceItem>
     final email = business.businessEmail ?? '';
     final phone = business.businessPhone ?? '';
     final location = business.fullAddress;
@@ -141,12 +142,9 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                       content: description,
                     ),
 
-                    // Products section (using service list from API)
+                    // Products/Services section
                     if (services.isNotEmpty)
-                      _buildSection(
-                        title: 'Products',
-                        content: services.join('\n'),
-                      ),
+                      _buildServicesSection(services),
 
                     // Contact Details section
                     _buildContactDetailsSection(
@@ -203,6 +201,57 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
               height: 1.5,
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServicesSection(List<ServiceItem> services) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0xFFCCCCCC))),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Products',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1E2021),
+            ),
+          ),
+          const SizedBox(height: 16),
+          ...services.map((service) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    service.name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF1E2021),
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+                if (service.priceRange != null && service.priceRange!.isNotEmpty)
+                  Text(
+                    service.priceRange!,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF603814),
+                    ),
+                  ),
+              ],
+            ),
+          )),
         ],
       ),
     );

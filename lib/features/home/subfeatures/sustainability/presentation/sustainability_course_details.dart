@@ -24,11 +24,11 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
         message: 'Failed to load initiative details',
         onRetry: () => ref.invalidate(sustainabilityDetailsProvider(initiativeId)),
       ),
-      data: (initiative) => _buildContent(context, initiative),
+      data: (initiative) => _buildContent(context, ref, initiative),
     );
   }
 
-  Widget _buildContent(BuildContext context, SustainabilityDetails initiative) {
+  Widget _buildContent(BuildContext context, WidgetRef ref, SustainabilityDetails initiative) {
     final title = initiative.title;
     final description = initiative.description ?? '';
     final category = initiative.category ?? '';
@@ -64,7 +64,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                   
                   // Reviews Section
-                  _buildReviewsSection(context),
+                  _buildReviewsSection(context, ref),
                   
                   const SizedBox(height: 180), // Space for bottom card and button
                 ],
@@ -312,79 +312,98 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildReviewsSection(BuildContext context) {
+  Widget _buildReviewsSection(BuildContext context, WidgetRef ref) {
+    final reviewsPage = ref.watch(reviewsProvider((type: 'initiative', id: initiativeId))).maybeWhen(
+          data: (d) => d,
+          orElse: () => null,
+        );
+
+    final reviewCount = reviewsPage?.total ?? 0;
+    final avgRating = reviewsPage?.entity.avgRating?.toStringAsFixed(1) ?? '0.0';
+    final firstReview = (reviewsPage?.items.isNotEmpty ?? false) ? reviewsPage!.items.first : null;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const ReviewsScreen()),
+      onTap: () => Navigator.of(context).pushNamed(
+        AppRoutes.reviews,
+        arguments: {'type': 'initiative', 'id': initiativeId},
       ),
       child: Container(
         padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Review Header
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Reviews (4)',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1E2021),
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFFDEDEDE)),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Review Header
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Reviews ($reviewCount)',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1E2021),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 9),
-              Row(
-                children: [
-                  const Text(
-                    '4.0',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1E2021),
+                const SizedBox(height: 9),
+                Row(
+                  children: [
+                    Text(
+                      avgRating,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontFamily: 'Campton',
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1E2021),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 4),
-                  Container(
-                    width: 12,
-                    height: 12,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFFFDB80),
-                      shape: BoxShape.circle,
+                    const SizedBox(width: 4),
+                    Container(
+                      width: 12,
+                      height: 12,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFFDB80),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.star,
+                        size: 8,
+                        color: Color(0xFFFDAF40),
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.star,
-                      size: 8,
-                      color: Color(0xFFFDAF40),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
+              ],
+            ),
+            
+            if (firstReview != null) ...[
+              const SizedBox(height: 24),
+              
+              // First review from API
+              _buildReviewItem(
+                name: firstReview.user?.displayName ?? '',
+                date: firstReview.createdAt != null ? _formatDate(firstReview.createdAt!) : '',
+                rating: firstReview.rating ?? 0,
+                title: firstReview.headline ?? '',
+                review: firstReview.body ?? '',
               ),
             ],
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Individual Review
-          _buildReviewItem(
-            name: 'Lennox Len',
-            date: 'Aug 19, 2023',
-            rating: 5,
-            title: 'So good',
-            review: 'Good customer service, I was at the Spa some times back, the receptionist is ok and their agents are so good at what they do. Will use them again',
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
+  }
+
+  String _formatDate(DateTime dt) {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    final m = months[(dt.month - 1).clamp(0, 11)];
+    return '$m ${dt.day}, ${dt.year}';
   }
 
   Widget _buildReviewItem({
@@ -439,32 +458,36 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
           ),
         ),
         
-        const SizedBox(height: 12),
-        
-        // Review title
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF1E2021),
+        if (title.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          
+          // Review title
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF1E2021),
+            ),
           ),
-        ),
+        ],
         
-        const SizedBox(height: 8),
-        
-        // Review text
-        Text(
-          review,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w400,
-            color: Color(0xFF1E2021),
-            height: 1.5,
+        if (review.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          
+          // Review text
+          Text(
+            review,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF1E2021),
+              height: 1.5,
+            ),
           ),
-        ),
+        ],
       ],
     );
   }

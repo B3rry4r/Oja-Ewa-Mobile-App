@@ -24,11 +24,11 @@ class MusicArtistProfileScreen extends ConsumerWidget {
         message: 'Failed to load artist details',
         onRetry: () => ref.invalidate(businessDetailsProvider(businessId)),
       ),
-      data: (business) => _buildContent(context, business),
+      data: (business) => _buildContent(context, ref, business),
     );
   }
 
-  Widget _buildContent(BuildContext context, BusinessDetails business) {
+  Widget _buildContent(BuildContext context, WidgetRef ref, BusinessDetails business) {
     final artistName = business.businessName;
     final biography = business.businessDescription ?? '';
     final email = business.businessEmail ?? '';
@@ -72,7 +72,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
 
                   // Reviews Section
-                  _buildReviewsSection(context),
+                  _buildReviewsSection(context, ref),
 
                   const SizedBox(height: 180), // Space for bottom card
                 ],
@@ -88,8 +88,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
             // Fixed Bottom Contact Card
             _buildBottomContactCard(context, phone),
 
-            // Floating Add Review Button
-            _buildFloatingReviewButton(),
           ],
         ),
       ),
@@ -507,12 +505,22 @@ class MusicArtistProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildReviewsSection(BuildContext context) {
+  Widget _buildReviewsSection(BuildContext context, WidgetRef ref) {
+    final reviewsPage = ref.watch(reviewsProvider((type: 'business', id: businessId))).maybeWhen(
+          data: (d) => d,
+          orElse: () => null,
+        );
+
+    final reviewCount = reviewsPage?.total ?? 0;
+    final avgRating = reviewsPage?.entity.avgRating?.toStringAsFixed(1) ?? '0.0';
+    final firstReview = (reviewsPage?.items.isNotEmpty ?? false) ? reviewsPage!.items.first : null;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (_) => const ReviewsScreen())),
+      onTap: () => Navigator.of(context).pushNamed(
+        AppRoutes.reviews,
+        arguments: {'type': 'business', 'id': businessId},
+      ),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -527,9 +535,9 @@ class MusicArtistProfileScreen extends ConsumerWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Reviews (4)',
-                  style: TextStyle(
+                Text(
+                  'Reviews ($reviewCount)',
+                  style: const TextStyle(
                     fontSize: 16,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
@@ -539,9 +547,9 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 9),
                 Row(
                   children: [
-                    const Text(
-                      '4.0',
-                      style: TextStyle(
+                    Text(
+                      avgRating,
+                      style: const TextStyle(
                         fontSize: 12,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w700,
@@ -567,21 +575,28 @@ class MusicArtistProfileScreen extends ConsumerWidget {
               ],
             ),
 
-            const SizedBox(height: 24),
+            if (firstReview != null) ...[
+              const SizedBox(height: 24),
 
-            // Individual Review
-            _buildReviewItem(
-              name: 'Lennox Len',
-              date: 'Aug 19, 2023',
-              rating: 5,
-              title: 'So good',
-              review:
-                  'Good customer service, I was at the Spa some times back, the receptionist is ok and their agents are so good at what they do. Will use them again',
-            ),
+              // First review from API
+              _buildReviewItem(
+                name: firstReview.user?.displayName ?? '',
+                date: firstReview.createdAt != null ? _formatDate(firstReview.createdAt!) : '',
+                rating: firstReview.rating ?? 0,
+                title: firstReview.headline ?? '',
+                review: firstReview.body ?? '',
+              ),
+            ],
           ],
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime dt) {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    final m = months[(dt.month - 1).clamp(0, 11)];
+    return '$m ${dt.day}, ${dt.year}';
   }
 
   Widget _buildReviewItem({
@@ -636,32 +651,36 @@ class MusicArtistProfileScreen extends ConsumerWidget {
           ),
         ),
 
-        const SizedBox(height: 12),
+        if (title.isNotEmpty) ...[
+          const SizedBox(height: 12),
 
-        // Review title
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF1E2021),
+          // Review title
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF1E2021),
+            ),
           ),
-        ),
+        ],
 
-        const SizedBox(height: 8),
+        if (review.isNotEmpty) ...[
+          const SizedBox(height: 8),
 
-        // Review text
-        Text(
-          review,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w400,
-            color: Color(0xFF1E2021),
-            height: 1.5,
+          // Review text
+          Text(
+            review,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF1E2021),
+              height: 1.5,
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -777,36 +796,4 @@ class MusicArtistProfileScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildFloatingReviewButton() {
-    return Positioned(
-      bottom: 165,
-      right: 22,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: IconButton(
-          icon: const Icon(
-            Icons.add_circle_outline,
-            size: 20,
-            color: Color(0xFF603814),
-          ),
-          padding: EdgeInsets.zero,
-          onPressed: () {
-            // Handle add review
-          },
-        ),
-      ),
-    );
-  }
 }

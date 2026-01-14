@@ -21,7 +21,10 @@ final allCountriesProvider = FutureProvider<List<Country>>((ref) async {
 });
 
 /// Provider that fetches states for a given country name
-final statesProvider = FutureProvider.family<List<StateProvince>, String>((ref, countryName) async {
+final statesProvider = FutureProvider.family<List<StateProvince>, String>((
+  ref,
+  countryName,
+) async {
   final api = ref.watch(locationApiProvider);
   return api.fetchStates(countryName);
 });
@@ -35,9 +38,13 @@ final countryByCodeProvider = Provider.family<Country?, String>((ref, code) {
 });
 
 /// Helper provider to get a country by its dial code
-final countryByDialCodeProvider = Provider.family<Country?, String>((ref, dialCode) {
+final countryByDialCodeProvider = Provider.family<Country?, String>((
+  ref,
+  dialCode,
+) {
   final countriesAsync = ref.watch(africanCountriesProvider);
   return countriesAsync.whenOrNull(
-    data: (countries) => countries.where((c) => c.dialCode == dialCode).firstOrNull,
+    data: (countries) =>
+        countries.where((c) => c.dialCode == dialCode).firstOrNull,
   );
 });

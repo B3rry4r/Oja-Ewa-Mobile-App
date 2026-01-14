@@ -42,7 +42,7 @@ class BusinessDetailsScreen extends ConsumerWidget {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: b.serviceList.map((s) => Chip(label: Text(s))).toList(),
+                  children: b.serviceList.map((s) => Chip(label: Text(s.name))).toList(),
                 ),
               ],
             ],

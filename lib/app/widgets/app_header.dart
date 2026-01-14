@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 
 /// Standard top header used across the app.
 ///
@@ -11,7 +14,7 @@ import 'package:ojaewa/core/resources/app_assets.dart';
 ///
 /// Keeps existing layout conventions: 40x40 square buttons, 104px bar height,
 /// and 32px top padding.
-class AppHeader extends StatelessWidget {
+class AppHeader extends ConsumerWidget {
   const AppHeader({
     super.key,
     required this.iconColor,
@@ -39,7 +42,19 @@ class AppHeader extends StatelessWidget {
   final double gap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Only fetch unread count if user is authenticated
+    final accessToken = ref.watch(accessTokenProvider);
+    final isAuthenticated = accessToken != null && accessToken.isNotEmpty;
+    
+    // Watch unread count for badge (only if authenticated)
+    final unreadCount = isAuthenticated 
+        ? ref.watch(unreadCountProvider).maybeWhen(
+            data: (count) => count,
+            orElse: () => 0,
+          )
+        : 0;
+
     final left = Padding(
       padding: EdgeInsets.only(left: horizontalPadding),
       child: showBack
@@ -57,12 +72,44 @@ class AppHeader extends StatelessWidget {
           ? Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                HeaderIconButton(
-                  asset: AppIcons.notification,
-                  iconColor: iconColor,
-                  onTap: () => Navigator.of(context).pushNamed(
-                    AppRoutes.notifications,
-                  ),
+                // Notification icon with badge
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    HeaderIconButton(
+                      asset: AppIcons.notification,
+                      iconColor: iconColor,
+                      onTap: () => Navigator.of(context).pushNamed(
+                        AppRoutes.notifications,
+                      ),
+                    ),
+                    if (unreadCount > 0)
+                      Positioned(
+                        right: -4,
+                        top: -4,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFDAF40),
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 18,
+                            minHeight: 18,
+                          ),
+                          child: Text(
+                            unreadCount > 99 ? '99+' : unreadCount.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Campton',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 SizedBox(width: gap),
                 HeaderIconButton(
