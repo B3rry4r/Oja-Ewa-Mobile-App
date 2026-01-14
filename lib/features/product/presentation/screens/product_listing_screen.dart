@@ -454,6 +454,7 @@ class _CategoryItemGrid extends StatelessWidget {
           priceLabel: b.category,
           rating: 0,
           reviewCount: 0,
+          imageUrl: b.businessLogo,
           imageColor: 0xFFD9D9D9,
         );
       case final CategoryInitiativeItem i:
@@ -463,6 +464,7 @@ class _CategoryItemGrid extends StatelessWidget {
           priceLabel: i.status ?? '',
           rating: 0,
           reviewCount: 0,
+          imageUrl: i.imageUrl,
           imageColor: 0xFFD9D9D9,
         );
     }
