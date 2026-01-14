@@ -50,6 +50,7 @@ class WishlistItem {
       image = (wishlistable['image'] as String?) ?? (wishlistable['business_logo'] as String?);
       final p = wishlistable['price'];
       if (p is num) price = p;
+      if (p is String) price = num.tryParse(p);
     }
 
     return WishlistItem(
