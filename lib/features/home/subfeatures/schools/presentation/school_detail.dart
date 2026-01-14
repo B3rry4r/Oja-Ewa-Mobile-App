@@ -2,63 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/widgets/error_state_widget.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/business_details/presentation/controllers/business_details_controller.dart';
-import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
+import 'package:ojaewa/features/reviews/presentation/controllers/reviews_controller.dart';
 import 'package:ojaewa/features/home/subfeatures/schools/presentation/school_registration_form.dart';
 
 /// School Detail Screen - Shows detailed information about a training school/institution
 class SchoolDetailScreen extends ConsumerWidget {
-  const SchoolDetailScreen({super.key, this.businessId});
+  const SchoolDetailScreen({super.key, required this.businessId});
 
-  final int? businessId;
+  final int businessId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (businessId != null) {
-      final detailsAsync = ref.watch(businessDetailsProvider(businessId!));
-      return detailsAsync.when(
-        loading: () => const Scaffold(
-          backgroundColor: Color(0xFFFFF8F1),
-          body: Center(child: CircularProgressIndicator()),
-        ),
-        error: (e, _) => Scaffold(
-          backgroundColor: const Color(0xFFFFF8F1),
-          appBar: AppBar(
-            backgroundColor: const Color(0xFFFFF8F1),
-            foregroundColor: const Color(0xFF241508),
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Failed to load school'),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => ref.invalidate(businessDetailsProvider(businessId!)),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          ),
-        ),
-        data: (business) => _buildContent(context, business),
-      );
-    }
-    return _buildContent(context, null);
+    final detailsAsync = ref.watch(businessDetailsProvider(businessId));
+    return detailsAsync.when(
+      loading: () => const LoadingStateWidget(),
+      error: (e, _) => ErrorStateWidget(
+        message: 'Failed to load school details',
+        onRetry: () => ref.invalidate(businessDetailsProvider(businessId)),
+      ),
+      data: (business) => _buildContent(context, business),
+    );
   }
 
-  Widget _buildContent(BuildContext context, BusinessDetails? business) {
-    final schoolName = business?.businessName ?? 'Beauty Academy';
+  Widget _buildContent(BuildContext context, BusinessDetails business) {
+    final schoolName = business.businessName;
     // Use school_biography if available, otherwise fall back to business_description
-    final biography = business?.schoolBiography ?? business?.businessDescription ?? 'Beauty Academy is a premier institution dedicated to training the next generation of beauty professionals. We offer comprehensive courses in makeup artistry, hair styling, skincare...';
-    final classes = business?.classesOffered.isNotEmpty == true ? business!.classesOffered : ['Makeup Artistry', 'Hair Styling', 'Skincare', 'Nail Technology'];
-    final email = business?.businessEmail ?? 'info@beautyacademy.com';
-    final phone = business?.businessPhone ?? '+234 8123 456 789';
-    final location = business?.fullAddress ?? '123 Fashion Street, Victoria Island, Lagos';
-    final websiteUrl = business?.websiteUrl;
-    final imageUrl = business?.imageUrl;
+    final biography = business.schoolBiography ?? business.businessDescription ?? '';
+    final classes = business.classesOffered;
+    final email = business.businessEmail ?? '';
+    final phone = business.businessPhone ?? '';
+    final location = business.fullAddress;
+    final websiteUrl = business.websiteUrl;
+    final imageUrl = business.imageUrl;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),

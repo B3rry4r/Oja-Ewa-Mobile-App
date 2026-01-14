@@ -69,9 +69,40 @@ class BusinessDetails {
 
   static List<String> _parseStringList(dynamic raw) {
     if (raw is List) {
-      return raw.whereType<String>().toList();
+      final result = <String>[];
+      for (final item in raw) {
+        if (item is String) {
+          result.add(item);
+        } else if (item is Map<String, dynamic>) {
+          // Handle objects like {"name": "Makeup", "price": 5000}
+          // Extract the name field if available
+          final name = item['name'] as String?;
+          if (name != null && name.isNotEmpty) {
+            result.add(name);
+          }
+        }
+      }
+      return result;
     } else if (raw is String && raw.isNotEmpty) {
-      // naive parse for ["A","B"] without adding dependencies
+      // Try to parse as JSON first
+      try {
+        // Check if it looks like a JSON array
+        if (raw.trim().startsWith('[')) {
+          // Simple JSON array parsing without dart:convert dependency issues
+          final cleaned = raw.replaceAll('[', '').replaceAll(']', '');
+          // Handle simple string arrays like ["A","B"]
+          if (!cleaned.contains('{')) {
+            return cleaned
+                .split(',')
+                .map((e) => e.trim().replaceAll('"', '').replaceAll("'", ''))
+                .where((e) => e.isNotEmpty)
+                .toList();
+          }
+        }
+      } catch (_) {
+        // Fall through to simple split
+      }
+      // Simple comma-separated parsing
       final cleaned = raw.replaceAll('[', '').replaceAll(']', '').replaceAll('"', '');
       return cleaned.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
     }

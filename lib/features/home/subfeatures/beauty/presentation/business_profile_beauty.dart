@@ -3,67 +3,42 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/widgets/error_state_widget.dart';
 import 'package:ojaewa/features/business_details/presentation/controllers/business_details_controller.dart';
-import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
+import 'package:ojaewa/features/reviews/presentation/controllers/reviews_controller.dart';
 
 class BusinessProfileBeautyScreen extends ConsumerWidget {
-  const BusinessProfileBeautyScreen({super.key, this.businessId});
+  const BusinessProfileBeautyScreen({super.key, required this.businessId});
 
-  /// If provided, fetches data from API. Otherwise shows placeholder data.
-  final int? businessId;
+  final int businessId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // If businessId is provided, fetch from API
-    if (businessId != null) {
-      final detailsAsync = ref.watch(businessDetailsProvider(businessId!));
-      return detailsAsync.when(
-        loading: () => const Scaffold(
-          backgroundColor: Color(0xFFFFF8F1),
-          body: Center(child: CircularProgressIndicator()),
-        ),
-        error: (e, _) => Scaffold(
-          backgroundColor: const Color(0xFFFFF8F1),
-          appBar: AppBar(
-            backgroundColor: const Color(0xFFFFF8F1),
-            foregroundColor: const Color(0xFF241508),
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Failed to load business'),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => ref.invalidate(businessDetailsProvider(businessId!)),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          ),
-        ),
-        data: (business) => _buildContent(context, business),
-      );
-    }
-    
-    // Fallback to placeholder data (for backward compatibility)
-    return _buildContent(context, null);
+    final detailsAsync = ref.watch(businessDetailsProvider(businessId));
+    return detailsAsync.when(
+      loading: () => const LoadingStateWidget(),
+      error: (e, _) => ErrorStateWidget(
+        message: 'Failed to load business details',
+        onRetry: () => ref.invalidate(businessDetailsProvider(businessId)),
+      ),
+      data: (business) => _buildContent(context, ref, business),
+    );
   }
 
-  Widget _buildContent(BuildContext context, BusinessDetails? business) {
-    // Use API data if available, otherwise fallback to placeholders
-    final businessName = business?.businessName ?? 'Cream De la\nCream';
-    final description = business?.businessDescription ?? 'Cream de la cream, is a beauty academy providing some of the best beauty related services like hair making, makeup, brow services e.t.c...';
-    final services = business?.serviceList ?? ['Makeup', 'Hair Styling', 'Skincare', 'Nail Art'];
-    final email = business?.businessEmail ?? 'creamlacream@gmail.com';
-    final phone = business?.businessPhone ?? '08106628782';
-    final location = business?.fullAddress ?? '33rd Street, New York';
-    final instagram = business?.instagram;
-    final facebook = business?.facebook;
-    final website = business?.websiteUrl;
-    final imageUrl = business?.imageUrl;
+  Widget _buildContent(BuildContext context, WidgetRef ref, BusinessDetails business) {
+    final businessName = business.businessName;
+    final description = business.businessDescription ?? '';
+    final services = business.serviceList;
+    final email = business.businessEmail ?? '';
+    final phone = business.businessPhone ?? '';
+    final location = business.fullAddress;
+    final instagram = business.instagram;
+    final facebook = business.facebook;
+    final website = business.websiteUrl;
+    final imageUrl = business.imageUrl;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
@@ -166,10 +141,10 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                       content: description,
                     ),
 
-                    // Services section
+                    // Products section (using service list from API)
                     if (services.isNotEmpty)
                       _buildSection(
-                        title: 'Services',
+                        title: 'Products',
                         content: services.join('\n'),
                       ),
 
@@ -186,7 +161,7 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                     const SizedBox(height: 20),
 
                     // Reviews section
-                    _buildReviewsSection(context),
+                    _buildReviewsSection(context, ref),
 
                     const SizedBox(height: 180), // Space for bottom action bar
                   ],
@@ -457,12 +432,22 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildReviewsSection(BuildContext context) {
+  Widget _buildReviewsSection(BuildContext context, WidgetRef ref) {
+    final reviewsPage = ref.watch(reviewsProvider((type: 'business', id: businessId))).maybeWhen(
+          data: (d) => d,
+          orElse: () => null,
+        );
+
+    final reviewCount = reviewsPage?.total ?? 0;
+    final avgRating = reviewsPage?.entity.avgRating?.toStringAsFixed(1) ?? '0.0';
+    final firstReview = (reviewsPage?.items.isNotEmpty ?? false) ? reviewsPage!.items.first : null;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (_) => const ReviewsScreen())),
+      onTap: () => Navigator.of(context).pushNamed(
+        AppRoutes.reviews,
+        arguments: {'type': 'business', 'id': businessId},
+      ),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(
@@ -475,9 +460,9 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Reviews (4)',
-                  style: TextStyle(
+                Text(
+                  'Reviews ($reviewCount)',
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF1E2021),
@@ -486,9 +471,9 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                 const SizedBox(height: 9),
                 Row(
                   children: [
-                    const Text(
-                      '4.0',
-                      style: TextStyle(
+                    Text(
+                      avgRating,
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF1E2021),
@@ -508,55 +493,62 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
               ],
             ),
 
-            const SizedBox(height: 12),
+            if (firstReview != null) ...[
+              const SizedBox(height: 12),
 
-            // Sample review
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Lennox Len',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF3C4042)),
-                    ),
+              // First review from API
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        firstReview.user?.displayName ?? '',
+                        style: const TextStyle(fontSize: 12, color: Color(0xFF3C4042)),
+                      ),
+                      Text(
+                        firstReview.createdAt != null ? _formatDate(firstReview.createdAt!) : '',
+                        style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: List.generate(5, (index) {
+                      return Icon(
+                        Icons.star,
+                        size: 11,
+                        color: index < (firstReview.rating ?? 0)
+                            ? const Color(0xFFFFDB80)
+                            : const Color(0xFFDEDEDE),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 12),
+                  if ((firstReview.headline ?? '').isNotEmpty)
                     Text(
-                      'Aug 19, 2023',
-                      style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                      firstReview.headline!,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF1E2021),
+                      ),
+                    ),
+                  if ((firstReview.body ?? '').isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      firstReview.body!,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF1E2021),
+                        height: 1.4,
+                      ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: List.generate(5, (index) {
-                    return const Icon(
-                      Icons.star,
-                      size: 11,
-                      color: Color(0xFFFFDB80),
-                    );
-                  }),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'So good',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF1E2021),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Good customer service, I was at the Spa some times back, the receptionist is ok and their agents are so goos aat what they do. Will use them again',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF1E2021),
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
 
             const SizedBox(height: 8),
 
@@ -576,6 +568,12 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime dt) {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    final m = months[(dt.month - 1).clamp(0, 11)];
+    return '$m ${dt.day}, ${dt.year}';
   }
 
   Widget _buildBottomActionBar(String phone) {

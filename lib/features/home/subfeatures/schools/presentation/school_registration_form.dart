@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/auth/auth_controller.dart';
 import 'package:ojaewa/core/auth/auth_state.dart';
-import 'package:ojaewa/core/widgets/selection_bottom_sheet.dart';
+import 'package:ojaewa/core/location/location_picker_sheets.dart';
 import 'package:ojaewa/features/home/subfeatures/schools/presentation/controllers/school_registration_controller.dart';
 
 /// School Registration Form Screen - Collects user details for school enrollment
@@ -29,9 +29,11 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   
-  String selectedCountry = 'Nigeria';
-  String selectedState = 'FCT';
-  String selectedCountryCode = '+234';
+  // Location selections
+  String _selectedCountryName = 'Nigeria';
+  String _selectedStateName = '';
+  String _selectedCountryCode = '+234';
+  String _selectedCountryFlag = '🇳🇬';
   
   @override
   void dispose() {
@@ -90,14 +92,23 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                       const SizedBox(height: 24),
                       
                       // Country Dropdown
-                      _buildDropdownField(
+                      _buildLocationDropdown(
                         label: 'Country',
-                        value: selectedCountry,
-                        items: ['Nigeria', 'Ghana', 'Kenya', 'South Africa'],
-                        onChanged: (value) {
-                          setState(() {
-                            selectedCountry = value;
-                          });
+                        value: _selectedCountryName,
+                        flag: _selectedCountryFlag,
+                        onTap: () async {
+                          final country = await CountryPickerSheet.show(
+                            context,
+                            selectedCountry: _selectedCountryName,
+                          );
+                          if (country != null) {
+                            setState(() {
+                              _selectedCountryName = country.name;
+                              _selectedCountryFlag = country.flag;
+                              _selectedCountryCode = country.dialCode;
+                              _selectedStateName = ''; // Reset state when country changes
+                            });
+                          }
                         },
                       ),
                       
@@ -118,14 +129,20 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                       const SizedBox(height: 24),
                       
                       // State Dropdown
-                      _buildDropdownField(
+                      _buildLocationDropdown(
                         label: 'State',
-                        value: selectedState,
-                        items: ['FCT', 'Lagos', 'Rivers', 'Kano'],
-                        onChanged: (value) {
-                          setState(() {
-                            selectedState = value;
-                          });
+                        value: _selectedStateName.isEmpty ? 'Select State' : _selectedStateName,
+                        onTap: () async {
+                          final state = await StatePickerSheet.show(
+                            context,
+                            countryName: _selectedCountryName,
+                            selectedState: _selectedStateName,
+                          );
+                          if (state != null) {
+                            setState(() {
+                              _selectedStateName = state.name;
+                            });
+                          }
                         },
                       ),
                       
@@ -164,11 +181,11 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
     );
   }
 
-  Widget _buildDropdownField({
+  Widget _buildLocationDropdown({
     required String label,
     required String value,
-    required List<String> items,
-    required ValueChanged<String> onChanged,
+    String? flag,
+    required VoidCallback onTap,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,26 +201,20 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
         ),
         const SizedBox(height: 8),
         GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () async {
-            final selected = await SelectionBottomSheet.show(
-              context,
-              title: label,
-              options: items,
-              selected: value,
-            );
-            if (selected != null && selected != value) {
-              onChanged(selected);
-            }
-          },
+          onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            height: 49,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
               border: Border.all(color: const Color(0xFFCCCCCC)),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               children: [
+                if (flag != null) ...[
+                  Text(flag, style: const TextStyle(fontSize: 20)),
+                  const SizedBox(width: 12),
+                ],
                 Expanded(
                   child: Text(
                     value,
@@ -211,12 +222,13 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                       fontSize: 16,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF1E2021),
+                      color: Color(0xFF241508),
                     ),
                   ),
                 ),
                 const Icon(
                   Icons.keyboard_arrow_down,
+                  size: 20,
                   color: Color(0xFF1E2021),
                 ),
               ],
@@ -309,15 +321,14 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () async {
-                  final selected = await SelectionBottomSheet.show(
+                  final country = await CountryCodePickerSheet.show(
                     context,
-                    title: 'Country code',
-                    options: const ['+234', '+233', '+254', '+27'],
-                    selected: selectedCountryCode,
+                    selectedDialCode: _selectedCountryCode,
                   );
-                  if (selected != null && selected != selectedCountryCode) {
+                  if (country != null) {
                     setState(() {
-                      selectedCountryCode = selected;
+                      _selectedCountryCode = country.dialCode;
+                      _selectedCountryFlag = country.flag;
                     });
                   }
                 },
@@ -326,7 +337,12 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                   child: Row(
                     children: [
                       Text(
-                        selectedCountryCode,
+                        _selectedCountryFlag,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _selectedCountryCode,
                         style: const TextStyle(
                           fontSize: 16,
                           fontFamily: 'Campton',
@@ -445,14 +461,14 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
     final notifier = ref.read(schoolRegistrationProvider.notifier);
     
     // Build full phone number
-    final fullPhoneNumber = '$selectedCountryCode${_phoneController.text}';
+    final fullPhoneNumber = '$_selectedCountryCode${_phoneController.text}';
 
     // Step 1: Submit registration
     final success = await notifier.submitRegistration(
-      country: selectedCountry,
+      country: _selectedCountryName,
       fullName: _nameController.text,
       phoneNumber: fullPhoneNumber,
-      userState: selectedState,
+      userState: _selectedStateName,
       city: _cityController.text,
       address: _addressController.text,
       businessId: widget.businessId,

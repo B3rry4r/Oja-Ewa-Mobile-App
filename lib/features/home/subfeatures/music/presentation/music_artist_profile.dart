@@ -2,64 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/widgets/error_state_widget.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/business_details/presentation/controllers/business_details_controller.dart';
-import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
+import 'package:ojaewa/features/reviews/presentation/controllers/reviews_controller.dart';
 
 /// Music Artist Profile Screen - Shows detailed information about a music artist
 class MusicArtistProfileScreen extends ConsumerWidget {
-  const MusicArtistProfileScreen({super.key, this.businessId});
+  const MusicArtistProfileScreen({super.key, required this.businessId});
 
-  final int? businessId;
+  final int businessId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // If businessId provided, fetch from API
-    if (businessId != null) {
-      final detailsAsync = ref.watch(businessDetailsProvider(businessId!));
-      return detailsAsync.when(
-        loading: () => const Scaffold(
-          backgroundColor: Color(0xFFFFF8F1),
-          body: Center(child: CircularProgressIndicator()),
-        ),
-        error: (e, _) => Scaffold(
-          backgroundColor: const Color(0xFFFFF8F1),
-          appBar: AppBar(
-            backgroundColor: const Color(0xFFFFF8F1),
-            foregroundColor: const Color(0xFF241508),
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Failed to load artist'),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => ref.invalidate(businessDetailsProvider(businessId!)),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          ),
-        ),
-        data: (business) => _buildContent(context, business),
-      );
-    }
-    return _buildContent(context, null);
+    final detailsAsync = ref.watch(businessDetailsProvider(businessId));
+    return detailsAsync.when(
+      loading: () => const LoadingStateWidget(),
+      error: (e, _) => ErrorStateWidget(
+        message: 'Failed to load artist details',
+        onRetry: () => ref.invalidate(businessDetailsProvider(businessId)),
+      ),
+      data: (business) => _buildContent(context, business),
+    );
   }
 
-  Widget _buildContent(BuildContext context, BusinessDetails? business) {
-    final artistName = business?.businessName ?? 'Vika Alagha';
-    final biography = business?.businessDescription ?? 'Vika Alagha is a passionate and dynamic artist hailing from Lagos, Nigeria, whose music is deeply rooted in her vibrant cultural heritage. Growing up in the bustling city of Lagos, Vika was surrounded by the rich sounds of Afrobeat, Highlife, and Juju music...';
-    final email = business?.businessEmail ?? 'vikaalagha@gmail.com';
-    final phone = business?.businessPhone ?? '08106628782';
-    final location = business?.fullAddress ?? '345 Ralph Shodeinde Street, Central Area Abuja, 9001';
-    final instagram = business?.instagram ?? '@vikaalagha';
-    final facebook = business?.facebook ?? 'Vika Alagha';
-    final youtube = business?.youtube;
-    final spotify = business?.spotify;
-    final imageUrl = business?.imageUrl;
+  Widget _buildContent(BuildContext context, BusinessDetails business) {
+    final artistName = business.businessName;
+    final biography = business.businessDescription ?? '';
+    final email = business.businessEmail ?? '';
+    final phone = business.businessPhone ?? '';
+    final location = business.fullAddress;
+    final instagram = business.instagram ?? '';
+    final facebook = business.facebook ?? '';
+    final youtube = business.youtube;
+    final spotify = business.spotify;
+    final imageUrl = business.imageUrl;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),

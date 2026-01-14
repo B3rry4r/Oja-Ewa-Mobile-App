@@ -11,6 +11,7 @@ import '../controllers/auth_controller.dart';
 import 'package:ojaewa/core/auth/google_sign_in_providers.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
+import 'package:ojaewa/core/location/location_picker_sheets.dart';
 
 class CreateAccountScreen extends ConsumerStatefulWidget {
   const CreateAccountScreen({super.key});
@@ -29,6 +30,8 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
   bool _obscurePassword = true;
   bool _agreeToTerms = false;
+  String _selectedCountryCode = '+234';
+  String _selectedCountryFlag = '🇳🇬';
 
   bool get _isFormValid =>
       _firstNameController.text.isNotEmpty &&
@@ -446,14 +449,45 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-                // Country code
-                Text(
-                  '+234',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    fontFamily: 'Campton',
-                    color: const Color(0xFF241508), // #241508
+                // Country code selector
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () async {
+                    final country = await CountryCodePickerSheet.show(
+                      context,
+                      selectedDialCode: _selectedCountryCode,
+                    );
+                    if (country != null) {
+                      setState(() {
+                        _selectedCountryCode = country.dialCode;
+                        _selectedCountryFlag = country.flag;
+                      });
+                    }
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _selectedCountryFlag,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _selectedCountryCode,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'Campton',
+                          color: const Color(0xFF241508),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.keyboard_arrow_down,
+                        size: 18,
+                        color: Color(0xFF777F84),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 12),

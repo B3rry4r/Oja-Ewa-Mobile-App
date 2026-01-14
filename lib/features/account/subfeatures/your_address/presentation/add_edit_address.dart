@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/location/location_picker_sheets.dart';
 
 import '../domain/address.dart';
 import 'controllers/address_controller.dart';
@@ -22,13 +23,17 @@ class AddEditAddressScreen extends ConsumerStatefulWidget {
 class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
   late final TextEditingController _fullName;
   late final TextEditingController _phone;
-  late final TextEditingController _country;
-  late final TextEditingController _state;
   late final TextEditingController _city;
   late final TextEditingController _postCode;
   late final TextEditingController _addressLine;
 
   bool _makeDefault = false;
+  
+  // Location selections
+  String _selectedCountryName = 'Nigeria';
+  String _selectedCountryFlag = '🇳🇬';
+  String _selectedStateName = '';
+  String _selectedCountryCode = '+234';
 
   @override
   void initState() {
@@ -37,20 +42,22 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
     final a = widget.initialAddress;
     _fullName = TextEditingController(text: a?.fullName ?? '');
     _phone = TextEditingController(text: a?.phone ?? '');
-    _country = TextEditingController(text: a?.country ?? 'Nigeria');
-    _state = TextEditingController(text: a?.state ?? '');
     _city = TextEditingController(text: a?.city ?? '');
     _postCode = TextEditingController(text: a?.postCode ?? '');
     _addressLine = TextEditingController(text: a?.addressLine ?? '');
     _makeDefault = a?.isDefault ?? false;
+    
+    // Initialize location from existing address
+    if (a != null) {
+      _selectedCountryName = a.country ?? 'Nigeria';
+      _selectedStateName = a.state ?? '';
+    }
   }
 
   @override
   void dispose() {
     _fullName.dispose();
     _phone.dispose();
-    _country.dispose();
-    _state.dispose();
     _city.dispose();
     _postCode.dispose();
     _addressLine.dispose();
@@ -88,9 +95,42 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
-                    _buildTextField(label: 'Country', controller: _country),
+                    _buildLocationDropdown(
+                      label: 'Country',
+                      value: _selectedCountryName,
+                      flag: _selectedCountryFlag,
+                      onTap: () async {
+                        final country = await CountryPickerSheet.show(
+                          context,
+                          selectedCountry: _selectedCountryName,
+                        );
+                        if (country != null) {
+                          setState(() {
+                            _selectedCountryName = country.name;
+                            _selectedCountryFlag = country.flag;
+                            _selectedCountryCode = country.dialCode;
+                            _selectedStateName = ''; // Reset state when country changes
+                          });
+                        }
+                      },
+                    ),
                     const SizedBox(height: 24),
-                    _buildTextField(label: 'State', controller: _state),
+                    _buildLocationDropdown(
+                      label: 'State',
+                      value: _selectedStateName.isEmpty ? 'Select State' : _selectedStateName,
+                      onTap: () async {
+                        final state = await StatePickerSheet.show(
+                          context,
+                          countryName: _selectedCountryName,
+                          selectedState: _selectedStateName,
+                        );
+                        if (state != null) {
+                          setState(() {
+                            _selectedStateName = state.name;
+                          });
+                        }
+                      },
+                    ),
                     const SizedBox(height: 24),
                     _buildTextField(label: 'City', controller: _city),
                     const SizedBox(height: 24),
@@ -155,6 +195,63 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
     );
   }
 
+  Widget _buildLocationDropdown({
+    required String label,
+    required String value,
+    String? flag,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontFamily: 'Campton',
+            color: Color(0xFF777F84),
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            height: 49,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFFCCCCCC)),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                if (flag != null) ...[
+                  Text(flag, style: const TextStyle(fontSize: 20)),
+                  const SizedBox(width: 12),
+                ],
+                Expanded(
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF241508),
+                    ),
+                  ),
+                ),
+                const Icon(
+                  Icons.keyboard_arrow_down,
+                  size: 20,
+                  color: Color(0xFF1E2021),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildDefaultAddressToggle() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -195,8 +292,8 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                     id: widget.initialAddress?.id ?? 0,
                     fullName: _fullName.text.trim(),
                     phone: _phone.text.trim(),
-                    country: _country.text.trim(),
-                    state: _state.text.trim(),
+                    country: _selectedCountryName,
+                    state: _selectedStateName,
                     city: _city.text.trim(),
                     postCode: _postCode.text.trim(),
                     addressLine: _addressLine.text.trim(),

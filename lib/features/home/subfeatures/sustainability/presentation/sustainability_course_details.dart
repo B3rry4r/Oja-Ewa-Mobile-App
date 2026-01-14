@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/widgets/error_state_widget.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
-import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
+import 'package:ojaewa/features/reviews/presentation/controllers/reviews_controller.dart';
 import 'package:ojaewa/features/sustainability_details/presentation/controllers/sustainability_details_controller.dart';
 
 /// Sustainability Course Detail Screen - Shows information about a course/event
@@ -17,29 +19,10 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
     final detailsAsync = ref.watch(sustainabilityDetailsProvider(initiativeId));
 
     return detailsAsync.when(
-      loading: () => const Scaffold(
-        backgroundColor: Color(0xFFFFF8F1),
-        body: Center(child: CircularProgressIndicator()),
-      ),
-      error: (e, _) => Scaffold(
-        backgroundColor: const Color(0xFFFFF8F1),
-        appBar: AppBar(
-          backgroundColor: const Color(0xFFFFF8F1),
-          foregroundColor: const Color(0xFF241508),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('Failed to load initiative'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => ref.invalidate(sustainabilityDetailsProvider(initiativeId)),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
+      loading: () => const LoadingStateWidget(),
+      error: (e, _) => ErrorStateWidget(
+        message: 'Failed to load initiative details',
+        onRetry: () => ref.invalidate(sustainabilityDetailsProvider(initiativeId)),
       ),
       data: (initiative) => _buildContent(context, initiative),
     );
@@ -47,9 +30,9 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
 
   Widget _buildContent(BuildContext context, SustainabilityDetails initiative) {
     final title = initiative.title;
-    final description = initiative.description ?? 'No description available';
-    final category = initiative.category ?? 'General';
-    final status = initiative.status ?? 'Active';
+    final description = initiative.description ?? '';
+    final category = initiative.category ?? '';
+    final status = initiative.status ?? '';
     final progress = initiative.progressPercentage?.toInt() ?? 0;
     final imageUrl = initiative.imageUrl;
 

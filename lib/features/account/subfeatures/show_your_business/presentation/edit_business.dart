@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/location/location_picker_sheets.dart';
 
-class EditBusinessScreen extends StatelessWidget {
+class EditBusinessScreen extends ConsumerStatefulWidget {
   const EditBusinessScreen({super.key});
+
+  @override
+  ConsumerState<EditBusinessScreen> createState() => _EditBusinessScreenState();
+}
+
+class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
+  String _selectedCountryName = 'Nigeria';
+  String _selectedCountryFlag = '🇳🇬';
+  String _selectedStateName = 'FCT';
+  String _selectedCountryCode = '+234';
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +44,15 @@ class EditBusinessScreen extends StatelessWidget {
                 children: [
                   _buildSectionHeader('Business Location'),
                   const SizedBox(height: 16),
-                  _buildDropdownField('Country', 'Nigeria'),
+                  _buildLocationDropdown(label: 'Country', value: _selectedCountryName, flag: _selectedCountryFlag, onTap: () async {
+                    final country = await CountryPickerSheet.show(context, selectedCountry: _selectedCountryName);
+                    if (country != null) setState(() { _selectedCountryName = country.name; _selectedCountryFlag = country.flag; _selectedCountryCode = country.dialCode; _selectedStateName = ''; });
+                  }),
                   const SizedBox(height: 16),
-                  _buildDropdownField('State', 'FCT'),
+                  _buildLocationDropdown(label: 'State', value: _selectedStateName.isEmpty ? 'Select State' : _selectedStateName, onTap: () async {
+                    final state = await StatePickerSheet.show(context, countryName: _selectedCountryName, selectedState: _selectedStateName);
+                    if (state != null) setState(() => _selectedStateName = state.name);
+                  }),
                   const SizedBox(height: 16),
                   _buildTextField('City', 'Your City'),
                   const SizedBox(height: 16),
@@ -45,7 +63,7 @@ class EditBusinessScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildTextField('Business Email', 'sanusimot@gmail.com'),
                   const SizedBox(height: 16),
-                  _buildPhoneInput(),
+                  _buildPhoneInputWithPicker(),
 
                   const SizedBox(height: 32),
                   _buildSectionHeader('Social handles'),
@@ -152,31 +170,45 @@ class EditBusinessScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDropdownField(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(value, style: const TextStyle(fontSize: 16)),
-              const Icon(Icons.keyboard_arrow_down, color: Color(0xFF777F84)),
-            ],
-          ),
-        ),
-      ],
-    );
+  Widget _buildLocationDropdown({required String label, required String value, String? flag, required VoidCallback onTap}) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+      const SizedBox(height: 8),
+      GestureDetector(onTap: onTap, child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFFCCCCCC))),
+        child: Row(children: [
+          if (flag != null) ...[Text(flag, style: const TextStyle(fontSize: 20)), const SizedBox(width: 12)],
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 16))),
+          const Icon(Icons.keyboard_arrow_down, color: Color(0xFF777F84)),
+        ]),
+      )),
+    ]);
+  }
+
+  Widget _buildPhoneInputWithPicker() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const Text('Business Phone Number', style: TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+      const SizedBox(height: 8),
+      Container(height: 49, padding: const EdgeInsets.symmetric(horizontal: 20),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFFCCCCCC))),
+        child: Row(children: [
+          GestureDetector(onTap: () async {
+            final country = await CountryCodePickerSheet.show(context, selectedDialCode: _selectedCountryCode);
+            if (country != null) setState(() { _selectedCountryCode = country.dialCode; _selectedCountryFlag = country.flag; });
+          }, child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(_selectedCountryFlag, style: const TextStyle(fontSize: 18)),
+            const SizedBox(width: 6),
+            Text(_selectedCountryCode, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF241508))),
+            const SizedBox(width: 4),
+            const Icon(Icons.keyboard_arrow_down, size: 18, color: Color(0xFF777F84)),
+          ])),
+          const SizedBox(width: 8),
+          const Expanded(child: TextField(keyboardType: TextInputType.phone, style: TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+            decoration: InputDecoration(border: InputBorder.none, hintText: 'Enter phone number', hintStyle: TextStyle(color: Color(0xFFCCCCCC))))),
+        ]),
+      ),
+    ]);
   }
 
   Widget _buildPhoneInput() {

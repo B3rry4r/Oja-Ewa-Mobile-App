@@ -10,7 +10,7 @@ class BusinessDetailsRepositoryImpl implements BusinessDetailsRepository {
   final BusinessDetailsApi _api;
 
   @override
-  Future<Map<String, dynamic>> getBusiness(int id) => _api.getBusiness(id);
+  Future<Map<String, dynamic>> getBusiness(int id) => _api.getPublicBusiness(id);
 }
 
 final businessDetailsApiProvider = Provider<BusinessDetailsApi>((ref) {

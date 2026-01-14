@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 
@@ -7,15 +8,16 @@ import '../../../../../../app/router/app_router.dart';
 
 import 'business_registration_draft.dart';
 import 'package:ojaewa/core/files/pick_file.dart';
+import 'package:ojaewa/core/location/location_picker_sheets.dart';
 
-class BusinessSellerRegistrationScreen extends StatefulWidget {
+class BusinessSellerRegistrationScreen extends ConsumerStatefulWidget {
   const BusinessSellerRegistrationScreen({super.key});
 
   @override
-  State<BusinessSellerRegistrationScreen> createState() => _BusinessSellerRegistrationScreenState();
+  ConsumerState<BusinessSellerRegistrationScreen> createState() => _BusinessSellerRegistrationScreenState();
 }
 
-class _BusinessSellerRegistrationScreenState extends State<BusinessSellerRegistrationScreen> {
+class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSellerRegistrationScreen> {
   final _cityController = TextEditingController();
   String? _identityDocumentLocalPath;
   final _addressController = TextEditingController();
@@ -26,6 +28,12 @@ class _BusinessSellerRegistrationScreenState extends State<BusinessSellerRegistr
   final _facebookController = TextEditingController();
   final _youtubeController = TextEditingController();
   final _spotifyController = TextEditingController();
+  
+  // Location selections
+  String _selectedCountryName = 'Nigeria';
+  String _selectedCountryFlag = '🇳🇬';
+  String _selectedStateName = 'FCT';
+  String _selectedCountryCode = '+234';
 
   @override
   void dispose() {
@@ -67,9 +75,15 @@ class _BusinessSellerRegistrationScreenState extends State<BusinessSellerRegistr
             // --- Location Section ---
             _buildSectionHeader("Location"),
             const SizedBox(height: 16),
-            _buildDropdownInput("Country", "Nigeria"),
+            _buildLocationDropdown(label: 'Country', value: _selectedCountryName, flag: _selectedCountryFlag, onTap: () async {
+              final country = await CountryPickerSheet.show(context, selectedCountry: _selectedCountryName);
+              if (country != null) setState(() { _selectedCountryName = country.name; _selectedCountryFlag = country.flag; _selectedCountryCode = country.dialCode; _selectedStateName = ''; });
+            }),
             const SizedBox(height: 20),
-            _buildDropdownInput("State", "FCT"),
+            _buildLocationDropdown(label: 'State', value: _selectedStateName.isEmpty ? 'Select State' : _selectedStateName, onTap: () async {
+              final state = await StatePickerSheet.show(context, countryName: _selectedCountryName, selectedState: _selectedStateName);
+              if (state != null) setState(() => _selectedStateName = state.name);
+            }),
             const SizedBox(height: 20),
             _buildTextInput("City", "Your City", controller: _cityController),
             const SizedBox(height: 20),
@@ -82,11 +96,7 @@ class _BusinessSellerRegistrationScreenState extends State<BusinessSellerRegistr
             const SizedBox(height: 16),
             _buildTextInput("Business Email", "you@example.com", controller: _emailController),
             const SizedBox(height: 20),
-            _buildPhoneInput(
-              "Business Phone Number",
-              "+234",
-              controller: _phoneController,
-            ),          
+            _buildPhoneInputWithPicker("Business Phone Number", controller: _phoneController),          
             const SizedBox(height: 20),
             _buildTextInput("Website URL", "https://example.com", controller: _websiteController),
 
@@ -208,28 +218,45 @@ class _BusinessSellerRegistrationScreenState extends State<BusinessSellerRegistr
     );
   }
 
-  Widget _buildDropdownInput(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(value, style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021))),
-              const Icon(Icons.keyboard_arrow_down, color: Color(0xFF777F84)),
-            ],
-          ),
-        ),
-      ],
-    );
+  Widget _buildLocationDropdown({required String label, required String value, String? flag, required VoidCallback onTap}) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+      const SizedBox(height: 8),
+      GestureDetector(onTap: onTap, child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFFCCCCCC))),
+        child: Row(children: [
+          if (flag != null) ...[Text(flag, style: const TextStyle(fontSize: 20)), const SizedBox(width: 12)],
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)))),
+          const Icon(Icons.keyboard_arrow_down, color: Color(0xFF777F84)),
+        ]),
+      )),
+    ]);
+  }
+
+  Widget _buildPhoneInputWithPicker(String label, {required TextEditingController controller}) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+      const SizedBox(height: 8),
+      Container(height: 49, padding: const EdgeInsets.symmetric(horizontal: 20),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFFCCCCCC))),
+        child: Row(children: [
+          GestureDetector(onTap: () async {
+            final country = await CountryCodePickerSheet.show(context, selectedDialCode: _selectedCountryCode);
+            if (country != null) setState(() { _selectedCountryCode = country.dialCode; _selectedCountryFlag = country.flag; });
+          }, child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(_selectedCountryFlag, style: const TextStyle(fontSize: 18)),
+            const SizedBox(width: 6),
+            Text(_selectedCountryCode, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF241508))),
+            const SizedBox(width: 4),
+            const Icon(Icons.keyboard_arrow_down, size: 18, color: Color(0xFF777F84)),
+          ])),
+          const SizedBox(width: 8),
+          Expanded(child: TextFormField(controller: controller, keyboardType: TextInputType.phone, style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+            decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero, hintText: 'Enter phone number', hintStyle: TextStyle(color: Color(0xFFCCCCCC))))),
+        ]),
+      ),
+    ]);
   }
 
   Widget _buildPhoneInput(String label, String code, {required TextEditingController controller}) {
