@@ -5,21 +5,104 @@ import '../../data/notifications_repository_impl.dart';
 import '../../domain/app_notification.dart';
 import '../../domain/notification_preferences.dart';
 
-final notificationsListProvider = FutureProvider<List<AppNotification>>((ref) async {
-  // Don't fetch if not authenticated
-  final token = ref.watch(accessTokenProvider);
-  if (token == null || token.isEmpty) return const [];
-  
-  return ref.read(notificationsRepositoryProvider).getNotifications();
-});
+/// Optimistic notifications list - updates immediately, syncs with server
+class OptimisticNotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
+  @override
+  Future<List<AppNotification>> build() async {
+    // Don't fetch if not authenticated
+    final token = ref.watch(accessTokenProvider);
+    if (token == null || token.isEmpty) return const [];
+    
+    return ref.read(notificationsRepositoryProvider).getNotifications();
+  }
 
-final unreadCountProvider = FutureProvider<int>((ref) async {
-  // Don't fetch if not authenticated
-  final token = ref.watch(accessTokenProvider);
-  if (token == null || token.isEmpty) return 0;
-  
-  return ref.read(notificationsRepositoryProvider).getUnreadCount();
-});
+  /// Mark a notification as read optimistically
+  void markAsReadOptimistically(int id) {
+    final currentList = state.asData?.value;
+    if (currentList == null) return;
+
+    // Update the list optimistically
+    state = AsyncData(
+      currentList.map((n) {
+        if (n.id == id) {
+          return AppNotification(
+            id: n.id,
+            title: n.title,
+            body: n.body,
+            isRead: true,
+            createdAt: n.createdAt,
+          );
+        }
+        return n;
+      }).toList(),
+    );
+  }
+
+  /// Mark all notifications as read optimistically
+  void markAllAsReadOptimistically() {
+    final currentList = state.asData?.value;
+    if (currentList == null) return;
+
+    state = AsyncData(
+      currentList.map((n) => AppNotification(
+        id: n.id,
+        title: n.title,
+        body: n.body,
+        isRead: true,
+        createdAt: n.createdAt,
+      )).toList(),
+    );
+  }
+
+  /// Refresh the list from server
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() => 
+      ref.read(notificationsRepositoryProvider).getNotifications()
+    );
+  }
+}
+
+final notificationsListProvider = AsyncNotifierProvider<OptimisticNotificationsNotifier, List<AppNotification>>(
+  OptimisticNotificationsNotifier.new,
+);
+
+/// Optimistic unread count - updates immediately
+class OptimisticUnreadCountNotifier extends AsyncNotifier<int> {
+  @override
+  Future<int> build() async {
+    // Don't fetch if not authenticated
+    final token = ref.watch(accessTokenProvider);
+    if (token == null || token.isEmpty) return 0;
+    
+    return ref.read(notificationsRepositoryProvider).getUnreadCount();
+  }
+
+  /// Decrement count optimistically
+  void decrementOptimistically() {
+    final current = state.asData?.value ?? 0;
+    if (current > 0) {
+      state = AsyncData(current - 1);
+    }
+  }
+
+  /// Set count to zero optimistically
+  void setZeroOptimistically() {
+    state = const AsyncData(0);
+  }
+
+  /// Refresh from server
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() => 
+      ref.read(notificationsRepositoryProvider).getUnreadCount()
+    );
+  }
+}
+
+final unreadCountProvider = AsyncNotifierProvider<OptimisticUnreadCountNotifier, int>(
+  OptimisticUnreadCountNotifier.new,
+);
 
 final notificationPreferencesProvider = FutureProvider<NotificationPreferences?>((ref) async {
   // Don't fetch if not authenticated
@@ -68,20 +151,24 @@ class NotificationsActionsController extends AsyncNotifier<void> {
   Future<void> build() async {}
 
   Future<void> markAsRead(int id) async {
-    state = const AsyncLoading();
+    // Optimistic update first
+    ref.read(notificationsListProvider.notifier).markAsReadOptimistically(id);
+    ref.read(unreadCountProvider.notifier).decrementOptimistically();
+
+    // Then sync with server
     state = await AsyncValue.guard(() async {
       await ref.read(notificationsRepositoryProvider).markAsRead(id);
-      ref.invalidate(notificationsListProvider);
-      ref.invalidate(unreadCountProvider);
     });
   }
 
   Future<void> markAllAsRead() async {
-    state = const AsyncLoading();
+    // Optimistic update first
+    ref.read(notificationsListProvider.notifier).markAllAsReadOptimistically();
+    ref.read(unreadCountProvider.notifier).setZeroOptimistically();
+
+    // Then sync with server
     state = await AsyncValue.guard(() async {
       await ref.read(notificationsRepositoryProvider).markAllAsRead();
-      ref.invalidate(notificationsListProvider);
-      ref.invalidate(unreadCountProvider);
     });
   }
 
@@ -89,8 +176,9 @@ class NotificationsActionsController extends AsyncNotifier<void> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       await ref.read(notificationsRepositoryProvider).deleteNotification(id);
-      ref.invalidate(notificationsListProvider);
-      ref.invalidate(unreadCountProvider);
+      // Refresh after delete
+      await ref.read(notificationsListProvider.notifier).refresh();
+      await ref.read(unreadCountProvider.notifier).refresh();
     });
   }
 
