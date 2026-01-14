@@ -226,6 +226,19 @@ class _BlogPostCard extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
+                  post.content,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF777F84),
+                    height: 1.35,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
                   post.createdAt?.toIso8601String().split('T').first ?? '',
                   style: const TextStyle(
                     fontSize: 10,
