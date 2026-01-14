@@ -12,6 +12,8 @@ import 'package:ojaewa/features/product/presentation/controllers/product_details
 import 'package:ojaewa/features/product_detail/presentation/seller_profile.dart';
 import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
 import 'package:ojaewa/features/reviews/presentation/controllers/reviews_controller.dart';
+import 'package:ojaewa/features/wishlist/presentation/controllers/wishlist_controller.dart';
+import 'package:ojaewa/features/wishlist/domain/wishlist_item.dart';
 
 class ProductDetailsScreen extends ConsumerStatefulWidget {
   const ProductDetailsScreen({super.key, required this.productId});
@@ -35,6 +37,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
           data: (d) => d,
           orElse: () => null,
         );
+
+    final wishlistAsync = ref.watch(wishlistProvider);
+    final isWishlisted = wishlistAsync.maybeWhen(
+      data: (items) => items.any(
+        (w) => w.type == WishlistableType.product && w.wishlistableId == widget.productId,
+      ),
+      orElse: () => false,
+    );
 
     final reviewsPage = ref.watch(reviewsProvider((type: 'product', id: widget.productId))).maybeWhen(
           data: (d) => d,
@@ -92,16 +102,27 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                               color: Color(0xFF241508),
                             ),
                           ),
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: const Color(0xFFDEDEDE),
+                          GestureDetector(
+                            onTap: () async {
+                              await ref.read(wishlistActionsProvider.notifier).toggleItem(
+                                    type: WishlistableType.product,
+                                    id: widget.productId,
+                                    isInWishlist: isWishlisted,
+                                  );
+                            },
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: const Color(0xFFDEDEDE)),
+                              ),
+                              child: Icon(
+                                isWishlisted ? Icons.favorite : Icons.favorite_border,
+                                size: 20,
+                                color: const Color(0xFFA15E22),
                               ),
                             ),
-                            child: const Icon(Icons.favorite_border, size: 20),
                           ),
                         ],
                       ),
@@ -316,23 +337,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
   }
 
   Widget _buildImageIndicators() {
-    return Center(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: List.generate(3, (index) {
-          return Container(
-            width: 12,
-            height: 12,
-            margin: EdgeInsets.only(left: index > 0 ? 8 : 0),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: index == currentImageIndex ? const Color(0xFFFDAF40) : Colors.transparent,
-              border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
-            ),
-          );
-        }),
-      ),
-    );
+    // Only one image is supported currently; hide indicators to avoid confusing UX.
+    return const SizedBox.shrink();
   }
 
   Widget _buildSizeSelector(String? backendSizes) {
@@ -582,37 +588,39 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          // Inline: just the top 1 review
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(user, style: const TextStyle(fontSize: 12, color: Color(0xFF3C4042))),
-                  Text(date, style: TextStyle(fontSize: 10, color: Colors.grey[400])),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: List.generate(5, (index) {
-                  return const Icon(Icons.star, size: 11, color: Color(0xFFFFDB80));
-                }),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                headline,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF1E2021),
+          if (reviewCount > 0) ...[
+            const SizedBox(height: 16),
+            // Inline: just the top 1 review
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(user, style: const TextStyle(fontSize: 12, color: Color(0xFF3C4042))),
+                    Text(date, style: TextStyle(fontSize: 10, color: Colors.grey[400])),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(body, style: const TextStyle(fontSize: 14, color: Color(0xFF1E2021))),
-            ],
-          ),
+                const SizedBox(height: 8),
+                Row(
+                  children: List.generate(5, (index) {
+                    return const Icon(Icons.star, size: 11, color: Color(0xFFFFDB80));
+                  }),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  headline,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1E2021),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(body, style: const TextStyle(fontSize: 14, color: Color(0xFF1E2021))),
+              ],
+            ),
+          ],
         ],
       ),
     );

@@ -15,6 +15,18 @@ class WishlistActionsController extends AsyncNotifier<void> {
     return null;
   }
 
+  Future<void> addItem({required WishlistableType type, required int id}) async {
+    state = const AsyncLoading();
+    try {
+      await ref.read(wishlistRepositoryProvider).add(type: type, id: id);
+      ref.invalidate(wishlistProvider);
+      state = const AsyncData(null);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
+  }
+
   Future<void> removeItem({required WishlistableType type, required int id}) async {
     state = const AsyncLoading();
     try {
@@ -24,6 +36,14 @@ class WishlistActionsController extends AsyncNotifier<void> {
     } catch (e, st) {
       state = AsyncError(e, st);
       rethrow;
+    }
+  }
+
+  Future<void> toggleItem({required WishlistableType type, required int id, required bool isInWishlist}) async {
+    if (isInWishlist) {
+      await removeItem(type: type, id: id);
+    } else {
+      await addItem(type: type, id: id);
     }
   }
 }
