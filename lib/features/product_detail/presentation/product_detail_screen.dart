@@ -350,9 +350,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 child: ElevatedButton(
                   onPressed: () async {
                     try {
-                      await ref
-                          .read(cartActionsProvider.notifier)
-                          .addItem(productId: widget.productId, quantity: 1);
+                      final processingTimeType = selectedProcessing.toLowerCase() == 'express' ? 'express' : 'normal';
+                     await ref.read(cartActionsProvider.notifier).addItem(
+                           productId: widget.productId,
+                           quantity: 1,
+                           selectedSize: selectedSize,
+                           processingTimeType: processingTimeType,
+                         );
                       if (!context.mounted) return;
                       Navigator.of(context).pushNamed(AppRoutes.shoppingBag);
                     } catch (_) {

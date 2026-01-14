@@ -43,10 +43,20 @@ class CartActionsController extends AsyncNotifier<void> {
     }
   }
 
-  Future<void> addItem({required int productId, int quantity = 1}) async {
+  Future<void> addItem({
+    required int productId,
+    required String selectedSize,
+    String processingTimeType = 'normal',
+    int quantity = 1,
+  }) async {
     state = const AsyncLoading();
     try {
-      await ref.read(cartRepositoryProvider).addItem(productId: productId, quantity: quantity);
+      await ref.read(cartRepositoryProvider).addItem(
+            productId: productId,
+            quantity: quantity,
+            selectedSize: selectedSize,
+            processingTimeType: processingTimeType,
+          );
       ref.invalidate(cartProvider);
       state = const AsyncData(null);
     } catch (e, st) {

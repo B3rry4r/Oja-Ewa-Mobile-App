@@ -8,6 +8,7 @@ class CartProductSnapshot {
     required this.image,
     required this.price,
     required this.size,
+    required this.processingDays,
     required this.sellerBusinessName,
   });
 
@@ -15,7 +16,13 @@ class CartProductSnapshot {
   final String name;
   final String? image;
   final num? price;
+
+  /// Backend may return a comma-separated string (e.g. "S, M, L, XL")
   final String? size;
+
+  /// Backend product field in cart response.
+  final int? processingDays;
+
   final String? sellerBusinessName;
 
   static CartProductSnapshot fromJson(Map<String, dynamic> json) {
@@ -26,6 +33,7 @@ class CartProductSnapshot {
       image: json['image'] as String?,
       price: json['price'] as num?,
       size: json['size'] as String?,
+      processingDays: (json['processing_days'] as num?)?.toInt(),
       sellerBusinessName: seller is Map<String, dynamic> ? seller['business_name'] as String? : null,
     );
   }
@@ -39,6 +47,8 @@ class CartItem {
     required this.quantity,
     required this.unitPrice,
     required this.subtotal,
+    required this.selectedSize,
+    required this.processingTimeType,
     required this.product,
   });
 
@@ -47,6 +57,11 @@ class CartItem {
   final int quantity;
   final num? unitPrice;
   final num? subtotal;
+
+  /// New cart variant fields
+  final String selectedSize;
+  final String processingTimeType; // normal|express
+
   final CartProductSnapshot product;
 
   static CartItem fromJson(Map<String, dynamic> json) {
@@ -56,6 +71,8 @@ class CartItem {
       quantity: (json['quantity'] as num?)?.toInt() ?? 0,
       unitPrice: json['unit_price'] as num?,
       subtotal: json['subtotal'] as num?,
+      selectedSize: (json['selected_size'] as String?) ?? '',
+      processingTimeType: (json['processing_time_type'] as String?) ?? 'normal',
       product: CartProductSnapshot.fromJson((json['product'] as Map?)?.cast<String, dynamic>() ?? const {}),
     );
   }

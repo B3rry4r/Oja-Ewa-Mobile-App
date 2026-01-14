@@ -19,10 +19,22 @@ class CartApi {
     }
   }
 
-  Future<Cart> addItem({required int productId, required int quantity}) async {
+  Future<Cart> addItem({
+    required int productId,
+    required int quantity,
+    required String selectedSize,
+    String processingTimeType = 'normal',
+  }) async {
     try {
-      final res = await _dio.post('/api/cart/items', data: {'product_id': productId, 'quantity': quantity});
-      // This endpoint returns a wrapper with cart_total/items_count; we refresh the cart afterwards.
+      await _dio.post(
+        '/api/cart/items',
+        data: {
+          'product_id': productId,
+          'quantity': quantity,
+          'selected_size': selectedSize,
+          'processing_time_type': processingTimeType,
+        },
+      );
       // To keep it simple and consistent, just fetch the cart.
       return getCart();
     } catch (e) {

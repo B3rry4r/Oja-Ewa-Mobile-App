@@ -14,7 +14,19 @@ class CartRepositoryImpl implements CartRepository {
   Future<Cart> getCart() => _api.getCart();
 
   @override
-  Future<Cart> addItem({required int productId, required int quantity}) => _api.addItem(productId: productId, quantity: quantity);
+  Future<Cart> addItem({
+    required int productId,
+    required int quantity,
+    required String selectedSize,
+    String processingTimeType = 'normal',
+  }) {
+    return _api.addItem(
+      productId: productId,
+      quantity: quantity,
+      selectedSize: selectedSize,
+      processingTimeType: processingTimeType,
+    );
+  }
 
   @override
   Future<Cart> updateItemQuantity({required int cartItemId, required int quantity}) => _api.updateItemQuantity(cartItemId: cartItemId, quantity: quantity);
