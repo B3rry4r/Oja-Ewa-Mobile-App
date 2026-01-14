@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/features/adverts/presentation/controllers/adverts_controller.dart';
 
 import '../../../app/router/app_router.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
@@ -32,8 +34,8 @@ class HomeScreen extends StatelessWidget {
 
                       const SizedBox(height: 24),
 
-                      // Promo Cards (Horizontal Scroll)
-                      _buildPromoCardsSection(),
+                      // Promo Cards (Horizontal Scroll) - now API driven via /api/adverts
+                      _buildAdvertsOrFallback(ref),
 
                       const SizedBox(height: 32),
 
@@ -148,6 +150,72 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildAdvertsOrFallback(WidgetRef ref) {
+    final advertsAsync = ref.watch(advertsByPositionProvider('banner'));
+
+    return advertsAsync.when(
+      loading: () => const SizedBox(
+        height: 160,
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      ),
+      error: (_, __) => _buildPromoCardsSection(),
+      data: (adverts) {
+        if (adverts.isEmpty) return _buildPromoCardsSection();
+
+        return SizedBox(
+          height: 160,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.only(left: 16),
+            itemCount: adverts.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 16),
+            itemBuilder: (context, index) {
+              final ad = adverts[index];
+              return Container(
+                width: 254,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: const Color(0xFFFDAF40),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: ad.imageUrl == null
+                    ? Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              ad.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black,
+                              ),
+                            ),
+                            if ((ad.description ?? '').trim().isNotEmpty) ...[
+                              const SizedBox(height: 6),
+                              Text(
+                                ad.description!,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                            ],
+                          ],
+                        ),
+                      )
+                    : Image.network(ad.imageUrl!, fit: BoxFit.cover),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 

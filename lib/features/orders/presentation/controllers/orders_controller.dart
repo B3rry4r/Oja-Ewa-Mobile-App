@@ -1,0 +1,48 @@
+import 'dart:async';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../data/orders_repository_impl.dart';
+import '../../domain/order_models.dart';
+
+final ordersProvider = FutureProvider<List<OrderSummary>>((ref) async {
+  return ref.watch(ordersRepositoryProvider).listOrders(page: 1);
+});
+
+class OrderActionsController extends AsyncNotifier<void> {
+  @override
+  FutureOr<void> build() {
+    return null;
+  }
+
+  Future<PaymentLink> createOrderAndPaymentLink({required List<Map<String, dynamic>> items}) async {
+    state = const AsyncLoading();
+    try {
+      final order = await ref.read(ordersRepositoryProvider).createOrder(items: items);
+      final link = await ref.read(ordersRepositoryProvider).createOrderPaymentLink(orderId: order.id);
+      // We intentionally do not clear cart automatically here; backend docs suggest clearing after successful order creation.
+      // We can do it after payment verification.
+      state = const AsyncData(null);
+      ref.invalidate(ordersProvider);
+      return link;
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
+  }
+
+  Future<PaymentVerifyResult> verifyPayment({required String reference}) async {
+    state = const AsyncLoading();
+    try {
+      final res = await ref.read(ordersRepositoryProvider).verifyPayment(reference: reference);
+      state = const AsyncData(null);
+      ref.invalidate(ordersProvider);
+      return res;
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
+  }
+}
+
+final orderActionsProvider = AsyncNotifierProvider<OrderActionsController, void>(OrderActionsController.new);

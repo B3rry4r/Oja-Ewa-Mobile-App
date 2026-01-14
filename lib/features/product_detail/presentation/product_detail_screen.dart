@@ -6,6 +6,7 @@ import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/widgets/info_bottom_sheet.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
+import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
 import 'package:ojaewa/features/product/presentation/controllers/product_details_controller.dart';
 import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
@@ -284,16 +285,23 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
           children: [
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (_) => InfoBottomSheet(
-                      title: 'Info',
-                      content: const Text(''),
-                    ),
-                  );
+                onPressed: () async {
+                  try {
+                    await ref.read(cartActionsProvider.notifier).addItem(productId: widget.productId, quantity: 1);
+                    if (!context.mounted) return;
+                    Navigator.of(context).pushNamed(AppRoutes.shoppingBag);
+                  } catch (_) {
+                    if (!context.mounted) return;
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => InfoBottomSheet(
+                        title: 'Could not add to bag',
+                        content: const Text('Please try again.'),
+                      ),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFA15E22),

@@ -50,22 +50,6 @@ final searchFiltersProvider =
       SearchFiltersController.new,
     );
 
-final searchSuggestionsProvider = FutureProvider<List<SearchProduct>>((
-  ref,
-) async {
-  final f = ref.watch(searchFiltersProvider);
-  return ref
-      .watch(searchRepositoryProvider)
-      .suggestions(
-        limit: 10,
-        gender: f.gender,
-        style: f.style,
-        tribe: f.tribe,
-        priceMin: f.priceMin,
-        priceMax: f.priceMax,
-      );
-});
-
 @immutable
 class SearchState {
   const SearchState({

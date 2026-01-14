@@ -15,6 +15,10 @@ class CategoryScreen extends StatefulWidget {
   /// Called when a subcategory item is tapped.
   final CategoryItemTap? onItemTap;
 
+  /// Optional retry callback used for API-backed categories.
+  /// If provided, the empty state can offer a refresh action.
+  final VoidCallback? onRetry;
+
   /// Whether to show the business type filter in the filter sheet.
   /// (Beauty category needs this.)
   final bool showBusinessTypeFilter;
@@ -27,6 +31,7 @@ class CategoryScreen extends StatefulWidget {
     required this.categoryDescription,
     required this.sections,
     this.onItemTap,
+    this.onRetry,
     this.showBusinessTypeFilter = false,
     this.showHeaderButtons = true,
   });
@@ -68,6 +73,67 @@ class CategorySection {
 class _CategoryScreenState extends State<CategoryScreen> {
   Map<String, bool> _expandedSections = {};
 
+  Widget _buildEmptyState() {
+    final retry = widget.onRetry;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 32),
+      child: Column(
+        children: [
+          // Keep it simple; no redesign, but consistent with other empty states.
+          Container(
+            width: 140,
+            height: 140,
+            decoration: BoxDecoration(
+              color: const Color(0xFFDEDEDE),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Icon(Icons.category_outlined, size: 64, color: Color(0xFF777F84)),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Nothing here yet',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              fontFamily: 'Campton',
+              color: Color(0xFF241508),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'No categories were found for this section.',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              fontFamily: 'Campton',
+              color: Color(0xFF777F84),
+              height: 1.4,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          if (retry != null) ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 46,
+              child: ElevatedButton(
+                onPressed: retry,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFA15E22),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                child: const Text('Retry'),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   // void _onBackPressed() {
   //   Navigator.pop(context);
   // }
@@ -92,6 +158,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
             // Main Content
             Expanded(
               child: Container(
+                width: double.infinity,
                 decoration: const BoxDecoration(
                   color: Color(0xFFFFF8F1),
                   borderRadius: BorderRadius.only(
@@ -115,46 +182,55 @@ class _CategoryScreenState extends State<CategoryScreen> {
   }
 
   Widget _buildContent() {
+    final hasSections = widget.sections.isNotEmpty;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 16),
-          
-          // Category Title
-          Text(
-            widget.categoryTitle,
-            style: const TextStyle(
-              fontSize: 33,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
-              color: Color(0xFF241508),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: double.infinity),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+
+            // Category Title
+            Text(
+              widget.categoryTitle,
+              style: const TextStyle(
+                fontSize: 33,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Campton',
+                color: Color(0xFF241508),
+              ),
             ),
-          ),
-          
-          const SizedBox(height: 4),
-          
-          // Category Description
-          Text(
-            widget.categoryDescription,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              fontFamily: 'Campton',
-              color: Color(0xFF777F84),
+
+            const SizedBox(height: 4),
+
+            // Category Description
+            Text(
+              widget.categoryDescription,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                fontFamily: 'Campton',
+                color: Color(0xFF777F84),
+              ),
             ),
-          ),
-          
-          const SizedBox(height: 28),
-          
-          // Sections
-          ...widget.sections.map((section) {
-            return _buildCategorySection(section);
-          }).expand((widget) => [widget, const SizedBox(height: 0)]),
-          
-          const SizedBox(height: 40),
-        ],
+
+            const SizedBox(height: 28),
+
+            if (!hasSections) _buildEmptyState(),
+
+            if (hasSections) ...[
+              // Sections
+              ...widget.sections.map((section) {
+                return _buildCategorySection(section);
+              }).expand((w) => [w, const SizedBox(height: 0)]),
+            ],
+
+            const SizedBox(height: 40),
+          ],
+        ),
       ),
     );
   }

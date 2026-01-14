@@ -3,7 +3,18 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/core/errors/app_exception.dart';
+
 import '../../data/auth_repository_impl.dart';
+import '../../../account/presentation/controllers/profile_controller.dart';
+import '../../../../core/auth/auth_controller.dart';
+import '../../../account/subfeatures/your_address/presentation/controllers/address_controller.dart';
+import '../../../cart/presentation/controllers/cart_controller.dart';
+import '../../../notifications/presentation/controllers/notifications_controller.dart';
+import '../../../wishlist/presentation/controllers/wishlist_controller.dart';
+import '../../../orders/presentation/controllers/orders_controller.dart';
+import '../../../search/presentation/controllers/search_suggestions_controller.dart';
+import '../../../blog/presentation/controllers/blog_controller.dart';
+import '../../../blog/presentation/controllers/blog_favorites_controller.dart';
 
 /// Presentation-layer controller for auth flows.
 ///
@@ -94,15 +105,48 @@ class AuthFlowController extends AsyncNotifier<void> {
 
   Future<void> logout() async {
     state = const AsyncLoading();
+
     // Logout should never fail from the user's perspective.
     try {
       await ref.read(authRepositoryProvider).logout();
-      state = const AsyncData(null);
     } catch (e, st) {
       // We swallow because local sign-out still completes.
       state = AsyncError(e, st);
+    } finally {
+      // Clear any cached feature data so next session is clean.
+      _invalidateSessionScopedProviders();
       state = const AsyncData(null);
     }
+  }
+
+  void _invalidateSessionScopedProviders() {
+    // Profile / account
+    ref.invalidate(userProfileProvider);
+    ref.invalidate(addressesProvider);
+
+    // Cart
+    ref.invalidate(cartProvider);
+
+    // Notifications
+    ref.invalidate(notificationsListProvider);
+    ref.invalidate(unreadCountProvider);
+    ref.invalidate(notificationPreferencesProvider);
+
+    // Wishlist
+    ref.invalidate(wishlistProvider);
+
+    // Orders
+    ref.invalidate(ordersProvider);
+
+    // Blog favorites are user-specific
+    ref.invalidate(blogFavoritesProvider);
+
+    // Search suggestions can be personalized
+    ref.invalidate(searchSuggestionsProvider);
+
+    // Reset auth state (forces any listeners/interceptors to see unauthenticated)
+    ref.invalidate(authControllerProvider);
+
   }
 
   /// Convenience getter for error message.

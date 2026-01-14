@@ -13,6 +13,7 @@ import 'package:ojaewa/features/product_detail/presentation/product_detail_scree
 
 import '../../../app/router/app_router.dart';
 import 'controllers/search_controller.dart';
+import 'controllers/search_suggestions_controller.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});

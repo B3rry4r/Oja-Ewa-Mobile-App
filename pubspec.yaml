@@ -30,6 +30,7 @@ dependencies:
   intl: ^0.20.2
   firebase_messaging: ^16.0.3
   flutter_svg: ^2.2.3
+  url_launcher: ^6.3.2
   google_sign_in: ^6.3.0
   file_picker: ^8.1.2
   path: ^1.9.1
