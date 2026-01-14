@@ -10,7 +10,6 @@ import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.da
 import 'package:ojaewa/features/product/domain/product.dart';
 import 'package:ojaewa/features/product/presentation/controllers/product_details_controller.dart';
 import 'package:ojaewa/features/product_detail/presentation/seller_profile.dart';
-import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
 import 'package:ojaewa/features/reviews/presentation/controllers/reviews_controller.dart';
 import 'package:ojaewa/features/wishlist/presentation/controllers/wishlist_ids_controller.dart';
 import 'package:ojaewa/features/wishlist/domain/wishlist_item.dart';
@@ -311,7 +310,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 const SizedBox(width: 8),
                 HeaderIconButton(
                   asset: AppIcons.bag,
-                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.cart),
                 ),
               ],
             ),
@@ -749,7 +748,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Added to cart')),
                       );
-                      Navigator.of(context).pushNamed(AppRoutes.shoppingBag);
+                      Navigator.of(context).pushNamed(AppRoutes.cart);
                     } catch (_) {
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(

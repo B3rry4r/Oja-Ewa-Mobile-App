@@ -73,7 +73,7 @@ abstract class AppRoutes {
   static const sustainability = '/sustainability';
 
   // Feature screens
-  static const shoppingBag = '/shopping-bag';
+  static const cart = '/cart';
   static const editProfile = '/edit-profile';
   static const addresses = '/addresses';
   static const addEditAddress = '/add-edit-address';
@@ -364,7 +364,7 @@ abstract class AppRouter {
           builder: (_) => const NotificationsScreen(),
         );
 
-      case AppRoutes.shoppingBag:
+      case AppRoutes.cart:
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const CartScreen(),

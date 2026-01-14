@@ -7,13 +7,33 @@ import '../storage/storage_providers.dart';
 
 /// Adds `Authorization: Bearer <token>` when available.
 ///
-/// Important: Some feature providers can fire network calls very early.
-/// To avoid missing the token during app bootstrap, we try the in-memory
-/// session first, then fall back to secure storage.
+/// Also prevents hitting authenticated endpoints when the user is logged out.
+/// This avoids noisy 401 bursts after logout while screens/providers are still
+/// rebuilding.
 class AuthTokenInterceptor extends Interceptor {
   AuthTokenInterceptor(this._ref);
 
   final Ref _ref;
+
+  static const _publicPrefixes = <String>[
+    '/api/products/public/',
+    '/api/products/browse',
+    '/api/categories',
+    '/api/blogs',
+    '/api/adverts',
+    '/api/sellers/',
+    '/api/sustainability',
+    // auth
+    '/api/login',
+    '/api/register',
+  ];
+
+  bool _isPublicPath(String path) {
+    for (final p in _publicPrefixes) {
+      if (path.startsWith(p)) return true;
+    }
+    return false;
+  }
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
@@ -23,9 +43,32 @@ class AuthTokenInterceptor extends Interceptor {
       // Fallback: if auth state isn't loaded yet, read from secure storage.
       token ??= await _ref.read(secureTokenStorageProvider).readAccessToken();
 
-      if (token != null && token.isNotEmpty) {
-        options.headers[NetworkConstants.authorizationHeader] = NetworkConstants.bearer(token);
+      final path = options.path;
+
+      if (token == null || token.isEmpty) {
+        // Allow public endpoints without auth.
+        if (_isPublicPath(path)) {
+          handler.next(options);
+          return;
+        }
+
+        // Block authenticated endpoints when logged out.
+        handler.reject(
+          DioException(
+            requestOptions: options,
+            type: DioExceptionType.badResponse,
+            response: Response(
+              requestOptions: options,
+              statusCode: 401,
+              data: {'message': 'Unauthenticated (client blocked request)'},
+            ),
+          ),
+          true,
+        );
+        return;
       }
+
+      options.headers[NetworkConstants.authorizationHeader] = NetworkConstants.bearer(token);
     } catch (_) {
       // Never block a request on token read errors.
     }

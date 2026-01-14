@@ -71,7 +71,18 @@ class _CartBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (cart.items.isEmpty) {
-      return const Center(child: Text('Your bag is empty'));
+      return const Center(
+        child: Text(
+          'Your cart is empty.',
+          style: TextStyle(
+            fontSize: 16,
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF1E2021),
+          ),
+          textAlign: TextAlign.center,
+        ),
+      );
     }
 
     return Column(

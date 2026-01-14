@@ -58,7 +58,7 @@ class _BlogScreenState extends ConsumerState<BlogScreen> {
                           HeaderIconButton(
                             asset: AppIcons.bag,
                             iconColor: Colors.white,
-                            onTap: () => Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
+                            onTap: () => Navigator.of(context).pushNamed(AppRoutes.cart),
                           ),
                         ],
                       ),

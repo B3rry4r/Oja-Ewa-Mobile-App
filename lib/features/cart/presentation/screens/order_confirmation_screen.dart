@@ -6,7 +6,7 @@ import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
 import 'package:ojaewa/features/orders/presentation/controllers/orders_controller.dart';
-import 'package:ojaewa/features/shopping_bag/presentation/controllers/checkout_controller.dart';
+import 'package:ojaewa/features/cart/presentation/controllers/checkout_controller.dart';
 
 class OrderConfirmationScreen extends ConsumerStatefulWidget {
   const OrderConfirmationScreen({super.key, this.hasAddress = true});

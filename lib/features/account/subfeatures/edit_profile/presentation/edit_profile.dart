@@ -38,7 +38,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         // Populate once; avoid overwriting user edits.
         if (_nameController.text.isEmpty) _nameController.text = u.fullName;
         if (_emailController.text.isEmpty) _emailController.text = u.email;
-        if (_phoneController.text.isEmpty) _phoneController.text = u.phone ?? '';
+        if (_phoneController.text.isEmpty)
+          _phoneController.text = u.phone ?? '';
       });
     });
 
@@ -82,7 +83,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 ),
                 Expanded(
                   child: profile.when(
-                    loading: () => const Center(child: CircularProgressIndicator()),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
                     error: (e, st) => ErrorStateView(
                       title: 'Could not load your profile',
                       message: 'Please check your connection and try again.',
@@ -95,11 +97,22 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         child: Column(
                           children: [
                             const SizedBox(height: 20),
-                            _buildTextField(label: 'Full Name', controller: _nameController),
+                            _buildTextField(
+                              label: 'Full Name',
+                              controller: _nameController,
+                            ),
                             const SizedBox(height: 19),
-                            _buildTextField(label: 'Email', controller: _emailController, keyboardType: TextInputType.emailAddress),
+                            _buildTextField(
+                              label: 'Email',
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                            ),
                             const SizedBox(height: 19),
-                            _buildTextField(label: 'Phone Number', controller: _phoneController, keyboardType: TextInputType.phone),
+                            _buildTextField(
+                              label: 'Phone Number',
+                              controller: _phoneController,
+                              keyboardType: TextInputType.phone,
+                            ),
                             const SizedBox(height: 60),
                             _buildSaveButton(context, actions),
                             const SizedBox(height: 100),
@@ -183,16 +196,22 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           onTap: actions.isLoading
               ? null
               : () async {
-                  await ref.read(profileActionsProvider.notifier).updateProfile(
+                  await ref
+                      .read(profileActionsProvider.notifier)
+                      .updateProfile(
                         name: _nameController.text.trim(),
                         email: _emailController.text.trim(),
-                        phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
+                        phone: _phoneController.text.trim().isEmpty
+                            ? null
+                            : _phoneController.text.trim(),
                       );
                   if (!mounted) return;
                   if (ref.read(profileActionsProvider).hasError) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(ref.read(profileActionsProvider).error.toString()),
+                        content: Text(
+                          ref.read(profileActionsProvider).error.toString(),
+                        ),
                         backgroundColor: const Color(0xFFFDAF40),
                       ),
                     );
@@ -209,7 +228,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFFFBF5)),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0xFFFFFBF5),
+                    ),
                   )
                 : const Text(
                     'Save Changes',

@@ -64,19 +64,8 @@ class AuthApi {
   /// Because the API docs do not currently document user logout, we try a small
   /// set of common endpoints. Any failure should NOT block local sign-out.
   Future<void> logout() async {
-    // Try each endpoint until one succeeds.
-    for (final path in userLogoutCandidates) {
-      try {
-        await _dio.post(path);
-        return;
-      } catch (e) {
-        // Try next candidate.
-        continue;
-      }
-    }
-
-    // All candidates failed; treat as server logout not supported.
-    return;
+    // Backend contract: POST /api/logout
+    await _dio.post(userLogoutPath);
   }
 
   Future<void> forgotPassword({required String email}) async {

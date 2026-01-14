@@ -69,7 +69,7 @@ class AppHeader extends StatelessWidget {
                   asset: AppIcons.bag,
                   iconColor: iconColor,
                   onTap: () => Navigator.of(context).pushNamed(
-                    AppRoutes.shoppingBag,
+                    AppRoutes.cart,
                   ),
                 ),
               ],

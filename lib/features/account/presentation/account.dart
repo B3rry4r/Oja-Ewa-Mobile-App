@@ -53,7 +53,7 @@ class AccountScreen extends ConsumerWidget {
                           asset: AppIcons.bag,
                           iconColor: Colors.white,
                           onTap: () => Navigator.of(context).pushNamed(
-                            AppRoutes.shoppingBag,
+                            AppRoutes.cart,
                           ),
                         ),
                       ],
@@ -309,7 +309,21 @@ class AccountScreen extends ConsumerWidget {
             color: Colors.transparent,
             child: InkWell(
               onTap: () async {
-                await ref.read(authFlowControllerProvider.notifier).logout();
+                // Overlay loader while logging out
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => const Center(child: CircularProgressIndicator()),
+                );
+                try {
+                  await ref.read(authFlowControllerProvider.notifier).logout();
+                  if (!context.mounted) return;
+                  Navigator.of(context).pop(); // close loader
+                  Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.onboarding, (r) => false);
+                } catch (_) {
+                  if (!context.mounted) return;
+                  Navigator.of(context).pop();
+                }
               },
               borderRadius: BorderRadius.circular(8),
               child: Row(

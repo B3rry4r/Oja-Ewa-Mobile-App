@@ -144,7 +144,7 @@ class HomeScreen extends ConsumerWidget {
               HeaderIconButton(
                 asset: AppIcons.bag,
                 onTap: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
+                    Navigator.of(context).pushNamed(AppRoutes.cart),
               ),
             ],
           ),
