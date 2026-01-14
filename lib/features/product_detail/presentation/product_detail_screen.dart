@@ -233,11 +233,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                       _buildExpandableSection(
                         'About Seller',
                         Icons.add,
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const SellerProfileScreen(),
-                          ),
-                        ),
+                        onTap: () {
+                          final sellerId = details?.sellerProfileId;
+                          if (sellerId == null || sellerId == 0) return;
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => SellerProfileScreen(sellerId: sellerId)),
+                          );
+                        },
                       ),
 
                       const SizedBox(height: 28),

@@ -12,6 +12,7 @@ class ProductDetails {
     required this.image,
     required this.price,
     required this.avgRating,
+    required this.sellerProfileId,
     required this.sellerBusinessName,
     required this.size,
     required this.processingTimeType,
@@ -25,6 +26,7 @@ class ProductDetails {
   final String? image;
   final num? price;
   final num? avgRating;
+  final int? sellerProfileId;
   final String? sellerBusinessName;
   final String? size;
   final String? processingTimeType;
@@ -48,6 +50,7 @@ class ProductDetails {
       image: json['image'] as String?,
       price: parseNum(json['price']),
       avgRating: parseNum(json['avg_rating']),
+      sellerProfileId: seller is Map<String, dynamic> ? (seller['id'] as num?)?.toInt() : (json['seller_profile_id'] as num?)?.toInt(),
       sellerBusinessName: seller is Map<String, dynamic> ? seller['business_name'] as String? : null,
       size: json['size'] as String?,
       processingTimeType: json['processing_time_type'] as String?,
