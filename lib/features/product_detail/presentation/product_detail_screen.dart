@@ -46,18 +46,15 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     final productTitle = (details?.name ?? '').trim();
     final sellerName = (details?.sellerBusinessName ?? '').trim();
     final imageUrl = (details?.image ?? '').trim();
-    final priceLabel = details?.price?.toString() ?? 'N20,000';
+    final priceLabel = details?.price?.toString() ?? '';
 
-    final reviewCount = reviewsPage?.total ?? 4;
-    final avgRating = reviewsPage?.entity.avgRating?.toString() ?? '4.0';
+    final reviewCount = reviewsPage?.total ?? 0;
+    final avgRating = reviewsPage?.entity.avgRating?.toString() ?? '';
 
-    // keep original hardcoded as fallback
-    final reviewUser = (firstReview?.user?.displayName ?? 'Lennox Len');
-    final reviewDate = firstReview?.createdAt == null ? 'Aug 19, 2023' : _formatDate(firstReview!.createdAt!);
-    final reviewHeadline = (firstReview?.headline ?? 'So good');
-    final reviewBody = (firstReview?.body ??
-            'Good customer service, I was at the Spa some times back, the receptionist is ok and their agents are so goos aat what they do. Will use them again')
-        .trim();
+    final reviewUser = (firstReview?.user?.displayName ?? '');
+    final reviewDate = firstReview?.createdAt == null ? '' : _formatDate(firstReview!.createdAt!);
+    final reviewHeadline = (firstReview?.headline ?? '');
+    final reviewBody = (firstReview?.body ?? '').trim();
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
@@ -88,7 +85,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            productTitle.isEmpty ? 'Agbada in Voue' : productTitle,
+                            productTitle,
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w700,
@@ -112,7 +109,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                       const SizedBox(height: 8),
 
                       Text(
-                        'by ${sellerName.isEmpty ? 'Jenny Stitches' : sellerName}',
+                        sellerName.isEmpty ? '' : 'by $sellerName',
                         style: const TextStyle(
                           fontSize: 12,
                           color: Color(0xFF595F63),
@@ -187,7 +184,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                             context,
                             title: 'Description',
                             content: Text(
-                              (details?.description ?? 'No description provided'),
+                              (details?.description ?? ''),
                               style: const TextStyle(
                                 fontFamily: 'Campton',
                                 fontSize: 16,
@@ -619,34 +616,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     final products = suggestions.take(2).map((s) {
       return Product(
         id: ((s['id'] as num?)?.toInt() ?? 0).toString(),
-        title: (s['name'] as String?) ?? 'Agbada in Voue',
-        priceLabel: 'From ${(s['price']?.toString() ?? 'N20,000')}',
-        rating: 4.0,
-        reviewCount: 8,
+        title: (s['name'] as String?) ?? '',
+        priceLabel: (s['price']?.toString() ?? ''),
+        rating: 0,
+        reviewCount: 0,
         imageColor: 0xFFD9D9D9,
       );
     }).toList();
 
     if (products.isEmpty) {
-      const fallback = [
-        Product(
-          id: 'related1',
-          title: 'Agbada in Voue',
-          priceLabel: 'From N20,000',
-          rating: 4.0,
-          reviewCount: 8,
-          imageColor: 0xFFD9D9D9,
-        ),
-        Product(
-          id: 'related2',
-          title: 'Agbada in Voue',
-          priceLabel: 'From N20,000',
-          rating: 4.0,
-          reviewCount: 8,
-          imageColor: 0xFFF5E0CE,
-        ),
-      ];
-      return _buildRelatedList(fallback);
+      return const SizedBox(height: 240);
     }
 
     return _buildRelatedList(products);
@@ -785,7 +764,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                     ),
                   ),
                   Text(
-                    '#25,000',
+                    '',
                     style: TextStyle(
                       fontSize: 10,
                       color: const Color(0xFFE9E9E9).withOpacity(0.6),
