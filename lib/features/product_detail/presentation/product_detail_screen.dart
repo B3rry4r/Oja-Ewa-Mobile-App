@@ -58,8 +58,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     final unitPrice = _parseNum(details?.price);
     final totalPrice = unitPrice == null ? null : (unitPrice * quantity);
 
-    // Keep UI unchanged: we just compute the displayed price value.
-    final priceLabel = totalPrice == null ? '' : 'N${totalPrice.toString()}';
+    // Bottom bar uses total (quantity-aware). One decimal for stability.
+    final priceLabel = totalPrice == null ? '' : 'N${totalPrice.toStringAsFixed(1)}';
+
+    // Processing cards should show unit price (not multiplied) to keep original meaning.
+    final unitPriceLabel = unitPrice == null ? '' : 'N${unitPrice.toStringAsFixed(1)}';
 
     final reviewCount = reviewsPage?.total ?? 0;
     final avgRating = reviewsPage?.entity.avgRating?.toString() ?? '';
@@ -194,7 +197,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
                       const SizedBox(height: 12),
 
-                      _buildProcessingOptions(priceLabel),
+                      _buildProcessingOptions(unitPriceLabel),
 
                       const SizedBox(height: 24),
 
@@ -741,15 +744,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                             processingTimeType: processingTimeType,
                           );
 
-                      // Ensure cart data refreshes immediately.
-                      ref.read(cartActionsProvider.notifier).refresh();
-
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Added to cart')),
                       );
                       Navigator.of(context).pushNamed(AppRoutes.cart);
-                    } catch (_) {
+                    } catch (e) {
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Failed to add to cart')),
