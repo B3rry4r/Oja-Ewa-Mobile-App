@@ -34,17 +34,24 @@ class ProductDetails {
   static ProductDetails fromJson(Map<String, dynamic> json) {
     final seller = json['seller_profile'];
     final suggestionsRaw = json['suggestions'];
+
+    num? parseNum(dynamic v) {
+      if (v is num) return v;
+      if (v is String) return num.tryParse(v);
+      return null;
+    }
+
     return ProductDetails(
       id: (json['id'] as num?)?.toInt() ?? 0,
       name: (json['name'] as String?) ?? '',
       description: json['description'] as String?,
       image: json['image'] as String?,
-      price: json['price'] as num?,
-      avgRating: json['avg_rating'] as num?,
+      price: parseNum(json['price']),
+      avgRating: parseNum(json['avg_rating']),
       sellerBusinessName: seller is Map<String, dynamic> ? seller['business_name'] as String? : null,
       size: json['size'] as String?,
       processingTimeType: json['processing_time_type'] as String?,
-      processingDays: (json['processing_days'] as num?)?.toInt(),
+      processingDays: (parseNum(json['processing_days']) as num?)?.toInt(),
       suggestions: (suggestionsRaw is List) ? suggestionsRaw.whereType<Map<String, dynamic>>().toList() : const [],
     );
   }

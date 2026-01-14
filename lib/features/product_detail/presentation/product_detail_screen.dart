@@ -380,12 +380,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
   }
 
   Widget _buildProcessingOptions(String priceLabel) {
+    final days = ref.read(productDetailsProvider(widget.productId)).maybeWhen(
+          data: (d) => d.processingDays,
+          orElse: () => null,
+        );
+    final duration = days == null ? '' : '$days days';
+
     return Row(
       children: [
         Expanded(
           child: _buildProcessingCard(
             'Normal',
-            '10 days',
+            duration,
             priceLabel,
             isSelected: selectedProcessing == 'Normal',
             onTap: () => setState(() => selectedProcessing = 'Normal'),
@@ -395,7 +401,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
         Expanded(
           child: _buildProcessingCard(
             'Quick Quick',
-            '10 days',
+            duration,
             priceLabel,
             isSelected: selectedProcessing == 'Quick Quick',
             onTap: () => setState(() => selectedProcessing = 'Quick Quick'),
@@ -620,6 +626,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
         priceLabel: (s['price']?.toString() ?? ''),
         rating: 0,
         reviewCount: 0,
+        imageUrl: (s['image'] as String?),
         imageColor: 0xFFD9D9D9,
       );
     }).toList();
