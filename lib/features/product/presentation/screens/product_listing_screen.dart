@@ -444,6 +444,7 @@ class _CategoryItemGrid extends StatelessWidget {
           priceLabel: p.price ?? '',
           rating: (p.avgRating ?? 0).toDouble(),
           reviewCount: 0,
+          imageUrl: p.image,
           imageColor: 0xFFD9D9D9,
         );
       case final CategoryBusinessItem b:

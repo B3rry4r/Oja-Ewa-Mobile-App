@@ -9,6 +9,8 @@ Product toUiProduct(WishlistItem w) {
     priceLabel: priceLabel,
     rating: 0,
     reviewCount: 0,
+    imageUrl: w.imageUrl,
+    imageColor: 0xFFD9D9D9,
     isFavorite: true,
   );
 }

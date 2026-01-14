@@ -428,6 +428,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               priceLabel: item.price?.toString() ?? '',
               rating: (item.avgRating ?? 0).toDouble(),
               reviewCount: 0,
+              imageUrl: item.image,
               imageColor: 0xFFD9D9D9,
             );
 

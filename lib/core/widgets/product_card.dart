@@ -39,17 +39,24 @@ class ProductCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: imageColor,
                 borderRadius: BorderRadius.circular(8),
+                image: (product.imageUrl == null || product.imageUrl!.trim().isEmpty)
+                    ? null
+                    : DecorationImage(
+                        image: NetworkImage(product.imageUrl!),
+                        fit: BoxFit.cover,
+                      ),
               ),
               child: Stack(
                 children: [
-                  const Center(
-                    child: AppImagePlaceholder(
-                      width: 96,
-                      height: 96,
-                      borderRadius: 0,
-                      backgroundColor: Colors.transparent,
+                  if (product.imageUrl == null || product.imageUrl!.trim().isEmpty)
+                    const Center(
+                      child: AppImagePlaceholder(
+                        width: 96,
+                        height: 96,
+                        borderRadius: 0,
+                        backgroundColor: Colors.transparent,
+                      ),
                     ),
-                  ),
                   Positioned(
                     right: 12,
                     bottom: 12,
@@ -65,7 +72,7 @@ class ProductCard extends StatelessWidget {
                         child: const Icon(
                           Icons.shopping_bag_outlined,
                           size: 20,
-                          color: Colors.white,
+                          color: Color(0xFF241508),
                         ),
                       ),
                     ),
