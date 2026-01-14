@@ -26,14 +26,20 @@ class CartProductSnapshot {
   final String? sellerBusinessName;
 
   static CartProductSnapshot fromJson(Map<String, dynamic> json) {
+    num? parseNum(dynamic v) {
+      if (v is num) return v;
+      if (v is String) return num.tryParse(v);
+      return null;
+    }
+
     final seller = json['seller_profile'];
     return CartProductSnapshot(
-      id: (json['id'] as num?)?.toInt() ?? 0,
+      id: (parseNum(json['id']) as num?)?.toInt() ?? 0,
       name: (json['name'] as String?) ?? '',
       image: json['image'] as String?,
-      price: json['price'] as num?,
+      price: parseNum(json['price']),
       size: json['size'] as String?,
-      processingDays: (json['processing_days'] as num?)?.toInt(),
+      processingDays: (parseNum(json['processing_days']) as num?)?.toInt(),
       sellerBusinessName: seller is Map<String, dynamic> ? seller['business_name'] as String? : null,
     );
   }
@@ -65,12 +71,18 @@ class CartItem {
   final CartProductSnapshot product;
 
   static CartItem fromJson(Map<String, dynamic> json) {
+    num? parseNum(dynamic v) {
+      if (v is num) return v;
+      if (v is String) return num.tryParse(v);
+      return null;
+    }
+
     return CartItem(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      productId: (json['product_id'] as num?)?.toInt() ?? 0,
-      quantity: (json['quantity'] as num?)?.toInt() ?? 0,
-      unitPrice: json['unit_price'] as num?,
-      subtotal: json['subtotal'] as num?,
+      id: (parseNum(json['id']) as num?)?.toInt() ?? 0,
+      productId: (parseNum(json['product_id']) as num?)?.toInt() ?? 0,
+      quantity: (parseNum(json['quantity']) as num?)?.toInt() ?? 0,
+      unitPrice: parseNum(json['unit_price']),
+      subtotal: parseNum(json['subtotal']),
       selectedSize: (json['selected_size'] as String?) ?? '',
       processingTimeType: (json['processing_time_type'] as String?) ?? 'normal',
       product: CartProductSnapshot.fromJson((json['product'] as Map?)?.cast<String, dynamic>() ?? const {}),
@@ -93,6 +105,12 @@ class Cart {
   final int itemsCount;
 
   static Cart fromWrappedResponse(Map<String, dynamic> json) {
+    num? parseNum(dynamic v) {
+      if (v is num) return v;
+      if (v is String) return num.tryParse(v);
+      return null;
+    }
+
     final data = json['data'];
     final payload = data is Map<String, dynamic> ? data : json;
 
@@ -102,10 +120,10 @@ class Cart {
         : const <CartItem>[];
 
     return Cart(
-      cartId: (payload['cart_id'] as num?)?.toInt() ?? 0,
+      cartId: (parseNum(payload['cart_id']) as num?)?.toInt() ?? 0,
       items: items,
-      total: (payload['total'] as num?) ?? 0,
-      itemsCount: (payload['items_count'] as num?)?.toInt() ?? 0,
+      total: parseNum(payload['total']) ?? 0,
+      itemsCount: (parseNum(payload['items_count']) as num?)?.toInt() ?? 0,
     );
   }
 }
