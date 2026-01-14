@@ -19,7 +19,8 @@ class ProductDetailsScreen extends ConsumerStatefulWidget {
   final int productId;
 
   @override
-  ConsumerState<ProductDetailsScreen> createState() => _ProductDetailScreenState();
+  ConsumerState<ProductDetailsScreen> createState() =>
+      _ProductDetailScreenState();
 }
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
@@ -42,14 +43,19 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Text('Failed to load product', style: Theme.of(context).textTheme.bodyMedium),
+            child: Text(
+              'Failed to load product',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ),
         ),
       ),
       data: (details) {
         final title = details.name;
         final seller = details.sellerBusinessName;
-        final byLine = (seller == null || seller.trim().isEmpty) ? '' : 'by $seller';
+        final byLine = (seller == null || seller.trim().isEmpty)
+            ? ''
+            : 'by $seller';
 
         return Scaffold(
           backgroundColor: const Color(0xFFFFF8F1),
@@ -99,7 +105,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                                     color: const Color(0xFFDEDEDE),
                                   ),
                                 ),
-                                child: const Icon(Icons.favorite_border, size: 20),
+                                child: const Icon(
+                                  Icons.favorite_border,
+                                  size: 20,
+                                ),
                               ),
                             ],
                           ),
@@ -183,7 +192,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                                 context,
                                 title: 'Description',
                                 content: Text(
-                                  (details.description ?? 'No description provided'),
+                                  (details.description ??
+                                      'No description provided'),
                                   style: const TextStyle(
                                     fontFamily: 'Campton',
                                     fontSize: 16,
@@ -284,12 +294,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
               children: [
                 HeaderIconButton(
                   asset: AppIcons.notification,
-                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.notifications),
                 ),
                 const SizedBox(width: 8),
                 HeaderIconButton(
                   asset: AppIcons.bag,
-                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.shoppingBag),
                 ),
               ],
             ),
@@ -309,9 +321,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: const BoxDecoration(
           color: Color(0xFFFFF8F1),
-          border: Border(
-            top: BorderSide(color: Color(0xFFDEDEDE)),
-          ),
+          border: Border(top: BorderSide(color: Color(0xFFDEDEDE))),
         ),
         child: Row(
           children: [
@@ -321,10 +331,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
               children: [
                 const Text(
                   'Price',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Color(0xFF777F84),
-                  ),
+                  style: TextStyle(fontSize: 10, color: Color(0xFF777F84)),
                 ),
                 Text(
                   priceLabel,
@@ -343,7 +350,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 child: ElevatedButton(
                   onPressed: () async {
                     try {
-                      await ref.read(cartActionsProvider.notifier).addItem(productId: widget.productId, quantity: 1);
+                      await ref
+                          .read(cartActionsProvider.notifier)
+                          .addItem(productId: widget.productId, quantity: 1);
                       if (!context.mounted) return;
                       Navigator.of(context).pushNamed(AppRoutes.shoppingBag);
                     } catch (_) {
@@ -385,7 +394,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
       alignment: Alignment.center,
       child: imageUrl == null
           ? const Icon(Icons.image, size: 72, color: Colors.white)
-          : Image.network(imageUrl, fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+          : Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+            ),
     );
   }
 
@@ -401,7 +415,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
             height: 8,
             margin: const EdgeInsets.symmetric(horizontal: 4),
             decoration: BoxDecoration(
-              color: isActive ? const Color(0xFFA15E22) : const Color(0xFFDEDEDE),
+              color: isActive
+                  ? const Color(0xFFA15E22)
+                  : const Color(0xFFDEDEDE),
               borderRadius: BorderRadius.circular(4),
             ),
           );
@@ -432,7 +448,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: isSelected ? const Color(0xFFFFFBF5) : const Color(0xFF241508),
+                  color: isSelected
+                      ? const Color(0xFFFFFBF5)
+                      : const Color(0xFF241508),
                 ),
               ),
             ),
@@ -456,19 +474,30 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: isSelected ? const Color(0xFF241508) : const Color(0xFFDEDEDE)),
+                border: Border.all(
+                  color: isSelected
+                      ? const Color(0xFF241508)
+                      : const Color(0xFFDEDEDE),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     opt,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF241508)),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF241508),
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     opt == 'Normal' ? '5-7 days' : '2-3 days',
-                    style: const TextStyle(fontSize: 10, color: Color(0xFF777F84)),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Color(0xFF777F84),
+                    ),
                   ),
                 ],
               ),
@@ -479,7 +508,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     );
   }
 
-  Widget _buildExpandableSection(String title, IconData icon, {required VoidCallback onTap}) {
+  Widget _buildExpandableSection(
+    String title,
+    IconData icon, {
+    required VoidCallback onTap,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: GestureDetector(
@@ -487,16 +520,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
         child: Container(
           height: 50,
           decoration: const BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: Color(0xFFDEDEDE)),
-            ),
+            border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE))),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 title,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1E2021)),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1E2021),
+                ),
               ),
               Icon(icon, size: 20, color: const Color(0xFF777F84)),
             ],
@@ -513,7 +548,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => const ReviewsScreen(),
-          settings: RouteSettings(arguments: {'type': 'product', 'id': productId}),
+          settings: RouteSettings(
+            arguments: {'type': 'product', 'id': productId},
+          ),
         ),
       ),
     );
@@ -552,7 +589,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
               final id = int.tryParse(p.id);
               if (id == null) return;
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => ProductDetailsScreen(productId: id)),
+                MaterialPageRoute(
+                  builder: (_) => ProductDetailsScreen(productId: id),
+                ),
               );
             },
             onFavoriteTap: () {},
