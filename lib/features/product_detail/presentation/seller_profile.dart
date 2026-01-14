@@ -5,6 +5,8 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
 import 'package:ojaewa/features/sellers/presentation/controllers/public_seller_controller.dart';
+import 'package:ojaewa/features/sellers/presentation/controllers/public_seller_products_controller.dart';
+import 'package:ojaewa/features/product_detail/presentation/product_detail_screen.dart';
 
 class SellerProfileScreen extends ConsumerWidget {
   const SellerProfileScreen({super.key, required this.sellerId});
@@ -14,7 +16,7 @@ class SellerProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sellerAsync = ref.watch(publicSellerProfileProvider(sellerId));
-    final productsAsync = ref.watch(publicSellerProductsProvider(sellerId));
+    final productsAsync = ref.watch(publicSellerProductsPagedProvider((sellerId: sellerId)));
 
     return Scaffold(
       backgroundColor: const Color(0xFF603814),
@@ -171,8 +173,8 @@ class SellerProfileScreen extends ConsumerWidget {
                               child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
                             ),
                             error: (_, __) => const Text('Failed to load products'),
-                            data: (products) {
-                              final items = products
+                            data: (state) {
+                              final items = state.items
                                   .map(
                                     (p) => Product(
                                       id: p.id.toString(),
@@ -190,24 +192,55 @@ class SellerProfileScreen extends ConsumerWidget {
                                 return const Text('No products yet');
                               }
 
-                              return GridView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 10,
-                                  mainAxisSpacing: 6,
-                                  mainAxisExtent: 248,
-                                ),
-                                itemCount: items.length,
-                                itemBuilder: (context, index) {
-                                  final prod = items[index];
-                                  return ProductCard(
-                                    product: prod,
-                                    onTap: () {},
-                                    onFavoriteTap: () {},
-                                  );
-                                },
+                              return Column(
+                                children: [
+                                  GridView.builder(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 6,
+                                      mainAxisExtent: 248,
+                                    ),
+                                    itemCount: items.length,
+                                    itemBuilder: (context, index) {
+                                      final prod = items[index];
+                                      return ProductCard(
+                                        product: prod,
+                                        onTap: () {
+                                          final id = int.tryParse(prod.id);
+                                          if (id == null) return;
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(builder: (_) => ProductDetailsScreen(productId: id)),
+                                          );
+                                        },
+                                        onFavoriteTap: () {},
+                                      );
+                                    },
+                                  ),
+                                  if (state.hasMore) ...[
+                                    const SizedBox(height: 12),
+                                    SizedBox(
+                                      height: 46,
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        onPressed: state.isLoadingMore
+                                            ? null
+                                            : () => ref
+                                                .read(publicSellerProductsPagedProvider((sellerId: sellerId)).notifier)
+                                                .loadMore(),
+                                        child: state.isLoadingMore
+                                            ? const SizedBox(
+                                                width: 18,
+                                                height: 18,
+                                                child: CircularProgressIndicator(strokeWidth: 2),
+                                              )
+                                            : const Text('Load more'),
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               );
                             },
                           ),

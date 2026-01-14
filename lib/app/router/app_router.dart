@@ -41,8 +41,8 @@ import '../../features/account/subfeatures/your_order/presentation/order_details
 import '../../features/account/subfeatures/your_order/presentation/tracking_order.dart';
 import '../../features/account/subfeatures/your_order/presentation/your_order.dart';
 import '../../features/notifications/presentation/notifications.dart';
-import '../../features/shopping_bag/presentation/shopping_bag_screen.dart';
-import '../../features/shopping_bag/presentation/order_confirmation.dart';
+import '../../features/cart/presentation/screens/cart_screen.dart';
+import '../../features/cart/presentation/screens/order_confirmation_screen.dart';
 import '../../features/review_submission/presentation/review_submission.dart';
 import '../../features/product_detail/presentation/reviews.dart';
 import '../../features/your_shop/presentation/shop_dashboard.dart';
@@ -367,7 +367,7 @@ abstract class AppRouter {
       case AppRoutes.shoppingBag:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const ShoppingBagScreen(),
+          builder: (_) => const CartScreen(),
         );
 
       case AppRoutes.orderConfirmation:
