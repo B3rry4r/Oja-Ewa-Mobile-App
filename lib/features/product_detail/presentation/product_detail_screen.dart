@@ -50,7 +50,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     final productTitle = (details?.name ?? '').trim();
     final sellerName = (details?.sellerBusinessName ?? '').trim();
     final imageUrl = (details?.image ?? '').trim();
-    final priceLabel = details?.price?.toString() ?? '';
+    num? _parseNum(dynamic v) {
+      if (v is num) return v;
+      if (v is String) return num.tryParse(v);
+      return null;
+    }
+
+    final unitPrice = _parseNum(details?.price);
+    final totalPrice = unitPrice == null ? null : (unitPrice * quantity);
+
+    // Keep UI unchanged: we just compute the displayed price value.
+    final priceLabel = totalPrice == null ? '' : 'N${totalPrice.toString()}';
 
     final reviewCount = reviewsPage?.total ?? 0;
     final avgRating = reviewsPage?.entity.avgRating?.toString() ?? '';
@@ -724,14 +734,28 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                         ? 'express'
                         : 'normal';
 
-                    await ref.read(cartActionsProvider.notifier).addItem(
-                          productId: widget.productId,
-                          quantity: quantity,
-                          selectedSize: selectedSize,
-                          processingTimeType: processingTimeType,
-                        );
-                    if (!context.mounted) return;
-                    Navigator.of(context).pushNamed(AppRoutes.shoppingBag);
+                    try {
+                      await ref.read(cartActionsProvider.notifier).addItem(
+                            productId: widget.productId,
+                            quantity: quantity,
+                            selectedSize: selectedSize,
+                            processingTimeType: processingTimeType,
+                          );
+
+                      // Ensure cart data refreshes immediately.
+                      ref.read(cartActionsProvider.notifier).refresh();
+
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Added to cart')),
+                      );
+                      Navigator.of(context).pushNamed(AppRoutes.shoppingBag);
+                    } catch (_) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Failed to add to cart')),
+                      );
+                    }
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 20),
