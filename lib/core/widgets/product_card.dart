@@ -39,15 +39,19 @@ class ProductCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: imageColor,
                 borderRadius: BorderRadius.circular(8),
-                image: (product.imageUrl == null || product.imageUrl!.trim().isEmpty)
-                    ? null
-                    : DecorationImage(
-                        image: NetworkImage(product.imageUrl!),
-                        fit: BoxFit.cover,
-                      ),
               ),
               child: Stack(
+                fit: StackFit.expand,
                 children: [
+                  if (product.imageUrl != null && product.imageUrl!.trim().isNotEmpty)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        product.imageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(color: imageColor),
+                      ),
+                    ),
                   if (product.imageUrl == null || product.imageUrl!.trim().isEmpty)
                     const Center(
                       child: AppImagePlaceholder(

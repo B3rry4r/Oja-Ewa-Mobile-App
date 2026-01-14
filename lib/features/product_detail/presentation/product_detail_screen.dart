@@ -12,7 +12,7 @@ import 'package:ojaewa/features/product/presentation/controllers/product_details
 import 'package:ojaewa/features/product_detail/presentation/seller_profile.dart';
 import 'package:ojaewa/features/product_detail/presentation/reviews.dart';
 import 'package:ojaewa/features/reviews/presentation/controllers/reviews_controller.dart';
-import 'package:ojaewa/features/wishlist/presentation/controllers/wishlist_controller.dart';
+import 'package:ojaewa/features/wishlist/presentation/controllers/wishlist_ids_controller.dart';
 import 'package:ojaewa/features/wishlist/domain/wishlist_item.dart';
 
 class ProductDetailsScreen extends ConsumerStatefulWidget {
@@ -38,13 +38,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
           orElse: () => null,
         );
 
-    final wishlistAsync = ref.watch(wishlistProvider);
-    final isWishlisted = wishlistAsync.maybeWhen(
-      data: (items) => items.any(
-        (w) => w.type == WishlistableType.product && w.wishlistableId == widget.productId,
-      ),
-      orElse: () => false,
-    );
+    final isWishlisted = ref.watch(isWishlistedProvider((type: WishlistableType.product, id: widget.productId)));
 
     final reviewsPage = ref.watch(reviewsProvider((type: 'product', id: widget.productId))).maybeWhen(
           data: (d) => d,
@@ -104,10 +98,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                           ),
                           GestureDetector(
                             onTap: () async {
-                              await ref.read(wishlistActionsProvider.notifier).toggleItem(
+                              await ref.read(wishlistIdsProvider.notifier).toggle(
                                     type: WishlistableType.product,
                                     id: widget.productId,
-                                    isInWishlist: isWishlisted,
                                   );
                             },
                             child: Container(
