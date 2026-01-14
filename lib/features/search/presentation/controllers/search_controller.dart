@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import '../../data/search_repository_impl.dart';
 import '../../domain/search_product.dart';
 
@@ -99,73 +100,35 @@ class SearchState {
 
 typedef SearchArgs = ({String query, SearchFilters filters});
 
-final searchProvider =
-    AsyncNotifierProvider.family<SearchController, SearchState, SearchArgs>(
-      SearchController.new,
-    );
-
-class SearchController extends AsyncNotifier<SearchState> {
-  SearchController(this._args);
-
-  final SearchArgs _args;
-
-  @override
-  Future<SearchState> build() async {
-    final q = _args.query.trim();
-    if (q.isEmpty) return SearchState.empty;
-
-    final f = _args.filters;
-    final page = await ref
-        .watch(searchRepositoryProvider)
-        .searchProducts(
-          query: q,
-          page: 1,
-          perPage: 10,
-          gender: f.gender,
-          style: f.style,
-          tribe: f.tribe,
-          priceMin: f.priceMin,
-          priceMax: f.priceMax,
-        );
-    return SearchState(
-      query: q,
-      page: page.currentPage,
-      perPage: page.perPage,
-      total: page.total,
-      items: page.items,
-    );
+/// Search provider - returns empty if not authenticated or no query
+final searchProvider = FutureProvider.family<SearchState, SearchArgs>((ref, args) async {
+  // Check authentication - search requires auth
+  final token = ref.read(accessTokenProvider);
+  if (token == null || token.isEmpty) {
+    return SearchState.empty;
   }
 
-  Future<void> loadMore() async {
-    final current = state.asData?.value;
-    if (current == null) return;
-    if (current.isLoadingMore || !current.hasMore) return;
+  final q = args.query.trim();
+  if (q.isEmpty) return SearchState.empty;
 
-    state = AsyncData(current.copyWith(isLoadingMore: true));
-
-    final nextPage = current.page + 1;
-    final f = _args.filters;
-    final res = await ref
-        .read(searchRepositoryProvider)
-        .searchProducts(
-          query: current.query,
-          page: nextPage,
-          perPage: current.perPage,
-          gender: f.gender,
-          style: f.style,
-          tribe: f.tribe,
-          priceMin: f.priceMin,
-          priceMax: f.priceMax,
-        );
-
-    state = AsyncData(
-      current.copyWith(
-        page: res.currentPage,
-        perPage: res.perPage,
-        total: res.total,
-        items: [...current.items, ...res.items],
-        isLoadingMore: false,
-      ),
-    );
-  }
-}
+  final f = args.filters;
+  final page = await ref
+      .read(searchRepositoryProvider)
+      .searchProducts(
+        query: q,
+        page: 1,
+        perPage: 10,
+        gender: f.gender,
+        style: f.style,
+        tribe: f.tribe,
+        priceMin: f.priceMin,
+        priceMax: f.priceMax,
+      );
+  return SearchState(
+    query: q,
+    page: page.currentPage,
+    perPage: page.perPage,
+    total: page.total,
+    items: page.items,
+  );
+});

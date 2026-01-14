@@ -14,8 +14,6 @@ class NotificationsSettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final prefs = ref.watch(notificationPreferencesProvider);
-
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
@@ -40,7 +38,7 @@ class NotificationsSettingsScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     const SizedBox(height: 24),
-                    _buildNotificationsList(context, ref, prefs),
+                    _buildNotificationsList(context, ref),
                     Align(
                       alignment: Alignment.centerRight,
                       child: Opacity(
@@ -66,30 +64,37 @@ class NotificationsSettingsScreen extends ConsumerWidget {
   Widget _buildNotificationsList(
     BuildContext context,
     WidgetRef ref,
-    AsyncValue<NotificationPreferences> prefs,
   ) {
-    return prefs.when(
-      loading: () => const Padding(
+    // Use optimistic provider for immediate UI updates
+    final prefs = ref.watch(optimisticPreferencesProvider);
+    final isLoading = ref.watch(notificationPreferencesProvider).isLoading && prefs == null;
+    final hasError = ref.watch(notificationPreferencesProvider).hasError && prefs == null;
+
+    if (isLoading) {
+      return const Padding(
         padding: EdgeInsets.symmetric(vertical: 24),
         child: Center(
           child: CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation(Color(0xFFFDAF40)),
           ),
         ),
-      ),
-      error: (e, st) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          AppSnackbars.showError(context, UiErrorMessage.from(e));
-        });
-        return Center(
-          child: ElevatedButton(
-            onPressed: () => ref.invalidate(notificationPreferencesProvider),
-            child: const Text('Retry'),
-          ),
-        );
-      },
+      );
+    }
 
-      data: (p) {
+    if (hasError) {
+      return Center(
+        child: ElevatedButton(
+          onPressed: () => ref.invalidate(notificationPreferencesProvider),
+          child: const Text('Retry'),
+        ),
+      );
+    }
+
+    if (prefs == null) {
+      return const Center(child: Text('Not logged in'));
+    }
+
+    final p = prefs;
         final items = <_PrefItem>[
           _PrefItem(
             title: 'Allow Push Notifications',
@@ -118,16 +123,14 @@ class NotificationsSettingsScreen extends ConsumerWidget {
           ),
         ];
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            children: [
-              const SizedBox(height: 16),
-              for (final item in items) _buildPrefRow(context: context, ref: ref, item: item),
-            ],
-          ),
-        );
-      },
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          const SizedBox(height: 16),
+          for (final item in items) _buildPrefRow(context: context, ref: ref, item: item),
+        ],
+      ),
     );
   }
 
@@ -164,29 +167,30 @@ class NotificationsSettingsScreen extends ConsumerWidget {
                 AppSnackbars.showError(context, UiErrorMessage.from(e));
               });
             },
-            child: Container(
-              width: 62,
-              height: 38,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 48,
+              height: 28,
               decoration: BoxDecoration(
-                color: const Color(0xFFE9E9E9),
-                borderRadius: BorderRadius.circular(20),
+                color: item.value ? const Color(0xFFA15E22) : const Color(0xFFD9CFC5),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: AnimatedAlign(
                 duration: const Duration(milliseconds: 200),
                 alignment: item.value ? Alignment.centerRight : Alignment.centerLeft,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
                   child: Container(
-                    width: 31,
-                    height: 31,
+                    width: 24,
+                    height: 24,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFBFBFB),
-                      borderRadius: BorderRadius.circular(15.5),
+                      color: item.value ? const Color(0xFFFDAF40) : const Color(0xFFFFF8F1),
+                      borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 3,
+                          offset: const Offset(0, 1),
                         ),
                       ],
                     ),

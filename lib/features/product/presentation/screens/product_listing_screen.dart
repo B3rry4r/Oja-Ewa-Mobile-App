@@ -8,11 +8,15 @@ import 'package:ojaewa/core/widgets/product_card.dart';
 import 'package:ojaewa/features/categories/domain/category_items.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
+import 'package:ojaewa/features/product/domain/product_filters.dart';
+import 'package:ojaewa/features/product/presentation/controllers/product_filters_controller.dart';
+import 'package:ojaewa/features/product/presentation/controllers/filtered_products_controller.dart';
 import 'package:ojaewa/features/product_detail/presentation/product_detail_screen.dart';
 import 'package:ojaewa/features/business_details/presentation/screens/business_details_screen.dart';
 import 'package:ojaewa/features/sustainability_details/presentation/screens/sustainability_details_screen.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/filter_sheet.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/sort_sheet.dart';
+import 'package:ojaewa/features/search/domain/search_product.dart';
 
 /// Product listing screen used for category browsing.
 ///
@@ -41,7 +45,8 @@ class ProductListingScreen extends ConsumerStatefulWidget {
   final void Function(BuildContext context)? onProductTap;
 
   @override
-  ConsumerState<ProductListingScreen> createState() => _ProductListingScreenState();
+  ConsumerState<ProductListingScreen> createState() =>
+      _ProductListingScreenState();
 }
 
 class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
@@ -67,13 +72,48 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
 
     // Trigger prefetch a bit before reaching the bottom.
     if (current >= max - 250) {
-      ref.read(categoryItemsProvider((type: widget.type, slug: widget.slug)).notifier).loadMore();
+      final filters = ref.read(selectedFiltersProvider);
+      if (!filters.hasFilters && !filters.hasSort) {
+        // Only paginate category items (filtered products don't support pagination yet)
+        ref
+            .read(
+              categoryItemsProvider((
+                type: widget.type,
+                slug: widget.slug,
+              )).notifier,
+            )
+            .loadMore();
+      }
     }
+  }
+
+  void _onFiltersChanged() {
+    // Refresh the filtered products when filters change
+    ref.invalidate(
+      filteredProductsProvider((
+        categorySlug: widget.slug,
+        categoryName: widget.pageTitle,
+      )),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final itemsAsync = ref.watch(categoryItemsProvider((type: widget.type, slug: widget.slug)));
+    final selectedFilters = ref.watch(selectedFiltersProvider);
+    final hasActiveFilters =
+        selectedFilters.hasFilters || selectedFilters.hasSort;
+
+    final categoryItemsAsync = ref.watch(
+      categoryItemsProvider((type: widget.type, slug: widget.slug)),
+    );
+    final filteredAsync = hasActiveFilters
+        ? ref.watch(
+            filteredProductsProvider((
+              categorySlug: widget.slug,
+              categoryName: widget.pageTitle,
+            )),
+          )
+        : null;
 
     return Scaffold(
       backgroundColor: const Color(0xFF603814),
@@ -88,8 +128,9 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                   color: Color(0xFFFFF8F1),
                   borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
                 ),
-                child: itemsAsync.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                child: categoryItemsAsync.when(
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (e, _) => Center(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -99,8 +140,10 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                       ),
                     ),
                   ),
-                  data: (state) {
-                    final childrenAsync = ref.watch(categoryChildrenProvider(state.category.id));
+                  data: (categoryState) {
+                    final childrenAsync = ref.watch(
+                      categoryChildrenProvider(categoryState.category.id),
+                    );
 
                     return SingleChildScrollView(
                       controller: _scrollController,
@@ -138,18 +181,44 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                           childrenAsync.when(
                             loading: () => const SizedBox(
                               height: 42,
-                              child: Center(child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))),
+                              child: Center(
+                                child: SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              ),
                             ),
                             error: (e, _) => const SizedBox(height: 42),
                             data: (children) {
-                              final pillNames = <String>['All', ...children.map((c) => c.name)];
+                              final pillNames = <String>[
+                                'All',
+                                ...children.map((c) => c.name),
+                              ];
                               return _CategoryPills(
                                 pills: pillNames,
                                 onTap: (name) {
-                                  // Note: We keep UI behavior but we can only load by slug.
-                                  // If a child pill is tapped, navigate to the child slug.
-                                  if (name == 'All') return;
-                                  final child = children.where((c) => c.name == name).cast().firstOrNull;
+                                  // Clear filters when changing category
+                                  ref
+                                      .read(selectedFiltersProvider.notifier)
+                                      .clearAll();
+
+                                  if (name == 'All') {
+                                    // Refresh current category without filters
+                                    ref.invalidate(
+                                      categoryItemsProvider((
+                                        type: widget.type,
+                                        slug: widget.slug,
+                                      )),
+                                    );
+                                    return;
+                                  }
+                                  final child = children
+                                      .where((c) => c.name == name)
+                                      .cast()
+                                      .firstOrNull;
                                   if (child == null) return;
                                   Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(
@@ -158,7 +227,8 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                                         slug: child.slug,
                                         pageTitle: child.name,
                                         breadcrumb: widget.breadcrumb,
-                                        showBusinessTypeFilter: widget.showBusinessTypeFilter,
+                                        showBusinessTypeFilter:
+                                            widget.showBusinessTypeFilter,
                                         onProductTap: widget.onProductTap,
                                       ),
                                     ),
@@ -170,46 +240,69 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
 
                           const SizedBox(height: 16),
 
-                          _SortFilterRow(showBusinessTypeFilter: widget.showBusinessTypeFilter),
+                          _SortFilterRow(
+                            showBusinessTypeFilter:
+                                widget.showBusinessTypeFilter,
+                            onFiltersChanged: _onFiltersChanged,
+                          ),
 
                           const SizedBox(height: 24),
 
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: _CategoryItemGrid(
-                              type: widget.type,
-                              items: state.items,
-                              hasMore: state.hasMore,
-                              isLoadingMore: state.isLoadingMore,
-                              onTap: (context, tapped) {
-                                final handler = widget.onProductTap;
-                                if (handler != null) {
-                                  handler(context);
-                                  return;
-                                }
+                          // Show filtered products or category items based on filter state
+                          if (hasActiveFilters && filteredAsync != null)
+                            _buildFilteredProductsGrid(filteredAsync)
+                          else
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: _CategoryItemGrid(
+                                type: widget.type,
+                                items: categoryState.items,
+                                hasMore: categoryState.hasMore,
+                                isLoadingMore: categoryState.isLoadingMore,
+                                onTap: (context, tapped) {
+                                  final handler = widget.onProductTap;
+                                  if (handler != null) {
+                                    handler(context);
+                                    return;
+                                  }
 
-                                if (tapped is CategoryProductItem) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(builder: (_) => ProductDetailsScreen(productId: tapped.id)),
-                                  );
-                                  return;
-                                }
+                                  if (tapped is CategoryProductItem) {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => ProductDetailsScreen(
+                                          productId: tapped.id,
+                                        ),
+                                      ),
+                                    );
+                                    return;
+                                  }
 
-                                if (tapped is CategoryBusinessItem) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(builder: (_) => BusinessDetailsScreen(businessId: tapped.id)),
-                                  );
-                                  return;
-                                }
+                                  if (tapped is CategoryBusinessItem) {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => BusinessDetailsScreen(
+                                          businessId: tapped.id,
+                                        ),
+                                      ),
+                                    );
+                                    return;
+                                  }
 
-                                if (tapped is CategoryInitiativeItem) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(builder: (_) => SustainabilityDetailsScreen(initiativeId: tapped.id)),
-                                  );
-                                }
-                              },
+                                  if (tapped is CategoryInitiativeItem) {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            SustainabilityDetailsScreen(
+                                              initiativeId: tapped.id,
+                                            ),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
                             ),
-                          ),
 
                           const SizedBox(height: 100),
                         ],
@@ -224,41 +317,150 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
       ),
     );
   }
+
+  Widget _buildFilteredProductsGrid(
+    AsyncValue<FilteredProductsState> filteredAsync,
+  ) {
+    return filteredAsync.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.all(32),
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Center(
+          child: Column(
+            children: [
+              const Text('Failed to load filtered products'),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: _onFiltersChanged,
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      ),
+      data: (state) {
+        if (state.items.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.all(32),
+            child: Center(
+              child: Text(
+                'No products match your filters',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Campton',
+                  color: Color(0xFF777F84),
+                ),
+              ),
+            ),
+          );
+        }
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            children: [
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.65,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
+                itemCount: state.items.length,
+                itemBuilder: (context, index) {
+                  final searchProduct = state.items[index];
+                  // Convert SearchProduct to Product for ProductCard
+                  final product = Product(
+                    id: searchProduct.id.toString(),
+                    title: searchProduct.name,
+                    priceLabel: 'N${searchProduct.price}',
+                    rating: (searchProduct.avgRating ?? 0).toDouble(),
+                    reviewCount: 0, // Not available in search result
+                    imageUrl: searchProduct.image,
+                  );
+                  return ProductCard(
+                    product: product,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              ProductDetailsScreen(productId: searchProduct.id),
+                        ),
+                      );
+                    },
+                    onFavoriteTap: () {
+                      // TODO: Handle favorite toggle
+                    },
+                  );
+                },
+              ),
+              if (state.isLoadingMore)
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
-class _SortFilterRow extends StatelessWidget {
-  const _SortFilterRow({required this.showBusinessTypeFilter});
+class _SortFilterRow extends ConsumerWidget {
+  const _SortFilterRow({
+    required this.showBusinessTypeFilter,
+    required this.onFiltersChanged,
+  });
 
   final bool showBusinessTypeFilter;
+  final VoidCallback onFiltersChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedFilters = ref.watch(selectedFiltersProvider);
+    final hasActiveFilters = selectedFilters.hasFilters;
+    final hasActiveSort = selectedFilters.hasSort;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
           _ActionButton(
             iconAsset: AppIcons.sort,
-            label: 'Sort',
-            onTap: () {
-              showModalBottomSheet(
+            label: hasActiveSort ? 'Sorted' : 'Sort',
+            isActive: hasActiveSort,
+            onTap: () async {
+              await showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
-                builder: (_) => const SortOverlay(),
+                builder: (_) => SortOverlay(
+                  onApplySort: (_) => onFiltersChanged(),
+                  onClearSort: onFiltersChanged,
+                ),
               );
             },
           ),
           const Spacer(),
           _ActionButton(
             iconAsset: AppIcons.filter,
-            label: 'Filters',
-            onTap: () {
-              showModalBottomSheet(
+            label: hasActiveFilters ? 'Filtered' : 'Filters',
+            isActive: hasActiveFilters,
+            onTap: () async {
+              await showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
-                builder: (_) => const FilterSheet(),
+                builder: (_) => FilterSheet(
+                  onApplyFilters: (_) => onFiltersChanged(),
+                  onClearFilters: onFiltersChanged,
+                ),
               );
             },
           ),
@@ -273,11 +475,13 @@ class _ActionButton extends StatelessWidget {
     required this.iconAsset,
     required this.label,
     required this.onTap,
+    this.isActive = false,
   });
 
   final String iconAsset;
   final String label;
   final VoidCallback onTap;
+  final bool isActive;
 
   @override
   Widget build(BuildContext context) {
@@ -286,7 +490,10 @@ class _ActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFCCCCCC)),
+          color: isActive ? const Color(0xFFA15E22) : Colors.transparent,
+          border: Border.all(
+            color: isActive ? const Color(0xFFA15E22) : const Color(0xFFCCCCCC),
+          ),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -296,19 +503,19 @@ class _ActionButton extends StatelessWidget {
               iconAsset,
               width: 20,
               height: 20,
-              colorFilter: const ColorFilter.mode(
-                Color(0xFF241508),
+              colorFilter: ColorFilter.mode(
+                isActive ? Colors.white : const Color(0xFF241508),
                 BlendMode.srcIn,
               ),
             ),
             const SizedBox(width: 4),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: Colors.black,
+                color: isActive ? Colors.white : Colors.black,
               ),
             ),
           ],
@@ -319,10 +526,7 @@ class _ActionButton extends StatelessWidget {
 }
 
 class _CategoryPills extends StatefulWidget {
-  const _CategoryPills({
-    required this.pills,
-    required this.onTap,
-  });
+  const _CategoryPills({required this.pills, required this.onTap});
 
   final List<String> pills;
   final ValueChanged<String> onTap;
@@ -355,8 +559,12 @@ class _CategoryPillsState extends State<_CategoryPills> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFFA15E22) : Colors.transparent,
-                border: isSelected ? null : Border.all(color: const Color(0xFFCCCCCC)),
+                color: isSelected
+                    ? const Color(0xFFA15E22)
+                    : Colors.transparent,
+                border: isSelected
+                    ? null
+                    : Border.all(color: const Color(0xFFCCCCCC)),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
@@ -366,7 +574,9 @@ class _CategoryPillsState extends State<_CategoryPills> {
                     fontSize: 14,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
-                    color: isSelected ? const Color(0xFFFBFBFB) : const Color(0xFF301C0A),
+                    color: isSelected
+                        ? const Color(0xFFFBFBFB)
+                        : const Color(0xFF301C0A),
                   ),
                 ),
               ),
@@ -419,7 +629,13 @@ class _CategoryItemGrid extends StatelessWidget {
       itemCount: count,
       itemBuilder: (context, index) {
         if (index >= items.length) {
-          return const Center(child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)));
+          return const Center(
+            child: SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          );
         }
 
         final item = items[index];

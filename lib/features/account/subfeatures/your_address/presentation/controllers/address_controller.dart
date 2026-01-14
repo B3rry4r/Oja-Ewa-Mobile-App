@@ -1,14 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import '../../data/address_repository_impl.dart';
 import '../../domain/address.dart';
 
 final addressesProvider = FutureProvider<List<Address>>((ref) async {
-  return ref.watch(addressRepositoryProvider).getAddresses();
+  // Don't fetch if not authenticated
+  final token = ref.watch(accessTokenProvider);
+  if (token == null || token.isEmpty) return const [];
+  
+  return ref.read(addressRepositoryProvider).getAddresses();
 });
 
-final addressByIdProvider = FutureProvider.family<Address, int>((ref, id) async {
-  return ref.watch(addressRepositoryProvider).getAddress(id);
+final addressByIdProvider = FutureProvider.family<Address?, int>((ref, id) async {
+  // Don't fetch if not authenticated
+  final token = ref.watch(accessTokenProvider);
+  if (token == null || token.isEmpty) return null;
+  
+  return ref.read(addressRepositoryProvider).getAddress(id);
 });
 
 class AddressActionsController extends AsyncNotifier<void> {

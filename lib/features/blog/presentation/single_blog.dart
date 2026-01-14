@@ -61,7 +61,7 @@ class BlogDetailScreen extends ConsumerWidget {
                 // Header section
                 Container(
                   color: const Color(0xFF603814),
-                  padding: const EdgeInsets.only(left: 18, right: 16),
+                  padding: const EdgeInsets.only(left: 18, right: 16, bottom: 24),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -73,11 +73,24 @@ class BlogDetailScreen extends ConsumerWidget {
                           color: const Color(0xFFD9D9D9),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const AppImagePlaceholder(
-                          width: 150,
-                          height: 100,
-                          borderRadius: 8,
-                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: post.imageUrl != null && post.imageUrl!.isNotEmpty
+                            ? Image.network(
+                                post.imageUrl!,
+                                fit: BoxFit.cover,
+                                width: 165,
+                                height: 100,
+                                errorBuilder: (_, __, ___) => const AppImagePlaceholder(
+                                  width: 150,
+                                  height: 100,
+                                  borderRadius: 8,
+                                ),
+                              )
+                            : const AppImagePlaceholder(
+                                width: 150,
+                                height: 100,
+                                borderRadius: 8,
+                              ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(

@@ -47,12 +47,21 @@ class BlogApi {
 
 List<BlogPost> _extractList(dynamic data) {
   // Supports shapes:
+  // - { data: { data: [ ... ] } }  (paginated Laravel response)
   // - { data: [ ... ] }
   // - [ ... ]
   if (data is Map<String, dynamic>) {
-    final list = data['data'];
-    if (list is List) {
-      return list.whereType<Map<String, dynamic>>().map(BlogPost.fromJson).toList();
+    final inner = data['data'];
+    // Check for nested pagination: { data: { data: [...] } }
+    if (inner is Map<String, dynamic>) {
+      final list = inner['data'];
+      if (list is List) {
+        return list.whereType<Map<String, dynamic>>().map(BlogPost.fromJson).toList();
+      }
+    }
+    // Simple wrapper: { data: [...] }
+    if (inner is List) {
+      return inner.whereType<Map<String, dynamic>>().map(BlogPost.fromJson).toList();
     }
   }
 

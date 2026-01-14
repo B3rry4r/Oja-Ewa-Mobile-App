@@ -7,17 +7,26 @@ import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/cart/domain/cart.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
 
+/// Format number to 1 decimal place, removing trailing zeros
+String _formatPrice(num value) {
+  final formatted = value.toStringAsFixed(1);
+  // Remove .0 if whole number
+  if (formatted.endsWith('.0')) {
+    return formatted.substring(0, formatted.length - 2);
+  }
+  return formatted;
+}
+
 /// Renamed/moved Shopping Bag screen. UI is unchanged.
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cartAsync = ref.watch(cartProvider);
-
-    // IMPORTANT: Avoid infinite-loader feel when cartProvider is invalidated.
-    // If we have previous data while a refresh is happening, keep showing it.
-    final cart = cartAsync.asData?.value;
+    // Watch the optimistic cart state instead of raw cartProvider
+    final cart = ref.watch(optimisticCartProvider);
+    final isInitialLoading = ref.watch(cartProvider).isLoading && cart == null;
+    final hasError = ref.watch(cartProvider).hasError && cart == null;
 
     return Scaffold(
       backgroundColor: const Color(0xFF603814),
@@ -32,30 +41,16 @@ class CartScreen extends ConsumerWidget {
                   color: Color(0xFFFFF8F1),
                   borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
                 ),
-                child: Stack(
-                  children: [
-                    if (cart == null)
-                      cartAsync.when(
-                        loading: () => const Center(child: CircularProgressIndicator()),
-                        error: (e, _) => const Center(child: Text('Failed to load cart')),
-                        data: (loaded) => _CartBody(cart: loaded),
-                      )
-                    else
-                      _CartBody(cart: cart),
-
-                    // Small loader overlay when refreshing/reloading.
-                    if (cart != null && cartAsync.isLoading)
-                      const Positioned(
-                        top: 12,
-                        left: 0,
-                        right: 0,
-                        child: Center(child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))),
-                      ),
-                  ],
-                ),
+                child: isInitialLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : hasError
+                        ? const Center(child: Text('Failed to load cart'))
+                        : cart == null
+                            ? const Center(child: Text('Your cart is empty.'))
+                            : _CartBody(cart: cart),
               ),
             ),
-            _CheckoutSection(cartAsync: cartAsync),
+            _CheckoutSection(cart: cart),
           ],
         ),
       ),
@@ -108,7 +103,7 @@ class _CartBody extends StatelessWidget {
             separatorBuilder: (context, index) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final item = cart.items[index];
-              return _CartRow(item: item);
+              return _CartRow(key: ValueKey(item.id), item: item);
             },
           ),
         ),
@@ -118,16 +113,17 @@ class _CartBody extends StatelessWidget {
 }
 
 class _CartRow extends ConsumerWidget {
-  const _CartRow({required this.item});
+  const _CartRow({super.key, required this.item});
 
   final CartItem item;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final actionsBusy = ref.watch(cartActionsProvider).isLoading;
-
     final cartItem = item;
     final product = cartItem.product;
+
+    // Parse available sizes from product
+    final availableSizes = product.size?.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList() ?? [];
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -155,7 +151,16 @@ class _CartRow extends ConsumerWidget {
                   )
                 : ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.network(product.image!, fit: BoxFit.cover),
+                    child: Image.network(
+                      product.image!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const AppImagePlaceholder(
+                        width: 96,
+                        height: 96,
+                        borderRadius: 0,
+                        backgroundColor: Colors.transparent,
+                      ),
+                    ),
                   ),
           ),
           const SizedBox(width: 12),
@@ -174,21 +179,48 @@ class _CartRow extends ConsumerWidget {
                       ),
                     ),
                     IconButton(
-                      onPressed: actionsBusy
-                          ? null
-                          : () async {
-                              await ref.read(cartActionsProvider.notifier).removeItem(cartItemId: cartItem.id);
-                            },
+                      onPressed: () {
+                        // Optimistic: remove immediately, revert on failure
+                        ref.read(optimisticCartActionsProvider.notifier).removeItem(
+                          context: context,
+                          cartItemId: cartItem.id,
+                        );
+                      },
                       icon: const Icon(Icons.delete_outline, size: 20, color: Color(0xFF241508)),
                     ),
                   ],
                 ),
+                // Size selector
+                if (availableSizes.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () => _showSizeSelector(context, ref, cartItem, availableSizes),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: const Color(0xFFDEDEDE)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Size: ${cartItem.selectedSize.isNotEmpty ? cartItem.selectedSize : "Select"}',
+                            style: const TextStyle(fontSize: 14, color: Color(0xFF3C4042)),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.keyboard_arrow_down, size: 18, color: Color(0xFF3C4042)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'N${(cartItem.unitPrice ?? 0).toString()}',
+                      'N${_formatPrice(cartItem.unitPrice ?? 0)}',
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF241508)),
                     ),
                     Container(
@@ -201,15 +233,21 @@ class _CartRow extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           GestureDetector(
-                            onTap: actionsBusy || cartItem.quantity <= 1
+                            onTap: cartItem.quantity <= 1
                                 ? null
                                 : () {
-                                    ref.read(cartActionsProvider.notifier).updateQuantity(
-                                          cartItemId: cartItem.id,
-                                          quantity: cartItem.quantity - 1,
-                                        );
+                                    // Optimistic: update immediately
+                                    ref.read(optimisticCartActionsProvider.notifier).updateQuantity(
+                                      context: context,
+                                      cartItemId: cartItem.id,
+                                      newQuantity: cartItem.quantity - 1,
+                                    );
                                   },
-                            child: const Icon(Icons.remove, size: 20, color: Color(0xFF3C4042)),
+                            child: Icon(
+                              Icons.remove,
+                              size: 20,
+                              color: cartItem.quantity <= 1 ? const Color(0xFFCCCCCC) : const Color(0xFF3C4042),
+                            ),
                           ),
                           const SizedBox(width: 24),
                           Text(
@@ -218,14 +256,14 @@ class _CartRow extends ConsumerWidget {
                           ),
                           const SizedBox(width: 24),
                           GestureDetector(
-                            onTap: actionsBusy
-                                ? null
-                                : () {
-                                    ref.read(cartActionsProvider.notifier).updateQuantity(
-                                          cartItemId: cartItem.id,
-                                          quantity: cartItem.quantity + 1,
-                                        );
-                                  },
+                            onTap: () {
+                              // Optimistic: update immediately
+                              ref.read(optimisticCartActionsProvider.notifier).updateQuantity(
+                                context: context,
+                                cartItemId: cartItem.id,
+                                newQuantity: cartItem.quantity + 1,
+                              );
+                            },
                             child: const Icon(Icons.add, size: 20, color: Color(0xFF3C4042)),
                           ),
                         ],
@@ -240,16 +278,107 @@ class _CartRow extends ConsumerWidget {
       ),
     );
   }
+
+  void _showSizeSelector(BuildContext context, WidgetRef ref, CartItem cartItem, List<String> sizes) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            color: Color(0xFFFFF8F1),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Handle bar
+                Center(
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 12, bottom: 8),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFDEDEDE),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                // Title
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Text(
+                    'Select Size',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF241508),
+                    ),
+                  ),
+                ),
+                const Divider(height: 1, color: Color(0xFFEEEEEE)),
+                // Size options - full width list
+                ...sizes.map((size) {
+                  final isSelected = size == cartItem.selectedSize;
+                  return InkWell(
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      // Optimistic: update immediately
+                      ref.read(optimisticCartActionsProvider.notifier).updateSize(
+                        context: context,
+                        cartItemId: cartItem.id,
+                        newSize: size,
+                      );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      decoration: BoxDecoration(
+                        color: isSelected ? const Color(0xFFFDF3E7) : Colors.transparent,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              size,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                                color: const Color(0xFF241508),
+                              ),
+                            ),
+                          ),
+                          if (isSelected)
+                            const Icon(Icons.check, size: 20, color: Color(0xFFA15E22)),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
-class _CheckoutSection extends ConsumerWidget {
-  const _CheckoutSection({required this.cartAsync});
+class _CheckoutSection extends StatelessWidget {
+  const _CheckoutSection({required this.cart});
 
-  final AsyncValue cartAsync;
+  final Cart? cart;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final total = cartAsync.asData?.value?.total ?? 0;
+  Widget build(BuildContext context) {
+    final total = cart?.total ?? 0;
+    final isEmpty = cart == null || cart!.items.isEmpty;
 
     return Container(
       decoration: const BoxDecoration(
@@ -272,7 +401,7 @@ class _CheckoutSection extends ConsumerWidget {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFFFBFBFB)),
                   ),
                   Text(
-                    'N$total',
+                    'N${_formatPrice(total)}',
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFFFBFBFB)),
                   ),
                 ],
@@ -284,22 +413,26 @@ class _CheckoutSection extends ConsumerWidget {
               ),
               const SizedBox(height: 20),
               GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pushNamed(AppRoutes.orderConfirmation);
-                },
+                onTap: isEmpty
+                    ? null
+                    : () {
+                        Navigator.of(context).pushNamed(AppRoutes.orderConfirmation);
+                      },
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFDAF40),
+                    color: isEmpty ? const Color(0xFFCCCCCC) : const Color(0xFFFDAF40),
                     borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFFDAF40).withOpacity(0.3),
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+                    boxShadow: isEmpty
+                        ? null
+                        : [
+                            BoxShadow(
+                              color: const Color(0xFFFDAF40).withOpacity(0.3),
+                              blurRadius: 16,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
                   ),
                   child: const Center(
                     child: Text('Checkout', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFFFFFBF5))),

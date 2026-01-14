@@ -1,6 +1,4 @@
 // search_screen.dart
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,8 +11,7 @@ import 'package:ojaewa/features/product_detail/presentation/product_detail_scree
 
 import '../../../app/router/app_router.dart';
 import 'controllers/search_controller.dart';
-import 'controllers/search_suggestions_controller.dart';
-import '../domain/search_product.dart';
+import '../data/recent_searches_storage.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -30,40 +27,49 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   final List<String> _genderFilters = const ['All', 'Male', 'Female', 'Unisex'];
 
   int _selectedGenderIndex = 0;
-
-  Timer? _debounce;
+  
+  // The submitted query - only this triggers search, not typing
+  String _submittedQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(_onQueryChanged);
+    // Listen only to update clear button visibility, NOT to trigger search
+    _searchController.addListener(_onTextChanged);
   }
 
   @override
   void dispose() {
-    _debounce?.cancel();
-    _searchController.removeListener(_onQueryChanged);
+    _searchController.removeListener(_onTextChanged);
     _searchController.dispose();
     super.dispose();
   }
 
-  void _onQueryChanged() {
-    // Debounce to avoid firing requests on every keystroke.
-    _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 350), () {
-      setState(() {
-        // Rebuild will re-watch searchProvider with the new query.
-      });
+  void _onTextChanged() {
+    // Only rebuild to show/hide clear button, NOT to trigger search
+    setState(() {});
+  }
+
+  void _onSearch() {
+    final trimmed = _searchController.text.trim();
+    if (trimmed.isEmpty) return;
+    
+    // Save to recent searches
+    ref.read(recentSearchesProvider.notifier).addSearch(trimmed);
+    
+    // Update submitted query to trigger search
+    setState(() {
+      _submittedQuery = trimmed;
     });
   }
 
   void _onRecentSearchTap(String searchTerm) {
-    setState(() {
-      _searchController.text = searchTerm;
-      _searchController.selection = TextSelection.fromPosition(
-        TextPosition(offset: _searchController.text.length),
-      );
-    });
+    _searchController.text = searchTerm;
+    _searchController.selection = TextSelection.fromPosition(
+      TextPosition(offset: _searchController.text.length),
+    );
+    // Trigger search immediately when tapping recent search
+    _onSearch();
   }
 
   void _onGenderTap(int index, String label) {
@@ -83,13 +89,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final query = _searchController.text.trim();
-
-    final suggestionsAsync = query.isEmpty
-        ? ref.watch(searchSuggestionsProvider)
-        : const AsyncData(<SearchProduct>[]);
+    final recentSearches = ref.watch(recentSearchesProvider);
     final filters = ref.watch(searchFiltersProvider);
-    final searchAsync = query.isEmpty ? AsyncData(SearchState.empty) : ref.watch(searchProvider((query: query, filters: filters)));
+    
+    // Only search when _submittedQuery is set (user pressed enter/search button)
+    final searchAsync = _submittedQuery.isEmpty
+        ? const AsyncData(SearchState.empty)
+        : ref.watch(searchProvider((query: _submittedQuery, filters: filters)));
 
     return Scaffold(
       backgroundColor: const Color(0xFF603814),
@@ -101,8 +107,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             Expanded(
               child: _buildContent(
                 context,
-                query: query,
-                suggestionsAsync: suggestionsAsync,
+                query: _submittedQuery,
+                recentSearches: recentSearches,
                 searchAsync: searchAsync,
               ),
             ),
@@ -127,7 +133,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 HeaderIconButton(
                   asset: AppIcons.notification,
                   iconColor: Colors.white,
-                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.notifications),
                 ),
                 const SizedBox(width: 8),
                 HeaderIconButton(
@@ -146,7 +153,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget _buildContent(
     BuildContext context, {
     required String query,
-    required AsyncValue<dynamic> suggestionsAsync,
+    required List<String> recentSearches,
     required AsyncValue<SearchState> searchAsync,
   }) {
     return Container(
@@ -186,7 +193,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 _buildResultsSection(searchAsync),
                 const SizedBox(height: 28),
               ] else ...[
-                _buildSuggestionsSection(suggestionsAsync),
+                _buildRecentSearchesSection(recentSearches),
                 const SizedBox(height: 40),
               ],
             ],
@@ -205,8 +212,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       ),
       child: Row(
         children: [
-          const SizedBox(width: 20),
-          const Icon(Icons.search_rounded, size: 24, color: Color(0xFF777F84)),
           const SizedBox(width: 16),
           Expanded(
             child: TextField(
@@ -219,70 +224,101 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
               decoration: const InputDecoration(
                 border: InputBorder.none,
-                hintText: 'search Oja Ewa',
+                hintText: 'Search Oja Ewa',
                 hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
               ),
               textInputAction: TextInputAction.search,
-              onSubmitted: (_) {
-                setState(() {});
-              },
+              onSubmitted: (_) => _onSearch(),
             ),
           ),
           if (_searchController.text.isNotEmpty)
-            IconButton(
-              onPressed: () {
+            GestureDetector(
+              onTap: () {
+                _searchController.clear();
                 setState(() {
-                  _searchController.clear();
+                  _submittedQuery = '';
                 });
               },
-              icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF777F84)),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(
+                  Icons.close_rounded,
+                  size: 20,
+                  color: Color(0xFF777F84),
+                ),
+              ),
             ),
-          const SizedBox(width: 20),
+          // Search button
+          GestureDetector(
+            onTap: _onSearch,
+            child: Container(
+              height: 49,
+              width: 49,
+              decoration: const BoxDecoration(
+                color: Color(0xFFA15E22),
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(7),
+                  bottomRight: Radius.circular(7),
+                ),
+              ),
+              child: const Icon(
+                Icons.search_rounded,
+                size: 24,
+                color: Colors.white,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSuggestionsSection(AsyncValue<dynamic> suggestionsAsync) {
+  Widget _buildRecentSearchesSection(List<String> recentSearches) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Recently Searched',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
-            color: Color(0xFF241508),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Recently Searched',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                fontFamily: 'Campton',
+                color: Color(0xFF241508),
+              ),
+            ),
+            if (recentSearches.isNotEmpty)
+              GestureDetector(
+                onTap: () {
+                  ref.read(recentSearchesProvider.notifier).clearAll();
+                },
+                child: const Text(
+                  'Clear all',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Campton',
+                    color: Color(0xFFA15E22),
+                  ),
+                ),
+              ),
+          ],
         ),
         const SizedBox(height: 12),
-        suggestionsAsync.when(
-          loading: () => const SizedBox(
-            height: 42,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+        if (recentSearches.isEmpty)
+          const Text(
+            'No recent searches',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              fontFamily: 'Campton',
+              color: Color(0xFF777F84),
             ),
-          ),
-          error: (_, __) {
-            // No hardcoded fallback; if suggestions fail, show nothing.
-            return const SizedBox.shrink();
-          },
-          data: (list) {
-            final names = (list is List)
-                ? list
-                    .where((e) => e != null)
-                    .map((e) => (e.name as String?) ?? '')
-                    .where((s) => s.trim().isNotEmpty)
-                    .take(12)
-                    .toList()
-                : const <String>[];
-
-            if (names.isEmpty) return const SizedBox.shrink();
-            return _buildChips(names);
-          },
-        ),
+          )
+        else
+          _buildChips(recentSearches),
       ],
     );
   }
@@ -353,7 +389,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         child: Container(
           height: 64,
           decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE), width: 1)),
+            border: Border(
+              bottom: BorderSide(color: Color(0xFFDEDEDE), width: 1),
+            ),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
@@ -366,13 +404,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Campton',
-                    color: isSelected ? const Color(0xFFFDAF40) : const Color(0xFF301C0A),
+                    color: isSelected
+                        ? const Color(0xFFFDAF40)
+                        : const Color(0xFF301C0A),
                   ),
                 ),
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 16,
-                  color: isSelected ? const Color(0xFFFDAF40) : const Color(0xFF777F84),
+                  color: isSelected
+                      ? const Color(0xFFFDAF40)
+                      : const Color(0xFF777F84),
                 ),
               ],
             ),
@@ -384,7 +426,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   Widget _buildResultsSection(AsyncValue<SearchState> searchAsync) {
     return searchAsync.when(
-      loading: () => const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator())),
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: CircularProgressIndicator(),
+        ),
+      ),
       error: (_, __) => const Padding(
         padding: EdgeInsets.symmetric(vertical: 16),
         child: Text(
@@ -440,8 +487,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               onTap: () {
                 // NOTE: ProductDetailsScreen is currently still static/dummy.
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => ProductDetailsScreen(productId: item.id)),
-
+                  MaterialPageRoute(
+                    builder: (_) => ProductDetailsScreen(productId: item.id),
+                  ),
                 );
               },
               onFavoriteTap: () {},

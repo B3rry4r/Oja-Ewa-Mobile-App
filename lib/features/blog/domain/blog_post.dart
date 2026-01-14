@@ -32,7 +32,8 @@ class BlogPost {
         (json['description'] as String?) ??
         '';
 
-    final imageUrl = (json['image_url'] as String?) ??
+    final imageUrl = (json['featured_image'] as String?) ??
+        (json['image_url'] as String?) ??
         (json['image'] as String?) ??
         (json['thumbnail'] as String?);
 

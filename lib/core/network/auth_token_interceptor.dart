@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../auth/auth_controller.dart';
 import '../auth/auth_providers.dart';
 import '../constants/network_constants.dart';
 import '../storage/storage_providers.dart';
@@ -10,10 +11,15 @@ import '../storage/storage_providers.dart';
 /// Also prevents hitting authenticated endpoints when the user is logged out.
 /// This avoids noisy 401 bursts after logout while screens/providers are still
 /// rebuilding.
+///
+/// Handles 401 responses from server (invalid/expired token) by clearing auth state.
 class AuthTokenInterceptor extends Interceptor {
   AuthTokenInterceptor(this._ref);
 
   final Ref _ref;
+  
+  // Track if we're already handling a 401 to prevent multiple logouts
+  bool _handlingUnauthorized = false;
 
   static const _publicPrefixes = <String>[
     '/api/products/public/',
@@ -74,5 +80,31 @@ class AuthTokenInterceptor extends Interceptor {
     }
 
     handler.next(options);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    // Handle 401 Unauthorized from server - token is invalid/expired
+    if (err.response?.statusCode == 401 && !_handlingUnauthorized) {
+      final path = err.requestOptions.path;
+      
+      // Don't logout for login/register failures or public endpoints
+      if (!_isPublicPath(path) && !path.contains('/api/login') && !path.contains('/api/register')) {
+        _handlingUnauthorized = true;
+        
+        try {
+          // Clear the stored token
+          await _ref.read(secureTokenStorageProvider).deleteAccessToken();
+          // Clear the auth state by invalidating the auth controller
+          _ref.invalidate(authControllerProvider);
+        } catch (_) {
+          // Ignore errors during cleanup
+        } finally {
+          _handlingUnauthorized = false;
+        }
+      }
+    }
+    
+    handler.next(err);
   }
 }

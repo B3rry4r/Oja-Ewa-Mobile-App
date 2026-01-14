@@ -35,6 +35,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
     ref.listen(userProfileProvider, (prev, next) {
       next.whenData((u) {
+        if (u == null) return;
         // Populate once; avoid overwriting user edits.
         if (_nameController.text.isEmpty) _nameController.text = u.fullName;
         if (_emailController.text.isEmpty) _emailController.text = u.email;

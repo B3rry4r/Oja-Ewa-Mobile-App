@@ -2,11 +2,16 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import '../../data/wishlist_repository_impl.dart';
 import '../../domain/wishlist_item.dart';
 
 final wishlistProvider = FutureProvider<List<WishlistItem>>((ref) async {
-  return ref.watch(wishlistRepositoryProvider).getWishlist();
+  // Don't fetch if not authenticated
+  final token = ref.watch(accessTokenProvider);
+  if (token == null || token.isEmpty) return const [];
+  
+  return ref.read(wishlistRepositoryProvider).getWishlist();
 });
 
 class WishlistActionsController extends AsyncNotifier<void> {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/auth/auth_guard.dart';
 import '../shell/app_shell.dart';
 import '../../features/auth/presentation/screens/create_account_screen.dart';
 import '../../features/auth/presentation/screens/onboarding_screen.dart';
@@ -211,31 +212,31 @@ abstract class AppRouter {
       case AppRoutes.editProfile:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const EditProfileScreen(),
+          builder: (_) => const AuthGuard(child: EditProfileScreen()),
         );
 
       case AppRoutes.addresses:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const AddressesScreen(),
+          builder: (_) => const AuthGuard(child: AddressesScreen()),
         );
 
       case AppRoutes.addEditAddress:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const AddEditAddressScreen(),
+          builder: (_) => const AuthGuard(child: AddEditAddressScreen()),
         );
 
       case AppRoutes.changePassword:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const ChangePasswordScreen(),
+          builder: (_) => const AuthGuard(child: ChangePasswordScreen()),
         );
 
       case AppRoutes.notificationsSettings:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const NotificationsSettingsScreen(),
+          builder: (_) => const AuthGuard(child: NotificationsSettingsScreen()),
         );
 
       case AppRoutes.faq:
@@ -253,79 +254,79 @@ abstract class AppRouter {
       case AppRoutes.businessOnboarding:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const BusinessOnboardingScreen(),
+          builder: (_) => const AuthGuard(child: BusinessOnboardingScreen()),
         );
 
       case AppRoutes.businessCategory:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const BusinessCategoryScreen(),
+          builder: (_) => const AuthGuard(child: BusinessCategoryScreen()),
         );
 
       case AppRoutes.businessSellerRegistration:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const BusinessSellerRegistrationScreen(),
+          builder: (_) => const AuthGuard(child: BusinessSellerRegistrationScreen()),
         );
 
       case AppRoutes.businessBeautyForm:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const BeautyBusinessDetailsScreen(),
+          builder: (_) => const AuthGuard(child: BeautyBusinessDetailsScreen()),
         );
 
       case AppRoutes.businessBrandsForm:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const BrandBusinessDetailsScreen(),
+          builder: (_) => const AuthGuard(child: BrandBusinessDetailsScreen()),
         );
 
       case AppRoutes.businessSchoolsForm:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const SchoolBusinessDetailsScreen(),
+          builder: (_) => const AuthGuard(child: SchoolBusinessDetailsScreen()),
         );
 
       case AppRoutes.businessMusicForm:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const MusicBusinessDetailsScreen(),
+          builder: (_) => const AuthGuard(child: MusicBusinessDetailsScreen()),
         );
 
       case AppRoutes.businessSettings:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const BusinessSettingsScreen(),
+          builder: (_) => const AuthGuard(child: BusinessSettingsScreen()),
         );
 
       case AppRoutes.businessAccountReview:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const BusinessAccountReviewScreen(),
+          builder: (_) => const AuthGuard(child: BusinessAccountReviewScreen()),
         );
 
       case AppRoutes.deactivateShop:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const DeactivateShopScreen(),
+          builder: (_) => const AuthGuard(child: DeactivateShopScreen()),
         );
 
       case AppRoutes.managePayment:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const ManagePaymentScreen(),
+          builder: (_) => const AuthGuard(child: ManagePaymentScreen()),
         );
 
       case AppRoutes.sellerOnboarding:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const SellerOnboardingScreen(),
+          builder: (_) => const AuthGuard(child: SellerOnboardingScreen()),
         );
 
       case AppRoutes.sellerRegistration:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const SellerRegistrationScreen(),
+          builder: (_) => const AuthGuard(child: SellerRegistrationScreen()),
         );
 
       case AppRoutes.businessDetails:
@@ -337,79 +338,79 @@ abstract class AppRouter {
       case AppRoutes.accountReview:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const AccountReviewScreen(),
+          builder: (_) => const AuthGuard(child: AccountReviewScreen()),
         );
 
       case AppRoutes.orders:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const OrdersScreen(),
+          builder: (_) => const AuthGuard(child: OrdersScreen()),
         );
 
       case AppRoutes.orderDetails:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const OrderDetailsScreen(),
+          builder: (_) => const AuthGuard(child: OrderDetailsScreen()),
         );
 
       case AppRoutes.trackingOrder:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const TrackingOrderScreen(),
+          builder: (_) => const AuthGuard(child: TrackingOrderScreen()),
         );
 
       case AppRoutes.notifications:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const NotificationsScreen(),
+          builder: (_) => const AuthGuard(child: NotificationsScreen()),
         );
 
       case AppRoutes.cart:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const CartScreen(),
+          builder: (_) => const AuthGuard(child: CartScreen()),
         );
 
       case AppRoutes.orderConfirmation:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const OrderConfirmationScreen(),
+          builder: (_) => const AuthGuard(child: OrderConfirmationScreen()),
         );
 
       case AppRoutes.reviewSubmission:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const ReviewSubmissionScreen(),
+          builder: (_) => const AuthGuard(child: ReviewSubmissionScreen()),
         );
 
       case AppRoutes.reviews:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const ReviewsScreen(),
+          builder: (_) => const AuthGuard(child: ReviewsScreen()),
         );
 
       case AppRoutes.yourShopDashboard:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const ShopDashboardScreen(),
+          builder: (_) => const AuthGuard(child: ShopDashboardScreen()),
         );
 
       case AppRoutes.manageShop:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const ManageShopScreen(),
+          builder: (_) => const AuthGuard(child: ManageShopScreen()),
         );
 
       case AppRoutes.editBusiness:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const EditBusinessScreen(),
+          builder: (_) => const AuthGuard(child: EditBusinessScreen()),
         );
 
       case AppRoutes.deleteShop:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const DeleteShopScreen(),
+          builder: (_) => const AuthGuard(child: DeleteShopScreen()),
         );
 
       case AppRoutes.home:

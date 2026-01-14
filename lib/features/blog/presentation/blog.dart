@@ -206,6 +206,16 @@ class _BlogPostCard extends ConsumerWidget {
               color: const Color(0xFFD9D9D9),
               borderRadius: BorderRadius.circular(5),
             ),
+            clipBehavior: Clip.antiAlias,
+            child: post.imageUrl != null && post.imageUrl!.isNotEmpty
+                ? Image.network(
+                    post.imageUrl!,
+                    fit: BoxFit.cover,
+                    width: 59,
+                    height: 69,
+                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  )
+                : null,
           ),
           const SizedBox(width: 16),
           Expanded(

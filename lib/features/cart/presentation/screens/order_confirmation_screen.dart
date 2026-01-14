@@ -8,6 +8,16 @@ import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.da
 import 'package:ojaewa/features/orders/presentation/controllers/orders_controller.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/checkout_controller.dart';
 
+/// Format number to 1 decimal place, removing trailing zeros
+String _formatPrice(num value) {
+  final formatted = value.toStringAsFixed(1);
+  // Remove .0 if whole number
+  if (formatted.endsWith('.0')) {
+    return formatted.substring(0, formatted.length - 2);
+  }
+  return formatted;
+}
+
 class OrderConfirmationScreen extends ConsumerStatefulWidget {
   const OrderConfirmationScreen({super.key, this.hasAddress = true});
 
@@ -15,10 +25,12 @@ class OrderConfirmationScreen extends ConsumerStatefulWidget {
   final bool hasAddress;
 
   @override
-  ConsumerState<OrderConfirmationScreen> createState() => _OrderConfirmationScreenState();
+  ConsumerState<OrderConfirmationScreen> createState() =>
+      _OrderConfirmationScreenState();
 }
 
-class _OrderConfirmationScreenState extends ConsumerState<OrderConfirmationScreen> {
+class _OrderConfirmationScreenState
+    extends ConsumerState<OrderConfirmationScreen> {
   static const _returnArgKey = 'returnTo';
   static const _returnToOrderConfirmation = 'orderConfirmation';
 
@@ -60,8 +72,12 @@ class _OrderConfirmationScreenState extends ConsumerState<OrderConfirmationScree
             Expanded(
               child: cartAsync.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => const Center(child: Text('Failed to load cart')),
+                error: (e, _) =>
+                    const Center(child: Text('Failed to load cart')),
                 data: (cart) {
+                  if (cart == null) {
+                    return const Center(child: Text('Cart is empty'));
+                  }
                   return SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Column(
@@ -92,11 +108,16 @@ class _OrderConfirmationScreenState extends ConsumerState<OrderConfirmationScree
                       final items = ref.read(checkoutOrderItemsProvider);
                       if (items.isEmpty) return;
 
-                      final link = await ref.read(orderActionsProvider.notifier).createOrderAndPaymentLink(items: items);
+                      final link = await ref
+                          .read(orderActionsProvider.notifier)
+                          .createOrderAndPaymentLink(items: items);
 
                       final uri = Uri.tryParse(link.paymentUrl);
                       if (uri == null) return;
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      await launchUrl(
+                        uri,
+                        mode: LaunchMode.externalApplication,
+                      );
                     },
             ),
           ],
@@ -111,7 +132,11 @@ class _OrderConfirmationScreenState extends ConsumerState<OrderConfirmationScree
       children: [
         const Text(
           'Address',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFF1E2021)),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1E2021),
+          ),
         ),
         const SizedBox(height: 12),
         if (!_hasAddress)
@@ -124,15 +149,16 @@ class _OrderConfirmationScreenState extends ConsumerState<OrderConfirmationScree
             child: Row(
               children: [
                 const Expanded(
-                  child: Text('No address selected yet', style: TextStyle(fontSize: 14, color: Color(0xFF777F84))),
+                  child: Text(
+                    'No address selected yet',
+                    style: TextStyle(fontSize: 14, color: Color(0xFF777F84)),
+                  ),
                 ),
                 TextButton(
                   onPressed: () async {
                     final updated = await Navigator.of(context).pushNamed(
                       AppRoutes.addEditAddress,
-                      arguments: {
-                        _returnArgKey: _returnToOrderConfirmation,
-                      },
+                      arguments: {_returnArgKey: _returnToOrderConfirmation},
                     );
                     if (updated == true) {
                       setState(() => _hasAddress = true);
@@ -149,9 +175,7 @@ class _OrderConfirmationScreenState extends ConsumerState<OrderConfirmationScree
             onTap: () async {
               final updated = await Navigator.of(context).pushNamed(
                 AppRoutes.addresses,
-                arguments: {
-                  _returnArgKey: _returnToOrderConfirmation,
-                },
+                arguments: {_returnArgKey: _returnToOrderConfirmation},
               );
               if (updated == true) {
                 setState(() => _hasAddress = true);
@@ -169,7 +193,11 @@ class _OrderConfirmationScreenState extends ConsumerState<OrderConfirmationScree
                   Expanded(
                     child: Text(
                       'Sanusi Sulat 08102718764\nRoyal Anchor, Abuja, FCT, \nNigeria 900187',
-                      style: TextStyle(fontSize: 16, color: Color(0xFF3C4042), height: 1.5),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF3C4042),
+                        height: 1.5,
+                      ),
                     ),
                   ),
                   Icon(Icons.keyboard_arrow_right, color: Color(0xFF777F84)),
@@ -185,18 +213,31 @@ class _OrderConfirmationScreenState extends ConsumerState<OrderConfirmationScree
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Payment Method', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFF1E2021))),
+        const Text(
+          'Payment Method',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1E2021),
+          ),
+        ),
         const SizedBox(height: 12),
         Container(
           height: 88,
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), border: Border.all(color: const Color(0xFFCCCCCC))),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: const Color(0xFFCCCCCC)),
+          ),
           child: const Row(
             children: [
               SizedBox(width: 12),
               Icon(Icons.radio_button_checked, color: Color(0xFFA15E22)),
               SizedBox(width: 16),
-              Text('Pay with cards', style: TextStyle(fontSize: 16, color: Color(0xFF1E2021))),
+              Text(
+                'Pay with cards',
+                style: TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+              ),
               Spacer(),
             ],
           ),
@@ -205,13 +246,19 @@ class _OrderConfirmationScreenState extends ConsumerState<OrderConfirmationScree
         Container(
           height: 64,
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), border: Border.all(color: const Color(0xFFCCCCCC))),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: const Color(0xFFCCCCCC)),
+          ),
           child: const Row(
             children: [
               SizedBox(width: 12),
               Icon(Icons.radio_button_unchecked, color: Color(0xFF777F84)),
               SizedBox(width: 16),
-              Text('Pay with Bank Transfer', style: TextStyle(fontSize: 16, color: Color(0xFF1E2021))),
+              Text(
+                'Pay with Bank Transfer',
+                style: TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+              ),
             ],
           ),
         ),
@@ -223,14 +270,28 @@ class _OrderConfirmationScreenState extends ConsumerState<OrderConfirmationScree
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Items', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFF1E2021))),
+        const Text(
+          'Items',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1E2021),
+          ),
+        ),
         const SizedBox(height: 12),
-        Text('$count item(s)', style: const TextStyle(color: Color(0xFF777F84))),
+        Text(
+          '$count item(s)',
+          style: const TextStyle(color: Color(0xFF777F84)),
+        ),
       ],
     );
   }
 
-  Widget _buildOrderSummary({required AsyncValue cartAsync, required bool isBusy, required VoidCallback? onPlaceOrder}) {
+  Widget _buildOrderSummary({
+    required AsyncValue cartAsync,
+    required bool isBusy,
+    required VoidCallback? onPlaceOrder,
+  }) {
     final total = cartAsync.asData?.value?.total ?? 0;
 
     return Container(
@@ -248,14 +309,31 @@ class _OrderConfirmationScreenState extends ConsumerState<OrderConfirmationScree
               const SizedBox(height: 8),
               const Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Order Summary', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFFFBFBFB))),
+                child: Text(
+                  'Order Summary',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFFBFBFB),
+                  ),
+                ),
               ),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Total', style: TextStyle(fontSize: 14, color: Color(0xFFFBFBFB))),
-                  Text('N$total', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFFFBFBFB))),
+                  const Text(
+                    'Total',
+                    style: TextStyle(fontSize: 14, color: Color(0xFFFBFBFB)),
+                  ),
+                  Text(
+                    'N${_formatPrice(total)}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFFBFBFB),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -278,7 +356,11 @@ class _OrderConfirmationScreenState extends ConsumerState<OrderConfirmationScree
                   child: Center(
                     child: Text(
                       isBusy ? 'Processing...' : 'Place Order',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFFFFFBF5)),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFFFFBF5),
+                      ),
                     ),
                   ),
                 ),

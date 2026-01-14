@@ -1,54 +1,44 @@
 // sort_overlay.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/features/product/domain/product_filters.dart';
+import 'package:ojaewa/features/product/presentation/controllers/product_filters_controller.dart';
 
-class SortOverlay extends StatefulWidget {
-  /// Current search query text
-  final String? searchQuery;
-  
+class SortOverlay extends ConsumerStatefulWidget {
   /// Callback when sort is applied
   final Function(String selectedSort)? onApplySort;
   
   /// Callback when sort is cleared
   final VoidCallback? onClearSort;
-  
-  /// Initial selected sort option
-  final String? initialSort;
 
   const SortOverlay({
     super.key,
-    this.searchQuery = '',
     this.onApplySort,
     this.onClearSort,
-    this.initialSort,
   });
 
   @override
-  State<SortOverlay> createState() => _SortOverlayState();
+  ConsumerState<SortOverlay> createState() => _SortOverlayState();
 }
 
-class _SortOverlayState extends State<SortOverlay> {
+class _SortOverlayState extends ConsumerState<SortOverlay> {
   String? _selectedSort;
-  
-  // Sort options from the IR
-  final List<Map<String, dynamic>> _sortOptions = [
-    {'id': 'most_recent', 'label': 'Most Recent'},
-    {'id': 'new_to_old', 'label': 'New to Old'},
-    {'id': 'old_to_new', 'label': 'Old to New'},
-    {'id': 'a_to_z', 'label': 'A-Z'},
-    {'id': 'z_to_a', 'label': 'Z-A'},
-  ];
 
   @override
   void initState() {
     super.initState();
-    _selectedSort = widget.initialSort ?? _sortOptions.first['id'];
+    // Initialize with current sort selection
+    _selectedSort = ref.read(selectedFiltersProvider).sortBy;
   }
 
   void _onApplyPressed() {
-    if (widget.onApplySort != null) {
+    // Apply sort to the provider
+    ref.read(selectedFiltersProvider.notifier).setSortBy(_selectedSort);
+    
+    if (widget.onApplySort != null && _selectedSort != null) {
       widget.onApplySort!(_selectedSort!);
     }
     Navigator.of(context).pop(_selectedSort);
@@ -58,11 +48,14 @@ class _SortOverlayState extends State<SortOverlay> {
     setState(() {
       _selectedSort = null;
     });
+    ref.read(selectedFiltersProvider.notifier).setSortBy(null);
     widget.onClearSort?.call();
   }
 
   @override
   Widget build(BuildContext context) {
+    final filtersAsync = ref.watch(availableFiltersProvider);
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
@@ -79,14 +72,48 @@ class _SortOverlayState extends State<SortOverlay> {
             ),
             
             // Sort overlay content
-            _buildSortOverlay(),
+            filtersAsync.when(
+              loading: () => _buildLoadingSheet(),
+              error: (_, __) => _buildErrorSheet(),
+              data: (filters) => _buildSortOverlay(filters.sortOptions),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSortOverlay() {
+  Widget _buildLoadingSheet() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(40),
+      decoration: const BoxDecoration(
+        color: Color(0xFFFFF8F1),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(28),
+          topRight: Radius.circular(28),
+        ),
+      ),
+      child: const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Widget _buildErrorSheet() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(40),
+      decoration: const BoxDecoration(
+        color: Color(0xFFFFF8F1),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(28),
+          topRight: Radius.circular(28),
+        ),
+      ),
+      child: const Center(child: Text('Failed to load sort options')),
+    );
+  }
+
+  Widget _buildSortOverlay(List<SortOption> sortOptions) {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -106,7 +133,7 @@ class _SortOverlayState extends State<SortOverlay> {
             
             // Sort options list
             const SizedBox(height: 16),
-            _buildSortOptions(),
+            _buildSortOptions(sortOptions),
             const SizedBox(height: 40),
             
             // Action buttons
@@ -145,41 +172,63 @@ class _SortOverlayState extends State<SortOverlay> {
     );
   }
 
-  Widget _buildSortOptions() {
+  Widget _buildSortOptions(List<SortOption> sortOptions) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
-        children: _sortOptions.map((option) {
-          final isSelected = _selectedSort == option['id'];
+        children: sortOptions.map((option) {
+          final isSelected = _selectedSort == option.value;
 
           return Material(
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
                 setState(() {
-                  _selectedSort = option['id'];
+                  _selectedSort = option.value;
                 });
               },
+              borderRadius: BorderRadius.circular(8),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                decoration: BoxDecoration(
+                  color: isSelected ? const Color(0xFFFDF3E7) : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: Row(
                   children: [
-                    Icon(
-                      isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-                      color: isSelected
-                          ? const Color(0xFFA15E22)
-                          : const Color(0xFF777F84),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        option['label'],
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'Campton',
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xFF241508),
+                    // Radio button
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isSelected ? const Color(0xFFA15E22) : const Color(0xFFCCCCCC),
+                          width: 2,
                         ),
+                      ),
+                      child: isSelected
+                          ? Center(
+                              child: Container(
+                                width: 10,
+                                height: 10,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xFFA15E22),
+                                ),
+                              ),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 12),
+                    // Label
+                    Text(
+                      option.label,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Campton',
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                        color: const Color(0xFF1E2021),
                       ),
                     ),
                   ],

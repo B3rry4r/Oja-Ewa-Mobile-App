@@ -8,6 +8,7 @@ import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/features/account/presentation/controllers/profile_controller.dart';
 import 'package:ojaewa/features/auth/presentation/controllers/auth_controller.dart';
 
@@ -17,6 +18,8 @@ class AccountScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(userProfileProvider);
+    final token = ref.watch(accessTokenProvider);
+    final isLoggedIn = token != null && token.isNotEmpty;
 
     ref.listen(authFlowControllerProvider, (prev, next) {
       if (prev?.isLoading == true && next.hasValue) {
@@ -102,7 +105,7 @@ class AccountScreen extends ConsumerWidget {
                             ),
                           ),
                           data: (u) => Text(
-                           'Hello ${u.fullName}',
+                           'Hello ${u?.fullName ?? 'Guest'}',
                            style: const TextStyle(
                              fontSize: 33,
                              fontFamily: 'Campton',
@@ -143,7 +146,7 @@ class AccountScreen extends ConsumerWidget {
                         // Support section
                         const SizedBox(height: 24),
                         _buildSectionHeader('Support'),
-                        _buildSupportList(context, ref),
+                        _buildSupportList(context, ref, isLoggedIn: isLoggedIn),
 
                         // Bottom spacing
                         const SizedBox(height: 32),
@@ -273,7 +276,7 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSupportList(BuildContext context, WidgetRef ref) {
+  Widget _buildSupportList(BuildContext context, WidgetRef ref, {required bool isLoggedIn}) {
     return Column(
       children: [
         _buildMenuItem(
@@ -301,7 +304,7 @@ class AccountScreen extends ConsumerWidget {
           label: 'Connect to us',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.connectToUs),
         ),
-        // Sign Out with different styling
+        // Sign Out or Sign In based on auth state
         Container(
           height: 48,
           margin: const EdgeInsets.only(bottom: 8),
@@ -309,20 +312,25 @@ class AccountScreen extends ConsumerWidget {
             color: Colors.transparent,
             child: InkWell(
               onTap: () async {
-                // Overlay loader while logging out
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (_) => const Center(child: CircularProgressIndicator()),
-                );
-                try {
-                  await ref.read(authFlowControllerProvider.notifier).logout();
-                  if (!context.mounted) return;
-                  Navigator.of(context).pop(); // close loader
-                  Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.onboarding, (r) => false);
-                } catch (_) {
-                  if (!context.mounted) return;
-                  Navigator.of(context).pop();
+                if (isLoggedIn) {
+                  // Logout flow
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (_) => const Center(child: CircularProgressIndicator()),
+                  );
+                  try {
+                    await ref.read(authFlowControllerProvider.notifier).logout();
+                    if (!context.mounted) return;
+                    Navigator.of(context).pop(); // close loader
+                    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.onboarding, (r) => false);
+                  } catch (_) {
+                    if (!context.mounted) return;
+                    Navigator.of(context).pop();
+                  }
+                } else {
+                  // Navigate to sign in
+                  Navigator.of(context).pushNamed(AppRoutes.signIn);
                 }
               },
               borderRadius: BorderRadius.circular(8),
@@ -335,7 +343,7 @@ class AccountScreen extends ConsumerWidget {
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF7E5E5),
+                          color: isLoggedIn ? const Color(0xFFF7E5E5) : const Color(0xFFE5F7E5),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         alignment: Alignment.center,
@@ -350,9 +358,9 @@ class AccountScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
-                        'Sign Out',
-                        style: TextStyle(
+                      Text(
+                        isLoggedIn ? 'Sign Out' : 'Sign In',
+                        style: const TextStyle(
                           fontSize: 16,
                           fontFamily: 'Campton',
                           fontWeight: FontWeight.w400,

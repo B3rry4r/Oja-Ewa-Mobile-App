@@ -26,7 +26,7 @@ class CartApi {
     String processingTimeType = 'normal',
   }) async {
     try {
-      await _dio.post(
+      final res = await _dio.post(
         '/api/cart/items',
         data: {
           'product_id': productId,
@@ -35,7 +35,19 @@ class CartApi {
           'processing_time_type': processingTimeType,
         },
       );
-      // To keep it simple and consistent, just fetch the cart.
+      // Try to parse the response directly if it contains cart data
+      final data = res.data;
+      if (data is Map<String, dynamic>) {
+        // Check if response contains cart data directly
+        final inner = data['data'];
+        if (inner is Map<String, dynamic> && inner.containsKey('items')) {
+          return Cart.fromWrappedResponse(data);
+        }
+        if (data.containsKey('items')) {
+          return Cart.fromWrappedResponse(data);
+        }
+      }
+      // Fallback: fetch cart separately
       return getCart();
     } catch (e) {
       throw mapDioError(e);
@@ -45,6 +57,15 @@ class CartApi {
   Future<Cart> updateItemQuantity({required int cartItemId, required int quantity}) async {
     try {
       await _dio.patch('/api/cart/items/$cartItemId', data: {'quantity': quantity});
+      return getCart();
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  Future<Cart> updateItemSize({required int cartItemId, required String selectedSize}) async {
+    try {
+      await _dio.patch('/api/cart/items/$cartItemId', data: {'selected_size': selectedSize});
       return getCart();
     } catch (e) {
       throw mapDioError(e);

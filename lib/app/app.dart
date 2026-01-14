@@ -4,14 +4,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'bootstrap/app_bootstrap.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
+import '../core/deep_links/deep_link_handler.dart';
+
+/// Global navigator key for deep link navigation
+final navigatorKey = GlobalKey<NavigatorState>();
 
 /// Root widget for the application.
-class App extends ConsumerWidget {
+class App extends ConsumerStatefulWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<App> createState() => _AppState();
+}
+
+class _AppState extends ConsumerState<App> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize deep link handler after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(deepLinkHandlerProvider).init(navigatorKey);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),

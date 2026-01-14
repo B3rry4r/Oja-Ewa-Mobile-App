@@ -2,11 +2,16 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import '../../data/orders_repository_impl.dart';
 import '../../domain/order_models.dart';
 
 final ordersProvider = FutureProvider<List<OrderSummary>>((ref) async {
-  return ref.watch(ordersRepositoryProvider).listOrders(page: 1);
+  // Don't fetch if not authenticated
+  final token = ref.watch(accessTokenProvider);
+  if (token == null || token.isEmpty) return const [];
+  
+  return ref.read(ordersRepositoryProvider).listOrders(page: 1);
 });
 
 class OrderActionsController extends AsyncNotifier<void> {

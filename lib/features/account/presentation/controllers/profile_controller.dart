@@ -1,10 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import '../../data/user_repository_impl.dart';
 import '../../domain/user_profile.dart';
 
-final userProfileProvider = FutureProvider<UserProfile>((ref) async {
-  return ref.watch(userRepositoryProvider).getMe();
+final userProfileProvider = FutureProvider<UserProfile?>((ref) async {
+  // Don't fetch if not authenticated
+  final token = ref.watch(accessTokenProvider);
+  if (token == null || token.isEmpty) return null;
+  
+  return ref.read(userRepositoryProvider).getMe();
 });
 
 class ProfileActionsController extends AsyncNotifier<void> {

@@ -11,13 +11,15 @@ import 'search_controller.dart';
 /// This prevents accidental rebuild loops from spamming the backend.
 class SearchSuggestionsController extends AsyncNotifier<List<SearchProduct>> {
   String? _lastKey;
+  List<SearchProduct>? _cachedResult;
 
   String _keyForFilters(SearchFilters f) {
     return '${f.gender}|${f.style}|${f.tribe}|${f.priceMin}|${f.priceMax}';
   }
 
   Future<List<SearchProduct>> _fetch(SearchFilters f) {
-    return ref.watch(searchRepositoryProvider).suggestions(
+    // Use ref.read to avoid triggering rebuilds
+    return ref.read(searchRepositoryProvider).suggestions(
           limit: 10,
           gender: f.gender,
           style: f.style,
@@ -29,22 +31,31 @@ class SearchSuggestionsController extends AsyncNotifier<List<SearchProduct>> {
 
   @override
   FutureOr<List<SearchProduct>> build() async {
-    ref.keepAlive();
-
-    final token = ref.watch(accessTokenProvider);
+    // Use ref.read for token check to avoid rebuild loops
+    final token = ref.read(accessTokenProvider);
     if (token == null || token.isEmpty) return const <SearchProduct>[];
 
-    final f = ref.watch(searchFiltersProvider);
+    // Use ref.read for filters to avoid rebuild loops
+    final f = ref.read(searchFiltersProvider);
     final key = _keyForFilters(f);
 
-    final current = state.asData?.value;
-    if (current != null && _lastKey == key) {
-      // No filter change -> return cached suggestions, no network call.
-      return current;
+    // Return cached result if filters haven't changed
+    if (_cachedResult != null && _lastKey == key) {
+      return _cachedResult!;
     }
 
     _lastKey = key;
-    return _fetch(f);
+    _cachedResult = await _fetch(f);
+    return _cachedResult!;
+  }
+
+  /// Call this method to refresh suggestions when filters change
+  void refreshIfNeeded() {
+    final f = ref.read(searchFiltersProvider);
+    final key = _keyForFilters(f);
+    if (_lastKey != key) {
+      ref.invalidateSelf();
+    }
   }
 }
 

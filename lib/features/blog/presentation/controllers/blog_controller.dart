@@ -4,18 +4,22 @@ import '../../data/blog_repository_impl.dart';
 import '../../domain/blog_post.dart';
 
 final blogListProvider = FutureProvider<List<BlogPost>>((ref) async {
-  return ref.watch(blogRepositoryProvider).getBlogs();
+  // Use ref.read to avoid rebuild loops
+  return ref.read(blogRepositoryProvider).getBlogs();
 });
 
 final latestBlogsProvider = FutureProvider<List<BlogPost>>((ref) async {
-  return ref.watch(blogRepositoryProvider).getLatestBlogs();
+  // Use ref.read to avoid rebuild loops
+  return ref.read(blogRepositoryProvider).getLatestBlogs();
 });
 
 final blogBySlugProvider = FutureProvider.family<BlogPost, String>((ref, slug) async {
-  return ref.watch(blogRepositoryProvider).getBlogBySlug(slug);
+  // Use ref.read to avoid rebuild loops
+  return ref.read(blogRepositoryProvider).getBlogBySlug(slug);
 });
 
 final blogSearchProvider = FutureProvider.family<List<BlogPost>, String>((ref, query) async {
   if (query.trim().isEmpty) return const [];
-  return ref.watch(blogRepositoryProvider).searchBlogs(query.trim());
+  // Use ref.read to avoid rebuild loops
+  return ref.read(blogRepositoryProvider).searchBlogs(query.trim());
 });
