@@ -12,6 +12,10 @@ class BlogFavoritesApi {
     try {
       final res = await _dio.get('/api/blogs/favorites');
       return _extractList(res.data);
+    } on DioException catch (e) {
+      // Some backends return 404 when there are no favorites.
+      if (e.response?.statusCode == 404) return const <BlogPost>[];
+      throw mapDioError(e);
     } catch (e) {
       throw mapDioError(e);
     }

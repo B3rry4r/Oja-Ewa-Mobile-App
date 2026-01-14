@@ -21,7 +21,9 @@ final dioClientsProvider = Provider<DioClients>((ref) {
     final options = BaseOptions(
       baseUrl: baseUrl,
       connectTimeout: NetworkConstants.connectTimeout,
-      sendTimeout: NetworkConstants.sendTimeout,
+      // Web warning: sendTimeout is only meaningful when sending a request body.
+      // Leaving this unset avoids noisy logs on web.
+      // sendTimeout: NetworkConstants.sendTimeout,
       receiveTimeout: NetworkConstants.receiveTimeout,
       headers: {
         'Accept': 'application/json',
