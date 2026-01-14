@@ -14,6 +14,7 @@ import 'package:ojaewa/features/product_detail/presentation/product_detail_scree
 import '../../../app/router/app_router.dart';
 import 'controllers/search_controller.dart';
 import 'controllers/search_suggestions_controller.dart';
+import '../domain/search_product.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -84,7 +85,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget build(BuildContext context) {
     final query = _searchController.text.trim();
 
-    final suggestionsAsync = ref.watch(searchSuggestionsProvider);
+    final suggestionsAsync = query.isEmpty
+        ? ref.watch(searchSuggestionsProvider)
+        : const AsyncData(<SearchProduct>[]);
     final filters = ref.watch(searchFiltersProvider);
     final searchAsync = query.isEmpty ? AsyncData(SearchState.empty) : ref.watch(searchProvider((query: query, filters: filters)));
 

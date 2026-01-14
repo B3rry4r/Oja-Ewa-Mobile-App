@@ -2,16 +2,21 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/auth/auth_providers.dart';
 import '../../data/search_repository_impl.dart';
 import '../../domain/search_product.dart';
 import 'search_controller.dart';
 
-/// Loads suggestions once per app session (per filter state), to avoid hammering the backend
-/// on screen rebuilds.
+/// Loads suggestions and memoizes results per filter key.
+/// This prevents accidental rebuild loops from spamming the backend.
 class SearchSuggestionsController extends AsyncNotifier<List<SearchProduct>> {
-  Future<List<SearchProduct>> _fetch() {
-    // Recompute only when filters change.
-    final f = ref.watch(searchFiltersProvider);
+  String? _lastKey;
+
+  String _keyForFilters(SearchFilters f) {
+    return '${f.gender}|${f.style}|${f.tribe}|${f.priceMin}|${f.priceMax}';
+  }
+
+  Future<List<SearchProduct>> _fetch(SearchFilters f) {
     return ref.watch(searchRepositoryProvider).suggestions(
           limit: 10,
           gender: f.gender,
@@ -23,11 +28,23 @@ class SearchSuggestionsController extends AsyncNotifier<List<SearchProduct>> {
   }
 
   @override
-  FutureOr<List<SearchProduct>> build() => _fetch();
+  FutureOr<List<SearchProduct>> build() async {
+    ref.keepAlive();
 
-  Future<void> refresh() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(_fetch);
+    final token = ref.watch(accessTokenProvider);
+    if (token == null || token.isEmpty) return const <SearchProduct>[];
+
+    final f = ref.watch(searchFiltersProvider);
+    final key = _keyForFilters(f);
+
+    final current = state.asData?.value;
+    if (current != null && _lastKey == key) {
+      // No filter change -> return cached suggestions, no network call.
+      return current;
+    }
+
+    _lastKey = key;
+    return _fetch(f);
   }
 }
 
