@@ -1,15 +1,30 @@
 // seller_onboarding_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 
 import '../../../../../app/router/app_router.dart';
 
-class SellerOnboardingScreen extends StatelessWidget {
+class SellerOnboardingScreen extends ConsumerWidget {
   const SellerOnboardingScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isSellerApproved = ref.watch(isSellerApprovedProvider);
+    if (isSellerApproved) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            AppRoutes.yourShopDashboard,
+            (route) => false,
+          );
+        }
+      });
+    }
+
+    
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(

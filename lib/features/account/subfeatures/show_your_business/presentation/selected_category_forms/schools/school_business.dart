@@ -58,7 +58,11 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
             ),
             const SizedBox(height: 16),
 
-            _buildInputField("School Name", "Your City"),
+            _buildInputField(
+              "School Name",
+              "Enter school name",
+              controller: _schoolNameController,
+            ),
             const SizedBox(height: 24),
 
             const Text(
@@ -78,6 +82,7 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
               "Share Short description of your business",
               maxLines: 3,
               helperText: "100 characters required",
+              controller: _schoolBiographyController,
             ),
             const SizedBox(height: 24),
             const Text(
@@ -95,7 +100,7 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
             _buildLogoUploadSection(),
 
             const SizedBox(height: 40),
-            _buildPaymentButton(context),
+            _buildContinueButton(context),
             const SizedBox(height: 40),
           ],
         ),
@@ -196,6 +201,7 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
         Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
         const SizedBox(height: 8),
         TextField(
+          controller: controller,
           style: const TextStyle(
             fontFamily: 'Campton',
             fontSize: 16,
@@ -264,7 +270,7 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
     );
   }
 
-  Widget _buildPaymentButton(BuildContext context) {
+  Widget _buildContinueButton(BuildContext context) {
     return InkWell(
       onTap: () {
         final draft = draftFromArgs(
@@ -300,7 +306,7 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
         ),
         child: const Center(
           child: Text(
-            "Make Payment",
+            "Continue",
             style: TextStyle(
               color: Color(0xFFFFFBF5),
               fontSize: 16,

@@ -11,6 +11,8 @@ import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/features/account/presentation/controllers/profile_controller.dart';
 import 'package:ojaewa/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
+import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_status_controller.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -141,7 +143,7 @@ class AccountScreen extends ConsumerWidget {
                         // Business section
                         const SizedBox(height: 24),
                         _buildSectionHeader('Oja Ewa Business'),
-                        _buildBusinessList(context),
+                        _buildBusinessList(context, ref),
 
                         // Support section
                         const SizedBox(height: 24),
@@ -259,18 +261,25 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBusinessList(BuildContext context) {
+  Widget _buildBusinessList(BuildContext context, WidgetRef ref) {
+    final isSellerApproved = ref.watch(isSellerApprovedProvider);
+    final hasApprovedBusiness = ref.watch(hasApprovedBusinessProvider);
+
     return Column(
       children: [
         _buildMenuItem(
           iconAsset: AppIcons.startSelling,
           label: 'Start selling',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.sellerOnboarding),
+          onTap: () => Navigator.of(context).pushNamed(
+            isSellerApproved ? AppRoutes.yourShopDashboard : AppRoutes.sellerOnboarding,
+          ),
         ),
         _buildMenuItem(
           iconAsset: AppIcons.showYourBusiness,
           label: 'Show your business',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.businessOnboarding),
+          onTap: () => Navigator.of(context).pushNamed(
+            hasApprovedBusiness ? AppRoutes.businessSettings : AppRoutes.businessOnboarding,
+          ),
         ),
       ],
     );

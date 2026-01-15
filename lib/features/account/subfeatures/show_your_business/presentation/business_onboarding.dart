@@ -1,14 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_status_controller.dart';
 
 import '../../../../../app/router/app_router.dart';
 
-class BusinessOnboardingScreen extends StatelessWidget {
+class BusinessOnboardingScreen extends ConsumerWidget {
   const BusinessOnboardingScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasApprovedBusiness = ref.watch(hasApprovedBusinessProvider);
+    if (hasApprovedBusiness) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            AppRoutes.businessSettings,
+            (route) => false,
+          );
+        }
+      });
+    }
+
+    
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Main background
       body: SafeArea(

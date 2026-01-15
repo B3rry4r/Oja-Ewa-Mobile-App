@@ -30,11 +30,15 @@ class _MusicBusinessDetailsScreenState
 
   final _businessNameController = TextEditingController();
   final _businessDescriptionController = TextEditingController();
+  final _youtubeController = TextEditingController();
+  final _spotifyController = TextEditingController();
 
   @override
   void dispose() {
     _businessNameController.dispose();
     _businessDescriptionController.dispose();
+    _youtubeController.dispose();
+    _spotifyController.dispose();
     super.dispose();
   }
 
@@ -92,13 +96,26 @@ class _MusicBusinessDetailsScreenState
               controller: _businessDescriptionController,
             ),
 
+            const SizedBox(height: 24),
+            _buildInputField(
+              "YouTube",
+              "Paste your YouTube link",
+              controller: _youtubeController,
+            ),
+            const SizedBox(height: 24),
+            _buildInputField(
+              "Spotify",
+              "Paste your Spotify link",
+              controller: _spotifyController,
+            ),
+
             const SizedBox(height: 32),
             _buildUploadSection("Identity Document"),
             const SizedBox(height: 24),
             _buildUploadSection("Business Logo"),
 
             const SizedBox(height: 40),
-            _buildPaymentButton(context),
+            _buildContinueButton(context),
             const SizedBox(height: 40),
           ],
         ),
@@ -305,7 +322,7 @@ class _MusicBusinessDetailsScreenState
     );
   }
 
-  Widget _buildPaymentButton(BuildContext context) {
+  Widget _buildContinueButton(BuildContext context) {
     return InkWell(
       onTap: () {
         final draft = draftFromArgs(
@@ -315,7 +332,9 @@ class _MusicBusinessDetailsScreenState
           final updated = draft
             ..businessName = _businessNameController.text.trim()
             ..businessDescription = _businessDescriptionController.text.trim()
-            ..musicCategory = _musicCategoryValue;
+            ..musicCategory = _musicCategoryValue
+            ..youtube = _youtubeController.text.trim()
+            ..spotify = _spotifyController.text.trim();
 
           Navigator.of(context).pushNamed(
             AppRoutes.businessAccountReview,
@@ -339,7 +358,7 @@ class _MusicBusinessDetailsScreenState
         ),
         child: const Center(
           child: Text(
-            "Make Payment",
+            "Continue",
             style: TextStyle(
               color: Colors.white,
               fontSize: 16,

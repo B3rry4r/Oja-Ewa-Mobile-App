@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/features/adverts/presentation/controllers/adverts_controller.dart';
@@ -128,11 +129,17 @@ class HomeScreen extends ConsumerWidget {
           // Header Icons
           Row(
             children: [
-              HeaderIconButton(
-                asset: AppIcons.shop,
-                onTap: () => Navigator.of(
-                  context,
-                ).pushNamed(AppRoutes.yourShopDashboard),
+              Consumer(
+                builder: (context, ref, _) {
+                  final isSellerApproved = ref.watch(isSellerApprovedProvider);
+                  if (!isSellerApproved) {
+                    return const SizedBox.shrink();
+                  }
+                  return HeaderIconButton(
+                    asset: AppIcons.shop,
+                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard),
+                  );
+                },
               ),
               const SizedBox(width: 8),
               HeaderIconButton(

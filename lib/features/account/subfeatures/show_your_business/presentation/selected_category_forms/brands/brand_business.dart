@@ -402,7 +402,7 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
         ),
         child: const Center(
           child: Text(
-            "Make Payment",
+            "Continue",
             style: TextStyle(
               color: Color(0xFFFFFBF5),
               fontSize: 16,
