@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/files/pick_file.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
 
 import '../../../../../../../app/router/app_router.dart';
 import '../service_list_editor.dart';
+import '../product_list_editor.dart';
 import '../draft_utils.dart';
 
 class BeautyBusinessDetailsScreen extends StatefulWidget {
@@ -18,16 +21,19 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
 
   final _businessNameController = TextEditingController();
   final _businessDescriptionController = TextEditingController();
-  final _productListController = TextEditingController();
+  final List<String> _products = [''];
 
   final TextEditingController _professionalTitleController = TextEditingController();
   final List<ServiceListItem> _services = [ServiceListItem()];
+
+  // File upload paths
+  String? _businessCertificatePath;
+  String? _businessLogoPath;
 
   @override
   void dispose() {
     _businessNameController.dispose();
     _businessDescriptionController.dispose();
-    _productListController.dispose();
     _professionalTitleController.dispose();
     super.dispose();
   }
@@ -98,20 +104,38 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
               helperText: "100 characters required",
               controller: _businessDescriptionController,
             ),
-            const SizedBox(height: 24),
-            _buildInputField("Product List", "List your products here", maxLines: 3, controller: _productListController),
+            
+            if (_selectedOffering == 'Selling Product') ...[
+              const SizedBox(height: 24),
+              const Text(
+                "What do you sell?",
+                style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
+              ),
+              const SizedBox(height: 8),
+              ProductListEditor(items: _products),
+            ],
             
             const SizedBox(height: 32),
             _buildUploadSection(
-              "Business & NAFDAC Certificates", 
-              "High resolution image\nPDF, JPG, PNG formats",
-              "200 x 200px\n20kb max",
+              title: "Business Certificate", 
+              leftHint: "High resolution image\nPDF, JPG, PNG formats",
+              rightHint: "200 x 200px\n20kb max",
+              selectedPath: _businessCertificatePath,
+              onTap: () async {
+                final path = await pickSingleFilePath();
+                if (path != null) setState(() => _businessCertificatePath = path);
+              },
             ),
             const SizedBox(height: 24),
             _buildUploadSection(
-              "Business logo", 
-              "High resolution image\nPNG formats",
-              "200 x 200px\nMust be in Black",
+              title: "Business logo", 
+              leftHint: "High resolution image\nPNG formats",
+              rightHint: "200 x 200px\nMust be in Black",
+              selectedPath: _businessLogoPath,
+              onTap: () async {
+                final path = await pickSingleFilePath();
+                if (path != null) setState(() => _businessLogoPath = path);
+              },
             ),
             
             const SizedBox(height: 40),
@@ -188,36 +212,56 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
     );
   }
 
-  Widget _buildUploadSection(String title, String leftHint, String rightHint) {
+  Widget _buildUploadSection({
+    required String title,
+    required String leftHint,
+    required String rightHint,
+    required String? selectedPath,
+    required VoidCallback onTap,
+  }) {
+    final hasFile = selectedPath != null && selectedPath.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
         const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 24),
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFF89858A), style: BorderStyle.solid), // In real code, use DottedBorder
-            borderRadius: BorderRadius.circular(11),
-          ),
-          child: Column(
-            children: [
-              const Icon(Icons.cloud_upload_outlined, color: Color(0xFF603814), size: 32),
-              const SizedBox(height: 8),
-              const Text("Browse Document", style: TextStyle(fontSize: 16, color: Color(0xFF1E2021))),
-              const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(leftHint, style: const TextStyle(fontSize: 10, color: Color(0xFF777F84))),
-                    Text(rightHint, textAlign: TextAlign.right, style: const TextStyle(fontSize: 10, color: Color(0xFF777F84))),
-                  ],
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            decoration: BoxDecoration(
+              border: Border.all(color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF89858A)),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
+                  color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF603814),
+                  size: 32,
                 ),
-              ),
-            ],
+                const SizedBox(height: 8),
+                Text(
+                  hasFile ? "File selected" : "Browse Document",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF1E2021),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(leftHint, style: const TextStyle(fontSize: 10, color: Color(0xFF777F84))),
+                      Text(rightHint, textAlign: TextAlign.right, style: const TextStyle(fontSize: 10, color: Color(0xFF777F84))),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -271,9 +315,59 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
     );
   }
 
+  bool _validateForm() {
+    final businessName = _businessNameController.text.trim();
+    final businessDescription = _businessDescriptionController.text.trim();
+    
+    if (businessName.isEmpty) {
+      AppSnackbars.showError(context, 'Please enter your business name');
+      return false;
+    }
+    
+    if (businessDescription.isEmpty) {
+      AppSnackbars.showError(context, 'Please enter your business description');
+      return false;
+    }
+    
+    if (businessDescription.length < 100) {
+      AppSnackbars.showError(context, 'Business description must be at least 100 characters');
+      return false;
+    }
+    
+    if (_selectedOffering == 'Selling Product') {
+      final validProducts = _products.where((p) => p.trim().isNotEmpty).toList();
+      if (validProducts.isEmpty) {
+        AppSnackbars.showError(context, 'Please add at least one product');
+        return false;
+      }
+    }
+    
+    if (_selectedOffering == 'Providing Service') {
+      final professionalTitle = _professionalTitleController.text.trim();
+      if (professionalTitle.isEmpty) {
+        AppSnackbars.showError(context, 'Please enter your professional title');
+        return false;
+      }
+      final validServices = _services.where((s) => s.name.trim().isNotEmpty).toList();
+      if (validServices.isEmpty) {
+        AppSnackbars.showError(context, 'Please add at least one service');
+        return false;
+      }
+    }
+    
+    if (_businessLogoPath == null) {
+      AppSnackbars.showError(context, 'Please upload your business logo');
+      return false;
+    }
+    
+    return true;
+  }
+
   Widget _buildSubmitButton() {
     return InkWell(
       onTap: () {
+        if (!_validateForm()) return;
+        
         final draft = draftFromArgs(
             ModalRoute.of(context)?.settings.arguments,
             categoryLabelFallback: 'Beauty',
@@ -282,9 +376,13 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
             ..businessName = _businessNameController.text.trim()
             ..businessDescription = _businessDescriptionController.text.trim()
             ..offeringType = mapOfferingLabelToEnum(_selectedOffering)
-            ..productListText = _productListController.text
+            ..productList = _products.where((p) => p.trim().isNotEmpty).toList()
             ..professionalTitle = _professionalTitleController.text.trim()
-            ..serviceList = _services;
+            ..serviceList = _services
+            ..businessLogoPath = _businessLogoPath
+            ..businessCertificates = _businessCertificatePath != null 
+                ? [{'path': _businessCertificatePath, 'name': 'Business Certificate'}] 
+                : null;
 
           Navigator.of(context).pushNamed(
             AppRoutes.businessAccountReview,

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/files/pick_file.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
 
 import '../../../../../../../app/router/app_router.dart';
 import '../service_list_editor.dart';
+import '../product_list_editor.dart';
 import '../draft_utils.dart';
 
 class BrandBusinessDetailsScreen extends StatefulWidget {
@@ -18,15 +21,18 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
 
   final _businessNameController = TextEditingController();
   final _businessDescriptionController = TextEditingController();
-  final _productListController = TextEditingController();
+  final List<String> _products = [''];
   final TextEditingController _professionalTitleController = TextEditingController();
   final List<ServiceListItem> _services = [ServiceListItem()];
+
+  // File upload paths
+  String? _businessCertificatePath;
+  String? _businessLogoPath;
 
   @override
   void dispose() {
     _businessNameController.dispose();
     _businessDescriptionController.dispose();
-    _productListController.dispose();
     _professionalTitleController.dispose();
     super.dispose();
   }
@@ -101,12 +107,12 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
               ServiceListEditor(items: _services),
               const SizedBox(height: 24),
             ] else ...[
-              _buildInputField(
-                "Product List",
-                "List your products here",
-                maxLines: 4,
-                controller: _productListController,
+              const Text(
+                "What do you sell?",
+                style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
               ),
+              const SizedBox(height: 8),
+              ProductListEditor(items: _products),
               const SizedBox(height: 24),
             ],
 
@@ -114,15 +120,25 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
 
             // Upload Sections
             _buildUploadCard(
-              title: "CAC Document",
+              title: "Business Certificate",
               hintLeft: "High resolution image\nPDF, JPEG, PNG formats",
               hintRight: "200 x 200px\n20kb Max",
+              selectedPath: _businessCertificatePath,
+              onTap: () async {
+                final path = await pickSingleFilePath();
+                if (path != null) setState(() => _businessCertificatePath = path);
+              },
             ),
             const SizedBox(height: 24),
             _buildUploadCard(
               title: "Business logo",
               hintLeft: "High resolution image\nPNG formats",
               hintRight: "200 x 200px\nMust be in Black",
+              selectedPath: _businessLogoPath,
+              onTap: () async {
+                final path = await pickSingleFilePath();
+                if (path != null) setState(() => _businessLogoPath = path);
+              },
             ),
 
             const SizedBox(height: 40),
@@ -302,7 +318,10 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
     required String title,
     required String hintLeft,
     required String hintRight,
+    required String? selectedPath,
+    required VoidCallback onTap,
   }) {
+    final hasFile = selectedPath != null && selectedPath.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -311,63 +330,116 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
           style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
         ),
         const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 24),
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFF89858A)),
-            borderRadius: BorderRadius.circular(11),
-          ),
-          child: Column(
-            children: [
-              const Icon(
-                Icons.cloud_upload_outlined,
-                color: Color(0xFF603814),
-                size: 30,
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Browse Document",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFF1E2021),
-                  fontWeight: FontWeight.w400,
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            decoration: BoxDecoration(
+              border: Border.all(color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF89858A)),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
+                  color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF603814),
+                  size: 30,
                 ),
-              ),
-              const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      hintLeft,
-                      style: const TextStyle(
-                        color: Color(0xFF777F84),
-                        fontSize: 10,
-                      ),
-                    ),
-                    Text(
-                      hintRight,
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        color: Color(0xFF777F84),
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 8),
+                Text(
+                  hasFile ? "File selected" : "Browse Document",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF1E2021),
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        hintLeft,
+                        style: const TextStyle(
+                          color: Color(0xFF777F84),
+                          fontSize: 10,
+                        ),
+                      ),
+                      Text(
+                        hintRight,
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                          color: Color(0xFF777F84),
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
     );
   }
 
+  bool _validateForm() {
+    final businessName = _businessNameController.text.trim();
+    final businessDescription = _businessDescriptionController.text.trim();
+
+    if (businessName.isEmpty) {
+      AppSnackbars.showError(context, 'Please enter your business name');
+      return false;
+    }
+
+    if (businessDescription.isEmpty) {
+      AppSnackbars.showError(context, 'Please enter your business description');
+      return false;
+    }
+
+    if (businessDescription.length < 100) {
+      AppSnackbars.showError(context, 'Business description must be at least 100 characters');
+      return false;
+    }
+
+    if (_selectedOffering == 'Selling Product') {
+      final validProducts = _products.where((p) => p.trim().isNotEmpty).toList();
+      if (validProducts.isEmpty) {
+        AppSnackbars.showError(context, 'Please add at least one product');
+        return false;
+      }
+    }
+
+    if (_selectedOffering == 'Providing Service') {
+      final professionalTitle = _professionalTitleController.text.trim();
+      if (professionalTitle.isEmpty) {
+        AppSnackbars.showError(context, 'Please enter your professional title');
+        return false;
+      }
+      final validServices = _services.where((s) => s.name.trim().isNotEmpty).toList();
+      if (validServices.isEmpty) {
+        AppSnackbars.showError(context, 'Please add at least one service');
+        return false;
+      }
+    }
+
+    if (_businessLogoPath == null) {
+      AppSnackbars.showError(context, 'Please upload your business logo');
+      return false;
+    }
+
+    return true;
+  }
+
   Widget _buildSubmitButton(BuildContext context) {
     return InkWell(
       onTap: () {
+        if (!_validateForm()) return;
+
         final draft = draftFromArgs(
             ModalRoute.of(context)?.settings.arguments,
             categoryLabelFallback: 'Brands',
@@ -376,9 +448,13 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
             ..businessName = _businessNameController.text.trim()
             ..businessDescription = _businessDescriptionController.text.trim()
             ..offeringType = mapOfferingLabelToEnum(_selectedOffering)
-            ..productListText = _productListController.text
+            ..productList = _products.where((p) => p.trim().isNotEmpty).toList()
             ..professionalTitle = _professionalTitleController.text.trim()
-            ..serviceList = _services;
+            ..serviceList = _services
+            ..businessLogoPath = _businessLogoPath
+            ..businessCertificates = _businessCertificatePath != null 
+                ? [{'path': _businessCertificatePath, 'name': 'Business Certificate'}] 
+                : null;
 
           Navigator.of(context).pushNamed(
             AppRoutes.businessAccountReview,

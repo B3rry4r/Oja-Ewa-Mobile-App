@@ -9,6 +9,7 @@ import '../../../../../../app/router/app_router.dart';
 import 'business_registration_draft.dart';
 import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/location/location_picker_sheets.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
 
 class BusinessSellerRegistrationScreen extends ConsumerStatefulWidget {
   const BusinessSellerRegistrationScreen({super.key});
@@ -26,8 +27,6 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
   final _websiteController = TextEditingController(text: 'https://example.com');
   final _instagramController = TextEditingController();
   final _facebookController = TextEditingController();
-  final _youtubeController = TextEditingController();
-  final _spotifyController = TextEditingController();
   
   // Location selections
   String _selectedCountryName = 'Nigeria';
@@ -44,8 +43,6 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
     _websiteController.dispose();
     _instagramController.dispose();
     _facebookController.dispose();
-    _youtubeController.dispose();
-    _spotifyController.dispose();
     super.dispose();
   }
 
@@ -109,13 +106,7 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
             const SizedBox(height: 20),
             _buildTextInput("Facebook", "Your Facebook URL", controller: _facebookController),
 
-            // Music only: platform links (required: at least one of youtube/spotify)
-            if ((selectedCategory ?? 'Beauty') == 'Music') ...[
-              const SizedBox(height: 20),
-              _buildTextInput('YouTube', 'Paste your YouTube link', controller: _youtubeController),
-              const SizedBox(height: 20),
-              _buildTextInput('Spotify', 'Paste your Spotify link', controller: _spotifyController),
-            ],
+            // Music platform links are entered in Step 2 (Music Business Details)
             
             const SizedBox(height: 40),
             
@@ -361,9 +352,44 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
     );
   }
 
+  bool _validateStep1() {
+    if (_selectedCountryName.isEmpty) {
+      AppSnackbars.showError(context, 'Please select a country');
+      return false;
+    }
+    if (_selectedStateName.isEmpty || _selectedStateName == 'Select State') {
+      AppSnackbars.showError(context, 'Please select a state');
+      return false;
+    }
+    if (_cityController.text.trim().isEmpty) {
+      AppSnackbars.showError(context, 'Please enter your city');
+      return false;
+    }
+    if (_addressController.text.trim().isEmpty) {
+      AppSnackbars.showError(context, 'Please enter your address');
+      return false;
+    }
+    final email = _emailController.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
+      AppSnackbars.showError(context, 'Please enter a valid email address');
+      return false;
+    }
+    if (_phoneController.text.trim().isEmpty) {
+      AppSnackbars.showError(context, 'Please enter a phone number');
+      return false;
+    }
+    if (_identityDocumentLocalPath == null || _identityDocumentLocalPath!.isEmpty) {
+      AppSnackbars.showError(context, 'Please upload your identity document');
+      return false;
+    }
+    return true;
+  }
+
   Widget _buildSubmitButton(BuildContext context) {
     return InkWell(
       onTap: () {
+        if (!_validateStep1()) return;
+
         final selectedCategory = (ModalRoute.of(context)?.settings.arguments as String?) ?? 'Beauty';
 
         final draft = BusinessRegistrationDraft(
@@ -377,8 +403,8 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
           websiteUrl: _websiteController.text.trim(),
           instagram: _instagramController.text.trim(),
           facebook: _facebookController.text.trim(),
-          youtube: _youtubeController.text.trim(),
-          spotify: _spotifyController.text.trim(),
+          youtube: null,
+          spotify: null,
           identityDocumentPath: _identityDocumentLocalPath,
         );
 

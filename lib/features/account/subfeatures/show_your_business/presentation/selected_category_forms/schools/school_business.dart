@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/files/pick_file.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
 
 import '../../../../../../../app/router/app_router.dart';
 import '../classes_offered_editor.dart';
@@ -19,6 +21,9 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
   final _schoolNameController = TextEditingController();
   final _schoolBiographyController = TextEditingController();
   final List<ClassOfferedItem> _classes = [ClassOfferedItem()];
+
+  String? _businessLogoPath;
+  String? _recognitionCertificatePath;
 
   @override
   void dispose() {
@@ -95,10 +100,26 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
             ),
             const SizedBox(height: 8),
             ClassesOfferedEditor(items: _classes),
-            
-            const SizedBox(height: 32),
-            _buildLogoUploadSection(),
 
+            const SizedBox(height: 24),
+            _buildUploadSection(
+              title: 'Business certificate / recognition',
+              selectedPath: _recognitionCertificatePath,
+              onTap: () async {
+                final path = await pickSingleFilePath();
+                if (path != null) setState(() => _recognitionCertificatePath = path);
+              },
+            ),
+            const SizedBox(height: 24),
+            _buildUploadSection(
+              title: 'Business logo',
+              selectedPath: _businessLogoPath,
+              onTap: () async {
+                final path = await pickSingleFilePath();
+                if (path != null) setState(() => _businessLogoPath = path);
+              },
+            ),
+            
             const SizedBox(height: 40),
             _buildContinueButton(context),
             const SizedBox(height: 40),
@@ -194,6 +215,52 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
     );
   }
 
+  Widget _buildUploadSection({
+    required String title,
+    required String? selectedPath,
+    required VoidCallback onTap,
+  }) {
+    final hasFile = selectedPath != null && selectedPath.isNotEmpty;
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            height: 140,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF89858A)),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
+                  size: 24,
+                  color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF777F84),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  hasFile ? 'Document selected' : 'Browse Document',
+                  style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'PDF, JPG, PNG formats',
+                  style: TextStyle(fontSize: 10, color: Color(0xFF777F84)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInputField(String label, String hint, {int maxLines = 1, String? helperText, TextEditingController? controller}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,45 +301,51 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
     );
   }
 
-  Widget _buildLogoUploadSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("Business logo", style: TextStyle(color: Color(0xFF777F84), fontSize: 14)),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 24),
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFF89858A)),
-            borderRadius: BorderRadius.circular(11),
-          ),
-          child: Column(
-            children: [
-              const Icon(Icons.cloud_upload_outlined, color: Color(0xFF603814), size: 28),
-              const SizedBox(height: 8),
-              const Text("Browse Document", style: TextStyle(fontSize: 16, color: Color(0xFF1E2021))),
-              const SizedBox(height: 12),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("High resolution image\nPNG formats", style: TextStyle(fontSize: 10, color: Color(0xFF777F84))),
-                    Text("200 x 200px\nMust be in Black", textAlign: TextAlign.right, style: TextStyle(fontSize: 10, color: Color(0xFF777F84))),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+  bool _validateForm() {
+    final name = _schoolNameController.text.trim();
+    final bio = _schoolBiographyController.text.trim();
+    final hasCert = _recognitionCertificatePath != null && _recognitionCertificatePath!.isNotEmpty;
+    final hasLogo = _businessLogoPath != null && _businessLogoPath!.isNotEmpty;
+
+    if (name.isEmpty) {
+      AppSnackbars.showError(context, 'Please enter your school name');
+      return false;
+    }
+
+    if (bio.isEmpty) {
+      AppSnackbars.showError(context, 'Please enter your school biography');
+      return false;
+    }
+
+    if (bio.length < 100) {
+      AppSnackbars.showError(context, 'School biography must be at least 100 characters');
+      return false;
+    }
+
+    final validClasses = _classes.where((c) => c.name.trim().isNotEmpty).toList();
+    if (validClasses.isEmpty) {
+      AppSnackbars.showError(context, 'Please add at least one class offered');
+      return false;
+    }
+
+    if (!hasCert) {
+      AppSnackbars.showError(context, 'Please upload a certificate / recognition document');
+      return false;
+    }
+
+    if (!hasLogo) {
+      AppSnackbars.showError(context, 'Please upload your business logo');
+      return false;
+    }
+
+    return true;
   }
 
   Widget _buildContinueButton(BuildContext context) {
     return InkWell(
       onTap: () {
+        if (!_validateForm()) return;
+
         final draft = draftFromArgs(
             ModalRoute.of(context)?.settings.arguments,
             categoryLabelFallback: 'Schools',
@@ -282,7 +355,13 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
             ..businessDescription = _schoolBiographyController.text.trim()
             ..schoolType = _selectedSchoolType.toLowerCase()
             ..schoolBiography = _schoolBiographyController.text.trim()
-            ..classesOffered = _classes;
+            ..classesOffered = _classes
+            ..businessLogoPath = _businessLogoPath
+            ..businessCertificates = _recognitionCertificatePath != null
+                ? [
+                    {'path': _recognitionCertificatePath, 'name': 'Certificate / Recognition'}
+                  ]
+                : null;
 
           Navigator.of(context).pushNamed(
             AppRoutes.businessAccountReview,

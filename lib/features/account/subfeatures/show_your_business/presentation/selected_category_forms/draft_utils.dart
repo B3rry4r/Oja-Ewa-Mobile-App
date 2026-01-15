@@ -19,16 +19,6 @@ String? mapOfferingLabelToEnum(String? label) {
   };
 }
 
-List<String> parseProductListText(String? text) {
-  if (text == null) return const [];
-  // Split by newlines and commas, trim and drop empties.
-  return text
-      .split(RegExp(r'[\n,]+'))
-      .map((e) => e.trim())
-      .where((e) => e.isNotEmpty)
-      .toList();
-}
-
 BusinessRegistrationDraft draftFromArgs(Object? args, {required String categoryLabelFallback}) {
   if (args is Map<String, dynamic>) return BusinessRegistrationDraft.fromJson(args);
   return BusinessRegistrationDraft(categoryLabel: categoryLabelFallback);

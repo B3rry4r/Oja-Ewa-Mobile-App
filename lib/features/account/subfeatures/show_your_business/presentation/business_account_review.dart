@@ -214,7 +214,10 @@ class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountRev
 
     // Map draft -> API payload
     // Clean + validate lists before submission
-    final cleanedProductList = parseProductListText(draft.productListText);
+    final cleanedProductList = (draft.productList ?? const [])
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
     final cleanedServiceList = (draft.serviceList ?? const [])
         .where((s) => s.name.trim().isNotEmpty)
         .toList();

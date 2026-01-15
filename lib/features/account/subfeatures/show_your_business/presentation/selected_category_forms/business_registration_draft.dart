@@ -24,7 +24,7 @@ class BusinessRegistrationDraft {
     this.businessName,
     this.businessDescription,
     this.offeringType,
-    this.productListText,
+    this.productList,
     this.professionalTitle,
     this.serviceList,
     this.schoolType,
@@ -64,8 +64,8 @@ class BusinessRegistrationDraft {
   /// backend enum: selling_product|providing_service
   String? offeringType;
 
-  /// UI free-text list; will be converted to canonical JSON on submit
-  String? productListText;
+  /// List of product names for selling_product offering type
+  List<String>? productList;
 
   /// providing_service
   String? professionalTitle;
@@ -100,7 +100,7 @@ class BusinessRegistrationDraft {
         'businessName': businessName,
         'businessDescription': businessDescription,
         'offeringType': offeringType,
-        'productListText': productListText,
+        'productList': productList,
         'professionalTitle': professionalTitle,
         'serviceList': serviceList?.map((e) => e.toJson()).toList(),
         'schoolType': schoolType,
@@ -129,7 +129,9 @@ class BusinessRegistrationDraft {
       businessName: json['businessName'] as String?,
       businessDescription: json['businessDescription'] as String?,
       offeringType: json['offeringType'] as String?,
-      productListText: json['productListText'] as String?,
+      productList: (json['productList'] is List)
+          ? (json['productList'] as List).whereType<String>().toList()
+          : null,
       professionalTitle: json['professionalTitle'] as String?,
       serviceList: (json['serviceList'] is List)
           ? (json['serviceList'] as List)

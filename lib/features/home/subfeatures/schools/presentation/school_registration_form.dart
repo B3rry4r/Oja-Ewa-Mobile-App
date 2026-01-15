@@ -476,7 +476,8 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
 
     if (!success) {
       if (!mounted) return;
-      _showErrorSnackbar('Failed to submit registration. Please try again.');
+      final err = ref.read(schoolRegistrationProvider).error;
+      _showErrorSnackbar(err ?? 'Failed to submit registration. Please try again.');
       return;
     }
 

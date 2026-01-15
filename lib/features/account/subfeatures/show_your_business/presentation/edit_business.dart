@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/location/location_picker_sheets.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/domain/business_profile_payload.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_management_controller.dart';
@@ -32,6 +33,9 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
   String _selectedCountryFlag = '🇳🇬';
   String _selectedStateName = 'FCT';
   String _selectedCountryCode = '+234';
+  
+  // File upload
+  String? _businessLogoPath;
 
   @override
   Widget build(BuildContext context) {
@@ -305,32 +309,42 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
   }
 
   Widget _buildLogoSection() {
+    final hasFile = _businessLogoPath != null && _businessLogoPath!.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionHeader('Business Logo'),
         const SizedBox(height: 16),
-        Container(
-          width: double.infinity,
-          height: 140,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(11),
-            border: Border.all(color: const Color(0xFF89858A)),
-          ),
-          child: const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.cloud_upload_outlined,
-                size: 24,
-                color: Color(0xFF777F84),
-              ),
-              SizedBox(height: 12),
-              Text(
-                'Browse Document',
-                style: TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
-              ),
-            ],
+        GestureDetector(
+          onTap: () async {
+            final path = await pickSingleFilePath();
+            if (path != null) setState(() => _businessLogoPath = path);
+          },
+          child: Container(
+            width: double.infinity,
+            height: 140,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF89858A)),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
+                  size: 24,
+                  color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF777F84),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  hasFile ? 'Logo selected' : 'Browse Document',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF1E2021),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],

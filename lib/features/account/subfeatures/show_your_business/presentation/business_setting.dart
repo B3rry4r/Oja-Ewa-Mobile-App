@@ -4,9 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_status_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/domain/business_status.dart';
+import 'package:ojaewa/features/home/subfeatures/beauty/presentation/business_profile_beauty.dart';
+import 'package:ojaewa/features/home/subfeatures/music/presentation/music_artist_profile.dart';
 
 import '../../../../../app/router/app_router.dart';
-import 'package:ojaewa/features/business_details/presentation/screens/business_details_screen.dart';
 
 class BusinessSettingsScreen extends ConsumerWidget {
   const BusinessSettingsScreen({super.key});
@@ -148,12 +149,8 @@ class BusinessSettingsScreen extends ConsumerWidget {
         return ListTile(
           contentPadding: const EdgeInsets.symmetric(vertical: 8),
           onTap: () {
-            // Open the business detail screen (public view) from management list
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => BusinessDetailsScreen(businessId: b.id),
-              ),
-            );
+            // Navigate to category-specific detail screen
+            _navigateToBusinessDetail(context, b);
           },
           title: Row(
             children: [
@@ -197,6 +194,38 @@ class BusinessSettingsScreen extends ConsumerWidget {
     );
   }
 
+  /// Navigate to the category-specific business detail screen
+  void _navigateToBusinessDetail(BuildContext context, BusinessStatus business) {
+    final category = business.category.toLowerCase();
+    
+    switch (category) {
+      case 'beauty':
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => BusinessProfileBeautyScreen(businessId: business.id),
+          ),
+        );
+        break;
+      case 'music':
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => MusicArtistProfileScreen(businessId: business.id),
+          ),
+        );
+        break;
+      case 'brand':
+      case 'school':
+      default:
+        // For brands and schools, use the route-based navigation
+        // These screens will be implemented similarly later
+        Navigator.of(context).pushNamed(
+          AppRoutes.beauty, // Fallback to beauty screen pattern for now
+          arguments: {'businessId': business.id},
+        );
+        break;
+    }
+  }
+
   /// Action Sheet inferred from response2.json
   void _showBusinessActions(BuildContext context, BusinessStatus business) {
     showModalBottomSheet(
@@ -233,17 +262,18 @@ class BusinessSettingsScreen extends ConsumerWidget {
                 },
               ),
               const Divider(color: Color(0xFFDEDEDE)),
-              _buildModalOption(
-                label: "Manage Payment",
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.of(context).pushNamed(
-                    AppRoutes.managePayment,
-                    arguments: {'businessId': business.id},
-                  );
-                },
-              ),
-              const Divider(color: Color(0xFFDEDEDE)),
+              // TODO: Uncomment when subscription feature is active
+              // _buildModalOption(
+              //   label: "Manage Payment",
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //     Navigator.of(context).pushNamed(
+              //       AppRoutes.managePayment,
+              //       arguments: {'businessId': business.id},
+              //     );
+              //   },
+              // ),
+              // const Divider(color: Color(0xFFDEDEDE)),
               _buildModalOption(
                 label: "Deactivate Shop",
                 isDestructive: true,

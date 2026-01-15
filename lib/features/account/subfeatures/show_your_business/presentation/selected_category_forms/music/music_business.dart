@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/files/pick_file.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
 
 import '../../../../../../../app/router/app_router.dart';
 import '../draft_utils.dart';
@@ -32,6 +34,8 @@ class _MusicBusinessDetailsScreenState
   final _businessDescriptionController = TextEditingController();
   final _youtubeController = TextEditingController();
   final _spotifyController = TextEditingController();
+
+  String? _businessLogoPath;
 
   @override
   void dispose() {
@@ -109,10 +113,8 @@ class _MusicBusinessDetailsScreenState
               controller: _spotifyController,
             ),
 
-            const SizedBox(height: 32),
-            _buildUploadSection("Identity Document"),
             const SizedBox(height: 24),
-            _buildUploadSection("Business Logo"),
+            _buildLogoUploadSection(),
 
             const SizedBox(height: 40),
             _buildContinueButton(context),
@@ -226,6 +228,54 @@ class _MusicBusinessDetailsScreenState
     );
   }
 
+  Widget _buildLogoUploadSection() {
+    final hasFile = _businessLogoPath != null && _businessLogoPath!.isNotEmpty;
+    return InkWell(
+      onTap: () async {
+        final path = await pickSingleFilePath();
+        if (path != null) setState(() => _businessLogoPath = path);
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Business logo',
+            style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            height: 140,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF89858A)),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
+                  size: 24,
+                  color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF777F84),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  hasFile ? 'Logo selected' : 'Browse Document',
+                  style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'PNG, JPG formats (200x200px recommended)',
+                  style: TextStyle(fontSize: 10, color: Color(0xFF777F84)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInputField(
     String label,
     String hint, {
@@ -279,52 +329,70 @@ class _MusicBusinessDetailsScreenState
     );
   }
 
-  Widget _buildUploadSection(String title) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 24),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color(0xFF89858A),
-              style: BorderStyle.solid,
-            ),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Column(
-            children: [
-              Icon(
-                Icons.cloud_upload_outlined,
-                color: Color(0xFF603814),
-                size: 30,
-              ),
-              SizedBox(height: 8),
-              Text(
-                "Browse Document",
-                style: TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
-              ),
-              SizedBox(height: 8),
-              Text(
-                "PNG, JPG formats (200x200px recommended)",
-                style: TextStyle(fontSize: 10, color: Color(0xFF777F84)),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+  bool _isValidUrl(String v) {
+    final value = v.trim();
+    if (value.isEmpty) return false;
+    final uri = Uri.tryParse(value);
+    return uri != null && uri.hasScheme && uri.host.isNotEmpty;
+  }
+
+  bool _validateForm() {
+    final name = _businessNameController.text.trim();
+    final description = _businessDescriptionController.text.trim();
+    final youtube = _youtubeController.text.trim();
+    final spotify = _spotifyController.text.trim();
+
+    if (name.isEmpty) {
+      AppSnackbars.showError(context, 'Please enter your business name');
+      return false;
+    }
+
+    if (description.isEmpty) {
+      AppSnackbars.showError(context, 'Please enter your business description');
+      return false;
+    }
+
+    if (description.length < 100) {
+      AppSnackbars.showError(context, 'Business description must be at least 100 characters');
+      return false;
+    }
+
+    // music_category is required by backend
+    if (_musicCategoryValue.trim().isEmpty) {
+      AppSnackbars.showError(context, 'Please select a music category');
+      return false;
+    }
+
+    // Backend requires at least one of youtube/spotify.
+    if (youtube.isEmpty && spotify.isEmpty) {
+      AppSnackbars.showError(context, 'Please provide at least one platform link (YouTube or Spotify)');
+      return false;
+    }
+
+    if (youtube.isNotEmpty && !_isValidUrl(youtube)) {
+      AppSnackbars.showError(context, 'Please enter a valid YouTube URL (include https://)');
+      return false;
+    }
+
+    if (spotify.isNotEmpty && !_isValidUrl(spotify)) {
+      AppSnackbars.showError(context, 'Please enter a valid Spotify URL (include https://)');
+      return false;
+    }
+
+    // You asked us to enforce business logo required for music.
+    if (_businessLogoPath == null || _businessLogoPath!.isEmpty) {
+      AppSnackbars.showError(context, 'Please upload your business logo');
+      return false;
+    }
+
+    return true;
   }
 
   Widget _buildContinueButton(BuildContext context) {
     return InkWell(
       onTap: () {
+        if (!_validateForm()) return;
+
         final draft = draftFromArgs(
             ModalRoute.of(context)?.settings.arguments,
             categoryLabelFallback: 'Music',
@@ -334,7 +402,8 @@ class _MusicBusinessDetailsScreenState
             ..businessDescription = _businessDescriptionController.text.trim()
             ..musicCategory = _musicCategoryValue
             ..youtube = _youtubeController.text.trim()
-            ..spotify = _spotifyController.text.trim();
+            ..spotify = _spotifyController.text.trim()
+            ..businessLogoPath = _businessLogoPath;
 
           Navigator.of(context).pushNamed(
             AppRoutes.businessAccountReview,

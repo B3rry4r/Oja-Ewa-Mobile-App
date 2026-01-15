@@ -51,7 +51,8 @@ class BusinessProfilePayload {
   final String? instagram;
   final String? facebook;
 
-  /// file paths (from upload endpoints)
+  /// Remote URLs returned by upload endpoint (NOT local file paths).
+  /// Local file paths are uploaded separately after business creation.
   final String? identityDocument;
   final String? businessLogo;
 
@@ -79,6 +80,12 @@ class BusinessProfilePayload {
   final String? youtube;
   final String? spotify;
 
+  bool _isRemoteUrl(String? v) {
+    if (v == null) return false;
+    final value = v.trim();
+    return value.startsWith('http://') || value.startsWith('https://');
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'category': category,
@@ -91,14 +98,17 @@ class BusinessProfilePayload {
       if (websiteUrl != null && websiteUrl!.isNotEmpty) 'website_url': websiteUrl,
       if (instagram != null && instagram!.isNotEmpty) 'instagram': instagram,
       if (facebook != null && facebook!.isNotEmpty) 'facebook': facebook,
-      if (identityDocument != null && identityDocument!.isNotEmpty) 'identity_document': identityDocument,
+      if (_isRemoteUrl(identityDocument)) 'identity_document': identityDocument,
       if (businessName.isNotEmpty) 'business_name': businessName,
       if (businessDescription.isNotEmpty) 'business_description': businessDescription,
-      if (businessLogo != null && businessLogo!.isNotEmpty) 'business_logo': businessLogo,
+      if (_isRemoteUrl(businessLogo)) 'business_logo': businessLogo,
       if (offeringType != null && offeringType!.isNotEmpty) 'offering_type': offeringType,
       if (productList != null) 'product_list': productList,
       if (serviceList != null) 'service_list': serviceList!.map((e) => e.toJson()).toList(),
-      if (businessCertificates != null) 'business_certificates': businessCertificates,
+      if (businessCertificates != null)
+        'business_certificates': businessCertificates!
+            .where((e) => (e['url'] is String) && _isRemoteUrl(e['url'] as String?))
+            .toList(),
       if (professionalTitle != null && professionalTitle!.isNotEmpty) 'professional_title': professionalTitle,
       if (schoolType != null && schoolType!.isNotEmpty) 'school_type': schoolType,
       if (schoolBiography != null && schoolBiography!.isNotEmpty) 'school_biography': schoolBiography,

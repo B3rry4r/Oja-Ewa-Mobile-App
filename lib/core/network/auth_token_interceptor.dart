@@ -29,6 +29,10 @@ class AuthTokenInterceptor extends Interceptor {
     '/api/adverts',
     '/api/sellers/',
     '/api/sustainability',
+
+    // school registration (public)
+    '/api/school-registrations',
+
     // auth
     '/api/login',
     '/api/register',
