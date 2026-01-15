@@ -10,8 +10,15 @@ final ordersProvider = FutureProvider<List<OrderSummary>>((ref) async {
   // Don't fetch if not authenticated
   final token = ref.watch(accessTokenProvider);
   if (token == null || token.isEmpty) return const [];
-  
+
   return ref.read(ordersRepositoryProvider).listOrders(page: 1);
+});
+
+final orderDetailsProvider = FutureProvider.family<Map<String, dynamic>, int>((ref, orderId) async {
+  final token = ref.watch(accessTokenProvider);
+  if (token == null || token.isEmpty) return const {};
+
+  return ref.read(ordersRepositoryProvider).getOrderDetails(orderId);
 });
 
 class OrderActionsController extends AsyncNotifier<void> {

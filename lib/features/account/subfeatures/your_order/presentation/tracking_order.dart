@@ -1,14 +1,38 @@
 // tracking_order_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/features/orders/data/orders_repository_impl.dart';
 
-class TrackingOrderScreen extends StatelessWidget {
+final _orderDetailsForTrackingProvider = FutureProvider.family<Map<String, dynamic>, int>((ref, orderId) async {
+  return ref.read(ordersRepositoryProvider).getOrderDetails(orderId);
+});
+
+final _orderTrackingProvider = FutureProvider.family<Map<String, dynamic>, int>((ref, orderId) async {
+  return ref.read(ordersRepositoryProvider).getOrderTracking(orderId);
+});
+
+class TrackingOrderScreen extends ConsumerWidget {
   const TrackingOrderScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final orderId = (args is Map && args['orderId'] is int) ? args['orderId'] as int : null;
+
+    if (orderId == null) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFFFF8F1),
+        body: SafeArea(child: Center(child: Text('Missing order id'))),
+      );
+    }
+
+    final orderAsync = ref.watch(_orderDetailsForTrackingProvider(orderId));
+    final trackingAsync = ref.watch(_orderTrackingProvider(orderId));
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
@@ -29,47 +53,76 @@ class TrackingOrderScreen extends StatelessWidget {
               ),
             ),
 
-            // Order ID
+            // Order ID (UI preserved)
             Padding(
               padding: const EdgeInsets.only(left: 16, top: 12),
               child: Text(
-                '#rt667899hnny007',
-                style: TextStyle(
+                '#$orderId',
+                style: const TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
-                  color: const Color(0xFF3C4042),
+                  color: Color(0xFF3C4042),
                 ),
               ),
             ),
 
             // Main content - Scrollable area
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Shipping Info Card
-                    _buildShippingInfoCard(),
+              child: trackingAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, st) => Center(child: Text('Failed to load tracking: $e')),
+                data: (trackingResponse) {
+                  final trackingData = trackingResponse['data'] as Map<String, dynamic>? ?? trackingResponse;
+                  final estimatedDelivery = trackingData['estimated_delivery'] as String?;
+                  final trackingNumber = trackingData['tracking_number'] as String?;
 
-                    // Tracking Timeline - Proper implementation
-                    _buildTrackingTimeline(),
+                  final stagesRaw = trackingData['stages'] as List?;
+                  final stages = stagesRaw
+                          ?.whereType<Map>()
+                          .map((m) => Map<String, dynamic>.from(m))
+                          .map(_TrackingStage.fromJson)
+                          .toList() ??
+                      [];
 
-                    // Decorative image (low opacity)
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Opacity(
-                        opacity: 0.03,
-                        child: Image.asset(
-                          AppImages.logoOutline,
-                          width: 234,
-                          height: 347,
-                          fit: BoxFit.contain,
+                  final steps = _mapStagesToTimelineSteps(stages);
+
+                  final firstProductName = orderAsync.asData?.value.isNotEmpty == true
+                      ? _firstProductName(orderAsync.asData!.value)
+                      : 'Order Item';
+
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Shipping Info Card (UI preserved; top label now product name)
+                        _buildShippingInfoCard(
+                          context: context,
+                          productName: firstProductName,
+                          estimatedDelivery: estimatedDelivery,
+                          trackingNumber: trackingNumber,
                         ),
-                      ),
+
+                        // Tracking Timeline (UI preserved; now data-driven)
+                        _buildTrackingTimeline(steps),
+
+                        // Decorative image (low opacity)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Opacity(
+                            opacity: 0.03,
+                            child: Image.asset(
+                              AppImages.logoOutline,
+                              width: 234,
+                              height: 347,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ],
@@ -78,7 +131,26 @@ class TrackingOrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildShippingInfoCard() {
+  String _firstProductName(Map<String, dynamic> orderDetails) {
+    final items = orderDetails['order_items'];
+    if (items is List && items.isNotEmpty) {
+      final first = items.first;
+      if (first is Map) {
+        final product = first['product'];
+        if (product is Map && product['name'] is String) {
+          return product['name'] as String;
+        }
+      }
+    }
+    return 'Order Item';
+  }
+
+  Widget _buildShippingInfoCard({
+    required BuildContext context,
+    required String productName,
+    required String? estimatedDelivery,
+    required String? trackingNumber,
+  }) {
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
@@ -90,10 +162,9 @@ class TrackingOrderScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Shipping company
-          const Text(
-            'Zikka Express',
-            style: TextStyle(
+          Text(
+            productName,
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               fontFamily: 'Campton',
@@ -102,37 +173,46 @@ class TrackingOrderScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // Delivery date
           _buildInfoSection(
             label: 'Estimated Delivery Date',
-            value: 'March 20 - March 25',
+            value: estimatedDelivery ?? '—',
             labelColor: const Color(0xFF777F84),
           ),
           const SizedBox(height: 16),
 
-          // Tracking number with copy button
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: _buildInfoSection(
                   label: 'Tracking Number',
-                  value: 'NG1234567890',
+                  value: trackingNumber ?? '—',
                   labelColor: const Color(0xFF777F84),
                 ),
               ),
               const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                child: const Text(
-                  'Copy',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontFamily: 'Campton',
-                    color: Color(0xFF777F84),
+              if (trackingNumber != null && trackingNumber.isNotEmpty)
+                InkWell(
+                  onTap: () async {
+                    await Clipboard.setData(ClipboardData(text: trackingNumber));
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Copied')),
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                    child: const Text(
+                      'Copy',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontFamily: 'Campton',
+                        color: Color(0xFF777F84),
+                      ),
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ],
@@ -169,55 +249,7 @@ class TrackingOrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTrackingTimeline() {
-    const List<TimelineStep> steps = [
-      TimelineStep(
-        title: 'Delivered',
-        timestamp: 'Mar 25 2023  06:30',
-        isCompleted: true,
-        isCurrent: false,
-        dotColor: Color(0xFFE9E9E9),
-        textColor: Color(0xFFE9E9E9),
-        timeColor: Color(0xFFDEDEDE),
-      ),
-      TimelineStep(
-        title: 'Out for Delivery',
-        timestamp: 'Mar 25 2023  06:30',
-        isCompleted: true,
-        isCurrent: false,
-        dotColor: Color(0xFFE9E9E9),
-        textColor: Color(0xFFE9E9E9),
-        timeColor: Color(0xFFDEDEDE),
-      ),
-      TimelineStep(
-        title: 'Shipped',
-        timestamp: 'Mar 25 2023  06:30',
-        isCompleted: true,
-        isCurrent: false,
-        dotColor: Color(0xFFE9E9E9),
-        textColor: Color(0xFFE9E9E9),
-        timeColor: Color(0xFFDEDEDE),
-      ),
-      TimelineStep(
-        title: 'Processing',
-        timestamp: 'Mar 25 2023  06:30',
-        isCompleted: true,
-        isCurrent: false,
-        dotColor: Color(0xFFE9E9E9),
-        textColor: Color(0xFFE9E9E9),
-        timeColor: Color(0xFFDEDEDE),
-      ),
-      TimelineStep(
-        title: 'Order Placed',
-        timestamp: 'Mar 25 2023  06:30',
-        isCompleted: true,
-        isCurrent: true,
-        dotColor: Color(0xFF603814),
-        textColor: Colors.black,
-        timeColor: Color(0xFF777F84),
-      ),
-    ];
-
+  Widget _buildTrackingTimeline(List<TimelineStep> steps) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.only(top: 24, bottom: 16),
@@ -236,7 +268,6 @@ class TrackingOrderScreen extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Timeline dot with proper centering
         Container(
           width: 20,
           height: 20,
@@ -245,12 +276,10 @@ class TrackingOrderScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
           ),
           child: step.isCurrent
-              ? Icon(Icons.check, size: 16, color: Colors.white)
+              ? const Icon(Icons.check, size: 16, color: Colors.white)
               : null,
         ),
         const SizedBox(width: 12),
-
-        // Text content
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,11 +315,55 @@ class TrackingOrderScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Connector line centered with the dot
           Container(width: 1, height: 26, color: const Color(0xFFD9D9D9)),
-          const SizedBox(width: 29), // Space to align with next dot
+          const SizedBox(width: 29),
         ],
       ),
+    );
+  }
+
+  List<TimelineStep> _mapStagesToTimelineSteps(List<_TrackingStage> stages) {
+    // The original UI expects newest first (Delivered at top). Backend might send oldest->newest.
+    final ordered = [...stages];
+    // If the first stage is "Order Placed", reverse to show Delivered first.
+    final normalized = (ordered.isNotEmpty && ordered.first.title.toLowerCase().contains('order'))
+        ? ordered.reversed.toList()
+        : ordered;
+
+    return normalized.map((s) {
+      final isActive = s.completed;
+      return TimelineStep(
+        title: s.title,
+        timestamp: s.date ?? s.description ?? '—',
+        isCompleted: isActive,
+        isCurrent: isActive,
+        dotColor: isActive ? const Color(0xFF603814) : const Color(0xFFE9E9E9),
+        textColor: isActive ? Colors.black : const Color(0xFFE9E9E9),
+        timeColor: isActive ? const Color(0xFF777F84) : const Color(0xFFDEDEDE),
+      );
+    }).toList();
+  }
+}
+
+class _TrackingStage {
+  final String title;
+  final String? description;
+  final bool completed;
+  final String? date;
+
+  const _TrackingStage({
+    required this.title,
+    required this.description,
+    required this.completed,
+    required this.date,
+  });
+
+  factory _TrackingStage.fromJson(Map<String, dynamic> json) {
+    return _TrackingStage(
+      title: (json['title'] as String?) ?? '',
+      description: json['description'] as String?,
+      completed: (json['completed'] as bool?) ?? false,
+      date: json['date'] as String?,
     );
   }
 }

@@ -24,7 +24,7 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
   final _addressController = TextEditingController();
   final _emailController = TextEditingController(text: 'sanusimot@gmail.com');
   final _phoneController = TextEditingController();
-  final _websiteController = TextEditingController(text: 'https://example.com');
+  final _websiteController = TextEditingController();
   final _instagramController = TextEditingController();
   final _facebookController = TextEditingController();
   
@@ -48,9 +48,6 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
 
   @override
   Widget build(BuildContext context) {
-    final arg = ModalRoute.of(context)?.settings.arguments;
-    final selectedCategory = (arg is String) ? arg : (arg is Map ? (arg['categoryLabel'] as String?) : null);
-
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Main background from IR
       appBar: const PreferredSize(
@@ -250,52 +247,6 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
     ]);
   }
 
-  Widget _buildPhoneInput(String label, String code, {required TextEditingController controller}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
-        const SizedBox(height: 8),
-        Container(
-          height: 49,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-          ),
-          alignment: Alignment.center,
-          child: Row(
-            children: [
-              Text(
-                code,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextFormField(
-                  controller: controller,
-                  keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                    hintText: 'Enter phone number',
-                    hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
-                  ),
-                  style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildFileUploadSection() {
     return InkWell(
       onTap: () async {
@@ -352,6 +303,13 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
     );
   }
 
+  bool _isValidUrl(String v) {
+    final value = v.trim();
+    if (value.isEmpty) return false;
+    final uri = Uri.tryParse(value);
+    return uri != null && uri.hasScheme && uri.host.isNotEmpty;
+  }
+
   bool _validateStep1() {
     if (_selectedCountryName.isEmpty) {
       AppSnackbars.showError(context, 'Please select a country');
@@ -382,6 +340,26 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
       AppSnackbars.showError(context, 'Please upload your identity document');
       return false;
     }
+
+    // Optional URLs: if provided, must be valid
+    final website = _websiteController.text.trim();
+    if (website.isNotEmpty && !_isValidUrl(website)) {
+      AppSnackbars.showError(context, 'Please enter a valid website URL (include https://)');
+      return false;
+    }
+
+    final instagram = _instagramController.text.trim();
+    if (instagram.isNotEmpty && !_isValidUrl(instagram)) {
+      AppSnackbars.showError(context, 'Please enter a valid Instagram URL (include https://)');
+      return false;
+    }
+
+    final facebook = _facebookController.text.trim();
+    if (facebook.isNotEmpty && !_isValidUrl(facebook)) {
+      AppSnackbars.showError(context, 'Please enter a valid Facebook URL (include https://)');
+      return false;
+    }
+
     return true;
   }
 
@@ -427,7 +405,7 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withOpacity(0.4),
+              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             )

@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/features/orders/presentation/controllers/orders_controller.dart';
+import 'package:ojaewa/features/orders/presentation/order_status_ui.dart';
+import 'package:ojaewa/core/widgets/image_placeholder.dart';
 
 class OrdersScreen extends ConsumerWidget {
   const OrdersScreen({super.key});
@@ -72,22 +74,16 @@ class OrdersScreen extends ConsumerWidget {
                   return ListView.separated(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     itemCount: orders.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 16),
+                    separatorBuilder: (context, index) => const SizedBox(height: 16),
                     itemBuilder: (context, index) {
                       final o = orders[index];
                       final status = (o.status ?? 'pending');
-                      final statusColor = switch (status) {
-                        'delivered' => const Color(0xFF70B673),
-                        'shipped' => const Color(0xFF3095CE),
-                        'processing' => const Color(0xFF3095CE),
-                        'paid' => const Color(0xFF3095CE),
-                        'cancelled' => const Color(0xFFCCCCCC),
-                        _ => const Color(0xFF3095CE),
-                      };
+                      final statusColor = OrderStatusUi.color(status);
+                      final statusLabel = OrderStatusUi.label(status);
 
                       final hasReviewButton = status == 'delivered';
                       final itemCount = '${o.items.length} item${o.items.length == 1 ? '' : 's'}';
-                      final totalAmount = 'N${(o.totalPrice ?? 0).toString()}';
+                      final totalAmount = '₦${(o.totalPrice ?? 0).toString()}';
 
                       return InkWell(
                         onTap: () => Navigator.of(context).pushNamed(
@@ -124,7 +120,7 @@ class OrdersScreen extends ConsumerWidget {
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        status,
+                                        statusLabel,
                                         style: const TextStyle(
                                           fontSize: 12,
                                           fontFamily: 'Campton',
@@ -139,14 +135,20 @@ class OrdersScreen extends ConsumerWidget {
                               const SizedBox(height: 8),
                               Row(
                                 children: [
-                                  for (final _ in o.items.take(2)) ...[
-                                    Container(
-                                      width: 80,
-                                      height: 68,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFD9D9D9),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
+                                  for (final item in o.items.take(2)) ...[
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: item.product.image == null || (item.product.image ?? '').isEmpty
+                                          ? const AppImagePlaceholder(width: 80, height: 68, borderRadius: 4)
+                                          : Image.network(
+                                              item.product.image!,
+                                              width: 80,
+                                              height: 68,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return const AppImagePlaceholder(width: 80, height: 68, borderRadius: 4);
+                                              },
+                                            ),
                                     ),
                                     const SizedBox(width: 8),
                                   ],

@@ -1,151 +1,252 @@
 // order_details_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/widgets/image_placeholder.dart';
+import 'package:ojaewa/features/orders/domain/order_models.dart';
+import 'package:ojaewa/features/orders/presentation/controllers/orders_controller.dart';
+import 'package:ojaewa/features/orders/presentation/order_status_ui.dart';
+import 'package:ojaewa/features/product_detail/presentation/product_detail_screen.dart';
 
-class OrderDetailsScreen extends StatelessWidget {
+class OrderDetailsScreen extends ConsumerWidget {
   const OrderDetailsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final orderId = (args is Map && args['orderId'] is int) ? args['orderId'] as int : null;
+
+    if (orderId == null) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFFFF8F1),
+        body: SafeArea(child: Center(child: Text('Missing order id'))),
+      );
+    }
+
+    final orderAsync = ref.watch(orderDetailsProvider(orderId));
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
-        child: Column(
-          children: [
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
-              title: Text(
-                'Order Details',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
+        child: orderAsync.when(
+          loading: () => const Column(
+            children: [
+              AppHeader(
+                backgroundColor: Color(0xFFFFF8F1),
+                iconColor: Color(0xFF241508),
+                title: Text(
+                  'Order Details',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF241508),
+                  ),
                 ),
               ),
-            ),
-            
-            // Main content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  children: [
-                    // Order Information section
-                    _buildOrderInformation(),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Shipping Address section
-                    _buildShippingAddress(),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Items in Order section
-                    _buildItemsInOrder(),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Payment section
-                    _buildPaymentDetails(),
-                    
-                    // Bottom spacing for buttons
-                    const SizedBox(height: 100),
-                  ],
+              Expanded(child: Center(child: CircularProgressIndicator())),
+            ],
+          ),
+          error: (e, st) => Column(
+            children: [
+              const AppHeader(
+                backgroundColor: Color(0xFFFFF8F1),
+                iconColor: Color(0xFF241508),
+                title: Text(
+                  'Order Details',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF241508),
+                  ),
                 ),
               ),
-            ),
-            
-            // Bottom action buttons
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Color(0xFF603814),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(22),
-                  topRight: Radius.circular(22),
-                ),
-              ),
-              child: Row(
+              Expanded(child: Center(child: Text('Failed to load order: $e'))),
+            ],
+          ),
+          data: (data) {
+            if (data.isEmpty) {
+              return const Column(
                 children: [
-                  // Buy Again button
-                  Expanded(
-                    child: Container(
-                      height: 57,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFFDAF40)),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {},
-                          borderRadius: BorderRadius.circular(8),
-                          child: Center(
-                            child: Text(
-                              'Buy Again',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'Campton',
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFFFDAF40),
-                              ),
-                            ),
-                          ),
-                        ),
+                  AppHeader(
+                    backgroundColor: Color(0xFFFFF8F1),
+                    iconColor: Color(0xFF241508),
+                    title: Text(
+                      'Order Details',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontFamily: 'Campton',
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF241508),
                       ),
                     ),
                   ),
-                  
-                  const SizedBox(width: 16),
-                  
-                  // Track button
-                  Expanded(
-                    child: Container(
-                      height: 57,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFDAF40),
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFFDAF40).withOpacity(0.5),
-                            blurRadius: 16,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {},
-                          borderRadius: BorderRadius.circular(8),
-                          child: const Center(
-                            child: Text(
-                              'Track',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'Campton',
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFFFFFBF5),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  Expanded(child: Center(child: Text('Order not found'))),
                 ],
-              ),
-            ),
-          ],
+              );
+            }
+
+            final order = OrderSummary.fromJson(data);
+
+            // Try to extract an address if backend provides one.
+            final shippingTo = (data['shipping_address'] ?? data['address']) as String?;
+
+            return Column(
+              children: [
+                const AppHeader(
+                  backgroundColor: Color(0xFFFFF8F1),
+                  iconColor: Color(0xFF241508),
+                  title: Text(
+                    'Order Details',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF241508),
+                    ),
+                  ),
+                ),
+
+                // Main content
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      children: [
+                        // Order Information section
+                        _buildOrderInformation(context, order),
+
+                        const SizedBox(height: 16),
+
+                        // Shipping Address section
+                        _buildShippingAddress(shippingTo),
+
+                        const SizedBox(height: 16),
+
+                        // Items in Order section
+                        _buildItemsInOrder(order.items),
+
+                        const SizedBox(height: 16),
+
+                        // Payment section
+                        _buildPaymentDetails(order.totalPrice ?? 0),
+
+                        // Bottom spacing for buttons
+                        const SizedBox(height: 100),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Bottom action buttons (UI unchanged)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF603814),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(22),
+                      topRight: Radius.circular(22),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      // Buy Again button
+                      Expanded(
+                        child: Container(
+                          height: 57,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFFFDAF40)),
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                final first = order.items.isNotEmpty ? order.items.first : null;
+                                if (first == null) return;
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => ProductDetailsScreen(productId: first.productId),
+                                  ),
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              child: const Center(
+                                child: Text(
+                                  'Buy Again',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'Campton',
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFFFDAF40),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 16),
+
+                      // Track button
+                      Expanded(
+                        child: Container(
+                          height: 57,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFDAF40),
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFDAF40).withValues(alpha: 0.5),
+                                blurRadius: 16,
+                                offset: Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () => Navigator.of(context).pushNamed(
+                                AppRoutes.trackingOrder,
+                                arguments: {'orderId': order.id},
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                              child: const Center(
+                                child: Text(
+                                  'Track',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'Campton',
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFFFFFBF5),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildOrderInformation() {
+  Widget _buildOrderInformation(BuildContext context, OrderSummary order) {
+    final orderedOn = order.createdAt?.toIso8601String() ?? '—';
+    final orderNumber = '#${order.id}';
+    final statusLabel = OrderStatusUi.label(order.status);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -164,9 +265,9 @@ class OrderDetailsScreen extends StatelessWidget {
               color: Color(0xFF3C4042),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Ordered on
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,7 +283,7 @@ class OrderDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Mar 03, 2022  05:49:40',
+                orderedOn,
                 style: const TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
@@ -192,9 +293,9 @@ class OrderDetailsScreen extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Order Number with Copy button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -213,7 +314,7 @@ class OrderDetailsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '#rt667899hnny007',
+                    orderNumber,
                     style: const TextStyle(
                       fontSize: 14,
                       fontFamily: 'Campton',
@@ -223,35 +324,43 @@ class OrderDetailsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              
-              // Copy button
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFCCCCCC)),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text(
-                  'Copy',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontFamily: 'Campton',
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xFF777F84),
+
+              InkWell(
+                onTap: () async {
+                  await Clipboard.setData(ClipboardData(text: orderNumber));
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Copied')),
+                    );
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: const Color(0xFFCCCCCC)),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    'Copy',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF777F84),
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 12),
-          
-          // Shipping Time
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Shipping Time',
+                'Status',
                 style: TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
@@ -261,7 +370,7 @@ class OrderDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                '10-12 business days\nfrom shipped',
+                statusLabel,
                 style: const TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
@@ -276,7 +385,7 @@ class OrderDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildShippingAddress() {
+  Widget _buildShippingAddress(String? shippingTo) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -295,11 +404,11 @@ class OrderDetailsScreen extends StatelessWidget {
               color: Color(0xFF3C4042),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           Text(
-            '08102718764\nRoyal Anchor, Abuja, FCT, \nNigeria 900187',
+            (shippingTo == null || shippingTo.trim().isEmpty) ? 'Not provided' : shippingTo,
             style: const TextStyle(
               fontSize: 14,
               fontFamily: 'Campton',
@@ -313,7 +422,7 @@ class OrderDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildItemsInOrder() {
+  Widget _buildItemsInOrder(List<OrderItem> items) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -332,59 +441,47 @@ class OrderDetailsScreen extends StatelessWidget {
               color: Color(0xFF3C4042),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
-          // Item 1
-          _buildOrderItem(
-            productName: 'Agagbada in Vogue',
-            price: 'From N20,000',
-            size: 'Small',
-            quantity: 'X1',
-          ),
-          
-          const SizedBox(height: 20),
-          
-          // Item 2
-          _buildOrderItem(
-            productName: 'Agagbada in Vogue',
-            price: 'From N20,000',
-            size: 'Small',
-            quantity: 'X1',
-          ),
+
+          for (int i = 0; i < items.length; i++) ...[
+            _buildOrderItem(item: items[i]),
+            if (i < items.length - 1) const SizedBox(height: 20),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildOrderItem({
-    required String productName,
-    required String price,
-    required String size,
-    required String quantity,
-  }) {
+  Widget _buildOrderItem({required OrderItem item}) {
+    final img = item.product.image;
+    final price = item.unitPrice ?? item.product.price ?? 0;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Product image
-        Container(
-          width: 80,
-          height: 68,
-          decoration: BoxDecoration(
-            color: const Color(0xFFD9D9D9),
-            borderRadius: BorderRadius.circular(4),
-          ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: (img == null || img.isEmpty)
+              ? const AppImagePlaceholder(width: 80, height: 68, borderRadius: 4)
+              : Image.network(
+                  img,
+                  width: 80,
+                  height: 68,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const AppImagePlaceholder(width: 80, height: 68, borderRadius: 4),
+                ),
         ),
-        
+
         const SizedBox(width: 8),
-        
-        // Product details
+
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                productName,
+                item.product.name,
                 style: const TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
@@ -392,11 +489,11 @@ class OrderDetailsScreen extends StatelessWidget {
                   color: Color(0xFF0F1011),
                 ),
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               Text(
-                price,
+                '₦$price',
                 style: const TextStyle(
                   fontSize: 16,
                   fontFamily: 'Campton',
@@ -407,25 +504,24 @@ class OrderDetailsScreen extends StatelessWidget {
             ],
           ),
         ),
-        
-        // Size and quantity
+
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              size,
-              style: const TextStyle(
+            const Text(
+              '-',
+              style: TextStyle(
                 fontSize: 10,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: Color(0xFF3C4042),
               ),
             ),
-            
+
             const SizedBox(height: 10),
-            
+
             Text(
-              quantity,
+              'X${item.quantity}',
               style: const TextStyle(
                 fontSize: 10,
                 fontFamily: 'Campton',
@@ -439,7 +535,9 @@ class OrderDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPaymentDetails() {
+  Widget _buildPaymentDetails(num total) {
+    final subtotal = total;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -458,10 +556,9 @@ class OrderDetailsScreen extends StatelessWidget {
               color: Color(0xFF3C4042),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
-          // Payment Methods
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -474,9 +571,9 @@ class OrderDetailsScreen extends StatelessWidget {
                   color: Color(0xFF3C4042),
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               const Text(
                 'Pay with Card',
                 style: TextStyle(
@@ -488,10 +585,9 @@ class OrderDetailsScreen extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
-          // Payment Details
+
           const Text(
             'Payment Details',
             style: TextStyle(
@@ -501,13 +597,11 @@ class OrderDetailsScreen extends StatelessWidget {
               color: Color(0xFF3C4042),
             ),
           ),
-          
+
           const SizedBox(height: 12),
-          
-          // Breakdown
+
           Column(
             children: [
-              // Subtotal
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -521,7 +615,7 @@ class OrderDetailsScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'N40,000',
+                    '₦$subtotal',
                     style: const TextStyle(
                       fontSize: 10,
                       fontFamily: 'Campton',
@@ -531,10 +625,9 @@ class OrderDetailsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 8),
-              
-              // Shipping
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -547,9 +640,9 @@ class OrderDetailsScreen extends StatelessWidget {
                       color: Color(0xFF3C4042),
                     ),
                   ),
-                  Text(
-                    'N4,000',
-                    style: const TextStyle(
+                  const Text(
+                    '₦0',
+                    style: TextStyle(
                       fontSize: 10,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w700,
@@ -558,10 +651,9 @@ class OrderDetailsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 8),
-              
-              // Total Price
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -575,7 +667,7 @@ class OrderDetailsScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'N44,000',
+                    '₦$total',
                     style: const TextStyle(
                       fontSize: 10,
                       fontFamily: 'Campton',

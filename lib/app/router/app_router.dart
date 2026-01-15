@@ -270,7 +270,8 @@ abstract class AppRouter {
       case AppRoutes.businessSellerRegistration:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const AuthGuard(child: BusinessSellerRegistrationScreen()),
+          builder: (_) =>
+              const AuthGuard(child: BusinessSellerRegistrationScreen()),
         );
 
       case AppRoutes.businessBeautyForm:
@@ -342,7 +343,8 @@ abstract class AppRouter {
       case AppRoutes.businessApprovalStatus:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const AuthGuard(child: BusinessApprovalStatusScreen()),
+          builder: (_) =>
+              const AuthGuard(child: BusinessApprovalStatusScreen()),
         );
 
       case AppRoutes.businessDetails:
@@ -366,13 +368,13 @@ abstract class AppRouter {
       case AppRoutes.orderDetails:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const AuthGuard(child: OrderDetailsScreen()),
+          builder: (_) => AuthGuard(child: const OrderDetailsScreen()),
         );
 
       case AppRoutes.trackingOrder:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const AuthGuard(child: TrackingOrderScreen()),
+          builder: (_) => AuthGuard(child: const TrackingOrderScreen()),
         );
 
       case AppRoutes.notifications:
