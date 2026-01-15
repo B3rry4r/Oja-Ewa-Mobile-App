@@ -14,14 +14,22 @@ import 'package:ojaewa/core/files/multipart_utils.dart';
 import 'draft_utils.dart';
 import 'seller_registration_draft.dart';
 
-class AccountReviewScreen extends ConsumerWidget {
+class AccountReviewScreen extends ConsumerStatefulWidget {
   const AccountReviewScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AccountReviewScreen> createState() => _AccountReviewScreenState();
+}
+
+class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
+  bool _isSubmitted = false;
+  bool _isSubmitting = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ref = this.ref;
     final args = ModalRoute.of(context)?.settings.arguments;
     final draft = sellerDraftFromArgs(args);
-    final state = ref.watch(sellerProfileControllerProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Background from IR
@@ -52,10 +60,12 @@ class AccountReviewScreen extends ConsumerWidget {
                   const SizedBox(height: 32),
 
                   // Status Message
-                  const Text(
-                    "We are reviewing your application\nThis takes 12-24 hours.",
+                  Text(
+                    _isSubmitted
+                        ? "Your seller application has been submitted\nThis takes 12-24 hours."
+                        : "Ready to submit your seller application?",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
@@ -67,7 +77,9 @@ class AccountReviewScreen extends ConsumerWidget {
                   const Spacer(flex: 3),
 
                   // --- Primary Action Button ---
-                  _buildGoHomeButton(context, ref, draft, state.isLoading),
+                  _isSubmitted
+                      ? _buildDoneButton(context)
+                      : _buildSubmitButton(context, draft),
                   const SizedBox(height: 40),
                 ],
               ),
@@ -209,5 +221,139 @@ class AccountReviewScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildSubmitButton(BuildContext context, SellerRegistrationDraft draft) {
+    return InkWell(
+      onTap: _isSubmitting ? null : () => _submitSeller(context, draft),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        width: double.infinity,
+        height: 57,
+        decoration: BoxDecoration(
+          color: _isSubmitting ? const Color(0xFFFDAF40).withAlpha(150) : const Color(0xFFFDAF40),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFFDAF40).withAlpha(102),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            )
+          ],
+        ),
+        child: Center(
+          child: _isSubmitting
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFFBF5)),
+                  ),
+                )
+              : const Text(
+                  "Submit for Review",
+                  style: TextStyle(
+                    color: Color(0xFFFFFBF5),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Campton',
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDoneButton(BuildContext context) {
+    return InkWell(
+      onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        width: double.infinity,
+        height: 57,
+        decoration: BoxDecoration(
+          color: const Color(0xFFFDAF40),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFFDAF40).withAlpha(102),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            )
+          ],
+        ),
+        child: const Center(
+          child: Text(
+            "Done",
+            style: TextStyle(
+              color: Color(0xFFFFFBF5),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Campton',
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submitSeller(BuildContext context, SellerRegistrationDraft draft) async {
+    setState(() => _isSubmitting = true);
+
+    final payload = SellerProfilePayload(
+      country: (draft.country ?? '').trim(),
+      state: (draft.state ?? '').trim(),
+      city: (draft.city ?? '').trim(),
+      address: (draft.address ?? '').trim(),
+      businessEmail: (draft.businessEmail ?? '').trim(),
+      businessPhoneNumber: (draft.businessPhoneNumber ?? '').trim(),
+      instagram: draft.instagram,
+      facebook: draft.facebook,
+      identityDocument: draft.identityDocumentPath,
+      businessName: (draft.businessName ?? '').trim(),
+      businessRegistrationNumber: (draft.businessRegistrationNumber ?? '').trim(),
+      businessCertificate: draft.businessCertificatePath,
+      businessLogo: draft.businessLogoPath,
+      bankName: (draft.bankName ?? '').trim(),
+      accountNumber: (draft.accountNumber ?? '').trim(),
+    );
+
+    try {
+      await ref.read(sellerProfileControllerProvider.notifier).submit(payload);
+
+      final uploadRepo = ref.read(sellerProfileUploadRepositoryProvider);
+      if ((draft.identityDocumentPath ?? '').isNotEmpty) {
+        await uploadRepo.upload(
+          type: 'identity_document',
+          file: multipartFromPath(draft.identityDocumentPath!),
+        );
+      }
+
+      if ((draft.businessCertificatePath ?? '').isNotEmpty) {
+        await uploadRepo.upload(
+          type: 'business_certificate',
+          file: multipartFromPath(draft.businessCertificatePath!),
+        );
+      }
+
+      if ((draft.businessLogoPath ?? '').isNotEmpty) {
+        await uploadRepo.upload(
+          type: 'business_logo',
+          file: multipartFromPath(draft.businessLogoPath!),
+        );
+      }
+
+      if (!mounted) return;
+      AppSnackbars.showSuccess(context, 'Seller application submitted');
+      setState(() {
+        _isSubmitting = false;
+        _isSubmitted = true;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      AppSnackbars.showError(context, UiErrorMessage.from(e));
+    }
   }
 }

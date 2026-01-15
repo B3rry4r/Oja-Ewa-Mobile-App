@@ -368,12 +368,12 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
 
         final draft = BusinessRegistrationDraft(
           categoryLabel: selectedCategory,
-          country: 'Nigeria',
-          state: 'FCT',
+          country: _selectedCountryName,
+          state: _selectedStateName,
           city: _cityController.text.trim(),
           address: _addressController.text.trim(),
           businessEmail: _emailController.text.trim(),
-          businessPhoneNumber: _phoneController.text.trim(),
+          businessPhoneNumber: '$_selectedCountryCode${_phoneController.text.trim()}',
           websiteUrl: _websiteController.text.trim(),
           instagram: _instagramController.text.trim(),
           facebook: _facebookController.text.trim(),

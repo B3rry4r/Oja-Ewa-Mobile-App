@@ -213,28 +213,65 @@ class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountRev
     setState(() => _isSubmitting = true);
 
     // Map draft -> API payload
+    // Clean + validate lists before submission
+    final cleanedProductList = parseProductListText(draft.productListText);
+    final cleanedServiceList = (draft.serviceList ?? const [])
+        .where((s) => s.name.trim().isNotEmpty)
+        .toList();
+    final cleanedClasses = (draft.classesOffered ?? const [])
+        .where((c) => c.name.trim().isNotEmpty)
+        .toList();
+
+    // Validation rules
+    final offering = draft.offeringType;
+    if (offering == 'providing_service') {
+      if ((draft.professionalTitle ?? '').trim().isEmpty) {
+        setState(() => _isSubmitting = false);
+        AppSnackbars.showError(context, UiErrorMessage.from('Professional title is required'));
+        return;
+      }
+      if (cleanedServiceList.isEmpty) {
+        setState(() => _isSubmitting = false);
+        AppSnackbars.showError(context, UiErrorMessage.from('Please add at least one service'));
+        return;
+      }
+    }
+
+    if (mapCategoryLabelToEnum(draft.categoryLabel) == 'school') {
+      if ((draft.schoolBiography ?? '').trim().isEmpty) {
+        setState(() => _isSubmitting = false);
+        AppSnackbars.showError(context, UiErrorMessage.from('School biography is required'));
+        return;
+      }
+      if (cleanedClasses.isEmpty) {
+        setState(() => _isSubmitting = false);
+        AppSnackbars.showError(context, UiErrorMessage.from('Please add at least one class'));
+        return;
+      }
+    }
+
     final payload = BusinessProfilePayload(
       category: mapCategoryLabelToEnum(draft.categoryLabel),
-      country: draft.country ?? '',
-      state: draft.state ?? '',
-      city: draft.city ?? '',
-      address: draft.address ?? '',
-      businessEmail: draft.businessEmail ?? '',
-      businessPhoneNumber: draft.businessPhoneNumber ?? '',
+      country: (draft.country ?? '').trim(),
+      state: (draft.state ?? '').trim(),
+      city: (draft.city ?? '').trim(),
+      address: (draft.address ?? '').trim(),
+      businessEmail: (draft.businessEmail ?? '').trim(),
+      businessPhoneNumber: (draft.businessPhoneNumber ?? '').trim(),
       websiteUrl: draft.websiteUrl,
       instagram: draft.instagram,
       facebook: draft.facebook,
       identityDocument: draft.identityDocumentPath,
-      businessName: draft.businessName ?? '',
-      businessDescription: draft.businessDescription ?? '',
+      businessName: (draft.businessName ?? '').trim(),
+      businessDescription: (draft.businessDescription ?? '').trim(),
       offeringType: draft.offeringType,
-      productList: parseProductListText(draft.productListText),
-      serviceList: draft.serviceList,
+      productList: cleanedProductList,
+      serviceList: cleanedServiceList,
       businessCertificates: draft.businessCertificates,
-      professionalTitle: draft.professionalTitle,
+      professionalTitle: (draft.professionalTitle ?? '').trim(),
       schoolType: draft.schoolType,
-      schoolBiography: draft.schoolBiography,
-      classesOffered: draft.classesOffered,
+      schoolBiography: (draft.schoolBiography ?? '').trim(),
+      classesOffered: cleanedClasses,
       musicCategory: draft.musicCategory,
       youtube: draft.youtube,
       spotify: draft.spotify,
