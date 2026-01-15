@@ -23,7 +23,10 @@ class AppNotification {
         (json['type'] as String?) ??
         '';
     final body = (json['message'] as String?) ?? (json['body'] as String?) ?? '';
-    final isRead = (json['is_read'] as bool?) ?? (json['read'] as bool?) ?? false;
+    
+    // API uses read_at timestamp - null means unread, non-null means read
+    final readAt = json['read_at'];
+    final isRead = readAt != null && readAt.toString().isNotEmpty;
 
     DateTime? createdAt;
     final createdAtRaw = json['created_at'];

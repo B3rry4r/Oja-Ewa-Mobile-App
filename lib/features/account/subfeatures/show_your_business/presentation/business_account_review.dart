@@ -18,23 +18,30 @@ import 'package:ojaewa/core/files/multipart_utils.dart';
 import 'selected_category_forms/draft_utils.dart';
 import 'selected_category_forms/business_registration_draft.dart';
 
-class BusinessAccountReviewScreen extends ConsumerWidget {
+class BusinessAccountReviewScreen extends ConsumerStatefulWidget {
   const BusinessAccountReviewScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) { 
+  ConsumerState<BusinessAccountReviewScreen> createState() => _BusinessAccountReviewScreenState();
+}
+
+class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountReviewScreen> {
+  bool _isSubmitted = false;
+  bool _isSubmitting = false;
+
+  @override
+  Widget build(BuildContext context) { 
     final args = ModalRoute.of(context)?.settings.arguments;
     final draft = draftFromArgs(args, categoryLabelFallback: 'Beauty');
-
-    final state = ref.watch(businessProfileControllerProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: Column(
         children: [
-          const AppHeader(
-            backgroundColor: Color(0xFFFFF8F1),
-            iconColor: Color(0xFF241508),
+          AppHeader(
+            backgroundColor: const Color(0xFFFFF8F1),
+            iconColor: const Color(0xFF241508),
+            showBack: !_isSubmitted, // Don't allow back after submission
           ),
           Expanded(
             child: Padding(
@@ -45,16 +52,18 @@ class BusinessAccountReviewScreen extends ConsumerWidget {
                   const SizedBox(height: 20),
                   _buildStepper(),
                   const Spacer(flex: 2),
-                  const Icon(
-                    Icons.access_time_filled_rounded,
+                  Icon(
+                    _isSubmitted ? Icons.check_circle : Icons.access_time_filled_rounded,
                     size: 80,
-                    color: Color(0xFFFDAF40),
+                    color: const Color(0xFFFDAF40),
                   ),
                   const SizedBox(height: 32),
-                  const Text(
-                    'We are reviewing your application\nThis takes 12-24 hours.',
+                  Text(
+                    _isSubmitted
+                        ? 'Your business has been submitted!\nWe will review it within 12-24 hours.'
+                        : 'Ready to submit your business profile?',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
@@ -63,7 +72,9 @@ class BusinessAccountReviewScreen extends ConsumerWidget {
                     ),
                   ),
                   const Spacer(flex: 3),
-                  _buildContinueButton(context, ref, draft, state.isLoading),
+                  _isSubmitted
+                      ? _buildDoneButton(context)
+                      : _buildSubmitButton(context, draft),
                   const SizedBox(height: 40),
                 ],
               ),
@@ -123,91 +134,51 @@ class BusinessAccountReviewScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContinueButton(
-    BuildContext context,
-    WidgetRef ref,
-    BusinessRegistrationDraft draft,
-    bool isLoading,
-  ) {
+  Widget _buildSubmitButton(BuildContext context, BusinessRegistrationDraft draft) {
     return InkWell(
-      onTap: isLoading
-          ? null
-          : () async {
-              // Map draft -> API payload
-              final payload = BusinessProfilePayload(
-                category: mapCategoryLabelToEnum(draft.categoryLabel),
-                country: draft.country ?? '',
-                state: draft.state ?? '',
-                city: draft.city ?? '',
-                address: draft.address ?? '',
-                businessEmail: draft.businessEmail ?? '',
-                businessPhoneNumber: draft.businessPhoneNumber ?? '',
-                websiteUrl: draft.websiteUrl,
-                instagram: draft.instagram,
-                facebook: draft.facebook,
-                identityDocument: draft.identityDocumentPath,
-                businessName: draft.businessName ?? '',
-                businessDescription: draft.businessDescription ?? '',
-                offeringType: draft.offeringType,
-                productList: parseProductListText(draft.productListText),
-                serviceList: draft.serviceList,
-                businessCertificates: draft.businessCertificates,
-                professionalTitle: draft.professionalTitle,
-                schoolType: draft.schoolType,
-                schoolBiography: draft.schoolBiography,
-                classesOffered: draft.classesOffered,
-                musicCategory: draft.musicCategory,
-                youtube: draft.youtube,
-                spotify: draft.spotify,
-              );
+      onTap: _isSubmitting ? null : () => _submitForReview(context, draft),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        width: double.infinity,
+        height: 57,
+        decoration: BoxDecoration(
+          color: _isSubmitting ? const Color(0xFFFDAF40).withAlpha(150) : const Color(0xFFFDAF40),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFFDAF40).withAlpha(102),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            )
+          ],
+        ),
+        child: Center(
+          child: _isSubmitting
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFFBF5)),
+                  ),
+                )
+              : const Text(
+                  'Submit for Review',
+                  style: TextStyle(
+                    color: Color(0xFFFFFBF5),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Campton',
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
 
-              try {
-                final res = await ref.read(businessProfileControllerProvider.notifier).submit(payload);
-
-                // Extract business id if present
-                final data = res['data'];
-                final businessId = (data is Map<String, dynamic>) ? data['id'] : null;
-                if (businessId is int) {
-                  final api = ref.read(businessProfileApiProvider);
-
-                  if ((draft.identityDocumentPath ?? '').isNotEmpty) {
-                    await api.uploadFile(
-                      businessId: businessId,
-                      fileType: 'identity_document',
-                      file: multipartFromPath(draft.identityDocumentPath!),
-                    );
-                  }
-
-                  if ((draft.businessLogoPath ?? '').isNotEmpty) {
-                    await api.uploadFile(
-                      businessId: businessId,
-                      fileType: 'business_logo',
-                      file: multipartFromPath(draft.businessLogoPath!),
-                    );
-                  }
-
-                  // business_certificates file_type expects a single file per call per docs
-                  if ((draft.businessCertificates ?? []).isNotEmpty) {
-                    final first = draft.businessCertificates!.first;
-                    final path = first['path'];
-                    if (path is String && path.isNotEmpty) {
-                      await api.uploadFile(
-                        businessId: businessId,
-                        fileType: 'business_certificates',
-                        file: multipartFromPath(path),
-                      );
-                    }
-                  }
-                }
-
-                if (!context.mounted) return;
-                AppSnackbars.showSuccess(context, 'Business submitted for review');
-                Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
-              } catch (e) {
-                if (!context.mounted) return;
-                AppSnackbars.showError(context, UiErrorMessage.from(e));
-              }
-            },
+  Widget _buildDoneButton(BuildContext context) {
+    return InkWell(
+      onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false),
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,
@@ -217,7 +188,7 @@ class BusinessAccountReviewScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withOpacity(0.4),
+              color: const Color(0xFFFDAF40).withAlpha(102),
               blurRadius: 16,
               offset: const Offset(0, 8),
             )
@@ -225,7 +196,7 @@ class BusinessAccountReviewScreen extends ConsumerWidget {
         ),
         child: const Center(
           child: Text(
-            'Continue',
+            'Done',
             style: TextStyle(
               color: Color(0xFFFFFBF5),
               fontSize: 16,
@@ -236,5 +207,88 @@ class BusinessAccountReviewScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _submitForReview(BuildContext context, BusinessRegistrationDraft draft) async {
+    setState(() => _isSubmitting = true);
+
+    // Map draft -> API payload
+    final payload = BusinessProfilePayload(
+      category: mapCategoryLabelToEnum(draft.categoryLabel),
+      country: draft.country ?? '',
+      state: draft.state ?? '',
+      city: draft.city ?? '',
+      address: draft.address ?? '',
+      businessEmail: draft.businessEmail ?? '',
+      businessPhoneNumber: draft.businessPhoneNumber ?? '',
+      websiteUrl: draft.websiteUrl,
+      instagram: draft.instagram,
+      facebook: draft.facebook,
+      identityDocument: draft.identityDocumentPath,
+      businessName: draft.businessName ?? '',
+      businessDescription: draft.businessDescription ?? '',
+      offeringType: draft.offeringType,
+      productList: parseProductListText(draft.productListText),
+      serviceList: draft.serviceList,
+      businessCertificates: draft.businessCertificates,
+      professionalTitle: draft.professionalTitle,
+      schoolType: draft.schoolType,
+      schoolBiography: draft.schoolBiography,
+      classesOffered: draft.classesOffered,
+      musicCategory: draft.musicCategory,
+      youtube: draft.youtube,
+      spotify: draft.spotify,
+    );
+
+    try {
+      final res = await ref.read(businessProfileControllerProvider.notifier).submit(payload);
+
+      // Extract business id if present
+      final data = res['data'];
+      final businessId = (data is Map<String, dynamic>) ? data['id'] : null;
+      if (businessId is int) {
+        final api = ref.read(businessProfileApiProvider);
+
+        if ((draft.identityDocumentPath ?? '').isNotEmpty) {
+          await api.uploadFile(
+            businessId: businessId,
+            fileType: 'identity_document',
+            file: multipartFromPath(draft.identityDocumentPath!),
+          );
+        }
+
+        if ((draft.businessLogoPath ?? '').isNotEmpty) {
+          await api.uploadFile(
+            businessId: businessId,
+            fileType: 'business_logo',
+            file: multipartFromPath(draft.businessLogoPath!),
+          );
+        }
+
+        // business_certificates file_type expects a single file per call per docs
+        if ((draft.businessCertificates ?? []).isNotEmpty) {
+          final first = draft.businessCertificates!.first;
+          final path = first['path'];
+          if (path is String && path.isNotEmpty) {
+            await api.uploadFile(
+              businessId: businessId,
+              fileType: 'business_certificates',
+              file: multipartFromPath(path),
+            );
+          }
+        }
+      }
+
+      if (!mounted) return;
+      AppSnackbars.showSuccess(context, 'Business submitted for review');
+      setState(() {
+        _isSubmitting = false;
+        _isSubmitted = true;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      AppSnackbars.showError(context, UiErrorMessage.from(e));
+    }
   }
 }

@@ -300,7 +300,7 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withOpacity(0.4),
+              color: const Color(0xFFFDAF40).withAlpha(102),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
@@ -308,7 +308,7 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
         ),
         child: const Center(
           child: Text(
-            "Make Payment",
+            "Continue",
             style: TextStyle(
               color: Color(0xFFFFFBF5),
               fontSize: 16,
