@@ -2,8 +2,20 @@ import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 
-class ManagePaymentScreen extends StatelessWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'controllers/business_management_controller.dart';
+
+class ManagePaymentScreen extends ConsumerStatefulWidget {
   const ManagePaymentScreen({super.key});
+
+  @override
+  ConsumerState<ManagePaymentScreen> createState() => _ManagePaymentScreenState();
+}
+
+class _ManagePaymentScreenState extends ConsumerState<ManagePaymentScreen> {
+  String _plan = 'basic';
+  String _cycle = 'monthly';
 
   @override
   Widget build(BuildContext context) {
@@ -48,10 +60,46 @@ class ManagePaymentScreen extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
+                  // Plan selection (basic/premium/enterprise)
+                  DropdownButton<String>(
+                    value: _plan,
+                    items: const [
+                      DropdownMenuItem(value: 'basic', child: Text('Basic')),
+                      DropdownMenuItem(value: 'premium', child: Text('Premium')),
+                      DropdownMenuItem(value: 'enterprise', child: Text('Enterprise')),
+                    ],
+                    onChanged: (v) => setState(() => _plan = v ?? 'basic'),
+                  ),
+                  const SizedBox(height: 12),
+                  // Billing cycle selection
+                  DropdownButton<String>(
+                    value: _cycle,
+                    items: const [
+                      DropdownMenuItem(value: 'monthly', child: Text('Monthly')),
+                      DropdownMenuItem(value: 'quarterly', child: Text('Quarterly')),
+                      DropdownMenuItem(value: 'yearly', child: Text('Yearly')),
+                    ],
+                    onChanged: (v) => setState(() => _cycle = v ?? 'monthly'),
+                  ),
+
+                  const SizedBox(height: 24),
+
                   // Renew Subscription Button
                   GestureDetector(
-                    onTap: () {
-                      // Logic for renewal payment
+                    onTap: () async {
+                      final args = ModalRoute.of(context)?.settings.arguments;
+                      final businessId = (args is Map ? args['businessId'] : null) as int?;
+                      if (businessId == null) return;
+
+                      await ref.read(businessManagementActionsProvider.notifier).renewSubscription(
+                        businessId: businessId,
+                        subscriptionType: _plan,
+                        billingCycle: _cycle,
+                      );
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Subscription updated')),
+                      );
                     },
                     child: Container(
                       width: double.infinity,

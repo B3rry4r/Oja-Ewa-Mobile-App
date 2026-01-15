@@ -18,6 +18,54 @@ class BusinessProfileApi {
     }
   }
 
+  Future<Map<String, dynamic>> getBusiness(int id) async {
+    try {
+      final res = await _dio.get('/api/business/$id');
+      if (res.data is Map<String, dynamic>) return res.data as Map<String, dynamic>;
+      throw const FormatException('Unexpected business get response');
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> updateBusiness(int id, BusinessProfilePayload payload) async {
+    try {
+      final res = await _dio.put('/api/business/$id', data: payload.toJson());
+      if (res.data is Map<String, dynamic>) return res.data as Map<String, dynamic>;
+      throw const FormatException('Unexpected business update response');
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> deactivateBusiness(int id) async {
+    try {
+      final res = await _dio.patch('/api/business/$id/deactivate');
+      if (res.data is Map<String, dynamic>) return res.data as Map<String, dynamic>;
+      throw const FormatException('Unexpected deactivate response');
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> updateSubscription({
+    required int businessId,
+    required String subscriptionType,
+    required String billingCycle,
+  }) async {
+    try {
+      final res = await _dio.put('/api/business/subscription', data: {
+        'business_id': businessId,
+        'subscription_type': subscriptionType,
+        'billing_cycle': billingCycle,
+      });
+      if (res.data is Map<String, dynamic>) return res.data as Map<String, dynamic>;
+      throw const FormatException('Unexpected subscription response');
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
   /// Upload endpoint for business profile files.
   /// docs: POST /api/business/{id}/upload (multipart)
   Future<Map<String, dynamic>> uploadFile({

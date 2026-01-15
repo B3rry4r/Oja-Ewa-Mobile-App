@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/location/location_picker_sheets.dart';
+import 'package:ojaewa/features/account/subfeatures/show_your_business/domain/business_profile_payload.dart';
+import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_management_controller.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/ui/ui_error_message.dart';
 
 class EditBusinessScreen extends ConsumerStatefulWidget {
   const EditBusinessScreen({super.key});
@@ -13,12 +17,50 @@ class EditBusinessScreen extends ConsumerStatefulWidget {
 
 class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
   String _selectedCountryName = 'Nigeria';
+  bool _initialized = false;
+
+  final _cityController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _instagramController = TextEditingController();
+  final _facebookController = TextEditingController();
+  final _websiteController = TextEditingController();
+  final _businessNameController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _productListController = TextEditingController();
   String _selectedCountryFlag = '🇳🇬';
   String _selectedStateName = 'FCT';
   String _selectedCountryCode = '+234';
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final businessId = (args is Map ? args['businessId'] : null) as int?;
+
+    final businessAsync = businessId == null ? null : ref.watch(businessByIdProvider(businessId));
+
+    // Populate controllers once
+    businessAsync?.whenOrNull(
+      data: (res) {
+        if (_initialized) return;
+        final data = res['data'] is Map<String, dynamic> ? res['data'] as Map<String, dynamic> : res;
+        _selectedCountryName = (data['country'] as String?) ?? _selectedCountryName;
+        _selectedStateName = (data['state'] as String?) ?? _selectedStateName;
+        _cityController.text = (data['city'] as String?) ?? '';
+        _addressController.text = (data['address'] as String?) ?? '';
+        _emailController.text = (data['business_email'] as String?) ?? '';
+        _phoneController.text = (data['business_phone_number'] as String?) ?? '';
+        _instagramController.text = (data['instagram'] as String?) ?? '';
+        _facebookController.text = (data['facebook'] as String?) ?? '';
+        _websiteController.text = (data['website_url'] as String?) ?? '';
+        _businessNameController.text = (data['business_name'] as String?) ?? '';
+        _descriptionController.text = (data['business_description'] as String?) ?? '';
+        _productListController.text = (data['product_list'] as String?) ?? '';
+        _initialized = true;
+      },
+    );
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Background from IR
       body: Column(
@@ -54,42 +96,44 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
                     if (state != null) setState(() => _selectedStateName = state.name);
                   }),
                   const SizedBox(height: 16),
-                  _buildTextField('City', 'Your City'),
+                  _buildTextField('City', 'Your City', controller: _cityController),
                   const SizedBox(height: 16),
-                  _buildTextField('Address Line', 'Street, house number etc'),
+                  _buildTextField('Address Line', 'Street, house number etc', controller: _addressController),
 
                   const SizedBox(height: 32),
                   _buildSectionHeader('Mobiles'),
                   const SizedBox(height: 16),
-                  _buildTextField('Business Email', 'sanusimot@gmail.com'),
+                  _buildTextField('Business Email', 'sanusimot@gmail.com', controller: _emailController),
                   const SizedBox(height: 16),
                   _buildPhoneInputWithPicker(),
 
                   const SizedBox(height: 32),
                   _buildSectionHeader('Social handles'),
                   const SizedBox(height: 16),
-                  _buildTextField('Instagram', 'Your Instagram URL'),
+                  _buildTextField('Instagram', 'Your Instagram URL', controller: _instagramController),
                   const SizedBox(height: 16),
-                  _buildTextField('Facebook', 'Your Facebook URL'),
+                  _buildTextField('Facebook', 'Your Facebook URL', controller: _facebookController),
                   const SizedBox(height: 16),
-                  _buildTextField('Website URL', 'sanusimot@gmail.com'),
+                  _buildTextField('Website URL', 'Website URL', controller: _websiteController),
 
                   const SizedBox(height: 32),
                   _buildSectionHeader('About Business'),
                   const SizedBox(height: 16),
-                  _buildTextField('Business Name', 'Your City'),
+                  _buildTextField('Business Name', 'Business Name', controller: _businessNameController),
                   const SizedBox(height: 16),
                   _buildTextField(
                     'Description',
                     'Share details of your experience',
                     maxLines: 4,
                     helperText: '100 characters required',
+                    controller: _descriptionController,
                   ),
                   const SizedBox(height: 16),
                   _buildTextField(
                     'Product List',
                     'List your products here',
                     maxLines: 4,
+                    controller: _productListController,
                   ),
 
                   const SizedBox(height: 32),
@@ -124,6 +168,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
     String hint, {
     int maxLines = 1,
     String? helperText,
+    TextEditingController? controller,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,6 +183,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
         ),
         const SizedBox(height: 8),
         TextField(
+          controller: controller,
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hint,
@@ -204,8 +250,18 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
             const Icon(Icons.keyboard_arrow_down, size: 18, color: Color(0xFF777F84)),
           ])),
           const SizedBox(width: 8),
-          const Expanded(child: TextField(keyboardType: TextInputType.phone, style: TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
-            decoration: InputDecoration(border: InputBorder.none, hintText: 'Enter phone number', hintStyle: TextStyle(color: Color(0xFFCCCCCC))))),
+          Expanded(
+            child: TextField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Enter phone number',
+                hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
+              ),
+            ),
+          ),
         ]),
       ),
     ]);
@@ -283,7 +339,52 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
 
   Widget _buildSubmitButton() {
     return GestureDetector(
-      onTap: () {},
+      onTap: () async {
+        final args = ModalRoute.of(context)?.settings.arguments;
+        final businessId = (args is Map ? args['businessId'] : null) as int?;
+        if (businessId == null) return;
+
+        // Fetch current to get required immutable fields (category/offering_type)
+        final res = await ref.read(businessByIdProvider(businessId).future);
+        final data = res['data'] is Map<String, dynamic> ? res['data'] as Map<String, dynamic> : res;
+        final category = (data['category'] as String?) ?? '';
+        final offeringType = (data['offering_type'] as String?) ?? '';
+
+        final payload = BusinessProfilePayload(
+          category: category,
+          country: _selectedCountryName,
+          state: _selectedStateName,
+          city: _cityController.text.trim(),
+          address: _addressController.text.trim(),
+          businessEmail: _emailController.text.trim(),
+          businessPhoneNumber: _phoneController.text.trim(),
+          websiteUrl: _websiteController.text.trim().isEmpty ? null : _websiteController.text.trim(),
+          instagram: _instagramController.text.trim().isEmpty ? null : _instagramController.text.trim(),
+          facebook: _facebookController.text.trim().isEmpty ? null : _facebookController.text.trim(),
+          businessName: _businessNameController.text.trim(),
+          businessDescription: _descriptionController.text.trim(),
+          offeringType: offeringType,
+          productList: const [],
+          serviceList: const [],
+          professionalTitle: data['professional_title'] as String?,
+          schoolType: data['school_type'] as String?,
+          schoolBiography: data['school_biography'] as String?,
+          classesOffered: const [],
+          musicCategory: data['music_category'] as String?,
+          youtube: data['youtube'] as String?,
+          spotify: data['spotify'] as String?,
+        );
+
+        try {
+          await ref.read(businessManagementActionsProvider.notifier).updateBusiness(businessId, payload);
+          if (!context.mounted) return;
+          AppSnackbars.showSuccess(context, 'Business updated');
+          Navigator.of(context).pop();
+        } catch (e) {
+          if (!context.mounted) return;
+          AppSnackbars.showError(context, UiErrorMessage.from(e));
+        }
+      },
       child: Container(
         width: double.infinity,
         height: 56,

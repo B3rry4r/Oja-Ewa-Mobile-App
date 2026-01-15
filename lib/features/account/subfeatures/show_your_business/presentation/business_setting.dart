@@ -119,7 +119,31 @@ class BusinessSettingsScreen extends ConsumerWidget {
       itemBuilder: (context, index) {
         final b = businesses[index];
         final status = b.storeStatus;
-        final statusLabel = status.isEmpty ? '' : ' • $status';
+        
+        Color chipBg;
+        Color chipFg;
+        String chipText;
+        switch (status) {
+          case 'approved':
+            chipBg = const Color(0xFF2ECC71).withAlpha(25);
+            chipFg = const Color(0xFF2ECC71);
+            chipText = 'Approved';
+            break;
+          case 'pending':
+            chipBg = const Color(0xFFFDAF40).withAlpha(25);
+            chipFg = const Color(0xFFFDAF40);
+            chipText = 'Pending';
+            break;
+          case 'deactivated':
+            chipBg = const Color(0xFFE74C3C).withAlpha(25);
+            chipFg = const Color(0xFFE74C3C);
+            chipText = 'Deactivated';
+            break;
+          default:
+            chipBg = const Color(0xFF777F84).withAlpha(25);
+            chipFg = const Color(0xFF777F84);
+            chipText = status.isEmpty ? 'Unknown' : status;
+        }
 
         return ListTile(
           contentPadding: const EdgeInsets.symmetric(vertical: 8),
@@ -131,14 +155,36 @@ class BusinessSettingsScreen extends ConsumerWidget {
               ),
             );
           },
-          title: Text(
-            '${b.businessName}$statusLabel',
-            style: const TextStyle(
-              fontSize: 16,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2021),
-            ),
+          title: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  b.businessName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF241508),
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: chipBg,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  chipText,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w600,
+                    color: chipFg,
+                  ),
+                ),
+              ),
+            ],
           ),
           trailing: IconButton(
             icon: const Icon(Icons.more_horiz, color: Color(0xFF1E2021)),

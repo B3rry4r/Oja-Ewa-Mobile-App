@@ -5,11 +5,18 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../../../../core/widgets/confirmation_modal.dart';
 
-class DeactivateShopScreen extends StatelessWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'controllers/business_management_controller.dart';
+
+class DeactivateShopScreen extends ConsumerWidget {
   const DeactivateShopScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final businessId = (args is Map ? args['businessId'] : null) as int?;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: Column(
@@ -61,8 +68,13 @@ class DeactivateShopScreen extends StatelessWidget {
                         title: 'Deactivate shop',
                         message: 'Are you sure you want to deactivate your shop?',
                         confirmLabel: 'Deactivate',
-                        onConfirm: () {
-                          // TODO: deactivate later.
+                        onConfirm: () async {
+                          if (businessId == null) {
+                            Navigator.of(context).pop();
+                            return;
+                          }
+                          await ref.read(businessManagementActionsProvider.notifier).deactivate(businessId);
+                          if (!context.mounted) return;
                           Navigator.of(context).pushNamedAndRemoveUntil(
                             AppRoutes.home,
                             (route) => false,
