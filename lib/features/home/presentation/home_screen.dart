@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
@@ -181,43 +182,54 @@ class HomeScreen extends ConsumerWidget {
             separatorBuilder: (_, __) => const SizedBox(width: 16),
             itemBuilder: (context, index) {
               final ad = adverts[index];
-              return Container(
-                width: 254,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: const Color(0xFFFDAF40),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: ad.imageUrl == null
-                    ? Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              ad.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black,
-                              ),
-                            ),
-                            if ((ad.description ?? '').trim().isNotEmpty) ...[
-                              const SizedBox(height: 6),
+              return GestureDetector(
+                onTap: () async {
+                  final actionUrl = ad.actionUrl;
+                  if (actionUrl != null && actionUrl.isNotEmpty) {
+                    final uri = Uri.tryParse(actionUrl);
+                    if (uri != null) {
+                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                    }
+                  }
+                },
+                child: Container(
+                  width: 254,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: const Color(0xFFFDAF40),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: ad.imageUrl == null
+                      ? Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
                               Text(
-                                ad.description!,
+                                ad.title,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: Colors.black),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.black,
+                                ),
                               ),
+                              if ((ad.description ?? '').trim().isNotEmpty) ...[
+                                const SizedBox(height: 6),
+                                Text(
+                                  ad.description!,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                              ],
                             ],
-                          ],
-                        ),
-                      )
-                    : Image.network(ad.imageUrl!, fit: BoxFit.cover),
+                          ),
+                        )
+                      : Image.network(ad.imageUrl!, fit: BoxFit.cover),
+                ),
               );
             },
           ),

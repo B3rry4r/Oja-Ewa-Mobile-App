@@ -20,18 +20,21 @@ final cartProvider = FutureProvider<Cart?>((ref) async {
 /// synced with backend only on initial load or explicit refresh.
 class OptimisticCartNotifier extends Notifier<Cart?> {
   bool _initialized = false;
+  bool _pendingSync = false;
 
   @override
   Cart? build() {
-    // Listen to the real cart provider ONLY for initial load
-    ref.listen(cartProvider, (_, next) {
-      // Only accept server data if we haven't been initialized yet
-      // or if it's explicitly requested via syncFromServer()
-      if (!_initialized) {
+    // Listen to the real cart provider for initial load AND when sync is requested
+    ref.listen(cartProvider, (prev, next) {
+      // Accept server data if:
+      // 1. We haven't been initialized yet, OR
+      // 2. A sync was explicitly requested (after add/clear operations)
+      if (!_initialized || _pendingSync) {
         final data = next.asData?.value;
         if (data != null) {
           state = data;
           _initialized = true;
+          _pendingSync = false;
         }
       }
     });
@@ -51,6 +54,11 @@ class OptimisticCartNotifier extends Notifier<Cart?> {
   /// Force sync from server - call this only when needed (e.g., after failure)
   void syncFromServer(Cart cart) {
     state = cart;
+  }
+
+  /// Mark that we want to sync from server on the next cartProvider update
+  void requestSync() {
+    _pendingSync = true;
   }
 
   /// Update a cart item's quantity optimistically
@@ -341,6 +349,8 @@ class CartActionsController extends AsyncNotifier<void> {
             selectedSize: selectedSize,
             processingTimeType: processingTimeType,
           );
+      // Request sync so optimisticCartProvider picks up the new cart data
+      ref.read(optimisticCartProvider.notifier).requestSync();
       ref.invalidate(cartProvider);
       state = const AsyncData(null);
     } catch (e, st) {
@@ -353,6 +363,8 @@ class CartActionsController extends AsyncNotifier<void> {
     state = const AsyncLoading();
     try {
       await ref.read(cartRepositoryProvider).clearCart();
+      // Request sync so optimisticCartProvider picks up the cleared cart
+      ref.read(optimisticCartProvider.notifier).requestSync();
       ref.invalidate(cartProvider);
       state = const AsyncData(null);
     } catch (e, st) {

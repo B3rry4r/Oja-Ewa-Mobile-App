@@ -27,12 +27,14 @@ class _AppShellState extends State<AppShell> {
       backgroundColor: Colors.transparent,
       body: IndexedStack(
         index: _index,
-        children: const [
-          HomeScreen(),
-          SearchScreen(),
-          WishlistScreen(),
-          BlogScreen(),
-          AccountScreen(),
+        children: [
+          const HomeScreen(),
+          const SearchScreen(),
+          WishlistScreen(
+            onKeepShoppingPressed: () => setState(() => _index = 0),
+          ),
+          const BlogScreen(),
+          const AccountScreen(),
         ],
       ),
       bottomNavigationBar: AppBottomNavBar(

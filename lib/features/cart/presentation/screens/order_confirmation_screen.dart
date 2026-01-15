@@ -4,6 +4,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/features/account/subfeatures/your_address/domain/address.dart';
+import 'package:ojaewa/features/account/subfeatures/your_address/presentation/controllers/address_controller.dart';
+import 'package:ojaewa/features/cart/domain/cart.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
 import 'package:ojaewa/features/orders/presentation/controllers/orders_controller.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/checkout_controller.dart';
@@ -34,18 +38,23 @@ class _OrderConfirmationScreenState
   static const _returnArgKey = 'returnTo';
   static const _returnToOrderConfirmation = 'orderConfirmation';
 
-  late bool _hasAddress;
-
-  @override
-  void initState() {
-    super.initState();
-    _hasAddress = widget.hasAddress;
-  }
-
   @override
   Widget build(BuildContext context) {
+    // Use optimistic cart for synced totals (updates when items are deleted/modified)
+    final optimisticCart = ref.watch(optimisticCartProvider);
     final cartAsync = ref.watch(cartProvider);
+    final addressesAsync = ref.watch(addressesProvider);
     final isBusy = ref.watch(orderActionsProvider).isLoading;
+
+    // Use optimistic cart if available, otherwise fall back to cartProvider
+    final cart = optimisticCart ?? cartAsync.asData?.value;
+    final isCartLoading = cartAsync.isLoading && optimisticCart == null;
+    final hasCartError = cartAsync.hasError && optimisticCart == null;
+
+    // Get selected/default address
+    final addresses = addressesAsync.asData?.value ?? [];
+    final selectedAddress = addresses.where((a) => a.isDefault).firstOrNull ?? 
+                            (addresses.isNotEmpty ? addresses.first : null);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
@@ -70,54 +79,65 @@ class _OrderConfirmationScreenState
             ),
 
             Expanded(
-              child: cartAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) =>
-                    const Center(child: Text('Failed to load cart')),
-                data: (cart) {
-                  if (cart == null) {
-                    return const Center(child: Text('Cart is empty'));
-                  }
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 24),
-                        _buildAddressSection(context),
-                        const SizedBox(height: 32),
-                        _buildPaymentMethodSection(),
-                        const SizedBox(height: 32),
-                        _buildItemsSection(cart.items.length),
-                        const SizedBox(height: 32),
-                      ],
-                    ),
-                  );
-                },
-              ),
+              child: isCartLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : hasCartError
+                      ? const Center(child: Text('Failed to load cart'))
+                      : cart == null || cart.items.isEmpty
+                          ? const Center(child: Text('Cart is empty'))
+                          : SingleChildScrollView(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 24),
+                                  _buildAddressSection(context, selectedAddress),
+                                  const SizedBox(height: 32),
+                                  _buildItemsSection(cart.items.length),
+                                  const SizedBox(height: 32),
+                                ],
+                              ),
+                            ),
             ),
 
             _buildOrderSummary(
-              cartAsync: cartAsync,
+              cart: cart,
               isBusy: isBusy,
               onPlaceOrder: isBusy
                   ? null
                   : () async {
-                      if (!_hasAddress) return;
+                      if (selectedAddress == null) {
+                        AppSnackbars.showError(context, 'Please add a delivery address');
+                        return;
+                      }
 
                       final items = ref.read(checkoutOrderItemsProvider);
-                      if (items.isEmpty) return;
+                      if (items.isEmpty) {
+                        AppSnackbars.showError(context, 'Your cart is empty');
+                        return;
+                      }
 
-                      final link = await ref
-                          .read(orderActionsProvider.notifier)
-                          .createOrderAndPaymentLink(items: items);
+                      try {
+                        final link = await ref
+                            .read(orderActionsProvider.notifier)
+                            .createOrderAndPaymentLink(items: items);
 
-                      final uri = Uri.tryParse(link.paymentUrl);
-                      if (uri == null) return;
-                      await launchUrl(
-                        uri,
-                        mode: LaunchMode.externalApplication,
-                      );
+                        final uri = Uri.tryParse(link.paymentUrl);
+                        if (uri == null || link.paymentUrl.isEmpty) {
+                          if (context.mounted) {
+                            AppSnackbars.showError(context, 'Failed to generate payment link');
+                          }
+                          return;
+                        }
+                        await launchUrl(
+                          uri,
+                          mode: LaunchMode.externalApplication,
+                        );
+                      } catch (e) {
+                        if (context.mounted) {
+                          AppSnackbars.showError(context, 'Failed to create order: ${e.toString()}');
+                        }
+                      }
                     },
             ),
           ],
@@ -126,7 +146,9 @@ class _OrderConfirmationScreenState
     );
   }
 
-  Widget _buildAddressSection(BuildContext context) {
+  Widget _buildAddressSection(BuildContext context, Address? address) {
+    final hasAddress = address != null;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -139,7 +161,7 @@ class _OrderConfirmationScreenState
           ),
         ),
         const SizedBox(height: 12),
-        if (!_hasAddress)
+        if (!hasAddress)
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -156,13 +178,10 @@ class _OrderConfirmationScreenState
                 ),
                 TextButton(
                   onPressed: () async {
-                    final updated = await Navigator.of(context).pushNamed(
+                    await Navigator.of(context).pushNamed(
                       AppRoutes.addEditAddress,
                       arguments: {_returnArgKey: _returnToOrderConfirmation},
                     );
-                    if (updated == true) {
-                      setState(() => _hasAddress = true);
-                    }
                   },
                   child: const Text('Add address'),
                 ),
@@ -173,13 +192,10 @@ class _OrderConfirmationScreenState
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () async {
-              final updated = await Navigator.of(context).pushNamed(
+              await Navigator.of(context).pushNamed(
                 AppRoutes.addresses,
                 arguments: {_returnArgKey: _returnToOrderConfirmation},
               );
-              if (updated == true) {
-                setState(() => _hasAddress = true);
-              }
             },
             child: Container(
               padding: const EdgeInsets.all(16),
@@ -187,81 +203,24 @@ class _OrderConfirmationScreenState
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: const Color(0xFFCCCCCC)),
               ),
-              child: const Row(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: Text(
-                      'Sanusi Sulat 08102718764\nRoyal Anchor, Abuja, FCT, \nNigeria 900187',
-                      style: TextStyle(
+                      '${address.fullName} ${address.phone}\n${address.addressLine}, ${address.city}, ${address.state}, \n${address.country} ${address.postCode}',
+                      style: const TextStyle(
                         fontSize: 16,
                         color: Color(0xFF3C4042),
                         height: 1.5,
                       ),
                     ),
                   ),
-                  Icon(Icons.keyboard_arrow_right, color: Color(0xFF777F84)),
+                  const Icon(Icons.keyboard_arrow_right, color: Color(0xFF777F84)),
                 ],
               ),
             ),
           ),
-      ],
-    );
-  }
-
-  Widget _buildPaymentMethodSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Payment Method',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF1E2021),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          height: 88,
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-          ),
-          child: const Row(
-            children: [
-              SizedBox(width: 12),
-              Icon(Icons.radio_button_checked, color: Color(0xFFA15E22)),
-              SizedBox(width: 16),
-              Text(
-                'Pay with cards',
-                style: TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
-              ),
-              Spacer(),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          height: 64,
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-          ),
-          child: const Row(
-            children: [
-              SizedBox(width: 12),
-              Icon(Icons.radio_button_unchecked, color: Color(0xFF777F84)),
-              SizedBox(width: 16),
-              Text(
-                'Pay with Bank Transfer',
-                style: TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -288,11 +247,11 @@ class _OrderConfirmationScreenState
   }
 
   Widget _buildOrderSummary({
-    required AsyncValue cartAsync,
+    required Cart? cart,
     required bool isBusy,
     required VoidCallback? onPlaceOrder,
   }) {
-    final total = cartAsync.asData?.value?.total ?? 0;
+    final total = cart?.total ?? 0;
 
     return Container(
       decoration: const BoxDecoration(
@@ -354,14 +313,23 @@ class _OrderConfirmationScreenState
                     ],
                   ),
                   child: Center(
-                    child: Text(
-                      isBusy ? 'Processing...' : 'Place Order',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFFFFFBF5),
-                      ),
-                    ),
+                    child: isBusy
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Color(0xFFFFFBF5),
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            'Place Order',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFFFFBF5),
+                            ),
+                          ),
                   ),
                 ),
               ),

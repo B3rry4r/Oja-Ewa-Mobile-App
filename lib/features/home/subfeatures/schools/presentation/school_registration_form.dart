@@ -509,73 +509,150 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
 
   Future<String?> _promptForEmail() async {
     final emailController = TextEditingController();
-    return showDialog<String>(
+    return showGeneralDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        title: const Text(
-          'Enter Your Email',
-          style: TextStyle(
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'We need your email to send payment confirmation.',
-              style: TextStyle(fontFamily: 'Campton'),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                hintText: 'email@example.com',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+      barrierDismissible: true,
+      barrierLabel: 'EmailPrompt',
+      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      pageBuilder: (context, anim1, anim2) {
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                width: 342,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFBF5),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Enter Your Email',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF603814),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'We need your email to send payment confirmation.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF1E2021),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFCCCCCC)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: TextField(
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Campton',
+                          color: Color(0xFF1E2021),
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: 'email@example.com',
+                          hintStyle: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Campton',
+                            color: Color(0xFFCCCCCC),
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => Navigator.of(context).pop(null),
+                            child: Container(
+                              height: 57,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: const Color(0xFFCCCCCC)),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF595F63),
+                                    fontFamily: 'Campton',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              final email = emailController.text.trim();
+                              if (email.isNotEmpty && email.contains('@')) {
+                                Navigator.of(context).pop(email);
+                              }
+                            },
+                            child: Container(
+                              height: 57,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFDAF40),
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFFDAF40).withOpacity(0.4),
+                                    blurRadius: 16,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Continue',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFFFFFBF5),
+                                    fontFamily: 'Campton',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                 ),
               ),
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(null),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(
-                fontFamily: 'Campton',
-                color: Color(0xFF777F84),
-              ),
-            ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              final email = emailController.text.trim();
-              if (email.isNotEmpty && email.contains('@')) {
-                Navigator.of(context).pop(email);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFDAF40),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text(
-              'Continue',
-              style: TextStyle(
-                fontFamily: 'Campton',
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -589,49 +666,106 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
   }
 
   void _showPaymentConfirmationDialog({required bool requiresLogin}) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        title: const Text(
-          'Registration Submitted',
-          style: TextStyle(
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        content: Text(
-          requiresLogin
-              ? 'Your registration has been submitted. Please log in to complete payment (₦500).'
-              : 'Your registration has been submitted successfully.',
-          style: const TextStyle(
-            fontFamily: 'Campton',
-          ),
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop(); // Go back to school detail
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFDAF40),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+      barrierDismissible: false,
+      barrierLabel: 'RegistrationSubmitted',
+      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      pageBuilder: (context, anim1, anim2) {
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                width: 342,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFBF5),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4CAF50).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.check_circle,
+                        color: Color(0xFF4CAF50),
+                        size: 40,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Registration Submitted',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF603814),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      requiresLogin
+                          ? 'Your registration has been submitted. Please log in to complete payment (₦500).'
+                          : 'Your registration has been submitted successfully.',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF1E2021),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop(); // Go back to school detail
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 57,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFDAF40),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFFDAF40).withOpacity(0.4),
+                              blurRadius: 16,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'OK',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFFFFBF5),
+                              fontFamily: 'Campton',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
             ),
-            child: const Text(
-              'OK',
-              style: TextStyle(
-                fontFamily: 'Campton',
-                color: Colors.white,
-              ),
-            ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -641,47 +775,104 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
       await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!mounted) return;
       // Show success dialog after opening payment
-      showDialog(
+      showGeneralDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          title: const Text(
-            'Payment Initiated',
-            style: TextStyle(
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          content: const Text(
-            'Complete the payment in your browser. The registration fee is ₦500.',
-            style: TextStyle(
-              fontFamily: 'Campton',
-            ),
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop(); // Go back to school detail
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFDAF40),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+        barrierDismissible: false,
+        barrierLabel: 'PaymentInitiated',
+        barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+        pageBuilder: (context, anim1, anim2) {
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Container(
+                  width: 342,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFBF5),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 12),
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFDAF40).withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.payment,
+                          color: Color(0xFFFDAF40),
+                          size: 32,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Payment Initiated',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF603814),
+                          fontFamily: 'Campton',
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Complete the payment in your browser. The registration fee is ₦500.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF1E2021),
+                          fontFamily: 'Campton',
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop(); // Go back to school detail
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 57,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFDAF40),
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFDAF40).withOpacity(0.4),
+                                blurRadius: 16,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Done',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFFFFFBF5),
+                                fontFamily: 'Campton',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
               ),
-              child: const Text(
-                'Done',
-                style: TextStyle(
-                  fontFamily: 'Campton',
-                  color: Colors.white,
-                ),
-              ),
             ),
-          ],
-        ),
+          );
+        },
       );
     } else {
       _showErrorSnackbar('Could not open payment page.');

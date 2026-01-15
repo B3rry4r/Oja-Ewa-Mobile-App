@@ -16,13 +16,19 @@ class OrderItemProductSnapshot {
   final num? price;
   final String? sellerBusinessName;
 
+  static num? _parseNum(dynamic v) {
+    if (v is num) return v;
+    if (v is String) return num.tryParse(v);
+    return null;
+  }
+
   static OrderItemProductSnapshot fromJson(Map<String, dynamic> json) {
     final seller = json['seller_profile'];
     return OrderItemProductSnapshot(
-      id: (json['id'] as num?)?.toInt() ?? 0,
+      id: _parseNum(json['id'])?.toInt() ?? 0,
       name: (json['name'] as String?) ?? '',
       image: json['image'] as String?,
-      price: json['price'] as num?,
+      price: _parseNum(json['price']),
       sellerBusinessName: seller is Map<String, dynamic> ? seller['business_name'] as String? : null,
     );
   }
@@ -44,12 +50,18 @@ class OrderItem {
   final num? unitPrice;
   final OrderItemProductSnapshot product;
 
+  static num? _parseNum(dynamic v) {
+    if (v is num) return v;
+    if (v is String) return num.tryParse(v);
+    return null;
+  }
+
   static OrderItem fromJson(Map<String, dynamic> json) {
     return OrderItem(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      productId: (json['product_id'] as num?)?.toInt() ?? 0,
-      quantity: (json['quantity'] as num?)?.toInt() ?? 0,
-      unitPrice: json['unit_price'] as num?,
+      id: _parseNum(json['id'])?.toInt() ?? 0,
+      productId: _parseNum(json['product_id'])?.toInt() ?? 0,
+      quantity: _parseNum(json['quantity'])?.toInt() ?? 0,
+      unitPrice: _parseNum(json['unit_price']),
       product: OrderItemProductSnapshot.fromJson((json['product'] as Map?)?.cast<String, dynamic>() ?? const {}),
     );
   }
@@ -75,11 +87,17 @@ class OrderSummary {
   final DateTime? createdAt;
   final List<OrderItem> items;
 
+  static num? _parseNum(dynamic v) {
+    if (v is num) return v;
+    if (v is String) return num.tryParse(v);
+    return null;
+  }
+
   static OrderSummary fromJson(Map<String, dynamic> json) {
     final rawItems = json['order_items'];
     return OrderSummary(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      totalPrice: json['total_price'] as num?,
+      id: _parseNum(json['id'])?.toInt() ?? 0,
+      totalPrice: _parseNum(json['total_price']),
       status: json['status'] as String?,
       paymentReference: json['payment_reference'] as String?,
       trackingNumber: json['tracking_number'] as String?,
@@ -105,6 +123,12 @@ class PaymentLink {
   final num amount;
   final String currency;
 
+  static num? _parseNum(dynamic v) {
+    if (v is num) return v;
+    if (v is String) return num.tryParse(v);
+    return null;
+  }
+
   static PaymentLink fromWrappedResponse(Map<String, dynamic> json) {
     final data = json['data'];
     final payload = data is Map<String, dynamic> ? data : json;
@@ -112,7 +136,7 @@ class PaymentLink {
       paymentUrl: (payload['payment_url'] as String?) ?? '',
       accessCode: (payload['access_code'] as String?) ?? '',
       reference: (payload['reference'] as String?) ?? '',
-      amount: (payload['amount'] as num?) ?? 0,
+      amount: _parseNum(payload['amount']) ?? 0,
       currency: (payload['currency'] as String?) ?? 'NGN',
     );
   }
@@ -134,13 +158,19 @@ class PaymentVerifyResult {
   final String currency;
   final DateTime? paidAt;
 
+  static num? _parseNum(dynamic v) {
+    if (v is num) return v;
+    if (v is String) return num.tryParse(v);
+    return null;
+  }
+
   static PaymentVerifyResult fromWrappedResponse(Map<String, dynamic> json) {
     final data = json['data'];
     final payload = data is Map<String, dynamic> ? data : json;
     return PaymentVerifyResult(
-      orderId: (payload['order_id'] as num?)?.toInt() ?? 0,
+      orderId: _parseNum(payload['order_id'])?.toInt() ?? 0,
       status: (payload['payment_status'] as String?) ?? '',
-      amount: (payload['amount'] as num?) ?? 0,
+      amount: _parseNum(payload['amount']) ?? 0,
       currency: (payload['currency'] as String?) ?? 'NGN',
       paidAt: DateTime.tryParse((payload['paid_at'] as String?) ?? ''),
     );

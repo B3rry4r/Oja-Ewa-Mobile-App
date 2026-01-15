@@ -4,6 +4,7 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../features/home/subfeatures/schools/presentation/controllers/school_registration_controller.dart';
 import '../../features/orders/presentation/controllers/orders_controller.dart';
 import '../ui/snackbars.dart';
 
@@ -42,12 +43,23 @@ class DeepLinkHandler {
   void _handleDeepLink(Uri uri) {
     debugPrint('Deep link received: $uri');
 
-    // Handle payment callback: ojaewa://payment/callback?reference=xxx
-    if (uri.scheme == 'ojaewa' && uri.host == 'payment') {
+    if (uri.scheme != 'ojaewa') return;
+
+    // Handle order payment callback: ojaewa://payment/callback?reference=xxx
+    if (uri.host == 'payment') {
       final path = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-      
       if (path == 'callback') {
         _handlePaymentCallback(uri);
+      }
+    }
+    
+    // Handle school payment callback: ojaewa://school/payment/callback?reference=xxx
+    if (uri.host == 'school') {
+      final pathSegments = uri.pathSegments;
+      if (pathSegments.length >= 2 && 
+          pathSegments[0] == 'payment' && 
+          pathSegments[1] == 'callback') {
+        _handleSchoolPaymentCallback(uri);
       }
     }
   }
@@ -93,82 +105,440 @@ class DeepLinkHandler {
     }
   }
 
+  Future<void> _handleSchoolPaymentCallback(Uri uri) async {
+    final reference = uri.queryParameters['reference'];
+    final status = uri.queryParameters['status'];
+
+    if (reference == null || reference.isEmpty) {
+      _showError('Invalid school payment callback: missing reference');
+      return;
+    }
+
+    final context = _navigatorKey?.currentContext;
+    if (context == null) {
+      debugPrint('No context available for school payment callback');
+      return;
+    }
+
+    // Show loading indicator
+    _showLoading(context, 'Verifying school payment...');
+
+    try {
+      // Verify payment with backend using school registration API
+      final api = _ref.read(schoolRegistrationApiProvider);
+      final result = await api.verifyPayment(reference: reference);
+      
+      // Hide loading
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+      }
+
+      final data = result['data'] as Map<String, dynamic>?;
+      final paymentStatus = data?['payment_status'] as String? ?? status;
+
+      if (paymentStatus == 'success' || status == 'success') {
+        _showSchoolPaymentSuccess(context);
+      } else {
+        _showPaymentFailed(context, 'School payment verification failed. Status: $paymentStatus');
+      }
+    } catch (e) {
+      // Hide loading
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        _showError('Failed to verify school payment: $e');
+      }
+    }
+  }
+
   void _showLoading(BuildContext context, String message) {
-    showDialog(
+    showGeneralDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        content: Row(
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(width: 16),
-            Expanded(child: Text(message)),
-          ],
-        ),
-      ),
+      barrierLabel: 'Loading',
+      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      pageBuilder: (context, anim1, anim2) {
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: Container(
+              width: 280,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFFBF5),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: CircularProgressIndicator(
+                      color: Color(0xFFFDAF40),
+                      strokeWidth: 3,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF1E2021),
+                      fontFamily: 'Campton',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
   void _showPaymentSuccess(BuildContext context, int? orderId) {
-    showDialog(
+    showGeneralDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 28),
-            SizedBox(width: 8),
-            Text('Payment Successful'),
-          ],
-        ),
-        content: const Text('Your order has been placed successfully!'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              // Navigate to order details or orders list
-              _navigatorKey?.currentState?.pushNamedAndRemoveUntil(
-                '/orders',
-                (route) => route.isFirst,
-              );
-            },
-            child: const Text('View Orders'),
+      barrierLabel: 'PaymentSuccess',
+      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      pageBuilder: (context, anim1, anim2) {
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                width: 342,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFBF5),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4CAF50).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.check_circle,
+                        color: Color(0xFF4CAF50),
+                        size: 40,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Payment Successful',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF603814),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Your order has been placed successfully!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF1E2021),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              _navigatorKey?.currentState?.pushNamedAndRemoveUntil(
+                                '/',
+                                (route) => false,
+                              );
+                            },
+                            child: Container(
+                              height: 57,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: const Color(0xFFCCCCCC)),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Continue',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF595F63),
+                                    fontFamily: 'Campton',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              _navigatorKey?.currentState?.pushNamedAndRemoveUntil(
+                                '/orders',
+                                (route) => route.isFirst,
+                              );
+                            },
+                            child: Container(
+                              height: 57,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFDAF40),
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFFDAF40).withOpacity(0.4),
+                                    blurRadius: 16,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'View Orders',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFFFFFBF5),
+                                    fontFamily: 'Campton',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              // Go back to home
-              _navigatorKey?.currentState?.pushNamedAndRemoveUntil(
-                '/',
-                (route) => false,
-              );
-            },
-            child: const Text('Continue Shopping'),
+        );
+      },
+    );
+  }
+
+  void _showSchoolPaymentSuccess(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: 'SchoolPaymentSuccess',
+      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      pageBuilder: (context, anim1, anim2) {
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                width: 342,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFBF5),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4CAF50).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.check_circle,
+                        color: Color(0xFF4CAF50),
+                        size: 40,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Registration Complete',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF603814),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Your school registration payment was successful!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF1E2021),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        _navigatorKey?.currentState?.pushNamedAndRemoveUntil(
+                          '/',
+                          (route) => false,
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 57,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFDAF40),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFFDAF40).withOpacity(0.4),
+                              blurRadius: 16,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Done',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFFFFBF5),
+                              fontFamily: 'Campton',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   void _showPaymentFailed(BuildContext context, String message) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.error, color: Colors.red, size: 28),
-            SizedBox(width: 8),
-            Text('Payment Failed'),
-          ],
-        ),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('OK'),
+      barrierDismissible: true,
+      barrierLabel: 'PaymentFailed',
+      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      pageBuilder: (context, anim1, anim2) {
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                width: 342,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFBF5),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE53935).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.error,
+                        color: Color(0xFFE53935),
+                        size: 40,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Payment Failed',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF603814),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF1E2021),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        width: double.infinity,
+                        height: 57,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFDAF40),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFFDAF40).withOpacity(0.4),
+                              blurRadius: 16,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'OK',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFFFFBF5),
+                              fontFamily: 'Campton',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
