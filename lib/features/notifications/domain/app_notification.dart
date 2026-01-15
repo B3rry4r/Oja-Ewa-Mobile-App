@@ -8,6 +8,8 @@ class AppNotification {
     required this.body,
     required this.isRead,
     this.createdAt,
+    this.event,
+    this.payload,
   });
 
   final int id;
@@ -15,6 +17,14 @@ class AppNotification {
   final String body;
   final bool isRead;
   final DateTime? createdAt;
+
+  /// Notification event type e.g. business_approved
+  final String? event;
+
+  /// Payload returned by backend (contains deep_link, ids, status)
+  final Map<String, dynamic>? payload;
+
+  String? get deepLink => payload?['deep_link'] as String?;
 
   static AppNotification fromJson(Map<String, dynamic> json) {
     final id = (json['id'] as num?)?.toInt() ?? 0;
@@ -38,6 +48,8 @@ class AppNotification {
       body: body,
       isRead: isRead,
       createdAt: createdAt,
+      event: json['event'] as String?,
+      payload: json['payload'] is Map<String, dynamic> ? json['payload'] as Map<String, dynamic> : null,
     );
   }
 }

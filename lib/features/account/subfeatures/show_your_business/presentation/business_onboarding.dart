@@ -11,17 +11,22 @@ class BusinessOnboardingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final hasApprovedBusiness = ref.watch(hasApprovedBusinessProvider);
-    if (hasApprovedBusiness) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            AppRoutes.businessSettings,
-            (route) => false,
-          );
-        }
-      });
-    }
+    final businessesAsync = ref.watch(myBusinessStatusesProvider);
+
+    businessesAsync.whenOrNull(
+      data: (items) {
+        if (items.isEmpty) return;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) return;
+          final hasApproved = items.any((b) => b.storeStatus == 'approved');
+          if (hasApproved) {
+            Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.businessSettings, (r) => false);
+          } else {
+            Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.businessApprovalStatus, (r) => false);
+          }
+        });
+      },
+    );
 
     
     return Scaffold(

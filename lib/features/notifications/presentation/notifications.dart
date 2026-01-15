@@ -2,12 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
 import 'package:ojaewa/features/notifications/domain/app_notification.dart';
 import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 import 'package:ojaewa/features/notifications/presentation/notification_detail.dart';
+import 'package:ojaewa/features/business_details/presentation/screens/business_details_screen.dart';
+import 'package:ojaewa/features/product_detail/presentation/product_detail_screen.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
@@ -168,7 +171,14 @@ class NotificationsScreen extends ConsumerWidget {
             AppSnackbars.showError(context, UiErrorMessage.from(e));
           });
         }
-        // Navigate to detail screen
+
+        final deepLink = notification.deepLink;
+        if (deepLink != null && deepLink.isNotEmpty) {
+          _handleDeepLinkNavigation(context, deepLink);
+          return;
+        }
+
+        // Fallback: open detail
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => NotificationDetailScreen(notification: notification),
@@ -262,6 +272,56 @@ class NotificationsScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  void _handleDeepLinkNavigation(BuildContext context, String deepLink) {
+    // Expected formats:
+    // /business/{id}
+    // /products/{id}
+    // /orders/{id}
+    // /seller/profile
+    try {
+      final uri = Uri.parse(deepLink);
+      final segments = uri.pathSegments;
+      if (segments.isEmpty) {
+        return;
+      }
+
+      if (segments.length >= 2 && segments[0] == 'business') {
+        final id = int.tryParse(segments[1]);
+        if (id != null) {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => BusinessDetailsScreen(businessId: id)),
+          );
+          return;
+        }
+      }
+
+      if (segments.length >= 2 && segments[0] == 'products') {
+        final id = int.tryParse(segments[1]);
+        if (id != null) {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => ProductDetailsScreen(productId: id)),
+          );
+          return;
+        }
+      }
+
+      if (segments.isNotEmpty && segments[0] == 'orders') {
+        // We don't yet support order-id specific screen; send to orders list.
+        Navigator.of(context).pushNamed(AppRoutes.orders);
+        return;
+      }
+
+      if (segments.length >= 2 && segments[0] == 'seller' && segments[1] == 'profile') {
+        Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
+        return;
+      }
+
+      // Unknown deep link → do nothing
+    } catch (_) {
+      // Ignore invalid deep links
+    }
   }
 
   String _formatTimeAgo(DateTime dateTime) {

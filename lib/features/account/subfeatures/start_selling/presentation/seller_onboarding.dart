@@ -12,17 +12,22 @@ class SellerOnboardingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isSellerApproved = ref.watch(isSellerApprovedProvider);
-    if (isSellerApproved) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            AppRoutes.yourShopDashboard,
-            (route) => false,
-          );
-        }
-      });
-    }
+    final sellerStatusAsync = ref.watch(mySellerStatusProvider);
+
+    // If seller profile exists, route based on status
+    sellerStatusAsync.whenOrNull(
+      data: (status) {
+        if (status == null) return;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) return;
+          if (status.isApprovedAndActive) {
+            Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.yourShopDashboard, (r) => false);
+          } else {
+            Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.sellerApprovalStatus, (r) => false);
+          }
+        });
+      },
+    );
 
     
     return Scaffold(

@@ -31,6 +31,8 @@ class OptimisticNotificationsNotifier extends AsyncNotifier<List<AppNotification
             body: n.body,
             isRead: true,
             createdAt: n.createdAt,
+            event: n.event,
+            payload: n.payload,
           );
         }
         return n;
@@ -50,6 +52,8 @@ class OptimisticNotificationsNotifier extends AsyncNotifier<List<AppNotification
         body: n.body,
         isRead: true,
         createdAt: n.createdAt,
+        event: n.event,
+        payload: n.payload,
       )).toList(),
     );
   }

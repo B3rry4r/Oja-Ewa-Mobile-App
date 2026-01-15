@@ -47,6 +47,8 @@ import '../../features/cart/presentation/screens/order_confirmation_screen.dart'
 import '../../features/review_submission/presentation/review_submission.dart';
 import '../../features/product_detail/presentation/reviews.dart';
 import '../../features/your_shop/presentation/shop_dashboard.dart';
+import '../../features/account/subfeatures/start_selling/presentation/seller_approval_status_screen.dart';
+import '../../features/account/subfeatures/show_your_business/presentation/business_approval_status_screen.dart';
 import '../../features/your_shop/subfeatures/manage_shop/manage_shop.dart';
 import '../../features/your_shop/subfeatures/manage_shop/sub_features/delete_shop.dart';
 import '../../features/your_shop/subfeatures/manage_shop/sub_features/edit_business.dart';
@@ -99,6 +101,8 @@ abstract class AppRoutes {
   // Seller onboarding
   static const sellerOnboarding = '/seller-onboarding';
   static const sellerRegistration = '/seller-registration';
+  static const sellerApprovalStatus = '/seller-approval-status';
+  static const businessApprovalStatus = '/business-approval-status';
   static const businessDetails = '/business-details';
   static const accountReview = '/account-review';
 
@@ -327,6 +331,18 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const AuthGuard(child: SellerRegistrationScreen()),
+        );
+
+      case AppRoutes.sellerApprovalStatus:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const AuthGuard(child: SellerApprovalStatusScreen()),
+        );
+
+      case AppRoutes.businessApprovalStatus:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const AuthGuard(child: BusinessApprovalStatusScreen()),
         );
 
       case AppRoutes.businessDetails:
