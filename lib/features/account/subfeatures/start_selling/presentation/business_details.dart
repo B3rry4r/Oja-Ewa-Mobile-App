@@ -5,7 +5,6 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 
 import '../../../../../app/router/app_router.dart';
 import 'draft_utils.dart';
-import 'seller_registration_draft.dart';
 
 class BusinessDetailsScreen extends StatefulWidget {
   const BusinessDetailsScreen({super.key});

@@ -39,8 +39,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         // Populate once; avoid overwriting user edits.
         if (_nameController.text.isEmpty) _nameController.text = u.fullName;
         if (_emailController.text.isEmpty) _emailController.text = u.email;
-        if (_phoneController.text.isEmpty)
+        if (_phoneController.text.isEmpty) {
           _phoneController.text = u.phone ?? '';
+        }
       });
     });
 

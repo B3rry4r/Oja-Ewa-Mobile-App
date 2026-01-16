@@ -26,7 +26,7 @@ It is designed to be sent to the client agent so they can implement the full onb
 - `Accept: application/json`
 - `Content-Type: application/json`
 
-**Request body (complete)**
+**Request body (complete — TEXTILES example)**
 ```json
 {
   "category_id": 5,
@@ -39,9 +39,42 @@ It is designed to be sent to the client agent so they can implement the full onb
   "size": "XL",
   "processing_time_type": "normal",
   "processing_days": 5,
+  "fabric_type": "Ankara",
   "price": 45000
 }
 ```
+
+**Request body (complete — SHOES & BAGS example)**
+```json
+{
+  "category_id": 70,
+  "name": "Leather Sandals",
+  "gender": "male",
+  "style": "Leather Sandals",
+  "tribe": "Hausa",
+  "description": "Handcrafted leather sandals with traditional patterns.",
+  "image": "https://images.unsplash.com/photo-1514986888952-8cd320577b68?w=500&h=500&fit=crop",
+  "size": "42",
+  "processing_time_type": "normal",
+  "processing_days": 4,
+  "price": 18000
+}
+```
+
+**Request body (complete — AFRO BEAUTY PRODUCTS example)**
+```json
+{
+  "category_id": 90,
+  "name": "Shea Butter Hair Cream",
+  "description": "Moisturizing hair cream for natural hair.",
+  "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=500&h=500&fit=crop",
+  "processing_time_type": "normal",
+  "processing_days": 2,
+  "price": 3500
+}
+```
+
+> Note: Afro Beauty Products and Art Products do **not** require `size`, `style`, `tribe`, `gender`, or `fabric_type`. Textiles require `fabric_type`; Shoes & Bags do not.
 
 **Validation rules (backend)**
 - `category_id` (required) must exist in `categories`
@@ -124,7 +157,6 @@ It is designed to be sent to the client agent so they can implement the full onb
 {
   "category": "school",
   "category_id": 81,
-  "subcategory_id": 82,
 
   "country": "Nigeria",
   "state": "Lagos",
@@ -158,9 +190,9 @@ It is designed to be sent to the client agent so they can implement the full onb
 **Request body (complete, AFRO BEAUTY services example)**
 ```json
 {
-  "category": "afro_beauty",
-  "category_id": 56,
-  "subcategory_id": 57,
+  "category": "afro_beauty_services",
+  "category_id": 57,
+  "subcategory_id": null,
 
   "country": "Nigeria",
   "state": "Lagos",
@@ -314,3 +346,44 @@ curl -X POST "https://<host>/api/business/my/123/upload" \
 ---
 
 *Last updated: 2026-01-15*
+
+
+ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ ┃                                                ✅ What I Changed                                                 ┃ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│                                                                                                                      │
+│                                        1) Fabrics removed from category tree                                         │
+│                                                                                                                      │
+│  • Fabrics are now filters, not categories                                                                           │
+│  • Category tree is clean 3‑step for products                                                                        │
+│                                                                                                                      │
+│                                           2) Added fabric_type to products                                           │
+│                                                                                                                      │
+│  • New DB column: products.fabric_type                                                                               │
+│  • Factory now seeds realistic fabric types                                                                          │
+│  • Filterable via /api/products/browse and /api/products/search                                                      │
+│                                                                                                                      │
+│                                           3) Art is now a PRODUCT catalog                                            │
+│                                                                                                                      │
+│  • Art moved from business categories to product categories                                                          │
+│  • Tree is now:                                                                                                      │
+│    Art → Products → Sculpture/Painting/etc                                                                           │
+│  • CategoryController returns products for art                                                                       │
+│                                                                                                                      │
+│                                               4) Gender filter removed                                               │
+│                                                                                                                      │
+│  • Not needed because Men/Women are already category groups                                                          │
+│  • Removed from product filters/search/browse/suggestions                                                            │
+│                                                                                                                      │
+│                                     5) Product validation now category‑sensitive                                     │
+│                                                                                                                      │
+│  • Textiles require: fabric_type, style, tribe, size                                                                 │
+│  • Shoes & Bags require: style, tribe, size (fabric optional)                                                        │
+│  • Afro Beauty Products & Art Products: no apparel fields required                                                   │
+│                                                                                                                      │
+│                                              6) Business types updated                                               │
+│                                                                                                                      │
+│  • Art removed from BusinessProfiles                                                                                 │
+│  • Business categories now only:                                                                                     │
+│     • school                                                                                                         │
+│     • afro_beauty_services                                                      

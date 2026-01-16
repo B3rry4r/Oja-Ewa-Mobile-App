@@ -577,7 +577,7 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                   const SizedBox(height: 12),
                   if ((firstReview.headline ?? '').isNotEmpty)
                     Text(
-                      firstReview.headline!,
+                      firstReview.headline,
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -587,7 +587,7 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                   if ((firstReview.body ?? '').isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(
-                      firstReview.body!,
+                      firstReview.body,
                       style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF1E2021),

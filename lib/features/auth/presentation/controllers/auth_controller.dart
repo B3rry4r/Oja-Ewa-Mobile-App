@@ -13,7 +13,6 @@ import '../../../notifications/presentation/controllers/notifications_controller
 import '../../../wishlist/presentation/controllers/wishlist_controller.dart';
 import '../../../orders/presentation/controllers/orders_controller.dart';
 import '../../../search/presentation/controllers/search_suggestions_controller.dart';
-import '../../../blog/presentation/controllers/blog_controller.dart';
 import '../../../blog/presentation/controllers/blog_favorites_controller.dart';
 
 /// Presentation-layer controller for auth flows.

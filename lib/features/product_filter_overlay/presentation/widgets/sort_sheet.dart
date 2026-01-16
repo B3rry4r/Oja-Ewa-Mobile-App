@@ -54,7 +54,8 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    final filtersAsync = ref.watch(availableFiltersProvider);
+    // Use hardcoded default sort options - no API call needed
+    final sortOptions = ProductFilters.defaults.sortOptions;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -71,45 +72,11 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
               ),
             ),
             
-            // Sort overlay content
-            filtersAsync.when(
-              loading: () => _buildLoadingSheet(),
-              error: (_, __) => _buildErrorSheet(),
-              data: (filters) => _buildSortOverlay(filters.sortOptions),
-            ),
+            // Sort overlay content - use defaults directly, no async needed
+            _buildSortOverlay(sortOptions),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildLoadingSheet() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(40),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFF8F1),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(28),
-          topRight: Radius.circular(28),
-        ),
-      ),
-      child: const Center(child: CircularProgressIndicator()),
-    );
-  }
-
-  Widget _buildErrorSheet() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(40),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFF8F1),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(28),
-          topRight: Radius.circular(28),
-        ),
-      ),
-      child: const Center(child: Text('Failed to load sort options')),
     );
   }
 

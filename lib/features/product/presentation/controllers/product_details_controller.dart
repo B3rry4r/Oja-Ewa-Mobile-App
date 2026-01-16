@@ -54,7 +54,7 @@ class ProductDetails {
       sellerBusinessName: seller is Map<String, dynamic> ? seller['business_name'] as String? : null,
       size: json['size'] as String?,
       processingTimeType: json['processing_time_type'] as String?,
-      processingDays: (parseNum(json['processing_days']) as num?)?.toInt(),
+      processingDays: (parseNum(json['processing_days']))?.toInt(),
       suggestions: (suggestionsRaw is List) ? suggestionsRaw.whereType<Map<String, dynamic>>().toList() : const [],
     );
   }

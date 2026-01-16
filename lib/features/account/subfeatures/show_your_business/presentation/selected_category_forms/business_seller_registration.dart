@@ -25,17 +25,17 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
   final _cityController = TextEditingController();
   String? _identityDocumentLocalPath;
   final _addressController = TextEditingController();
-  final _emailController = TextEditingController(text: 'sanusimot@gmail.com');
+  final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _websiteController = TextEditingController();
   final _instagramController = TextEditingController();
   final _facebookController = TextEditingController();
   
-  // Location selections
-  String _selectedCountryName = 'Nigeria';
-  String _selectedCountryFlag = '🇳🇬';
-  String _selectedStateName = 'FCT';
-  String _selectedCountryCode = '+234';
+  // Location selections - empty by default
+  String _selectedCountryName = '';
+  String _selectedCountryFlag = '';
+  String _selectedStateName = '';
+  String _selectedCountryCode = '';
 
   @override
   void dispose() {
@@ -72,12 +72,13 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
             // --- Location Section ---
             _buildSectionHeader("Location"),
             const SizedBox(height: 16),
-            _buildLocationDropdown(label: 'Country', value: _selectedCountryName, flag: _selectedCountryFlag, onTap: () async {
+            _buildLocationDropdown(label: 'Country', value: _selectedCountryName.isEmpty ? 'Select Country' : _selectedCountryName, flag: _selectedCountryFlag.isEmpty ? null : _selectedCountryFlag, onTap: () async {
               final country = await CountryPickerSheet.show(context, selectedCountry: _selectedCountryName);
               if (country != null) setState(() { _selectedCountryName = country.name; _selectedCountryFlag = country.flag; _selectedCountryCode = country.dialCode; _selectedStateName = ''; });
             }),
             const SizedBox(height: 20),
             _buildLocationDropdown(label: 'State', value: _selectedStateName.isEmpty ? 'Select State' : _selectedStateName, onTap: () async {
+              if (_selectedCountryName.isEmpty) return; // Must select country first
               final state = await StatePickerSheet.show(context, countryName: _selectedCountryName, selectedState: _selectedStateName);
               if (state != null) setState(() => _selectedStateName = state.name);
             }),
@@ -226,6 +227,7 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
   }
 
   Widget _buildPhoneInputWithPicker(String label, {required TextEditingController controller}) {
+    final hasCountryCode = _selectedCountryCode.isNotEmpty;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
       const SizedBox(height: 8),
@@ -236,9 +238,12 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
             final country = await CountryCodePickerSheet.show(context, selectedDialCode: _selectedCountryCode);
             if (country != null) setState(() { _selectedCountryCode = country.dialCode; _selectedCountryFlag = country.flag; });
           }, child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Text(_selectedCountryFlag, style: const TextStyle(fontSize: 18)),
-            const SizedBox(width: 6),
-            Text(_selectedCountryCode, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF241508))),
+            if (hasCountryCode) ...[
+              Text(_selectedCountryFlag, style: const TextStyle(fontSize: 18)),
+              const SizedBox(width: 6),
+              Text(_selectedCountryCode, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF241508))),
+            ] else
+              const Text('Code', style: TextStyle(fontSize: 16, color: Color(0xFFCCCCCC))),
             const SizedBox(width: 4),
             const Icon(Icons.keyboard_arrow_down, size: 18, color: Color(0xFF777F84)),
           ])),
@@ -318,7 +323,7 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
       AppSnackbars.showError(context, 'Please select a country');
       return false;
     }
-    if (_selectedStateName.isEmpty || _selectedStateName == 'Select State') {
+    if (_selectedStateName.isEmpty) {
       AppSnackbars.showError(context, 'Please select a state');
       return false;
     }
@@ -391,11 +396,12 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
           ..spotify = null
           ..identityDocumentPath = _identityDocumentLocalPath;
 
+        // Map UI category labels to form routes
+        // Business profiles now only use: afro_beauty_services (Beauty), school (Schools)
+        // Art has been moved to Products
         final route = switch (selectedCategory) {
           'Beauty' => AppRoutes.businessBeautyForm,
-          'Brands' => AppRoutes.businessBrandsForm,
           'Schools' => AppRoutes.businessSchoolsForm,
-          'Music' => AppRoutes.businessMusicForm,
           _ => AppRoutes.businessBeautyForm,
         };
 
@@ -405,21 +411,16 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
           final all = await ref.read(allCategoriesProvider.future);
           if (!mounted) return;
 
+          // Map UI category labels to backend category types
+          // Business profiles now only use: afro_beauty_services, school
+          // Art has been moved to Products
           List<CategoryNode> roots;
           switch (selectedCategory) {
             case 'Beauty':
-              final r = all['afro_beauty'] ?? const [];
-              final svc = r.where((e) => e.slug.contains('afro-beauty-services')).toList();
-              roots = svc.isNotEmpty ? svc : r;
-              break;
-            case 'Brands':
-              roots = all['shoes_bags'] ?? const [];
+              roots = all['afro_beauty_services'] ?? const [];
               break;
             case 'Schools':
               roots = all['school'] ?? const [];
-              break;
-            case 'Music':
-              roots = all['art'] ?? const [];
               break;
             default:
               roots = all[selectedCategory.toLowerCase()] ?? const [];
@@ -433,7 +434,7 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
           if (selectedNode == null) return;
 
           draft
-            ..categoryId = selectedNode.parentId == null ? selectedNode.id : selectedNode.parentId
+            ..categoryId = selectedNode.parentId ?? selectedNode.id
             ..subcategoryId = selectedNode.id;
         }
 

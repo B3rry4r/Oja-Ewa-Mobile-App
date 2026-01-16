@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/router/app_router.dart';
+import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
+import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
-import 'package:ojaewa/core/widgets/image_placeholder.dart';
+import 'package:ojaewa/core/widgets/product_card.dart';
+import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
+import 'package:ojaewa/features/product/domain/product.dart';
 import 'package:ojaewa/features/product_detail/presentation/product_detail_screen.dart';
 import 'package:ojaewa/features/search/presentation/controllers/search_controller.dart';
 import 'package:ojaewa/features/search/presentation/controllers/search_suggestions_controller.dart';
@@ -15,9 +20,6 @@ const _categoryTypes = [
   {'key': 'textiles', 'label': 'Textiles'},
   {'key': 'afro_beauty', 'label': 'Afro Beauty'},
   {'key': 'shoes_bags', 'label': 'Shoes & Bags'},
-  {'key': 'art', 'label': 'Art'},
-  {'key': 'school', 'label': 'Schools'},
-  {'key': 'sustainability', 'label': 'Sustainability'},
 ];
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -70,158 +72,268 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final isSearching = _focusNode.hasFocus && _searchController.text.isNotEmpty;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFBF5),
+      backgroundColor: const Color(0xFF603814),
       body: SafeArea(
+        bottom: false,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const AppHeader(
-              backgroundColor: Color(0xFFFFFBF5),
-              iconColor: Color(0xFF241508),
-              title: Text(
-                'Search',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
-                ),
-              ),
-            ),
+            // Header with buttons - matching wishlist style
+            _buildHeader(context),
 
-            // Search Input
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: const Color(0xFFE0E0E0)),
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 16),
-                    SvgPicture.asset(
-                      AppIcons.search,
-                      width: 20,
-                      height: 20,
-                      colorFilter: const ColorFilter.mode(
-                        Color(0xFF777F84),
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        focusNode: _focusNode,
-                        textInputAction: TextInputAction.search,
-                        onSubmitted: (_) => _performSearch(),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'Campton',
-                          color: Color(0xFF1E2021),
-                        ),
-                        decoration: const InputDecoration(
-                          hintText: 'Search products, businesses...',
-                          hintStyle: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Campton',
-                            color: Color(0xFFCCCCCC),
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                      ),
-                    ),
-                    if (_searchController.text.isNotEmpty)
-                      GestureDetector(
-                        onTap: () {
-                          _searchController.clear();
-                          ref.read(searchResultsProvider.notifier).clear();
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.all(12),
-                          child: Icon(Icons.close, size: 20, color: Color(0xFF777F84)),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Category Type Filter Chips
-            SizedBox(
-              height: 40,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: _categoryTypes.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  final type = _categoryTypes[index];
-                  final isSelected = _selectedCategoryType == type['key'];
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() => _selectedCategoryType = type['key']!);
-                      if (_searchController.text.trim().isNotEmpty) {
-                        _performSearch();
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFFFDAF40) : Colors.transparent,
-                        border: Border.all(
-                          color: isSelected ? const Color(0xFFFDAF40) : const Color(0xFFCCCCCC),
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Center(
-                        child: Text(
-                          type['label']!,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'Campton',
-                            fontWeight: FontWeight.w500,
-                            color: isSelected ? Colors.white : const Color(0xFF777F84),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Content
+            // Main Content
             Expanded(
-              child: isSearching && suggestions.isNotEmpty
-                  ? _buildSuggestions(suggestions)
-                  : searchResults.when(
-                      data: (results) => results.isEmpty
-                          ? _buildEmptyState()
-                          : _buildSearchResults(results),
-                      loading: () => const Center(child: CircularProgressIndicator()),
-                      error: (e, _) => Center(
-                        child: Text(
-                          'Search failed: $e',
-                          style: const TextStyle(
-                            fontFamily: 'Campton',
-                            color: Color(0xFF777F84),
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFF8F1),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(28),
+                    topRight: Radius.circular(28),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: AppBottomNavBar.height),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 30),
+
+                      // Screen Title
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Search',
+                            style: TextStyle(
+                              fontSize: 33,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Campton',
+                              color: Color(0xFF241508),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+
+                      const SizedBox(height: 24),
+
+                      // Search Input
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(25),
+                            border: Border.all(color: const Color(0xFFE0E0E0)),
+                          ),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 16),
+                              SvgPicture.asset(
+                                AppIcons.search,
+                                width: 20,
+                                height: 20,
+                                colorFilter: const ColorFilter.mode(
+                                  Color(0xFF777F84),
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextField(
+                                  controller: _searchController,
+                                  focusNode: _focusNode,
+                                  textInputAction: TextInputAction.search,
+                                  onSubmitted: (_) => _performSearch(),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'Campton',
+                                    color: Color(0xFF1E2021),
+                                  ),
+                                  decoration: const InputDecoration(
+                                    hintText: 'Search products...',
+                                    hintStyle: TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'Campton',
+                                      color: Color(0xFFCCCCCC),
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                ),
+                              ),
+                              if (_searchController.text.isNotEmpty)
+                                GestureDetector(
+                                  onTap: () {
+                                    _searchController.clear();
+                                    ref.read(searchResultsProvider.notifier).clear();
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(12),
+                                    child: Icon(Icons.close, size: 20, color: Color(0xFF777F84)),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Category Type Filter Chips
+                      SizedBox(
+                        height: 40,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: _categoryTypes.length,
+                          separatorBuilder: (_, __) => const SizedBox(width: 8),
+                          itemBuilder: (context, index) {
+                            final type = _categoryTypes[index];
+                            final isSelected = _selectedCategoryType == type['key'];
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() => _selectedCategoryType = type['key']!);
+                                if (_searchController.text.trim().isNotEmpty) {
+                                  _performSearch();
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? const Color(0xFFFDAF40) : Colors.transparent,
+                                  border: Border.all(
+                                    color: isSelected ? const Color(0xFFFDAF40) : const Color(0xFFCCCCCC),
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    type['label']!,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontFamily: 'Campton',
+                                      fontWeight: FontWeight.w500,
+                                      color: isSelected ? Colors.white : const Color(0xFF777F84),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Content
+                      Expanded(
+                        child: isSearching && suggestions.isNotEmpty
+                            ? _buildSuggestions(suggestions)
+                            : searchResults.when(
+                                data: (results) => results.isEmpty
+                                    ? _buildEmptyState()
+                                    : _buildSearchResults(results),
+                                loading: () => const Center(
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation(Color(0xFFFDAF40)),
+                                  ),
+                                ),
+                                error: (e, _) => Center(
+                                  child: Text(
+                                    'Search failed: $e',
+                                    style: const TextStyle(
+                                      fontFamily: 'Campton',
+                                      color: Color(0xFF777F84),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Consumer(
+      builder: (context, ref, _) {
+        final accessToken = ref.watch(accessTokenProvider);
+        final isAuthenticated = accessToken != null && accessToken.isNotEmpty;
+        final unreadCount = isAuthenticated
+            ? ref.watch(unreadCountProvider).maybeWhen(
+                  data: (count) => count,
+                  orElse: () => 0,
+                )
+            : 0;
+
+        return Container(
+          height: 104,
+          color: const Color(0xFF603814),
+          padding: const EdgeInsets.only(top: 32),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: Row(
+                  children: [
+                    // Notification icon with badge
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        HeaderIconButton(
+                          asset: AppIcons.notification,
+                          onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+                          iconColor: Colors.white,
+                        ),
+                        if (unreadCount > 0)
+                          Positioned(
+                            right: -4,
+                            top: -4,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFFDAF40),
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 18,
+                                minHeight: 18,
+                              ),
+                              child: Text(
+                                unreadCount > 99 ? '99+' : unreadCount.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  fontFamily: 'Campton',
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(width: 8),
+                    HeaderIconButton(
+                      asset: AppIcons.bag,
+                      onTap: () => Navigator.of(context).pushNamed(AppRoutes.cart),
+                      iconColor: Colors.white,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -291,131 +403,50 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   Widget _buildSearchResults(List<dynamic> results) {
+    // Convert search results to Product for ProductCard
+    final products = results
+        .whereType<Map<String, dynamic>>()
+        .where((item) => !item.containsKey('business_name')) // Only products
+        .map((item) => Product(
+              id: (item['id'] as int? ?? 0).toString(),
+              title: item['name'] as String? ?? '',
+              priceLabel: '₦${item['price'] ?? 0}',
+              imageUrl: item['image'] as String?,
+              rating: (item['avg_rating'] as num?)?.toDouble() ?? 0,
+              reviewCount: (item['review_count'] as int?) ?? 0,
+            ))
+        .toList();
+
+    if (products.isEmpty) {
+      return _buildEmptyState();
+    }
+
     return GridView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 0.65,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 6,
+        mainAxisExtent: 248,
       ),
-      itemCount: results.length,
+      itemCount: products.length,
       itemBuilder: (context, index) {
-        final item = results[index];
-        // Handle both product and business results
-        if (item is Map<String, dynamic>) {
-          final id = item['id'] as int? ?? 0;
-          final name = item['name'] as String? ?? item['business_name'] as String? ?? '';
-          final image = item['image'] as String? ?? item['logo'] as String?;
-          final price = item['price'] as num?;
-          final isBusiness = item.containsKey('business_name') || item.containsKey('category');
-
-          return _SearchResultCard(
-            id: id,
-            name: name,
-            imageUrl: image,
-            price: price?.toDouble(),
-            showPrice: !isBusiness,
-            onTap: () {
-              if (!isBusiness) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ProductDetailsScreen(productId: id),
-                  ),
-                );
-              }
-            },
-          );
-        }
-        return const SizedBox.shrink();
+        final product = products[index];
+        return ProductCard(
+          product: product,
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => ProductDetailsScreen(productId: int.tryParse(product.id) ?? 0),
+              ),
+            );
+          },
+          onFavoriteTap: () {
+            // TODO: Add to wishlist functionality
+          },
+        );
       },
     );
   }
 }
 
-class _SearchResultCard extends StatelessWidget {
-  const _SearchResultCard({
-    required this.id,
-    required this.name,
-    required this.imageUrl,
-    required this.price,
-    required this.showPrice,
-    required this.onTap,
-  });
-
-  final int id;
-  final String name;
-  final String? imageUrl;
-  final double? price;
-  final bool showPrice;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 152,
-            decoration: BoxDecoration(
-              color: const Color(0xFFD9D9D9),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                if (imageUrl != null && imageUrl!.trim().isNotEmpty)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      imageUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const AppImagePlaceholder(
-                        width: double.infinity,
-                        height: 152,
-                        borderRadius: 8,
-                      ),
-                    ),
-                  )
-                else
-                  const AppImagePlaceholder(
-                    width: double.infinity,
-                    height: 152,
-                    borderRadius: 8,
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            name,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Color(0xFF241508),
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w400,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          if (showPrice && price != null) ...[
-            const SizedBox(height: 4),
-            Text(
-              '₦${price!.toStringAsFixed(0)}',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF241508),
-                fontFamily: 'Campton',
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}

@@ -30,10 +30,16 @@ class MarketScreen extends ConsumerWidget {
       ),
       data: (cats) {
         final sections = cats
+            .where((c) => c.name.toLowerCase() != 'fabrics')
             .map(
               (c) => CategorySection(
                 title: c.name,
-                items: ['View All', ...c.children.map((ch) => ch.name)],
+                items: [
+                  'View All',
+                  ...c.children
+                      .where((ch) => ch.name.toLowerCase() != 'fabrics')
+                      .map((ch) => ch.name),
+                ],
               ),
             )
             .toList();

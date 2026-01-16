@@ -3,9 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/features/categories/domain/category_node.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
 import 'package:ojaewa/features/categories/presentation/screens/category_screen.dart';
-import 'package:ojaewa/features/home/subfeatures/beauty/presentation/business_profile_beauty.dart';
 import 'package:ojaewa/features/product/presentation/screens/product_listing_screen.dart';
 
+/// Shoes & Bags screen - displays products (not businesses).
+/// Category type: shoes_bags → Returns Products
 class BrandsScreen extends ConsumerWidget {
   const BrandsScreen({super.key});
 
@@ -63,6 +64,8 @@ class BrandsScreen extends ConsumerWidget {
 
             final slug = item == 'View All' ? parent.slug : (findChildByName(parent, item)?.slug ?? parent.slug);
 
+            // shoes_bags returns Products - navigate to product listing
+            // Product details will open from the listing screen
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ProductListingScreen(
@@ -71,11 +74,7 @@ class BrandsScreen extends ConsumerWidget {
                   pageTitle: item == 'View All' ? section.title : item,
                   breadcrumb: 'Shoes & Bags • ${section.title}',
                   showBusinessTypeFilter: false,
-                  onProductTap: (context, businessId) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => BusinessProfileBeautyScreen(businessId: businessId)),
-                    );
-                  },
+                  // No onProductTap - uses default product detail navigation
                 ),
               ),
             );

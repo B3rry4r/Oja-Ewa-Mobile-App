@@ -52,7 +52,7 @@ class PublicSellerProfile {
       facebook: json['facebook'] as String?,
       sellingSince: DateTime.tryParse((json['selling_since'] as String?) ?? ''),
       avgRating: parseNum(json['avg_rating']),
-      totalReviews: (parseNum(json['total_reviews']) as num?)?.toInt(),
+      totalReviews: (parseNum(json['total_reviews']))?.toInt(),
     );
   }
 }

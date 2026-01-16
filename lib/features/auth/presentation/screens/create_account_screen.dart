@@ -30,8 +30,9 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
   bool _obscurePassword = true;
   bool _agreeToTerms = false;
-  String _selectedCountryCode = '+234';
-  String _selectedCountryFlag = '🇳🇬';
+  // Phone country code - empty by default
+  String _selectedCountryCode = '';
+  String _selectedCountryFlag = '';
 
   bool get _isFormValid =>
       _firstNameController.text.isNotEmpty &&
@@ -467,20 +468,30 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        _selectedCountryFlag,
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        _selectedCountryCode,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'Campton',
-                          color: const Color(0xFF241508),
+                      if (_selectedCountryCode.isNotEmpty) ...[
+                        Text(
+                          _selectedCountryFlag,
+                          style: const TextStyle(fontSize: 18),
                         ),
-                      ),
+                        const SizedBox(width: 6),
+                        Text(
+                          _selectedCountryCode,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: 'Campton',
+                            color: const Color(0xFF241508),
+                          ),
+                        ),
+                      ] else
+                        Text(
+                          'Code',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Campton',
+                            color: const Color(0xFFCCCCCC),
+                          ),
+                        ),
                       const SizedBox(width: 4),
                       const Icon(
                         Icons.keyboard_arrow_down,

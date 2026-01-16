@@ -14,10 +14,14 @@ class FilterSheet extends ConsumerStatefulWidget {
   /// Callback when filters are cleared
   final VoidCallback? onClearFilters;
 
+  /// Styles to exclude from selection
+  final Set<String> excludeStyles;
+
   const FilterSheet({
     super.key,
     this.onApplyFilters,
     this.onClearFilters,
+    this.excludeStyles = const {},
   });
 
   @override
@@ -49,7 +53,8 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final filtersAsync = ref.watch(availableFiltersProvider);
+    // Use hardcoded default filters - no API call needed
+    final filters = ProductFilters.defaults;
 
     return Scaffold(
       backgroundColor: Colors.black.withOpacity(0.7),
@@ -63,45 +68,11 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                 child: Container(color: Colors.transparent),
               ),
             ),
-            // Filter sheet content
-            filtersAsync.when(
-              loading: () => _buildLoadingSheet(),
-              error: (_, __) => _buildErrorSheet(),
-              data: (filters) => _buildFilterSheet(filters),
-            ),
+            // Filter sheet content - use defaults directly, no async needed
+            _buildFilterSheet(filters),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildLoadingSheet() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(40),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFF8F1),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      child: const Center(child: CircularProgressIndicator()),
-    );
-  }
-
-  Widget _buildErrorSheet() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(40),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFF8F1),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      child: const Center(child: Text('Failed to load filters')),
     );
   }
 
@@ -140,7 +111,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               _buildSectionTitle('Style'),
               const SizedBox(height: 8),
               _buildChipFilters(
-                options: filters.styles,
+                options: filters.styles.where((s) => !widget.excludeStyles.contains(s)).toList(),
                 selected: _selectedStyle,
                 onSelected: (value) => setState(() => _selectedStyle = value),
               ),

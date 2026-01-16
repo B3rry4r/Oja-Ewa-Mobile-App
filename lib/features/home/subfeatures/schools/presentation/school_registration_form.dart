@@ -30,10 +30,11 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
   final TextEditingController _addressController = TextEditingController();
   
   // Location selections
-  String _selectedCountryName = 'Nigeria';
+  // Location selections - empty by default
+  String _selectedCountryName = '';
   String _selectedStateName = '';
-  String _selectedCountryCode = '+234';
-  String _selectedCountryFlag = '🇳🇬';
+  String _selectedCountryCode = '';
+  String _selectedCountryFlag = '';
   
   @override
   void dispose() {

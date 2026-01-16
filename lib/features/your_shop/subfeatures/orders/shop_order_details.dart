@@ -1,77 +1,59 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 class ShopOrderDetailsScreen extends StatelessWidget {
   const ShopOrderDetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // Background from IR
+      backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 28),
-              _buildHeader(),
-              const SizedBox(height: 28),
-              
-              // Order ID Heading
-              const Text(
-                "#hg5675894h",
-                style: TextStyle(
-                  fontSize: 33,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
-                  fontFamily: 'Campton',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const AppHeader(
+              backgroundColor: Color(0xFFFFF8F1),
+              iconColor: Color(0xFF241508),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Order ID Heading
+                    const Text(
+                      "#hg5675894h",
+                      style: TextStyle(
+                        fontSize: 33,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF241508),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    
+                    // Details List
+                    _buildDetailTile("Order Date", "Jan 6 2023"),
+                    _buildDetailTile("Product", "Agbada in Style"),
+                    _buildDetailTile("Quantity", "2"),
+                    _buildDetailTile("Size", "XL"),
+                    _buildDetailTile("Processing Time", "5 days / N20,000"),
+                    
+                    const SizedBox(height: 40),
+                    
+                    // Action Buttons
+                    _buildActionButtons(),
+                    const SizedBox(height: 40),
+                  ],
                 ),
               ),
-              const SizedBox(height: 30),
-              
-              // Details List
-              _buildDetailTile("Order Date", "Jan 6 2023"),
-              _buildDetailTile("Product", "Agbada in Style"),
-              _buildDetailTile("Quantity", "2"),
-              _buildDetailTile("Size", "XL"),
-              _buildDetailTile("Processing Time", "5 days / N20,000"),
-              
-              const SizedBox(height: 40),
-              
-              // Action Buttons (Inferred UX addition for production-ready UI)
-              _buildActionButtons(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildIconBox(Icons.arrow_back_ios_new),
-        Row(
-          children: [
-            _buildIconBox(Icons.notifications_none),
-            const SizedBox(width: 8),
-            _buildIconBox(Icons.person_outline),
+            ),
           ],
         ),
-      ],
-    );
-  }
-
-  Widget _buildIconBox(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
       ),
-      child: Icon(icon, size: 20, color: const Color(0xFF241508)),
     );
   }
 

@@ -17,7 +17,7 @@ class EditBusinessScreen extends ConsumerStatefulWidget {
 }
 
 class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
-  String _selectedCountryName = 'Nigeria';
+  String _selectedCountryName = '';
   bool _initialized = false;
 
   final _cityController = TextEditingController();
@@ -30,9 +30,9 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
   final _businessNameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _productListController = TextEditingController();
-  String _selectedCountryFlag = '🇳🇬';
-  String _selectedStateName = 'FCT';
-  String _selectedCountryCode = '+234';
+  String _selectedCountryFlag = '';
+  String _selectedStateName = '';
+  String _selectedCountryCode = '';
   
   // File upload
   String? _businessLogoPath;

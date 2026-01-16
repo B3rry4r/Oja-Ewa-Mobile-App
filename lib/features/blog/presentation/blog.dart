@@ -5,9 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
+import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 
 import '../domain/blog_post.dart';
 import 'controllers/blog_controller.dart';
@@ -24,6 +26,80 @@ class BlogScreen extends ConsumerStatefulWidget {
 class _BlogScreenState extends ConsumerState<BlogScreen> {
   bool _showFavorites = false;
 
+  Widget _buildHeader(BuildContext context) {
+    final accessToken = ref.watch(accessTokenProvider);
+    final isAuthenticated = accessToken != null && accessToken.isNotEmpty;
+    final unreadCount = isAuthenticated
+        ? ref.watch(unreadCountProvider).maybeWhen(
+              data: (count) => count,
+              orElse: () => 0,
+            )
+        : 0;
+
+    return Container(
+      height: 104,
+      color: const Color(0xFF603814),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 32),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Row(
+                children: [
+                  // Notification icon with badge
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      HeaderIconButton(
+                        asset: AppIcons.notification,
+                        iconColor: Colors.white,
+                        onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+                      ),
+                      if (unreadCount > 0)
+                        Positioned(
+                          right: -4,
+                          top: -4,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFFDAF40),
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 18,
+                              minHeight: 18,
+                            ),
+                            child: Text(
+                              unreadCount > 99 ? '99+' : unreadCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                fontFamily: 'Campton',
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(width: 8),
+                  HeaderIconButton(
+                    asset: AppIcons.bag,
+                    iconColor: Colors.white,
+                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.cart),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final recent = ref.watch(blogListProvider);
@@ -37,36 +113,7 @@ class _BlogScreenState extends ConsumerState<BlogScreen> {
         bottom: false,
         child: Column(
           children: [
-            Container(
-              height: 104,
-              color: const Color(0xFF603814),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 32),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: Row(
-                        children: [
-                          HeaderIconButton(
-                            asset: AppIcons.notification,
-                            iconColor: Colors.white,
-                            onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
-                          ),
-                          const SizedBox(width: 8),
-                          HeaderIconButton(
-                            asset: AppIcons.bag,
-                            iconColor: Colors.white,
-                            onTap: () => Navigator.of(context).pushNamed(AppRoutes.cart),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            _buildHeader(context),
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
@@ -112,7 +159,7 @@ class _BlogScreenState extends ConsumerState<BlogScreen> {
                         list.when(
                           loading: () => const Padding(
                             padding: EdgeInsets.symmetric(vertical: 24),
-                            child: const Center(
+                            child: Center(
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation(Color(0xFFFDAF40)),
                               ),

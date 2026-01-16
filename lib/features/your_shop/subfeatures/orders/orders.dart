@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import 'shop_order_details.dart';
 
 class ShopOrdersScreen extends StatelessWidget {
@@ -10,57 +12,41 @@ class ShopOrdersScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 28),
-              _buildAppBar(),
-              const SizedBox(height: 13),
-              const Text(
-                "Orders",
-                style: TextStyle(
-                  fontSize: 33,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
-                  fontFamily: 'Campton',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const AppHeader(
+              backgroundColor: Color(0xFFFFF8F1),
+              iconColor: Color(0xFF241508),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Orders",
+                      style: TextStyle(
+                        fontSize: 33,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF241508),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    _buildSearchBar(),
+                    const SizedBox(height: 28),
+                    _buildFilterTabs(),
+                    const SizedBox(height: 32),
+                    Expanded(child: _buildOrdersTable()),
+                  ],
                 ),
               ),
-              const SizedBox(height: 14),
-              _buildSearchBar(),
-              const SizedBox(height: 28),
-              _buildFilterTabs(),
-              const SizedBox(height: 32),
-              Expanded(child: _buildOrdersTable()),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
-
-  Widget _buildAppBar() {
-    return Row(
-      children: [
-        _buildIconBox(Icons.arrow_back_ios_new),
-        const Spacer(),
-        _buildIconBox(Icons.notifications_none),
-        const SizedBox(width: 4),
-        _buildIconBox(Icons.person_outline),
-      ],
-    );
-  }
-
-  Widget _buildIconBox(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: Icon(icon, size: 20, color: const Color(0xFF241508)),
     );
   }
 

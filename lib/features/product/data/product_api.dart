@@ -46,35 +46,43 @@ class ProductApi {
 
   /// Create a new product (seller endpoint)
   /// POST /api/products
+  /// 
+  /// Fields style, tribe, size are required for textiles & shoes_bags
+  /// fabric_type is required for textiles only
+  /// NOT required for afro_beauty_products and art.
   Future<Map<String, dynamic>> createProduct({
     required int categoryId,
     required String name,
-    required String gender,
-    required String style,
-    required String tribe,
+    String? style,
+    String? tribe,
+    String? fabricType,
     required String description,
     required String imagePath,
-    required List<String> sizes,
-    required String processingTimeType, // 'normal' or 'quick'
+    List<String>? sizes,
+    required String processingTimeType, // 'normal' or 'quick_quick'
     required int processingDays,
     required num price,
     int? discount,
   }) async {
     try {
-      final formData = FormData.fromMap({
+      final map = <String, dynamic>{
         'category_id': categoryId,
         'name': name,
-        'gender': gender,
-        'style': style,
-        'tribe': tribe,
         'description': description,
         'image': await MultipartFile.fromFile(imagePath),
-        'size': sizes.join(','),
         'processing_time_type': processingTimeType,
         'processing_days': processingDays,
         'price': price,
-        if (discount != null) 'discount': discount,
-      });
+      };
+      
+      // Only include extended fields if provided (textiles & shoes_bags)
+      if (style != null) map['style'] = style;
+      if (tribe != null) map['tribe'] = tribe;
+      if (fabricType != null) map['fabric_type'] = fabricType;
+      if (sizes != null && sizes.isNotEmpty) map['size'] = sizes.join(',');
+      if (discount != null) map['discount'] = discount;
+      
+      final formData = FormData.fromMap(map);
 
       final res = await _dio.post('/api/products', data: formData);
       final data = res.data;
@@ -95,9 +103,9 @@ class ProductApi {
     required int productId,
     int? categoryId,
     String? name,
-    String? gender,
     String? style,
     String? tribe,
+    String? fabricType,
     String? description,
     String? imagePath,
     List<String>? sizes,
@@ -110,9 +118,9 @@ class ProductApi {
       final map = <String, dynamic>{};
       if (categoryId != null) map['category_id'] = categoryId;
       if (name != null) map['name'] = name;
-      if (gender != null) map['gender'] = gender;
       if (style != null) map['style'] = style;
       if (tribe != null) map['tribe'] = tribe;
+      if (fabricType != null) map['fabric_type'] = fabricType;
       if (description != null) map['description'] = description;
       if (sizes != null) map['size'] = sizes.join(',');
       if (processingTimeType != null) map['processing_time_type'] = processingTimeType;

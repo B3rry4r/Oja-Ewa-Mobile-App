@@ -37,6 +37,21 @@ class ProductFilters {
     priceRange: PriceRange.empty,
     sortOptions: [],
   );
+
+  /// Default filter values - no API call needed
+  static const defaults = ProductFilters(
+    genders: ['Men', 'Women', 'Unisex'],
+    styles: ['Traditional', 'Western', 'Casual', 'Formal', 'Fabrics'],
+    tribes: ['Yoruba', 'Igbo', 'Hausa', 'Edo', 'Efik', 'Tiv', 'Ijaw', 'Fulani', 'Kanuri', 'Nupe'],
+    priceRange: PriceRange(min: 0, max: 500000),
+    sortOptions: [
+      SortOption(value: 'newest', label: 'Newest'),
+      SortOption(value: 'price_low', label: 'Price: Low to High'),
+      SortOption(value: 'price_high', label: 'Price: High to Low'),
+      SortOption(value: 'popular', label: 'Most Popular'),
+      SortOption(value: 'rating', label: 'Top Rated'),
+    ],
+  );
 }
 
 @immutable

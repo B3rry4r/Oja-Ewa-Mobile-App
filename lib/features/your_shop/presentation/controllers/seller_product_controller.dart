@@ -11,15 +11,20 @@ class SellerProductActionsNotifier extends AsyncNotifier<void> {
   @override
   Future<void> build() async {}
 
+  /// Create a new product.
+  /// 
+  /// Fields style, tribe, sizes are required for textiles & shoes_bags
+  /// fabric_type is required for textiles only
+  /// NOT required for afro_beauty_products and art.
   Future<Map<String, dynamic>> createProduct({
     required int categoryId,
     required String name,
-    required String gender,
-    required String style,
-    required String tribe,
+    String? style,
+    String? tribe,
+    String? fabricType,
     required String description,
     required String imagePath,
-    required List<String> sizes,
+    List<String>? sizes,
     required String processingTimeType,
     required int processingDays,
     required num price,
@@ -30,9 +35,9 @@ class SellerProductActionsNotifier extends AsyncNotifier<void> {
       final result = await ref.read(sellerProductRepositoryProvider).createProduct(
             categoryId: categoryId,
             name: name,
-            gender: gender,
             style: style,
             tribe: tribe,
+            fabricType: fabricType,
             description: description,
             imagePath: imagePath,
             sizes: sizes,
@@ -53,9 +58,9 @@ class SellerProductActionsNotifier extends AsyncNotifier<void> {
     required int productId,
     int? categoryId,
     String? name,
-    String? gender,
     String? style,
     String? tribe,
+    String? fabricType,
     String? description,
     String? imagePath,
     List<String>? sizes,
@@ -70,9 +75,9 @@ class SellerProductActionsNotifier extends AsyncNotifier<void> {
             productId: productId,
             categoryId: categoryId,
             name: name,
-            gender: gender,
             style: style,
             tribe: tribe,
+            fabricType: fabricType,
             description: description,
             imagePath: imagePath,
             sizes: sizes,

@@ -6,6 +6,7 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
 import 'package:ojaewa/features/categories/domain/category_items.dart';
+import 'package:ojaewa/features/categories/domain/category_node.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
 import 'package:ojaewa/features/product/presentation/controllers/product_filters_controller.dart';
@@ -55,10 +56,17 @@ class ProductListingScreen extends ConsumerStatefulWidget {
 
 class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
   final ScrollController _scrollController = ScrollController();
+  late String _activeSlug;
+  String? _activePill; // Track selected pill, null means 'All'
+  
+  // Cache for category children to avoid re-fetching
+  List<CategoryNode>? _cachedChildren;
 
   @override
   void initState() {
     super.initState();
+    _activeSlug = widget.slug;
+    _activePill = null; // Start with 'All' selected
     _scrollController.addListener(_onScroll);
   }
 
@@ -83,7 +91,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
             .read(
               categoryItemsProvider((
                 type: widget.type,
-                slug: widget.slug,
+                slug: _activeSlug,
               )).notifier,
             )
             .loadMore();
@@ -95,6 +103,52 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
     // No manual invalidation needed: filteredProductsProvider watches selectedFiltersProvider
     // and will refresh automatically when filters/sort change.
     setState(() {});
+  }
+
+  /// Build category pills from cached children
+  Widget _buildPills(List<CategoryNode> children) {
+    List<CategoryNode> leafNodes(List<CategoryNode> nodes) {
+      final leaves = <CategoryNode>[];
+      for (final n in nodes) {
+        if (n.children.isEmpty) {
+          leaves.add(n);
+        } else {
+          leaves.addAll(leafNodes(n.children));
+        }
+      }
+      return leaves;
+    }
+
+    final leaves = leafNodes(children);
+    final pillNames = <String>['All', ...leaves.map((c) => c.name)];
+    
+    return _CategoryPills(
+      pills: pillNames,
+      selectedPill: _activePill,
+      onTap: (name) {
+        // Don't reload if same pill is tapped
+        final newPill = name == 'All' ? null : name;
+        if (newPill == _activePill) return;
+
+        // Clear filters when changing category
+        ref.read(selectedFiltersProvider.notifier).clearAll();
+
+        if (name == 'All') {
+          setState(() {
+            _activeSlug = widget.slug;
+            _activePill = null;
+          });
+        } else {
+          final child = leaves.where((c) => c.name == name).firstOrNull;
+          if (child == null) return;
+          setState(() {
+            _activeSlug = child.slug;
+            _activePill = name;
+          });
+        }
+        // No need to invalidate - the provider will refetch with new slug automatically
+      },
+    );
   }
 
   void _onCategoryItemTap(BuildContext context, CategoryItem tapped) {
@@ -135,7 +189,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
   Widget build(BuildContext context) {
     final kind = widget.type == 'sustainability'
         ? _ListingKind.sustainability
-        : (widget.type == 'school' || widget.slug.contains('services'))
+        : (widget.type == 'school' || widget.type == 'art' || widget.type == 'afro_beauty_services')
             ? _ListingKind.business
             : _ListingKind.product;
 
@@ -155,12 +209,12 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
         (sustFilters.sort ?? '').isNotEmpty;
 
     final categoryItemsAsync = ref.watch(
-      categoryItemsProvider((type: widget.type, slug: widget.slug)),
+      categoryItemsProvider((type: widget.type, slug: _activeSlug)),
     );
     final filteredAsync = hasActiveFilters
         ? ref.watch(
             filteredProductsProvider((
-              categorySlug: widget.slug,
+              categorySlug: _activeSlug,
               categoryName: widget.pageTitle,
             )),
           )
@@ -179,28 +233,52 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                   color: Color(0xFFFFF8F1),
                   borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
                 ),
-                child: categoryItemsAsync.when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        'Failed to load items',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ),
-                  ),
-                  data: (categoryState) {
-                    final childrenAsync = ref.watch(
-                      categoryChildrenProvider(categoryState.category.id),
-                    );
+                child: Builder(
+                  builder: (context) {
+                    // Get loading/error state but don't block UI
+                    final isLoading = categoryItemsAsync.isLoading;
+                    final hasError = categoryItemsAsync.hasError;
+                    final categoryState = categoryItemsAsync.value;
+                    
+                    // Only show full-page loader on first load (no cached data)
+                    if (categoryState == null && isLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    
+                    if (categoryState == null && hasError) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                            'Failed to load items',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ),
+                      );
+                    }
+                    
+                    if (categoryState == null) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    
+                    // We have data - show content with inline loader if refreshing
+                    final showInlineLoader = isLoading;
+                    // Cache children once loaded to avoid refetching
+                    if (_cachedChildren == null) {
+                      final childrenAsync = ref.watch(
+                        categoryChildrenProvider(categoryState.category.id),
+                      );
+                      if (childrenAsync.hasValue) {
+                        _cachedChildren = childrenAsync.value;
+                      }
+                    }
 
                     return SingleChildScrollView(
                       controller: _scrollController,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Page title - always show the original page title
                           Padding(
                             padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
                             child: Text(
@@ -228,64 +306,38 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                           ),
                           const SizedBox(height: 16),
 
-                          // Category pills (children of current category).
-                          childrenAsync.when(
-                            loading: () => const SizedBox(
-                              height: 42,
-                              child: Center(
-                                child: SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            error: (e, _) => const SizedBox(height: 42),
-                            data: (children) {
-                              final pillNames = <String>[
-                                'All',
-                                ...children.map((c) => c.name),
-                              ];
-                              return _CategoryPills(
-                                pills: pillNames,
-                                onTap: (name) {
-                                  // Clear filters when changing category
-                                  ref
-                                      .read(selectedFiltersProvider.notifier)
-                                      .clearAll();
-
-                                  if (name == 'All') {
-                                    // Refresh current category without filters
-                                    ref.invalidate(
-                                      categoryItemsProvider((
-                                        type: widget.type,
-                                        slug: widget.slug,
-                                      )),
-                                    );
-                                    return;
-                                  }
-                                  final child = children
-                                      .where((c) => c.name == name)
-                                      .cast()
-                                      .firstOrNull;
-                                  if (child == null) return;
-                                  Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                      builder: (_) => ProductListingScreen(
-                                        type: widget.type,
-                                        slug: child.slug,
-                                        pageTitle: child.name,
-                                        breadcrumb: widget.breadcrumb,
-                                        showBusinessTypeFilter:
-                                            widget.showBusinessTypeFilter,
-                                        onProductTap: widget.onProductTap,
+                          // Category pills - use cached children, don't refetch
+                          Builder(
+                            builder: (context) {
+                              // If not cached yet, try to get from provider
+                              if (_cachedChildren == null) {
+                                final childrenAsync = ref.watch(
+                                  categoryChildrenProvider(categoryState.category.id),
+                                );
+                                return childrenAsync.when(
+                                  loading: () => const SizedBox(
+                                    height: 42,
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
                                       ),
                                     ),
-                                  );
-                                },
-                              );
+                                  ),
+                                  error: (e, _) => const SizedBox(height: 42),
+                                  data: (children) {
+                                    // Cache on first load
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      if (mounted && _cachedChildren == null) {
+                                        setState(() => _cachedChildren = children);
+                                      }
+                                    });
+                                    return _buildPills(children);
+                                  },
+                                );
+                              }
+                              return _buildPills(_cachedChildren!);
                             },
                           ),
 
@@ -296,6 +348,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                                 widget.showBusinessTypeFilter,
                             onFiltersChanged: _onFiltersChanged,
                             kind: kind,
+                            excludeStyles: widget.type == 'textiles' ? {'Fabrics'} : const {},
                           ),
 
                           const SizedBox(height: 24),
@@ -310,7 +363,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                                 builder: (context) {
                                   if (hasBusinessFilters) {
                                     final businessAsync = ref.watch(
-                                      filteredBusinessesByCategoryProvider((slug: widget.slug)),
+                                      filteredBusinessesByCategoryProvider((slug: _activeSlug)),
                                     );
                                     return businessAsync.when(
                                       loading: () => const Center(child: CircularProgressIndicator()),
@@ -327,7 +380,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
 
                                   if (hasSustFilters) {
                                     final sustAsync = ref.watch(
-                                      filteredSustainabilityByCategoryProvider((slug: widget.slug)),
+                                      filteredSustainabilityByCategoryProvider((slug: _activeSlug)),
                                     );
                                     return sustAsync.when(
                                       loading: () => const Center(child: CircularProgressIndicator()),
@@ -346,7 +399,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                                     type: widget.type,
                                     items: categoryState.items,
                                     hasMore: categoryState.hasMore,
-                                    isLoadingMore: categoryState.isLoadingMore,
+                                    isLoadingMore: categoryState.isLoadingMore || showInlineLoader,
                                     onTap: _onCategoryItemTap,
                                   );
                                 },
@@ -468,11 +521,13 @@ class _SortFilterRow extends ConsumerWidget {
     required this.showBusinessTypeFilter,
     required this.onFiltersChanged,
     required this.kind,
+    required this.excludeStyles,
   });
 
   final bool showBusinessTypeFilter;
   final VoidCallback onFiltersChanged;
   final _ListingKind kind;
+  final Set<String> excludeStyles;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -514,6 +569,7 @@ class _SortFilterRow extends ConsumerWidget {
                   builder: (_) => FilterSheet(
                     onApplyFilters: (_) => onFiltersChanged(),
                     onClearFilters: onFiltersChanged,
+                    excludeStyles: excludeStyles,
                   ),
                 );
               },
@@ -628,18 +684,16 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
-class _CategoryPills extends StatefulWidget {
-  const _CategoryPills({required this.pills, required this.onTap});
+class _CategoryPills extends StatelessWidget {
+  const _CategoryPills({
+    required this.pills,
+    required this.onTap,
+    this.selectedPill,
+  });
 
   final List<String> pills;
   final ValueChanged<String> onTap;
-
-  @override
-  State<_CategoryPills> createState() => _CategoryPillsState();
-}
-
-class _CategoryPillsState extends State<_CategoryPills> {
-  String selected = 'All';
+  final String? selectedPill; // null means 'All' is selected
 
   @override
   Widget build(BuildContext context) {
@@ -648,17 +702,14 @@ class _CategoryPillsState extends State<_CategoryPills> {
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
-        itemCount: widget.pills.length,
+        itemCount: pills.length,
         separatorBuilder: (context, index) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
-          final pill = widget.pills[index];
-          final isSelected = pill == selected;
+          final pill = pills[index];
+          final isSelected = pill == 'All' ? selectedPill == null : pill == selectedPill;
 
           return GestureDetector(
-            onTap: () {
-              setState(() => selected = pill);
-              widget.onTap(pill);
-            },
+            onTap: () => onTap(pill),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               decoration: BoxDecoration(

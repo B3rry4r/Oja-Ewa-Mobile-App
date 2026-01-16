@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ErrorStateView extends StatelessWidget {
-  const ErrorStateView({
+  const ErrorStateView({super.key, 
     required this.title,
     required this.message,
     required this.details,

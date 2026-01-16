@@ -4,7 +4,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
+import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/features/adverts/presentation/controllers/adverts_controller.dart';
@@ -132,21 +134,85 @@ class HomeScreen extends ConsumerWidget {
             children: [
               Consumer(
                 builder: (context, ref, _) {
-                  final isSellerApproved = ref.watch(isSellerApprovedProvider);
-                  if (!isSellerApproved) {
-                    return const SizedBox.shrink();
-                  }
-                  return HeaderIconButton(
-                    asset: AppIcons.shop,
-                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard),
+                  // Watch the async provider directly to ensure rebuild on data arrival
+                  final sellerStatusAsync = ref.watch(mySellerStatusProvider);
+                  
+                  debugPrint('[HomeScreen] sellerStatusAsync state: ${sellerStatusAsync.isLoading ? "loading" : sellerStatusAsync.hasError ? "error" : "data"}');
+                  
+                  return sellerStatusAsync.when(
+                    loading: () {
+                      debugPrint('[HomeScreen] Your Shop icon: HIDDEN (loading)');
+                      return const SizedBox.shrink();
+                    },
+                    error: (e, __) {
+                      debugPrint('[HomeScreen] Your Shop icon: HIDDEN (error: $e)');
+                      return const SizedBox.shrink();
+                    },
+                    data: (status) {
+                      final isApproved = status?.isApprovedAndActive ?? false;
+                      debugPrint('[HomeScreen] Your Shop icon: status=$status, isApproved=$isApproved');
+                      if (!isApproved) {
+                        debugPrint('[HomeScreen] Your Shop icon: HIDDEN (not approved)');
+                        return const SizedBox.shrink();
+                      }
+                      debugPrint('[HomeScreen] Your Shop icon: VISIBLE');
+                      return HeaderIconButton(
+                        asset: AppIcons.shop,
+                        onTap: () => Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard),
+                      );
+                    },
                   );
                 },
               ),
               const SizedBox(width: 8),
-              HeaderIconButton(
-                asset: AppIcons.notification,
-                onTap: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.notifications),
+              // Notification icon with badge
+              Consumer(
+                builder: (context, ref, _) {
+                  final accessToken = ref.watch(accessTokenProvider);
+                  final isAuthenticated = accessToken != null && accessToken.isNotEmpty;
+                  final unreadCount = isAuthenticated
+                      ? ref.watch(unreadCountProvider).maybeWhen(
+                            data: (count) => count,
+                            orElse: () => 0,
+                          )
+                      : 0;
+
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      HeaderIconButton(
+                        asset: AppIcons.notification,
+                        onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+                      ),
+                      if (unreadCount > 0)
+                        Positioned(
+                          right: -4,
+                          top: -4,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFFDAF40),
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 18,
+                              minHeight: 18,
+                            ),
+                            child: Text(
+                              unreadCount > 99 ? '99+' : unreadCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                fontFamily: 'Campton',
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(width: 8),
               HeaderIconButton(

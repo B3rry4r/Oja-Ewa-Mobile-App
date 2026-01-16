@@ -1,77 +1,57 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 import '../../../../../app/router/app_router.dart';
+
 class ManageShopScreen extends StatelessWidget {
   const ManageShopScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // Background from IR
+      backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 28),
-              _buildHeader(),
-              const SizedBox(height: 18),
-              
-              // Title: Manage Shop
-              const Text(
-                "Manage Shop",
-                style: TextStyle(
-                  fontSize: 33,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
-                  fontFamily: 'Campton',
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Menu Options
-              _buildMenuOption(
-                title: "Edit Business Information",
-                onTap: () => Navigator.of(context).pushNamed(AppRoutes.editBusiness),
-              ),
-              _buildMenuOption(
-                title: "Delete Shop",
-                titleColor: const Color(0xFFC95353), // Semantic Red for delete
-                onTap: () => Navigator.of(context).pushNamed(AppRoutes.deleteShop),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildIconBox(Icons.arrow_back_ios_new), // Back button
-        Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildIconBox(Icons.notifications_none), // Notification
-            const SizedBox(width: 8),
-            _buildIconBox(Icons.person_outline), // Profile
+            const AppHeader(
+              backgroundColor: Color(0xFFFFF8F1),
+              iconColor: Color(0xFF241508),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title: Manage Shop
+                  const Text(
+                    "Manage Shop",
+                    style: TextStyle(
+                      fontSize: 33,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF241508),
+                      fontFamily: 'Campton',
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Menu Options
+                  _buildMenuOption(
+                    title: "Edit Business Information",
+                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.editBusiness),
+                  ),
+                  _buildMenuOption(
+                    title: "Delete Shop",
+                    titleColor: const Color(0xFFC95353),
+                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.deleteShop),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
-      ],
-    );
-  }
-
-  Widget _buildIconBox(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)), // Border from IR
       ),
-      child: Icon(icon, size: 20, color: const Color(0xFF241508)),
     );
   }
 

@@ -30,10 +30,11 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
   bool _makeDefault = false;
   
   // Location selections
-  String _selectedCountryName = 'Nigeria';
-  String _selectedCountryFlag = '🇳🇬';
+  // Location selections - empty by default (populated from existing address if editing)
+  String _selectedCountryName = '';
+  String _selectedCountryFlag = '';
   String _selectedStateName = '';
-  String _selectedCountryCode = '+234';
+  String _selectedCountryCode = '';
 
   @override
   void initState() {
@@ -267,7 +268,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
         ),
         Switch(
           value: _makeDefault,
-          activeColor: const Color(0xFFFDAF40),
+          activeThumbColor: const Color(0xFFFDAF40),
           onChanged: (v) => setState(() => _makeDefault = v),
         ),
       ],

@@ -1,6 +1,7 @@
 /// Carries data collected across the multi-step "Show Your Business" flow.
 ///
 /// UI-only draft + local file paths; mapped to API payload on submit.
+library;
 import 'service_list_editor.dart';
 import 'classes_offered_editor.dart';
 

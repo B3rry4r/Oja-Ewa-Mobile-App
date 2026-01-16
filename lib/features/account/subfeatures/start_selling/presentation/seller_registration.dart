@@ -6,7 +6,6 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 import '../../../../../app/router/app_router.dart';
 
 import 'draft_utils.dart';
-import 'seller_registration_draft.dart';
 import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/location/location_picker_sheets.dart';
 
@@ -27,10 +26,11 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
   final _facebookController = TextEditingController();
   
   // Location selections
-  String _selectedCountryName = 'Nigeria';
-  String _selectedCountryFlag = '🇳🇬';
-  String _selectedStateName = 'FCT';
-  String _selectedCountryCode = '+234';
+  // Location selections - empty by default
+  String _selectedCountryName = '';
+  String _selectedCountryFlag = '';
+  String _selectedStateName = '';
+  String _selectedCountryCode = '';
 
   @override
   void dispose() {
@@ -68,8 +68,8 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
                   const SizedBox(height: 16),
                   _buildLocationDropdown(
                     label: 'Country',
-                    value: _selectedCountryName,
-                    flag: _selectedCountryFlag,
+                    value: _selectedCountryName.isEmpty ? 'Select Country' : _selectedCountryName,
+                    flag: _selectedCountryFlag.isEmpty ? null : _selectedCountryFlag,
                     onTap: () async {
                       final country = await CountryPickerSheet.show(context, selectedCountry: _selectedCountryName);
                       if (country != null) {
@@ -87,6 +87,7 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
                     label: 'State',
                     value: _selectedStateName.isEmpty ? 'Select State' : _selectedStateName,
                     onTap: () async {
+                      if (_selectedCountryName.isEmpty) return; // Must select country first
                       final state = await StatePickerSheet.show(context, countryName: _selectedCountryName, selectedState: _selectedStateName);
                       if (state != null) setState(() => _selectedStateName = state.name);
                     },
@@ -257,6 +258,7 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
   }
 
   Widget _buildPhoneInputWithPicker(String label, {required TextEditingController controller}) {
+    final hasCountryCode = _selectedCountryCode.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -279,9 +281,12 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(_selectedCountryFlag, style: const TextStyle(fontSize: 18)),
-                    const SizedBox(width: 6),
-                    Text(_selectedCountryCode, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF241508))),
+                    if (hasCountryCode) ...[
+                      Text(_selectedCountryFlag, style: const TextStyle(fontSize: 18)),
+                      const SizedBox(width: 6),
+                      Text(_selectedCountryCode, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF241508))),
+                    ] else
+                      const Text('Code', style: TextStyle(fontSize: 16, color: Color(0xFFCCCCCC))),
                     const SizedBox(width: 4),
                     const Icon(Icons.keyboard_arrow_down, size: 18, color: Color(0xFF777F84)),
                   ],

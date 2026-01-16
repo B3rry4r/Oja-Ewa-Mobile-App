@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:ojaewa/app/router/app_router.dart';
+import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 
 import '../../../../../core/widgets/confirmation_modal.dart';
 
-class DeleteShopScreen extends StatefulWidget {
+class DeleteShopScreen extends ConsumerStatefulWidget {
   const DeleteShopScreen({super.key});
 
   @override
-  State<DeleteShopScreen> createState() => _DeleteShopScreenState();
+  ConsumerState<DeleteShopScreen> createState() => _DeleteShopScreenState();
 }
 
-class _DeleteShopScreenState extends State<DeleteShopScreen> {
+class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
+  bool _isDeleting = false;
   // Local state to track selected reason
   String? selectedReason;
 
@@ -21,19 +28,54 @@ class _DeleteShopScreenState extends State<DeleteShopScreen> {
     "Other"
   ];
 
+  Future<void> _deleteShop() async {
+    if (selectedReason == null || _isDeleting) return;
+
+    setState(() => _isDeleting = true);
+
+    try {
+      await ref.read(sellerStatusApiProvider).deleteSellerProfile(reason: selectedReason);
+      
+      // Invalidate the seller status provider to refresh state
+      ref.invalidate(mySellerStatusProvider);
+      
+      if (mounted) {
+        AppSnackbars.showSuccess(context, 'Shop deleted successfully');
+        // Navigate back to home
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.home,
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        AppSnackbars.showError(context, 'Failed to delete shop: $e');
+        setState(() => _isDeleting = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // Background from IR
+      backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 28),
-              _buildHeader(),
-              const SizedBox(height: 36),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Standard App Header
+            const AppHeader(
+              backgroundColor: Color(0xFFFFF8F1),
+              iconColor: Color(0xFF241508),
+            ),
+            
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 16),
               
               // Title: Why are you leaving
               const Text(
@@ -57,41 +99,16 @@ class _DeleteShopScreenState extends State<DeleteShopScreen> {
                 ),
               ),
 
-              // Action Button
-              _buildDeleteButton(context),
-              const SizedBox(height: 40),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildIconBox(Icons.arrow_back_ios_new), // Back Button
-        Row(
-          children: [
-            _buildIconBox(Icons.notifications_none),
-            const SizedBox(width: 8),
-            _buildIconBox(Icons.person_outline),
+                    // Action Button
+                    _buildDeleteButton(context),
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
-      ],
-    );
-  }
-
-  Widget _buildIconBox(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
       ),
-      child: Icon(icon, size: 20, color: const Color(0xFF241508)),
     );
   }
 
@@ -139,17 +156,16 @@ class _DeleteShopScreenState extends State<DeleteShopScreen> {
   }
 
   Widget _buildDeleteButton(BuildContext context) {
+    final isDisabled = selectedReason == null || _isDeleting;
+    
     return InkWell(
-      onTap: () {
-        if (selectedReason == null) return;
+      onTap: isDisabled ? null : () {
         ConfirmationModal.show(
           context,
           title: 'Delete Shop',
-          message: 'Are you sure you want to delete this shop?',
+          message: 'Are you sure you want to delete your shop? This action cannot be undone.',
           confirmLabel: 'Delete',
-          onConfirm: () {
-            // TODO: Perform delete later.
-          },
+          onConfirm: _deleteShop,
         );
       },
       borderRadius: BorderRadius.circular(8),
@@ -157,26 +173,37 @@ class _DeleteShopScreenState extends State<DeleteShopScreen> {
         width: double.infinity,
         height: 57,
         decoration: BoxDecoration(
-          color: const Color(0xFFFDAF40), // Primary Orange from IR
+          color: isDisabled 
+              ? const Color(0xFFFDAF40).withOpacity(0.5) 
+              : const Color(0xFFFDAF40),
           borderRadius: BorderRadius.circular(8),
-          boxShadow: [
+          boxShadow: isDisabled ? null : [
             BoxShadow(
               color: const Color(0xFFFDAF40).withOpacity(0.4),
               blurRadius: 16,
-              offset: const Offset(0, 8), // Shadow from IR
+              offset: const Offset(0, 8),
             )
           ],
         ),
-        child: const Center(
-          child: Text(
-            "Continue to delete",
-            style: TextStyle(
-              color: Color(0xFFFFFBF5),
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
-            ),
-          ),
+        child: Center(
+          child: _isDeleting
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation(Color(0xFFFFFBF5)),
+                  ),
+                )
+              : const Text(
+                  "Continue to delete",
+                  style: TextStyle(
+                    color: Color(0xFFFFFBF5),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Campton',
+                  ),
+                ),
         ),
       ),
     );

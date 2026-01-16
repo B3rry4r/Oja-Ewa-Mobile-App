@@ -71,7 +71,7 @@ class CategorySection {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-  Map<String, bool> _expandedSections = {};
+  final Map<String, bool> _expandedSections = {};
 
   Widget _buildEmptyState() {
     final retry = widget.onRetry;

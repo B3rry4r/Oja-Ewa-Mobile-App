@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/sort_sheet.dart';
 import '../add_edit_product/add_edit_product.dart';
+import '../add_edit_product/seller_category_selection.dart';
 import 'data/mock_shop_products.dart';
 import 'domain/shop_product.dart';
 
@@ -88,8 +89,9 @@ class ProductListingsScreen extends StatelessWidget {
   Widget _buildAddProductButton(BuildContext context) {
     return InkWell(
       onTap: () {
+        // Navigate to category selection first, then to add product
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const AddProductScreen()),
+          MaterialPageRoute(builder: (_) => const SellerCategorySelectionScreen()),
         );
       },
       borderRadius: BorderRadius.circular(8),

@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
+import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 
 import '../../../app/router/app_router.dart';
 
@@ -46,7 +48,7 @@ class WishlistScreen extends ConsumerWidget {
         child: Column(
           children: [
             // Header with buttons
-            _buildHeader(context),
+            _buildHeader(context, ref),
 
             // Main Content
             Expanded(
@@ -90,7 +92,16 @@ class WishlistScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, WidgetRef ref) {
+    final accessToken = ref.watch(accessTokenProvider);
+    final isAuthenticated = accessToken != null && accessToken.isNotEmpty;
+    final unreadCount = isAuthenticated
+        ? ref.watch(unreadCountProvider).maybeWhen(
+              data: (count) => count,
+              orElse: () => 0,
+            )
+        : 0;
+
     return Container(
       height: 104,
       color: const Color(0xFF603814),
@@ -102,11 +113,43 @@ class WishlistScreen extends ConsumerWidget {
             padding: const EdgeInsets.only(right: 16),
             child: Row(
               children: [
-                HeaderIconButton(
-                  asset: AppIcons.notification,
-                  onTap: () =>
-                      Navigator.of(context).pushNamed(AppRoutes.notifications),
-                  iconColor: Colors.white,
+                // Notification icon with badge
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    HeaderIconButton(
+                      asset: AppIcons.notification,
+                      onTap: () =>
+                          Navigator.of(context).pushNamed(AppRoutes.notifications),
+                      iconColor: Colors.white,
+                    ),
+                    if (unreadCount > 0)
+                      Positioned(
+                        right: -4,
+                        top: -4,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFDAF40),
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 18,
+                            minHeight: 18,
+                          ),
+                          child: Text(
+                            unreadCount > 99 ? '99+' : unreadCount.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Campton',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(width: 8),
                 HeaderIconButton(

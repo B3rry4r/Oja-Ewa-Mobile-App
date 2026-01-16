@@ -27,22 +27,41 @@ curl -X GET "https://<host>/api/categories/all" \
   -H "Accept: application/json"
 ```
 
-**Response (shape)**
+**Response (example)**
 ```json
 {
   "status": "success",
   "data": {
-    "textiles": [ ...tree... ],
-    "afro_beauty": [ ...tree... ],
-    "shoes_bags": [ ...tree... ],
-    "art": [ ...tree... ],
-    "school": [ ...tree... ],
-    "sustainability": [ ...tree... ]
+    "textiles": [
+      {"id": 1, "name": "Women", "slug": "textiles-women", "type": "textiles", "children": [
+        {"id": 5, "name": "Dresses & Gowns", "slug": "textiles-women-dresses-gowns", "type": "textiles"}
+      ]}
+    ],
+    "afro_beauty_products": [
+      {"id": 55, "name": "Hair Care", "slug": "afro-beauty-products-hair-care", "type": "afro_beauty_products"}
+    ],
+    "afro_beauty_services": [
+      {"id": 80, "name": "Hair Care & Styling Services", "slug": "afro-beauty-services-hair-care-styling-services", "type": "afro_beauty_services"}
+    ],
+    "shoes_bags": [
+      {"id": 70, "name": "Women", "slug": "shoes-bags-women", "type": "shoes_bags", "children": [
+        {"id": 72, "name": "Slides & Mules", "slug": "shoes-bags-women-slides-mules", "type": "shoes_bags"}
+      ]}
+    ],
+    "art": [
+      {"id": 76, "name": "Sculpture", "slug": "art-sculpture", "type": "art"}
+    ],
+    "school": [
+      {"id": 90, "name": "Undergraduate", "slug": "school-undergraduate", "type": "school"}
+    ],
+    "sustainability": [
+      {"id": 110, "name": "Biodegradable Items", "slug": "sustainability-biodegradable-items", "type": "sustainability"}
+    ]
   },
   "meta": {
     "usage": {
-      "products": "Use category_id from textiles, shoes_bags, afro_beauty (products subtree), or art",
-      "businesses": "Use category_id/subcategory_id from school or afro_beauty (services subtree)",
+      "products": "Use category_id from textiles, shoes_bags, afro_beauty_products",
+      "businesses": "Use category_id from art, school, or afro_beauty_services",
       "sustainability": "Use category_id from sustainability"
     }
   }
@@ -54,7 +73,7 @@ curl -X GET "https://<host>/api/categories/all" \
 **GET** `/api/categories?type={type}`
 
 **Query params**
-- `type` (required): `textiles | afro_beauty | shoes_bags | art | school | sustainability`
+- `type` (required): `textiles | shoes_bags | afro_beauty_products | afro_beauty_services | art | school | sustainability`
 
 **Headers**
 - `Accept: application/json`
@@ -67,7 +86,70 @@ curl -X GET "https://<host>/api/categories?type=textiles" \
 
 **Example response (real)**
 ```json
-{"status":"success","data":[{"id":1,"name":"For Women","slug":"textiles-women","parent_id":null,"type":"textiles","order":1,"deleted_at":null,"created_at":"2026-01-15T18:02:30.000000Z","updated_at":"2026-01-15T18:02:30.000000Z","children":[{"id":4,"name":"Categories","slug":"textiles-women-categories","parent_id":1,"type":"textiles","order":1,"deleted_at":null,"created_at":"2026-01-15T18:02:30.000000Z","updated_at":"2026-01-15T18:02:30.000000Z"}]},{"id":2,"name":"For Men","slug":"textiles-men","parent_id":null,"type":"textiles","order":2,"deleted_at":null,"created_at":"2026-01-15T18:02:30.000000Z","updated_at":"2026-01-15T18:02:30.000000Z","children":[{"id":10,"name":"Categories","slug":"textiles-men-categories","parent_id":2,"type":"textiles","order":1,"deleted_at":null,"created_at":"2026-01-15T18:02:30.000000Z","updated_at":"2026-01-15T18:02:30.000000Z"}]}, {"id":3,"name":"Unisex / For Both","slug":"textiles-unisex","parent_id":null,"type":"textiles","order":3,"deleted_at":null,"created_at":"2026-01-15T18:02:30.000000Z","updated_at":"2026-01-15T18:02:30.000000Z"}]}
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "name": "Women",
+      "slug": "textiles-women",
+      "type": "textiles",
+      "parent_id": null,
+      "children": [
+        {
+          "id": 5,
+          "name": "Dresses & Gowns",
+          "slug": "textiles-women-dresses-gowns",
+          "parent_id": 1,
+          "type": "textiles",
+          "children": []
+        },
+        {
+          "id": 6,
+          "name": "Tops",
+          "slug": "textiles-women-tops",
+          "parent_id": 1,
+          "type": "textiles",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Men",
+      "slug": "textiles-men",
+      "type": "textiles",
+      "parent_id": null,
+      "children": [
+        {
+          "id": 12,
+          "name": "Shirts & Tops",
+          "slug": "textiles-men-shirts-tops",
+          "parent_id": 2,
+          "type": "textiles",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Unisex",
+      "slug": "textiles-unisex",
+      "type": "textiles",
+      "parent_id": null,
+      "children": [
+        {
+          "id": 20,
+          "name": "Modern Casual Wear",
+          "slug": "textiles-unisex-modern-casual-wear",
+          "parent_id": 3,
+          "type": "textiles",
+          "children": []
+        }
+      ]
+    }
+  ]
+}
 ```
 
 ---
@@ -88,7 +170,7 @@ curl -X GET "https://<host>/api/categories?type=textiles" \
 
 **Example request (Textiles → Women → Dresses & Gowns)**
 ```bash
-curl -X GET "https://<host>/api/categories/textiles/textiles-women-categories-dresses-gowns/items?per_page=2" \
+curl -X GET "https://<host>/api/categories/textiles/textiles-women-dresses-gowns/items?per_page=2" \
   -H "Accept: application/json"
 ```
 
@@ -101,7 +183,7 @@ curl -X GET "https://<host>/api/categories/textiles/textiles-women-categories-dr
             "id": 5,
             "type": "textiles",
             "name": "Dresses & Gowns",
-            "slug": "textiles-women-categories-dresses-gowns",
+            "slug": "textiles-women-dresses-gowns",
             "description": null
         },
         "items": {
@@ -130,8 +212,8 @@ curl -X GET "https://<host>/api/categories/textiles/textiles-women-categories-dr
                     "category": {
                         "id": 5,
                         "name": "Dresses & Gowns",
-                        "slug": "textiles-women-categories-dresses-gowns",
-                        "parent_id": 4,
+                        "slug": "textiles-women-dresses-gowns",
+                        "parent_id": 1,
                         "type": "textiles"
                     },
                     "seller_profile": {
@@ -154,13 +236,13 @@ curl -X GET "https://<host>/api/categories/textiles/textiles-women-categories-dr
 
 ### 1.3 Afro Beauty Services returns Businesses (NOT Products)
 
-**GET** `/api/categories/afro_beauty/{slug}/items`
+**GET** `/api/categories/afro_beauty_services/{slug}/items`
 
-If the slug starts with `afro-beauty-services...`, the endpoint returns **business profiles**.
+The services tab uses `type=afro_beauty_services` and returns **business profiles**.
 
 **Example request**
 ```bash
-curl -X GET "https://<host>/api/categories/afro_beauty/afro-beauty-services-hair-care-styling-services/items?per_page=2" \
+curl -X GET "https://<host>/api/categories/afro_beauty_services/afro-beauty-services-hair-care-styling-services/items?per_page=2" \
   -H "Accept: application/json"
 ```
 
@@ -171,7 +253,7 @@ curl -X GET "https://<host>/api/categories/afro_beauty/afro-beauty-services-hair
   "data": {
     "category": {
       "id": 57,
-      "type": "afro_beauty",
+      "type": "afro_beauty_services",
       "name": "Hair Care & Styling Services",
       "slug": "afro-beauty-services-hair-care-styling-services",
       "description": null
@@ -182,7 +264,7 @@ curl -X GET "https://<host>/api/categories/afro_beauty/afro-beauty-services-hair
         {
           "id": 2,
           "user_id": 2,
-          "category": "afro_beauty",
+          "category": "afro_beauty_services",
           "country": "Solomon Islands",
           "state": "Hawaii",
           "city": "Douglasville",
@@ -203,18 +285,11 @@ curl -X GET "https://<host>/api/categories/afro_beauty/afro-beauty-services-hair
             "lastname": "Becker"
           },
           "category_relation": {
-            "id": 56,
-            "name": "Categories Under Services",
-            "slug": "afro-beauty-services",
-            "parent_id": null,
-            "type": "afro_beauty"
-          },
-          "subcategory_relation": {
             "id": 57,
             "name": "Hair Care & Styling Services",
             "slug": "afro-beauty-services-hair-care-styling-services",
-            "parent_id": 56,
-            "type": "afro_beauty"
+            "parent_id": null,
+            "type": "afro_beauty_services"
           }
         }
       ],
@@ -243,19 +318,19 @@ curl -X GET "https://<host>/api/products/filters" \
 ```
 
 **Example response (real, trimmed)**
-- Contains `category_trees.textiles`, `category_trees.afro_beauty`, `category_trees.shoes_bags`, `category_trees.art`
-- Also contains `genders`, `styles`, `tribes`, `price_range`, `sort_options`
+- Contains `category_trees.textiles`, `category_trees.shoes_bags`, `category_trees.afro_beauty_products`, `category_trees.art`
+- Also contains `fabrics`, `styles`, `tribes`, `price_range`, `sort_options`
 
 ```json
 {
   "status": "success",
   "data": {
-    "product_category_types": ["textiles", "afro_beauty", "shoes_bags", "art"],
+    "product_category_types": ["textiles", "shoes_bags", "afro_beauty_products", "art"],
     "category_trees": {
-      "textiles": [ {"id": 1, "name": "For Women", "slug": "textiles-women", "children": [ ... ] } ],
-      "afro_beauty": [ {"id": 55, "name": "Categories Under Products", "slug": "afro-beauty-products", "children": [ ... ] } ],
-      "shoes_bags": [ {"id": 70, "name": "For Women", "slug": "shoes-bags-women", "children": [ ... ] } ],
-      "art": [ {"id": 76, "name": "Sculpture", "slug": "art-sculpture" } ]
+      "textiles": [ {"id": 1, "name": "Women", "slug": "textiles-women", "children": [ ... ] } ],
+      "afro_beauty_products": [ {"id": 55, "name": "Hair Care", "slug": "afro-beauty-products-hair-care" } ],
+      "shoes_bags": [ {"id": 70, "name": "Women", "slug": "shoes-bags-women", "children": [ ... ] } ],
+      "art": [ {"id": 200, "name": "Products", "slug": "art-products", "children": [ {"id": 201, "name": "Sculpture", "slug": "art-products-sculpture"} ] } ]
     },
     "price_range": {"min": "89.81", "max": "467.04"},
     "sort_options": [
@@ -278,10 +353,10 @@ curl -X GET "https://<host>/api/products/filters" \
 
 **Query params**
 - `q` (required)
-- `type` (optional): `textiles|afro_beauty|shoes_bags|art`
+- `type` (optional): `textiles|shoes_bags|afro_beauty_products|art`
 - `category_slug` (optional)
 - `category_id` (optional)
-- `gender`, `style`, `tribe`, `price_min`, `price_max`, `per_page`
+- `style`, `tribe`, `fabric_type`, `price_min`, `price_max`, `per_page`
 
 **Example request**
 ```bash
@@ -309,7 +384,7 @@ curl -X GET "https://<host>/api/products/search?q=a&type=textiles&per_page=2" \
         "status": "approved",
         "category_id": 5,
         "seller_profile": {"id": 1, "business_name": "Steuber-Altenwerth"},
-        "category": {"id": 5, "name": "Dresses & Gowns", "slug": "textiles-women-categories-dresses-gowns", "type": "textiles"}
+        "category": {"id": 5, "name": "Dresses & Gowns", "slug": "textiles-women-dresses-gowns", "type": "textiles"}
       }
     ],
     "per_page": 2,
@@ -445,14 +520,14 @@ curl -X GET "https://<host>/api/sustainability/search?q=initiative&per_page=2" \
 - Endpoint: `POST /api/products`
 - Required: `category_id`
   - Must be a valid category node under one of the product catalogs:
-    - `textiles`, `shoes_bags`, `afro_beauty` (products subtree), `art`
+    - `textiles`, `shoes_bags`, `afro_beauty_products`, `art`
 
 ### Business profile creation (services)
 - Endpoint: `POST /api/business`
 - Recommended:
-  - `category_id` and `subcategory_id` picked from:
+  - `category_id` picked from:
     - `school` category tree, or
-    - `afro_beauty` → services subtree (`afro-beauty-services...`)
+    - `afro_beauty_services` (leaf categories)
 
 ### Sustainability initiative creation (admin)
 - Endpoint: `POST /api/admin/sustainability`

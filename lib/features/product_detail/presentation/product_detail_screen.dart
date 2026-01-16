@@ -49,13 +49,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     final productTitle = (details?.name ?? '').trim();
     final sellerName = (details?.sellerBusinessName ?? '').trim();
     final imageUrl = (details?.image ?? '').trim();
-    num? _parseNum(dynamic v) {
+    num? parseNum(dynamic v) {
       if (v is num) return v;
       if (v is String) return num.tryParse(v);
       return null;
     }
 
-    final unitPrice = _parseNum(details?.price);
+    final unitPrice = parseNum(details?.price);
     final totalPrice = unitPrice == null ? null : (unitPrice * quantity);
 
     // Bottom bar uses total (quantity-aware). One decimal for stability.

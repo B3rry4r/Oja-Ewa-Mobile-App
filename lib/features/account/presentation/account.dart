@@ -13,6 +13,7 @@ import 'package:ojaewa/features/account/presentation/controllers/profile_control
 import 'package:ojaewa/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_status_controller.dart';
+import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -35,37 +36,80 @@ class AccountScreen extends ConsumerWidget {
         child: Column(
           children: [
             // Top bar (Account is a tab-root: no left/back icon)
-            Container(
-              height: 104,
-              color: const Color(0xFF603814),
-              padding: const EdgeInsets.only(top: 32),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: Row(
-                      children: [
-                        HeaderIconButton(
-                          asset: AppIcons.notificationSmall,
-                          iconColor: Colors.white,
-                          onTap: () => Navigator.of(context).pushNamed(
-                            AppRoutes.notifications,
-                          ),
+            Builder(
+              builder: (context) {
+                final unreadCount = isLoggedIn
+                    ? ref.watch(unreadCountProvider).maybeWhen(
+                          data: (count) => count,
+                          orElse: () => 0,
+                        )
+                    : 0;
+
+                return Container(
+                  height: 104,
+                  color: const Color(0xFF603814),
+                  padding: const EdgeInsets.only(top: 32),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: Row(
+                          children: [
+                            // Notification icon with badge
+                            Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                HeaderIconButton(
+                                  asset: AppIcons.notificationSmall,
+                                  iconColor: Colors.white,
+                                  onTap: () => Navigator.of(context).pushNamed(
+                                    AppRoutes.notifications,
+                                  ),
+                                ),
+                                if (unreadCount > 0)
+                                  Positioned(
+                                    right: -4,
+                                    top: -4,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFFDAF40),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 18,
+                                        minHeight: 18,
+                                      ),
+                                      child: Text(
+                                        unreadCount > 99 ? '99+' : unreadCount.toString(),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          fontFamily: 'Campton',
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(width: 8),
+                            HeaderIconButton(
+                              asset: AppIcons.bag,
+                              iconColor: Colors.white,
+                              onTap: () => Navigator.of(context).pushNamed(
+                                AppRoutes.cart,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        HeaderIconButton(
-                          asset: AppIcons.bag,
-                          iconColor: Colors.white,
-                          onTap: () => Navigator.of(context).pushNamed(
-                            AppRoutes.cart,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
 
             // Main content card

@@ -1,16 +1,30 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
+
 class EditBusinessScreen extends StatelessWidget {
   const EditBusinessScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // Primary BG
+      backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
         child: Column(
           children: [
-            _buildAppBar(),
+            AppHeader(
+              backgroundColor: const Color(0xFFFFF8F1),
+              iconColor: const Color(0xFF241508),
+              title: const Text(
+                "Edit Business",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF241508),
+                  fontFamily: 'Campton',
+                ),
+              ),
+            ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -65,38 +79,6 @@ class EditBusinessScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppBar() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildIconBox(Icons.arrow_back_ios_new),
-          const Text(
-            "Edit Business",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
-            ),
-          ),
-          _buildIconBox(Icons.close),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIconBox(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: Icon(icon, size: 20, color: const Color(0xFF241508)),
-    );
-  }
 
   Widget _buildSectionHeader(String title) {
     return Padding(

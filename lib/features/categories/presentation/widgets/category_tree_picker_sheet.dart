@@ -95,7 +95,7 @@ class _CategoryTreePickerContentState extends State<_CategoryTreePickerContent> 
                     ),
                     trailing: hasChildren
                         ? const Icon(Icons.chevron_right, color: Color(0xFF777F84))
-                        : const Icon(Icons.check_circle_outline, color: Color(0xFF4CAF50)),
+                        : const Icon(Icons.check_circle_outline, color: Color(0xFFFDAF40)),
                     onTap: () {
                       if (hasChildren) {
                         setState(() => _stack.add(node));

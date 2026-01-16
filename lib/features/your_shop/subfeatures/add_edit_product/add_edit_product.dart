@@ -5,15 +5,9 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
-import 'package:ojaewa/features/categories/domain/category_node.dart';
 import 'package:ojaewa/features/categories/presentation/widgets/category_tree_picker_sheet.dart';
 import 'package:ojaewa/features/product/presentation/controllers/product_filters_controller.dart';
 import 'package:ojaewa/features/your_shop/presentation/controllers/seller_product_controller.dart';
-
-/// Fetch categories for product creation (textiles type by default for sellers)
-final _productCategoriesProvider = FutureProvider<List<CategoryNode>>((ref) async {
-  return ref.watch(categoriesByTypeProvider('textiles').future);
-});
 
 /// Fetch product filters (genders, styles, tribes)
 final _productFiltersProvider = FutureProvider<Map<String, dynamic>>((ref) async {
@@ -25,10 +19,30 @@ final _productFiltersProvider = FutureProvider<Map<String, dynamic>>((ref) async
   };
 });
 
+/// Add/Edit Product Screen
+/// 
+/// Backend form rules:
+/// - textiles & shoes_bags: require gender, style, tribe, size
+/// - afro_beauty_products: does NOT require gender, style, tribe, size
 class AddProductScreen extends ConsumerStatefulWidget {
-  const AddProductScreen({super.key, this.productId});
+  const AddProductScreen({
+    super.key, 
+    this.productId,
+    this.categoryType,
+    this.categoryId,
+    this.categoryName,
+  });
 
   final String? productId; // If provided, we're editing (string ID from ShopProduct)
+  
+  /// The category type (textiles, shoes_bags, afro_beauty_products)
+  final String? categoryType;
+  
+  /// The selected category ID from the category picker
+  final int? categoryId;
+  
+  /// The selected category name for display
+  final String? categoryName;
 
   @override
   ConsumerState<AddProductScreen> createState() => _AddProductScreenState();
@@ -42,14 +56,52 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   final _processingDaysController = TextEditingController(text: '3');
 
   String? _imagePath;
-  CategoryNode? _selectedCategory;
-  String? _selectedGender;
   String? _selectedStyle;
   String? _selectedTribe;
+  String? _selectedFabricType;
   String _processingTimeType = 'normal';
   final List<String> _selectedSizes = [];
+  
+  // Track category type and ID from navigation
+  late String _categoryType;
+  late int? _categoryId;
+  late String? _categoryName;
 
   bool get isEditing => widget.productId != null;
+  
+  /// Whether to show style, tribe, size fields
+  /// Required for textiles and shoes_bags
+  /// NOT required for afro_beauty_products and art
+  bool get _requiresExtendedFields => 
+      _categoryType == 'textiles' || _categoryType == 'shoes_bags';
+  
+  /// Whether to show fabric_type field (Textiles only)
+  bool get _requiresFabricType => _categoryType == 'textiles';
+  
+  /// Fabric type options
+  static const List<String> _fabricTypes = [
+    'Ankara',
+    'Aso-Oke',
+    'Adire',
+    'Kente',
+    'Lace',
+    'Cotton',
+    'Silk',
+    'Wool',
+    'Linen',
+    'Velvet',
+    'Brocade',
+    'Jacquard',
+    'Other',
+  ];
+  
+  @override
+  void initState() {
+    super.initState();
+    _categoryType = widget.categoryType ?? 'textiles';
+    _categoryId = widget.categoryId;
+    _categoryName = widget.categoryName;
+  }
 
   @override
   void dispose() {
@@ -63,9 +115,16 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final categoriesAsync = ref.watch(_productCategoriesProvider);
     final filtersAsync = ref.watch(_productFiltersProvider);
     final isLoading = ref.watch(sellerProductActionsProvider).isLoading;
+    
+    // Get category type display name
+    final categoryTypeDisplay = switch (_categoryType) {
+      'textiles' => 'Textiles',
+      'shoes_bags' => 'Shoes & Bags',
+      'afro_beauty_products' => 'Beauty Products',
+      _ => 'Product',
+    };
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF5),
@@ -76,7 +135,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               backgroundColor: const Color(0xFFFFFBF5),
               iconColor: const Color(0xFF241508),
               title: Text(
-                isEditing ? 'Edit Product' : 'Add Product',
+                isEditing ? 'Edit Product' : 'Add $categoryTypeDisplay',
                 style: const TextStyle(
                   fontSize: 22,
                   fontFamily: 'Campton',
@@ -105,37 +164,38 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Category Picker
-                    categoriesAsync.when(
-                      loading: () => _buildDropdownPlaceholder('Category', 'Loading...'),
-                      error: (e, st) => _buildDropdownPlaceholder('Category', 'Failed to load'),
-                      data: (categories) => _buildCategoryPicker(categories),
-                    ),
+                    // Category Display (pre-selected from previous screen)
+                    _buildCategoryDisplay(),
                     const SizedBox(height: 16),
 
-                    // Gender, Style, Tribe from filters
-                    filtersAsync.when(
-                      loading: () => Column(
-                        children: [
-                          _buildDropdownPlaceholder('Gender', 'Loading...'),
-                          const SizedBox(height: 16),
-                          _buildDropdownPlaceholder('Style', 'Loading...'),
-                          const SizedBox(height: 16),
-                          _buildDropdownPlaceholder('Tribe', 'Loading...'),
-                        ],
+                    // Fabric Type - ONLY for textiles
+                    if (_requiresFabricType) ...[
+                      _buildFabricTypePicker(),
+                      const SizedBox(height: 16),
+                    ],
+
+                    // Style, Tribe from filters - ONLY for textiles and shoes_bags
+                    // Gender removed (Men/Women are now category groups)
+                    if (_requiresExtendedFields) ...[
+                      filtersAsync.when(
+                        loading: () => Column(
+                          children: [
+                            _buildDropdownPlaceholder('Style', 'Loading...'),
+                            const SizedBox(height: 16),
+                            _buildDropdownPlaceholder('Tribe', 'Loading...'),
+                          ],
+                        ),
+                        error: (e, st) => Column(
+                          children: [
+                            _buildDropdownPlaceholder('Style', 'Failed to load'),
+                            const SizedBox(height: 16),
+                            _buildDropdownPlaceholder('Tribe', 'Failed to load'),
+                          ],
+                        ),
+                        data: (filters) => _buildFilterDropdowns(filters),
                       ),
-                      error: (e, st) => Column(
-                        children: [
-                          _buildDropdownPlaceholder('Gender', 'Failed to load'),
-                          const SizedBox(height: 16),
-                          _buildDropdownPlaceholder('Style', 'Failed to load'),
-                          const SizedBox(height: 16),
-                          _buildDropdownPlaceholder('Tribe', 'Failed to load'),
-                        ],
-                      ),
-                      data: (filters) => _buildFilterDropdowns(filters),
-                    ),
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
+                    ],
 
                     // Description
                     _buildTextField(
@@ -146,9 +206,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Size Selection
-                    _buildSizeSelector(),
-                    const SizedBox(height: 16),
+                    // Size Selection - ONLY for textiles and shoes_bags
+                    if (_requiresExtendedFields) ...[
+                      _buildSizeSelector(),
+                      const SizedBox(height: 16),
+                    ],
 
                     // Price
                     _buildTextField(
@@ -329,7 +391,12 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     );
   }
 
-  Widget _buildCategoryPicker(List<CategoryNode> categories) {
+  /// Displays the pre-selected category (from category selection screen)
+  /// with option to change it via the category tree picker
+  Widget _buildCategoryDisplay() {
+    final displayName = _categoryName ?? 'Select category';
+    final hasCategory = _categoryId != null;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -344,13 +411,23 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         const SizedBox(height: 8),
         GestureDetector(
           onTap: () async {
+            // Allow changing category within the same type
+            final all = await ref.read(allCategoriesProvider.future);
+            if (!mounted) return;
+            
+            final roots = all[_categoryType] ?? [];
+            if (roots.isEmpty) return;
+            
             final selected = await showCategoryTreePickerSheet(
               context: context,
               title: 'Select Category',
-              roots: categories,
+              roots: roots,
             );
             if (selected != null) {
-              setState(() => _selectedCategory = selected);
+              setState(() {
+                _categoryId = selected.id;
+                _categoryName = selected.name;
+              });
             }
           },
           child: Container(
@@ -364,11 +441,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               children: [
                 Expanded(
                   child: Text(
-                    _selectedCategory?.name ?? 'Select category',
+                    displayName,
                     style: TextStyle(
                       fontSize: 16,
                       fontFamily: 'Campton',
-                      color: _selectedCategory == null ? const Color(0xFFCCCCCC) : const Color(0xFF1E2021),
+                      color: hasCategory ? const Color(0xFF1E2021) : const Color(0xFFCCCCCC),
                     ),
                   ),
                 ),
@@ -382,21 +459,12 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   }
 
   Widget _buildFilterDropdowns(Map<String, dynamic> filters) {
-    final genders = (filters['genders'] as List?)?.whereType<String>().toList() ?? [];
+    // Gender removed - Men/Women are now category groups
     final styles = (filters['styles'] as List?)?.whereType<String>().toList() ?? [];
     final tribes = (filters['tribes'] as List?)?.whereType<String>().toList() ?? [];
 
     return Column(
       children: [
-        // Gender
-        _buildDropdown(
-          label: 'Gender',
-          value: _selectedGender,
-          items: genders,
-          onChanged: (v) => setState(() => _selectedGender = v),
-        ),
-        const SizedBox(height: 16),
-
         // Style
         _buildDropdown(
           label: 'Style',
@@ -414,6 +482,15 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           onChanged: (v) => setState(() => _selectedTribe = v),
         ),
       ],
+    );
+  }
+
+  Widget _buildFabricTypePicker() {
+    return _buildDropdown(
+      label: 'Fabric Type',
+      value: _selectedFabricType,
+      items: _fabricTypes,
+      onChanged: (v) => setState(() => _selectedFabricType = v),
     );
   }
 
@@ -669,7 +746,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   }
 
   Future<void> _submitProduct() async {
-    // Validate
+    // Validate common fields
     if (_imagePath == null || _imagePath!.isEmpty) {
       AppSnackbars.showError(context, 'Please upload a product image');
       return;
@@ -678,28 +755,37 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       AppSnackbars.showError(context, 'Please enter product name');
       return;
     }
-    if (_selectedCategory == null) {
+    if (_categoryId == null) {
       AppSnackbars.showError(context, 'Please select a category');
       return;
     }
-    if (_selectedGender == null) {
-      AppSnackbars.showError(context, 'Please select a gender');
-      return;
+    
+    // Validate fabric_type for textiles only
+    if (_requiresFabricType) {
+      if (_selectedFabricType == null) {
+        AppSnackbars.showError(context, 'Please select a fabric type');
+        return;
+      }
     }
-    if (_selectedStyle == null) {
-      AppSnackbars.showError(context, 'Please select a style');
-      return;
+    
+    // Validate extended fields only for textiles and shoes_bags
+    if (_requiresExtendedFields) {
+      if (_selectedStyle == null) {
+        AppSnackbars.showError(context, 'Please select a style');
+        return;
+      }
+      if (_selectedTribe == null) {
+        AppSnackbars.showError(context, 'Please select a tribe');
+        return;
+      }
+      if (_selectedSizes.isEmpty) {
+        AppSnackbars.showError(context, 'Please select at least one size');
+        return;
+      }
     }
-    if (_selectedTribe == null) {
-      AppSnackbars.showError(context, 'Please select a tribe');
-      return;
-    }
+    
     if (_descriptionController.text.trim().isEmpty) {
       AppSnackbars.showError(context, 'Please enter product description');
-      return;
-    }
-    if (_selectedSizes.isEmpty) {
-      AppSnackbars.showError(context, 'Please select at least one size');
       return;
     }
     final price = num.tryParse(_priceController.text.trim());
@@ -720,14 +806,15 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         final productIdInt = int.tryParse(widget.productId!) ?? 0;
         await ref.read(sellerProductActionsProvider.notifier).updateProduct(
               productId: productIdInt,
-              categoryId: _selectedCategory!.id,
+              categoryId: _categoryId!,
               name: _nameController.text.trim(),
-              gender: _selectedGender!,
-              style: _selectedStyle!,
-              tribe: _selectedTribe!,
+              // Only pass extended fields if required
+              style: _requiresExtendedFields ? _selectedStyle : null,
+              tribe: _requiresExtendedFields ? _selectedTribe : null,
+              fabricType: _requiresFabricType ? _selectedFabricType : null,
               description: _descriptionController.text.trim(),
               imagePath: _imagePath,
-              sizes: _selectedSizes,
+              sizes: _requiresExtendedFields ? _selectedSizes : null,
               processingTimeType: _processingTimeType,
               processingDays: processingDays,
               price: price,
@@ -739,14 +826,15 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         }
       } else {
         await ref.read(sellerProductActionsProvider.notifier).createProduct(
-              categoryId: _selectedCategory!.id,
+              categoryId: _categoryId!,
               name: _nameController.text.trim(),
-              gender: _selectedGender!,
-              style: _selectedStyle!,
-              tribe: _selectedTribe!,
+              // Only pass extended fields if required
+              style: _requiresExtendedFields ? _selectedStyle : null,
+              tribe: _requiresExtendedFields ? _selectedTribe : null,
+              fabricType: _requiresFabricType ? _selectedFabricType : null,
               description: _descriptionController.text.trim(),
               imagePath: _imagePath!,
-              sizes: _selectedSizes,
+              sizes: _requiresExtendedFields ? _selectedSizes : null,
               processingTimeType: _processingTimeType,
               processingDays: processingDays,
               price: price,

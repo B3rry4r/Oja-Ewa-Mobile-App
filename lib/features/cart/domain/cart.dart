@@ -34,12 +34,12 @@ class CartProductSnapshot {
 
     final seller = json['seller_profile'];
     return CartProductSnapshot(
-      id: (parseNum(json['id']) as num?)?.toInt() ?? 0,
+      id: (parseNum(json['id']))?.toInt() ?? 0,
       name: (json['name'] as String?) ?? '',
       image: json['image'] as String?,
       price: parseNum(json['price']),
       size: json['size'] as String?,
-      processingDays: (parseNum(json['processing_days']) as num?)?.toInt(),
+      processingDays: (parseNum(json['processing_days']))?.toInt(),
       sellerBusinessName: seller is Map<String, dynamic> ? seller['business_name'] as String? : null,
     );
   }
@@ -78,9 +78,9 @@ class CartItem {
     }
 
     return CartItem(
-      id: (parseNum(json['id']) as num?)?.toInt() ?? 0,
-      productId: (parseNum(json['product_id']) as num?)?.toInt() ?? 0,
-      quantity: (parseNum(json['quantity']) as num?)?.toInt() ?? 0,
+      id: (parseNum(json['id']))?.toInt() ?? 0,
+      productId: (parseNum(json['product_id']))?.toInt() ?? 0,
+      quantity: (parseNum(json['quantity']))?.toInt() ?? 0,
       unitPrice: parseNum(json['unit_price']),
       subtotal: parseNum(json['subtotal']),
       selectedSize: (json['selected_size'] as String?) ?? '',
@@ -120,10 +120,10 @@ class Cart {
         : const <CartItem>[];
 
     return Cart(
-      cartId: (parseNum(payload['cart_id']) as num?)?.toInt() ?? 0,
+      cartId: (parseNum(payload['cart_id']))?.toInt() ?? 0,
       items: items,
       total: parseNum(payload['total']) ?? 0,
-      itemsCount: (parseNum(payload['items_count']) as num?)?.toInt() ?? 0,
+      itemsCount: (parseNum(payload['items_count']))?.toInt() ?? 0,
     );
   }
 }

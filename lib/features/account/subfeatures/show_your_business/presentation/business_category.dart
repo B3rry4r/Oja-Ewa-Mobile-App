@@ -21,23 +21,19 @@ class _BusinessCategoryScreenState extends ConsumerState<BusinessCategoryScreen>
   // Local state to track selection
   String selectedCategory = "Beauty";
 
-  // Data mapping based on IR content
+  // Data mapping based on backend category types
+  // Business profiles now only use: afro_beauty_services, school
+  // Art has been moved to Products (not BusinessProfiles)
   final List<Map<String, String>> categories = [
     {
       "name": "Beauty",
-      "desc": "Soaps & Creams, Fitness Coach, Dieticians, Spa, Salons"
-    },
-    {
-      "name": "Brands",
-      "desc": "Shoes & bags, Jewelries, Accessories, Gifts"
+      "desc": "Hair Care, Skin Care, Makeup Services, Spa, Salons",
+      "type": "afro_beauty_services",
     },
     {
       "name": "Schools",
-      "desc": "Fashion, Beauty, Catering, Music"
-    },
-    {
-      "name": "Music",
-      "desc": "Djs, Producers, Artists"
+      "desc": "Fashion, Beauty, Catering, Music",
+      "type": "school",
     },
   ];
 
@@ -139,18 +135,14 @@ class _BusinessCategoryScreenState extends ConsumerState<BusinessCategoryScreen>
   }
 
   List<CategoryNode> _rootsForLabel(Map<String, List<CategoryNode>> all, String label) {
+    // Map UI labels to backend category types
+    // Business profiles now only use: afro_beauty_services, school
+    // Art has been moved to Products
     switch (label) {
       case 'Beauty':
-        // Use afro_beauty -> services branch
-        final roots = all['afro_beauty'] ?? const [];
-        final servicesRoot = roots.where((e) => e.slug.contains('afro-beauty-services')).toList();
-        return servicesRoot.isNotEmpty ? servicesRoot : roots;
-      case 'Brands':
-        return all['shoes_bags'] ?? const [];
+        return all['afro_beauty_services'] ?? const [];
       case 'Schools':
         return all['school'] ?? const [];
-      case 'Music':
-        return all['art'] ?? const [];
       default:
         return all[label.toLowerCase()] ?? const [];
     }
@@ -176,7 +168,7 @@ class _BusinessCategoryScreenState extends ConsumerState<BusinessCategoryScreen>
         if (selectedNode == null) return;
 
         final draft = BusinessRegistrationDraft(categoryLabel: selectedCategory)
-          ..categoryId = selectedNode.parentId == null ? selectedNode.id : selectedNode.parentId
+          ..categoryId = selectedNode.parentId ?? selectedNode.id
           ..subcategoryId = selectedNode.id;
 
         if (!context.mounted) return;
