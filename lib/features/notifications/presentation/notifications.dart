@@ -11,6 +11,8 @@ import 'package:ojaewa/features/notifications/presentation/controllers/notificat
 import 'package:ojaewa/features/notifications/presentation/notification_detail.dart';
 import 'package:ojaewa/features/business_details/presentation/screens/business_details_screen.dart';
 import 'package:ojaewa/features/product_detail/presentation/product_detail_screen.dart';
+import 'package:ojaewa/features/account/subfeatures/your_order/presentation/order_details.dart';
+import 'package:ojaewa/features/your_shop/subfeatures/orders/shop_order_details.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
@@ -313,9 +315,21 @@ class NotificationsScreen extends ConsumerWidget {
         return;
       }
 
-      if (segments.length >= 2 && segments[0] == 'seller' && segments[1] == 'profile') {
-        Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
-        return;
+      if (segments.length >= 2 && segments[0] == 'seller') {
+        if (segments[1] == 'profile') {
+          Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
+          return;
+        }
+        // Handle /seller/orders/{id}
+        if (segments.length >= 3 && segments[1] == 'orders') {
+          final orderId = int.tryParse(segments[2]);
+          if (orderId != null) {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => ShopOrderDetailsScreen(orderId: orderId)),
+            );
+            return;
+          }
+        }
       }
 
       // Unknown deep link → do nothing

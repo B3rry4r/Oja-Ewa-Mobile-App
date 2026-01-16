@@ -123,7 +123,7 @@ class OnboardingScreen extends StatelessWidget {
 
   Widget _buildHeadline() {
     return Text(
-      'Bringing out \nyour inner \nradiance',
+      'The Pan-African\nBeauty Market',
       style: TextStyle(
         fontSize: 48,
         fontWeight: FontWeight.w600,

@@ -52,7 +52,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
                     
                     // Main title
                     const Text(
-                      'Sell your fashion designs on Oja Ewa',
+                      'Sell on Ojá-Ẹwà',
                       style: TextStyle(
                         fontSize: 33,
                         fontWeight: FontWeight.w600,
@@ -65,7 +65,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
                     
                     // Subtitle
                     const Text(
-                      'Spend more time creating what you love and let Oja Ewa connect you with people who love it too!',
+                      'Tell your Story on Ojá-Ẹwà. Where makers build their legacy. List your work, tell your story, reach the world.',
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Campton',
@@ -104,7 +104,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
       ),
       HowItWorksStep(
         number: '2',
-        description: 'Wait for Oja Ewa to approve your details',
+        description: 'Wait for Ojá-Ẹwà to approve your details',
       ),
       HowItWorksStep(
         number: '3',

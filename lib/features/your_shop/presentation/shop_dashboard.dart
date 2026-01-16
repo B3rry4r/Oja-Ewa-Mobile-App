@@ -99,7 +99,7 @@ class ShopDashboardScreen extends StatelessWidget {
           Icon(Icons.search, color: Color(0xFF777F84), size: 20),
           SizedBox(width: 12),
           Text(
-            "search Oja Ewa",
+            "search Ojá-Ẹwà",
             style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 16),
           ),
         ],

@@ -403,7 +403,7 @@ class HomeScreen extends ConsumerWidget {
 
   Widget _buildHeroTitle() {
     return const Text(
-      'Where would\nyou like to go?',
+      'Find What Speaks\nTo Your Soul',
       style: TextStyle(
         fontSize: 32,
         fontWeight: FontWeight.w700,

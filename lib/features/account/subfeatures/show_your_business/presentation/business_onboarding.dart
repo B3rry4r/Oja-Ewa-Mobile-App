@@ -58,7 +58,7 @@ class BusinessOnboardingScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Expand your business reach on Oja Ewa",
+                      "Share your Business Heritage on Ojá-Ẹwà",
                       style: TextStyle(
                         fontSize: 33,
                         fontWeight: FontWeight.w600,
@@ -68,7 +68,7 @@ class BusinessOnboardingScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      "Show your business on Oja Ewa and let more buyers find you",
+                      "Craftsmanship, agency, and the tangible connection between cultural identity and creative expression.",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
@@ -105,7 +105,7 @@ class BusinessOnboardingScreen extends ConsumerWidget {
                     _buildStepRow("1", "Provide your business information"),
                     _buildStepRow(
                       "2",
-                      "Wait for Oja Ewa to approve your details",
+                      "Wait for Ojá-Ẹwà to approve your details",
                     ),
                     _buildStepRow(
                       "3",

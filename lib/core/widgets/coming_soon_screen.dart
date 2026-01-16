@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
-/// A simple "Coming Soon" placeholder screen with Oja Ewa logo.
+/// A simple "Coming Soon" placeholder screen with Ojá-Ẹwà logo.
 /// Used for features that are not yet available.
 class ComingSoonScreen extends StatelessWidget {
   const ComingSoonScreen({
@@ -37,7 +37,7 @@ class ComingSoonScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Oja Ewa Logo
+                    // Ojá-Ẹwà Logo
                     Image.asset(
                       AppImages.logoOutline,
                       width: 120,
