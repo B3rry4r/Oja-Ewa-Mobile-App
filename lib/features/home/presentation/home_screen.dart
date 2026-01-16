@@ -137,25 +137,14 @@ class HomeScreen extends ConsumerWidget {
                   // Watch the async provider directly to ensure rebuild on data arrival
                   final sellerStatusAsync = ref.watch(mySellerStatusProvider);
                   
-                  debugPrint('[HomeScreen] sellerStatusAsync state: ${sellerStatusAsync.isLoading ? "loading" : sellerStatusAsync.hasError ? "error" : "data"}');
-                  
                   return sellerStatusAsync.when(
-                    loading: () {
-                      debugPrint('[HomeScreen] Your Shop icon: HIDDEN (loading)');
-                      return const SizedBox.shrink();
-                    },
-                    error: (e, __) {
-                      debugPrint('[HomeScreen] Your Shop icon: HIDDEN (error: $e)');
-                      return const SizedBox.shrink();
-                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
                     data: (status) {
                       final isApproved = status?.isApprovedAndActive ?? false;
-                      debugPrint('[HomeScreen] Your Shop icon: status=$status, isApproved=$isApproved');
                       if (!isApproved) {
-                        debugPrint('[HomeScreen] Your Shop icon: HIDDEN (not approved)');
                         return const SizedBox.shrink();
                       }
-                      debugPrint('[HomeScreen] Your Shop icon: VISIBLE');
                       return HeaderIconButton(
                         asset: AppIcons.shop,
                         onTap: () => Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard),

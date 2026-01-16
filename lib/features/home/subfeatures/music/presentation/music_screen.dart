@@ -71,11 +71,6 @@ class MusicScreen extends ConsumerWidget {
                   pageTitle: item == 'View All' ? section.title : item,
                   breadcrumb: 'Art • ${section.title}',
                   showBusinessTypeFilter: false,
-                  onProductTap: (context, businessId) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => MusicArtistProfileScreen(businessId: businessId)),
-                    );
-                  },
                 ),
               ),
             );
