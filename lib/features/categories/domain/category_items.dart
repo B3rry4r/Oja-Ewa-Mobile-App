@@ -123,6 +123,12 @@ CategoryItem parseCategoryItem(String type, Map<String, dynamic> json) {
   if (productTypes.contains(type)) {
     return CategoryProductItem.fromJson(json);
   }
+  
+  // Art products sometimes include business_name from seller; treat as product.
+  final category = json['category']?.toString();
+  if (category == 'art') {
+    return CategoryProductItem.fromJson(json);
+  }
 
   // Infer item type by payload shape (more robust than relying on the listing type).
   if (json.containsKey('business_name') || json.containsKey('business_logo')) {
