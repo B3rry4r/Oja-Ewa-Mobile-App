@@ -61,6 +61,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
   
   // Cache for category children to avoid re-fetching
   List<CategoryNode>? _cachedChildren;
+  CategoryItemsState? _cachedCategoryState;
 
   @override
   void initState() {
@@ -187,30 +188,11 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final kind = widget.type == 'sustainability'
-        ? _ListingKind.sustainability
-        : (widget.type == 'school' || widget.type == 'art' || widget.type == 'afro_beauty_services')
-            ? _ListingKind.business
-            : _ListingKind.product;
-
-    final selectedFilters = ref.watch(selectedFiltersProvider);
-    final hasActiveFilters = kind == _ListingKind.product
-        ? (selectedFilters.hasFilters || selectedFilters.hasSort)
-        : false;
-
-    final businessFilters = ref.watch(businessListingFiltersProvider);
-    final hasBusinessFilters = kind == _ListingKind.business &&
-        ((businessFilters.state ?? '').isNotEmpty ||
-            (businessFilters.city ?? '').isNotEmpty ||
-            (businessFilters.sort ?? '').isNotEmpty);
-
-    final sustFilters = ref.watch(sustainabilityListingFiltersProvider);
-    final hasSustFilters = kind == _ListingKind.sustainability &&
-        (sustFilters.sort ?? '').isNotEmpty;
-
     final categoryItemsAsync = ref.watch(
       categoryItemsProvider((type: widget.type, slug: _activeSlug)),
     );
+    final hasActiveFilters = ref.watch(selectedFiltersProvider).hasFilters ||
+        ref.watch(selectedFiltersProvider).hasSort;
     final filteredAsync = hasActiveFilters
         ? ref.watch(
             filteredProductsProvider((
@@ -223,9 +205,13 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF603814),
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
-            const AppHeader(iconColor: Colors.white),
+            const AppHeader(
+              backgroundColor: Color(0xFF603814),
+              iconColor: Colors.white,
+            ),
             Expanded(
               child: Container(
                 margin: const EdgeInsets.only(top: 18),
@@ -240,11 +226,15 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                     final hasError = categoryItemsAsync.hasError;
                     final categoryState = categoryItemsAsync.value;
                     
+                    if (categoryState == null && _cachedCategoryState != null) {
+                      return _buildContent(_cachedCategoryState!, isLoading: isLoading, filteredAsync: filteredAsync);
+                    }
+
                     // Only show full-page loader on first load (no cached data)
                     if (categoryState == null && isLoading) {
                       return const Center(child: CircularProgressIndicator());
                     }
-                    
+
                     if (categoryState == null && hasError) {
                       return Center(
                         child: Padding(
@@ -256,160 +246,13 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                         ),
                       );
                     }
-                    
+
                     if (categoryState == null) {
                       return const Center(child: CircularProgressIndicator());
                     }
-                    
-                    // We have data - show content with inline loader if refreshing
-                    final showInlineLoader = isLoading;
-                    // Cache children once loaded to avoid refetching
-                    if (_cachedChildren == null) {
-                      final childrenAsync = ref.watch(
-                        categoryChildrenProvider(categoryState.category.id),
-                      );
-                      if (childrenAsync.hasValue) {
-                        _cachedChildren = childrenAsync.value;
-                      }
-                    }
 
-                    return SingleChildScrollView(
-                      controller: _scrollController,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Page title - always show the original page title
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-                            child: Text(
-                              widget.pageTitle,
-                              style: const TextStyle(
-                                fontSize: 33,
-                                fontFamily: 'Campton',
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF241508),
-                                height: 1.2,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              widget.breadcrumb,
-                              style: const TextStyle(
-                                color: Color(0xFF777F84),
-                                fontSize: 14,
-                                fontFamily: 'Campton',
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Category pills - use cached children, don't refetch
-                          Builder(
-                            builder: (context) {
-                              // If not cached yet, try to get from provider
-                              if (_cachedChildren == null) {
-                                final childrenAsync = ref.watch(
-                                  categoryChildrenProvider(categoryState.category.id),
-                                );
-                                return childrenAsync.when(
-                                  loading: () => const SizedBox(
-                                    height: 42,
-                                    child: Center(
-                                      child: SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(strokeWidth: 2),
-                                      ),
-                                    ),
-                                  ),
-                                  error: (e, _) => const SizedBox(height: 42),
-                                  data: (children) {
-                                    // Cache on first load
-                                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                                      if (mounted && _cachedChildren == null) {
-                                        setState(() => _cachedChildren = children);
-                                      }
-                                    });
-                                    return _buildPills(children);
-                                  },
-                                );
-                              }
-                              return _buildPills(_cachedChildren!);
-                            },
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          _SortFilterRow(
-                            showBusinessTypeFilter:
-                                widget.showBusinessTypeFilter,
-                            onFiltersChanged: _onFiltersChanged,
-                            kind: kind,
-                            excludeStyles: widget.type == 'textiles' ? {'Fabrics'} : const {},
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          // Show filtered products/businesses/sustainability or category items
-                          if (hasActiveFilters && filteredAsync != null)
-                            _buildFilteredProductsGrid(filteredAsync)
-                          else
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Builder(
-                                builder: (context) {
-                                  if (hasBusinessFilters) {
-                                    final businessAsync = ref.watch(
-                                      filteredBusinessesByCategoryProvider((slug: _activeSlug)),
-                                    );
-                                    return businessAsync.when(
-                                      loading: () => const Center(child: CircularProgressIndicator()),
-                                      error: (e, _) => Center(child: Text('Failed to load: $e')),
-                                      data: (items) => _CategoryItemGrid(
-                                        type: widget.type,
-                                        items: items,
-                                        hasMore: false,
-                                        isLoadingMore: false,
-                                        onTap: _onCategoryItemTap,
-                                      ),
-                                    );
-                                  }
-
-                                  if (hasSustFilters) {
-                                    final sustAsync = ref.watch(
-                                      filteredSustainabilityByCategoryProvider((slug: _activeSlug)),
-                                    );
-                                    return sustAsync.when(
-                                      loading: () => const Center(child: CircularProgressIndicator()),
-                                      error: (e, _) => Center(child: Text('Failed to load: $e')),
-                                      data: (items) => _CategoryItemGrid(
-                                        type: widget.type,
-                                        items: items,
-                                        hasMore: false,
-                                        isLoadingMore: false,
-                                        onTap: _onCategoryItemTap,
-                                      ),
-                                    );
-                                  }
-
-                                  return _CategoryItemGrid(
-                                    type: widget.type,
-                                    items: categoryState.items,
-                                    hasMore: categoryState.hasMore,
-                                    isLoadingMore: categoryState.isLoadingMore || showInlineLoader,
-                                    onTap: _onCategoryItemTap,
-                                  );
-                                },
-                              ),
-                            ),
-
-                          const SizedBox(height: 100),
-                        ],
-                      ),
-                    );
+                    _cachedCategoryState = categoryState;
+                    return _buildContent(categoryState, isLoading: isLoading, filteredAsync: filteredAsync);
                   },
                 ),
               ),
@@ -420,12 +263,175 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
     );
   }
 
+  Widget _buildContent(
+    CategoryItemsState categoryState, {
+    required bool isLoading,
+    AsyncValue<FilteredProductsState>? filteredAsync,
+  }) {
+    final kind = ListingKindMapper.fromType(widget.type);
+    final businessFilters = ref.watch(businessListingFiltersProvider);
+    final hasBusinessFilters = kind == _ListingKind.business &&
+        ((businessFilters.state ?? '').isNotEmpty ||
+            (businessFilters.city ?? '').isNotEmpty ||
+            (businessFilters.sort ?? '').isNotEmpty);
+
+    final sustFilters = ref.watch(sustainabilityListingFiltersProvider);
+    final hasSustFilters = kind == _ListingKind.sustainability &&
+        (sustFilters.sort ?? '').isNotEmpty;
+
+    final hasActiveFilters = ref.watch(selectedFiltersProvider).hasFilters || ref.watch(selectedFiltersProvider).hasSort;
+    final effectiveFilteredAsync = filteredAsync ??
+        (hasActiveFilters
+            ? ref.watch(
+                filteredProductsProvider((
+                  categorySlug: _activeSlug,
+                  categoryName: widget.pageTitle,
+                )),
+              )
+            : null);
+
+    final showInlineLoader = isLoading;
+    // Cache children once loaded to avoid refetching
+    if (_cachedChildren == null) {
+      final childrenAsync = ref.watch(categoryChildrenProvider(categoryState.category.id));
+      if (childrenAsync.hasValue) {
+        _cachedChildren = childrenAsync.value;
+      }
+    }
+
+    return SingleChildScrollView(
+      controller: _scrollController,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+            child: Text(
+              widget.pageTitle,
+              style: const TextStyle(
+                fontSize: 33,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF241508),
+                height: 1.2,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              widget.breadcrumb,
+              style: const TextStyle(
+                color: Color(0xFF777F84),
+                fontSize: 14,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Builder(
+            builder: (context) {
+              if (_cachedChildren == null) {
+                final childrenAsync = ref.watch(
+                  categoryChildrenProvider(categoryState.category.id),
+                );
+                return childrenAsync.when(
+                  loading: () => const SizedBox(
+                    height: 42,
+                    child: Center(child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))),
+                  ),
+                  error: (e, _) => const SizedBox(height: 42),
+                  data: (children) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted && _cachedChildren == null) {
+                        setState(() => _cachedChildren = children);
+                      }
+                    });
+                    return _buildPills(children);
+                  },
+                );
+              }
+              return _buildPills(_cachedChildren!);
+            },
+          ),
+          const SizedBox(height: 16),
+          _SortFilterRow(
+            showBusinessTypeFilter: widget.showBusinessTypeFilter,
+            onFiltersChanged: _onFiltersChanged,
+            kind: kind,
+            excludeStyles: widget.type == 'textiles' ? {'Fabrics'} : const {},
+          ),
+          const SizedBox(height: 24),
+          if (hasActiveFilters && effectiveFilteredAsync != null)
+            _buildFilteredProductsGrid(effectiveFilteredAsync)
+          else
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Builder(
+                builder: (context) {
+                  if (hasBusinessFilters) {
+                    final businessAsync = ref.watch(
+                      filteredBusinessesByCategoryProvider((slug: _activeSlug)),
+                    );
+                    return businessAsync.when(
+                      loading: () => const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 48),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                      error: (e, _) => Center(child: Text('Failed to load: $e')),
+                      data: (items) => _CategoryItemGrid(
+                        type: widget.type,
+                        items: items,
+                        hasMore: false,
+                        isLoadingMore: false,
+                        onTap: _onCategoryItemTap,
+                      ),
+                    );
+                  }
+
+                  if (hasSustFilters) {
+                    final sustAsync = ref.watch(
+                      filteredSustainabilityByCategoryProvider((slug: _activeSlug)),
+                    );
+                    return sustAsync.when(
+                      loading: () => const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 48),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                      error: (e, _) => Center(child: Text('Failed to load: $e')),
+                      data: (items) => _CategoryItemGrid(
+                        type: widget.type,
+                        items: items,
+                        hasMore: false,
+                        isLoadingMore: false,
+                        onTap: _onCategoryItemTap,
+                      ),
+                    );
+                  }
+
+                  return _CategoryItemGrid(
+                    type: widget.type,
+                    items: categoryState.items,
+                    hasMore: categoryState.hasMore,
+                    isLoadingMore: categoryState.isLoadingMore || showInlineLoader,
+                    onTap: _onCategoryItemTap,
+                  );
+                },
+              ),
+            ),
+          const SizedBox(height: 100),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFilteredProductsGrid(
     AsyncValue<FilteredProductsState> filteredAsync,
   ) {
     return filteredAsync.when(
       loading: () => const Padding(
-        padding: EdgeInsets.all(32),
+        padding: EdgeInsets.symmetric(vertical: 48),
         child: Center(child: CircularProgressIndicator()),
       ),
       error: (e, _) => Padding(
@@ -515,6 +521,27 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
 }
 
 enum _ListingKind { product, business, sustainability }
+
+extension ListingKindMapper on _ListingKind {
+  static _ListingKind fromType(String type) {
+    switch (type) {
+      case 'art':
+      case 'textiles':
+      case 'shoes_bags':
+      case 'afro_beauty_products':
+        return _ListingKind.product;
+      case 'afro_beauty_services':
+      case 'school':
+      case 'art_services':
+        return _ListingKind.business;
+      case 'sustainability':
+        return _ListingKind.sustainability;
+      default:
+        return _ListingKind.product;
+    }
+  }
+}
+
 
 class _SortFilterRow extends ConsumerWidget {
   const _SortFilterRow({

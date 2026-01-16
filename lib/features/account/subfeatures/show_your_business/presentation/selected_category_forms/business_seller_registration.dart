@@ -408,8 +408,9 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
         // If we came in via legacy string-only args, we may not have categoryId/subcategoryId.
         // Force selection before continuing.
         if (draft.categoryId == null || draft.subcategoryId == null) {
-          final all = await ref.read(allCategoriesProvider.future);
+          final catalog = await ref.read(allCategoriesProvider.future);
           if (!mounted) return;
+          final all = catalog.categories;
 
           // Map UI category labels to backend category types
           // Business profiles now only use: afro_beauty_services, school

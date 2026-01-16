@@ -1,8 +1,9 @@
 import '../domain/category_items.dart';
 import '../domain/category_node.dart';
+import '../domain/category_catalog.dart';
 
 abstract interface class CategoryRepository {
-  Future<Map<String, List<CategoryNode>>> getAllCategories();
+  Future<CategoryCatalog> getAllCategories();
 
   Future<List<CategoryNode>> getCategories({required String type});
   Future<List<CategoryNode>> getChildren(int id);

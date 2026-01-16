@@ -171,10 +171,10 @@ class _SellerCategorySelectionScreenState extends ConsumerState<SellerCategorySe
         final apiType = _getApiType(selectedCategoryType);
         
         // Fetch categories for selected type
-        final all = await ref.read(allCategoriesProvider.future);
+        final catalog = await ref.read(allCategoriesProvider.future);
         if (!mounted) return;
 
-        final roots = all[apiType] ?? const [];
+        final roots = catalog.categories[apiType] ?? const [];
         if (roots.isEmpty) {
           AppSnackbars.showError(context, 'No categories available for $selectedCategoryType');
           return;

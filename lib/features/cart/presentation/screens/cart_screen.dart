@@ -29,12 +29,19 @@ class CartScreen extends ConsumerWidget {
     final hasError = ref.watch(cartProvider).hasError && cart == null;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF603814),
+      backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
-            const AppHeader(iconColor: Colors.white, showActions: false),
+            Container(
+              color: const Color(0xFF603814),
+              child: const AppHeader(
+                backgroundColor: Color(0xFF603814),
+                iconColor: Colors.white,
+                showActions: false,
+              ),
+            ),
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(

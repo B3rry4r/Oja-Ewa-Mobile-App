@@ -5,6 +5,8 @@ import 'bootstrap/app_bootstrap.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 import '../core/deep_links/deep_link_handler.dart';
+import '../core/network/network_providers.dart';
+import '../core/widgets/offline_screen.dart';
 
 /// Global navigator key for deep link navigation
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -36,9 +38,27 @@ class _AppState extends ConsumerState<App> {
       darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.system,
       builder: (context, child) {
-        // Ensure we load token from storage once at startup.
-        // This keeps initial screens simple and avoids duplicated boot logic.
-        return AppBootstrap(child: child ?? const SizedBox.shrink());
+        return Consumer(
+          builder: (context, ref, _) {
+            final isOnline = ref.watch(isOnlineProvider);
+            final content = AppBootstrap(child: child ?? const SizedBox.shrink());
+
+            if (isOnline) {
+              return content;
+            }
+
+            return Stack(
+              children: [
+                content,
+                Positioned.fill(
+                  child: OfflineScreen(
+                    onRetry: () => ref.invalidate(connectivityProvider),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
       },
       onGenerateRoute: AppRouter.onGenerateRoute,
       initialRoute: AppRoutes.splash,

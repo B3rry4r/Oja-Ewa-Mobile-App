@@ -1,88 +1,75 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/sort_sheet.dart';
 import '../add_edit_product/add_edit_product.dart';
 import '../add_edit_product/seller_category_selection.dart';
-import 'data/mock_shop_products.dart';
 import 'domain/shop_product.dart';
 
 import '../../../../core/widgets/confirmation_modal.dart';
+
 class ProductListingsScreen extends StatelessWidget {
   const ProductListingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // TODO: Replace with seller products API once available
+    const products = <ShopProduct>[];
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16, top: 10),
-            child: Row(
-              children: [
-                _buildCircularButton(Icons.notifications_none_outlined),
-                const SizedBox(width: 8),
-                _buildCircularButton(Icons.settings_outlined),
-              ],
-            ),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Products Listings",
-              style: TextStyle(
-                fontSize: 33,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF241508),
+            const AppHeader(
+              backgroundColor: Color(0xFFFFF8F1),
+              iconColor: Color(0xFF241508),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Products Listings",
+                      style: TextStyle(
+                        fontSize: 33,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF241508),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "${products.length} Products",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1E2021),
+                          ),
+                        ),
+                        _buildAddProductButton(context),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    _buildSearchBar(),
+                    const SizedBox(height: 20),
+                    _buildFilterTabs(context),
+                    const SizedBox(height: 24),
+                    _buildProductTable(context, products),
+                    const SizedBox(height: 40),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "20 Products",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E2021),
-                  ),
-                ),
-                _buildAddProductButton(context),
-              ],
-            ),
-            const SizedBox(height: 20),
-            _buildSearchBar(),
-            const SizedBox(height: 20),
-            _buildFilterTabs(context),
-            const SizedBox(height: 24),
-            _buildProductTable(context),
-            const SizedBox(height: 40),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildCircularButton(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
-      ),
-      child: Icon(icon, size: 20, color: Colors.black),
     );
   }
 
@@ -211,7 +198,15 @@ class ProductListingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProductTable(BuildContext context) {
+  Widget _buildProductTable(BuildContext context, List<ShopProduct> products) {
+    if (products.isEmpty) {
+      return const Expanded(
+        child: Center(
+          child: Text('No products yet', style: TextStyle(fontSize: 16, color: Color(0xFF777F84))),
+        ),
+      );
+    }
+
     return Column(
       children: [
         // Header
@@ -230,7 +225,7 @@ class ProductListingsScreen extends StatelessWidget {
           ),
         ),
         // Rows
-        ...mockShopProducts.map((p) {
+        ...products.map((p) {
           final color = switch (p.status) {
             'Approved' => const Color(0xFF70B673),
             'Pending' => const Color(0xFFF9ECBD),

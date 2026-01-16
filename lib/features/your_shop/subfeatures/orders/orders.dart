@@ -204,7 +204,7 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
                   orderId: order.id,
                   orderNumber: '#${order.orderNumber}',
                   date: dateFormat.format(order.createdAt),
-                  customer: order.customerName ?? 'N/A',
+                  customer: order.customerName ?? '—',
                   status: order.status,
                   backgroundColor: index.isEven ? const Color(0xFFFBFBFB) : const Color(0xFFF4F4F4),
                 );

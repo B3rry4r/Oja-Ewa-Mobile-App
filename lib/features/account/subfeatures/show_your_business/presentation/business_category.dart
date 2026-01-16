@@ -151,10 +151,10 @@ class _BusinessCategoryScreenState extends ConsumerState<BusinessCategoryScreen>
   Widget _buildSaveButton(BuildContext context) {
     return InkWell(
       onTap: () async {
-        final all = await ref.read(allCategoriesProvider.future);
+        final catalog = await ref.read(allCategoriesProvider.future);
         if (!mounted) return;
 
-        final roots = _rootsForLabel(all, selectedCategory);
+        final roots = _rootsForLabel(catalog.categories, selectedCategory);
         if (roots.isEmpty) {
           AppSnackbars.showError(context, 'No categories available');
           return;

@@ -4,14 +4,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/category_repository_impl.dart';
 import '../../domain/category_items.dart';
 import '../../domain/category_node.dart';
+import '../../domain/category_catalog.dart';
 
-final allCategoriesProvider = FutureProvider<Map<String, List<CategoryNode>>>((ref) async {
+final allCategoriesProvider = FutureProvider<CategoryCatalog>((ref) async {
   ref.keepAlive();
   return ref.watch(categoryRepositoryProvider).getAllCategories();
 });
 
 final categoriesByTypeProvider = FutureProvider.family<List<CategoryNode>, String>((ref, type) async {
   return ref.watch(categoryRepositoryProvider).getCategories(type: type);
+});
+
+final categoryFormOptionsProvider = Provider<CategoryFormOptions>((ref) {
+  final catalog = ref.watch(allCategoriesProvider).value;
+  return catalog?.formOptions ?? const CategoryFormOptions(fabrics: [], styles: [], tribes: []);
 });
 
 final categoryChildrenProvider = FutureProvider.family<List<CategoryNode>, int>((ref, id) async {

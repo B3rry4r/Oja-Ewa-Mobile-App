@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/dio_clients.dart';
 import '../domain/category_items.dart';
 import '../domain/category_node.dart';
+import '../domain/category_catalog.dart';
 import 'category_api.dart';
 import 'category_repository.dart';
 
@@ -12,7 +13,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
   final CategoryApi _api;
 
   @override
-  Future<Map<String, List<CategoryNode>>> getAllCategories() => _api.getAllCategories();
+  Future<CategoryCatalog> getAllCategories() => _api.getAllCategories();
 
   @override
   Future<List<CategoryNode>> getCategories({required String type}) => _api.getCategories(type: type);

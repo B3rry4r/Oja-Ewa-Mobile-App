@@ -27,7 +27,7 @@ class SelectionBottomSheet {
                   ),
                 ),
                 trailing: o == selected
-                    ? const Icon(Icons.check, color: Color(0xFF603814))
+                    ? const Icon(Icons.check, color: Color(0xFFFDAF40))
                     : null,
                 onTap: () => Navigator.of(context).pop(o),
               ),

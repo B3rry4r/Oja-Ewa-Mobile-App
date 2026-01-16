@@ -1,5 +1,6 @@
 import '../domain/shop_product.dart';
 
+@deprecated
 const mockShopProducts = <ShopProduct>[
   ShopProduct(
     id: 'sp1',

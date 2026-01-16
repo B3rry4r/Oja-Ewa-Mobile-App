@@ -6,17 +6,13 @@ import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
 import 'package:ojaewa/features/categories/presentation/widgets/category_tree_picker_sheet.dart';
-import 'package:ojaewa/features/product/presentation/controllers/product_filters_controller.dart';
+import 'package:ojaewa/core/widgets/selection_bottom_sheet.dart';
+import 'package:ojaewa/features/categories/domain/category_catalog.dart';
 import 'package:ojaewa/features/your_shop/presentation/controllers/seller_product_controller.dart';
 
-/// Fetch product filters (genders, styles, tribes)
-final _productFiltersProvider = FutureProvider<Map<String, dynamic>>((ref) async {
-  final filters = await ref.watch(availableFiltersProvider.future);
-  return {
-    'genders': filters.genders,
-    'styles': filters.styles,
-    'tribes': filters.tribes,
-  };
+/// Fetch form options from categories endpoint
+final _productFiltersProvider = Provider<CategoryFormOptions>((ref) {
+  return ref.watch(categoryFormOptionsProvider);
 });
 
 /// Add/Edit Product Screen
@@ -78,22 +74,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   /// Whether to show fabric_type field (Textiles only)
   bool get _requiresFabricType => _categoryType == 'textiles';
   
-  /// Fabric type options
-  static const List<String> _fabricTypes = [
-    'Ankara',
-    'Aso-Oke',
-    'Adire',
-    'Kente',
-    'Lace',
-    'Cotton',
-    'Silk',
-    'Wool',
-    'Linen',
-    'Velvet',
-    'Brocade',
-    'Jacquard',
-    'Other',
-  ];
   
   @override
   void initState() {
@@ -115,7 +95,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filtersAsync = ref.watch(_productFiltersProvider);
+    final formOptions = ref.watch(_productFiltersProvider);
     final isLoading = ref.watch(sellerProductActionsProvider).isLoading;
     
     // Get category type display name
@@ -170,30 +150,14 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
 
                     // Fabric Type - ONLY for textiles
                     if (_requiresFabricType) ...[
-                      _buildFabricTypePicker(),
+                      _buildFabricTypePicker(formOptions),
                       const SizedBox(height: 16),
                     ],
 
                     // Style, Tribe from filters - ONLY for textiles and shoes_bags
                     // Gender removed (Men/Women are now category groups)
                     if (_requiresExtendedFields) ...[
-                      filtersAsync.when(
-                        loading: () => Column(
-                          children: [
-                            _buildDropdownPlaceholder('Style', 'Loading...'),
-                            const SizedBox(height: 16),
-                            _buildDropdownPlaceholder('Tribe', 'Loading...'),
-                          ],
-                        ),
-                        error: (e, st) => Column(
-                          children: [
-                            _buildDropdownPlaceholder('Style', 'Failed to load'),
-                            const SizedBox(height: 16),
-                            _buildDropdownPlaceholder('Tribe', 'Failed to load'),
-                          ],
-                        ),
-                        data: (filters) => _buildFilterDropdowns(filters),
-                      ),
+                      _buildFilterDropdowns(formOptions),
                       const SizedBox(height: 16),
                     ],
 
@@ -412,10 +376,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         GestureDetector(
           onTap: () async {
             // Allow changing category within the same type
-            final all = await ref.read(allCategoriesProvider.future);
+            final catalog = await ref.read(allCategoriesProvider.future);
             if (!mounted) return;
             
-            final roots = all[_categoryType] ?? [];
+            final roots = catalog.categories[_categoryType] ?? [];
             if (roots.isEmpty) return;
             
             final selected = await showCategoryTreePickerSheet(
@@ -458,38 +422,31 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     );
   }
 
-  Widget _buildFilterDropdowns(Map<String, dynamic> filters) {
-    // Gender removed - Men/Women are now category groups
-    final styles = (filters['styles'] as List?)?.whereType<String>().toList() ?? [];
-    final tribes = (filters['tribes'] as List?)?.whereType<String>().toList() ?? [];
-
+  Widget _buildFilterDropdowns(CategoryFormOptions filters) {
     return Column(
       children: [
-        // Style
         _buildDropdown(
           label: 'Style',
           value: _selectedStyle,
-          items: styles,
+          items: filters.styles,
           onChanged: (v) => setState(() => _selectedStyle = v),
         ),
         const SizedBox(height: 16),
-
-        // Tribe
         _buildDropdown(
           label: 'Tribe',
           value: _selectedTribe,
-          items: tribes,
+          items: filters.tribes,
           onChanged: (v) => setState(() => _selectedTribe = v),
         ),
       ],
     );
   }
 
-  Widget _buildFabricTypePicker() {
+  Widget _buildFabricTypePicker(CategoryFormOptions options) {
     return _buildDropdown(
       label: 'Fabric Type',
       value: _selectedFabricType,
-      items: _fabricTypes,
+      items: options.fabrics,
       onChanged: (v) => setState(() => _selectedFabricType = v),
     );
   }
@@ -512,39 +469,40 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: value,
-              hint: Text(
-                'Select $label',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Campton',
-                  color: Color(0xFFCCCCCC),
-                ),
-              ),
-              isExpanded: true,
-              items: items.map((item) {
-                return DropdownMenuItem<String>(
-                  value: item,
+        GestureDetector(
+          onTap: () async {
+            if (items.isEmpty) return;
+            final selected = await SelectionBottomSheet.show(
+              context,
+              title: label,
+              options: items,
+              selected: value ?? '',
+            );
+            if (selected != null) {
+              onChanged(selected);
+            }
+          },
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFFCCCCCC)),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Expanded(
                   child: Text(
-                    item,
-                    style: const TextStyle(
+                    value?.isNotEmpty == true ? value! : 'Select $label',
+                    style: TextStyle(
                       fontSize: 16,
                       fontFamily: 'Campton',
-                      color: Color(0xFF1E2021),
+                      color: value?.isNotEmpty == true ? const Color(0xFF1E2021) : const Color(0xFFCCCCCC),
                     ),
                   ),
-                );
-              }).toList(),
-              onChanged: onChanged,
+                ),
+                const Icon(Icons.keyboard_arrow_down, color: Color(0xFF777F84)),
+              ],
             ),
           ),
         ),

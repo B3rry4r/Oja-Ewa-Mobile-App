@@ -22,13 +22,18 @@ class NotificationsScreen extends ConsumerWidget {
     final notifications = ref.watch(notificationsListProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF603814), // Main background color
+      backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
-            const AppHeader(
-              iconColor: Colors.white,
-              showActions: false,
+            Container(
+              color: const Color(0xFF603814),
+              child: const AppHeader(
+                backgroundColor: Color(0xFF603814),
+                iconColor: Colors.white,
+                showActions: false,
+              ),
             ),
             // Main content card
             Expanded(

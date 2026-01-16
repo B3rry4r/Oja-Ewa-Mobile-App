@@ -1,8 +1,10 @@
 // splash_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
 import '../../../../core/auth/auth_providers.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -29,16 +31,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // #fff8f1
+      backgroundColor: const Color(0xFFFFF8F1),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Brand Logo/Name
             _buildBrandLogo(),
-
-            // Subtitle (optional - added for better UX)
-            const SizedBox(height: 40),
+            const SizedBox(height: 48),
             _buildLoadingIndicator(),
           ],
         ),
@@ -50,104 +49,58 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     return Stack(
       alignment: Alignment.center,
       children: [
-        // Background decorative element with low opacity
+        // Large outline logo in the background
         Opacity(
-          opacity: 0.1,
-          child: Container(
-            width: 311,
-            height: 461,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFDAF40).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(150),
-            ),
-            child: const Center(
-              child: Icon(
-                Icons.spa_rounded,
-                size: 120,
-                color: Color(0xFFFDAF40),
-              ),
-            ),
+          opacity: 0.12,
+          child: Image.asset(
+            AppImages.logoOutline,
+            width: 280,
+            height: 280,
+            fit: BoxFit.contain,
           ),
         ),
-
-        // Brand Name Container
-        Container(
-          width: 231.01,
-          height: 61.89,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+        // Foreground logo + text aligned like home screen
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(AppImages.appLogoAlt, width: 36, height: 36),
+            const SizedBox(width: 10),
+            const Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
               children: [
-                // Decorative dot before text
-                Container(
-                  width: 18.91,
-                  height: 18.91,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFDAF40),
-                    shape: BoxShape.circle,
+                Text(
+                  'oj',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black,
+                    fontFamily: 'Campton',
                   ),
                 ),
-
-                const SizedBox(width: 20),
-
-                // Brand Name
-                RichText(
-                  text: const TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'oj',
-                        style: TextStyle(
-                          fontSize: 43.81,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'Inter',
-                          color: Color(0xFF000000),
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'à-ewà',
-                        style: TextStyle(
-                          fontSize: 43.81,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'Inter',
-                          color: Color(0xFF000000),
-                        ),
-                      ),
-                    ],
+                SizedBox(width: 2),
+                Text(
+                  'à-ewà',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black,
+                    fontFamily: 'Campton',
                   ),
                 ),
-
-                const SizedBox(width: 8),
-
-                // Registered trademark symbol
-                const Padding(
-                  padding: EdgeInsets.only(top: 12.0),
-                  child: Text(
-                    '®',
-                    style: TextStyle(
-                      fontSize: 12.18,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Inter',
-                      color: Color(0xFF000000),
-                    ),
+                SizedBox(width: 4),
+                Text(
+                  '®',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black,
+                    fontFamily: 'Campton',
                   ),
                 ),
               ],
             ),
-          ),
+          ],
         ),
       ],
     );

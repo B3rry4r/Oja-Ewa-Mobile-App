@@ -42,7 +42,7 @@ class WishlistScreen extends ConsumerWidget {
     final actions = ref.watch(wishlistActionsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF603814), // #603814
+      backgroundColor: const Color(0xFF603814),
       body: SafeArea(
         bottom: false,
         child: Column(

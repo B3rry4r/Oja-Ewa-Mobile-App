@@ -3,19 +3,30 @@ import 'package:dio/dio.dart';
 import '../../../core/network/dio_error_mapper.dart';
 import '../domain/category_items.dart';
 import '../domain/category_node.dart';
+import '../domain/category_catalog.dart';
 
 class CategoryApi {
   CategoryApi(this._dio);
 
   final Dio _dio;
 
-  Future<Map<String, List<CategoryNode>>> getAllCategories() async {
+  Future<CategoryCatalog> getAllCategories() async {
     try {
       final res = await _dio.get('/api/categories/all');
       final data = res.data;
-      if (data is! Map<String, dynamic>) return const {};
+      if (data is! Map<String, dynamic>) {
+        return const CategoryCatalog(
+          categories: {},
+          formOptions: CategoryFormOptions(fabrics: [], styles: [], tribes: []),
+        );
+      }
       final payload = data['data'];
-      if (payload is! Map<String, dynamic>) return const {};
+      if (payload is! Map<String, dynamic>) {
+        return const CategoryCatalog(
+          categories: {},
+          formOptions: CategoryFormOptions(fabrics: [], styles: [], tribes: []),
+        );
+      }
 
       final out = <String, List<CategoryNode>>{};
       for (final entry in payload.entries) {
@@ -24,7 +35,11 @@ class CategoryApi {
           out[entry.key] = v.whereType<Map<String, dynamic>>().map(CategoryNode.fromJson).toList();
         }
       }
-      return out;
+
+      final formOptionsRaw = data['form_options'] as Map<String, dynamic>? ?? const {};
+      final formOptions = CategoryFormOptions.fromJson(formOptionsRaw);
+
+      return CategoryCatalog(categories: out, formOptions: formOptions);
     } catch (e) {
       throw mapDioError(e);
     }
