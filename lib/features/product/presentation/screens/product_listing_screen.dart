@@ -18,6 +18,7 @@ import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/sort
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/business_filter_sheet.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/simple_sort_sheet.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/listing_filters_controller.dart';
+import 'package:ojaewa/features/categories/presentation/controllers/business_sustainability_search_providers.dart';
 
 /// Product listing screen used for category browsing.
 ///
@@ -96,6 +97,40 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
     setState(() {});
   }
 
+  void _onCategoryItemTap(BuildContext context, CategoryItem tapped) {
+    final handler = widget.onProductTap;
+    if (handler != null) {
+      handler(context, tapped.id);
+      return;
+    }
+
+    if (tapped is CategoryProductItem) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ProductDetailsScreen(productId: tapped.id),
+        ),
+      );
+      return;
+    }
+
+    if (tapped is CategoryBusinessItem) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => BusinessDetailsScreen(businessId: tapped.id),
+        ),
+      );
+      return;
+    }
+
+    if (tapped is CategoryInitiativeItem) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => SustainabilityDetailsScreen(initiativeId: tapped.id),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final kind = widget.type == 'sustainability'
@@ -108,6 +143,16 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
     final hasActiveFilters = kind == _ListingKind.product
         ? (selectedFilters.hasFilters || selectedFilters.hasSort)
         : false;
+
+    final businessFilters = ref.watch(businessListingFiltersProvider);
+    final hasBusinessFilters = kind == _ListingKind.business &&
+        ((businessFilters.state ?? '').isNotEmpty ||
+            (businessFilters.city ?? '').isNotEmpty ||
+            (businessFilters.sort ?? '').isNotEmpty);
+
+    final sustFilters = ref.watch(sustainabilityListingFiltersProvider);
+    final hasSustFilters = kind == _ListingKind.sustainability &&
+        (sustFilters.sort ?? '').isNotEmpty;
 
     final categoryItemsAsync = ref.watch(
       categoryItemsProvider((type: widget.type, slug: widget.slug)),
@@ -255,58 +300,55 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
 
                           const SizedBox(height: 24),
 
-                          // Show filtered products or category items based on filter state
+                          // Show filtered products/businesses/sustainability or category items
                           if (hasActiveFilters && filteredAsync != null)
                             _buildFilteredProductsGrid(filteredAsync)
                           else
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: _CategoryItemGrid(
-                                type: widget.type,
-                                items: categoryState.items,
-                                hasMore: categoryState.hasMore,
-                                isLoadingMore: categoryState.isLoadingMore,
-                                onTap: (context, tapped) {
-                                  final handler = widget.onProductTap;
-                                  if (handler != null) {
-                                    handler(context, tapped.id);
-                                    return;
-                                  }
-
-                                  if (tapped is CategoryProductItem) {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (_) => ProductDetailsScreen(
-                                          productId: tapped.id,
-                                        ),
-                                      ),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Builder(
+                                builder: (context) {
+                                  if (hasBusinessFilters) {
+                                    final businessAsync = ref.watch(
+                                      filteredBusinessesByCategoryProvider((slug: widget.slug)),
                                     );
-                                    return;
-                                  }
-
-                                  if (tapped is CategoryBusinessItem) {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (_) => BusinessDetailsScreen(
-                                          businessId: tapped.id,
-                                        ),
-                                      ),
-                                    );
-                                    return;
-                                  }
-
-                                  if (tapped is CategoryInitiativeItem) {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (_) =>
-                                            SustainabilityDetailsScreen(
-                                              initiativeId: tapped.id,
-                                            ),
+                                    return businessAsync.when(
+                                      loading: () => const Center(child: CircularProgressIndicator()),
+                                      error: (e, _) => Center(child: Text('Failed to load: $e')),
+                                      data: (items) => _CategoryItemGrid(
+                                        type: widget.type,
+                                        items: items,
+                                        hasMore: false,
+                                        isLoadingMore: false,
+                                        onTap: _onCategoryItemTap,
                                       ),
                                     );
                                   }
+
+                                  if (hasSustFilters) {
+                                    final sustAsync = ref.watch(
+                                      filteredSustainabilityByCategoryProvider((slug: widget.slug)),
+                                    );
+                                    return sustAsync.when(
+                                      loading: () => const Center(child: CircularProgressIndicator()),
+                                      error: (e, _) => Center(child: Text('Failed to load: $e')),
+                                      data: (items) => _CategoryItemGrid(
+                                        type: widget.type,
+                                        items: items,
+                                        hasMore: false,
+                                        isLoadingMore: false,
+                                        onTap: _onCategoryItemTap,
+                                      ),
+                                    );
+                                  }
+
+                                  return _CategoryItemGrid(
+                                    type: widget.type,
+                                    items: categoryState.items,
+                                    hasMore: categoryState.hasMore,
+                                    isLoadingMore: categoryState.isLoadingMore,
+                                    onTap: _onCategoryItemTap,
+                                  );
                                 },
                               ),
                             ),
