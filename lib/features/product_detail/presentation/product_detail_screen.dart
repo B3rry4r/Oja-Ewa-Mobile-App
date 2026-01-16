@@ -59,10 +59,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     final totalPrice = unitPrice == null ? null : (unitPrice * quantity);
 
     // Bottom bar uses total (quantity-aware). One decimal for stability.
-    final priceLabel = totalPrice == null ? '' : 'N${totalPrice.toStringAsFixed(1)}';
+    final priceLabel = totalPrice == null ? '' : '₦${totalPrice.toStringAsFixed(0)}';
 
     // Processing cards should show unit price (not multiplied) to keep original meaning.
-    final unitPriceLabel = unitPrice == null ? '' : 'N${unitPrice.toStringAsFixed(1)}';
+    final unitPriceLabel = unitPrice == null ? '' : '₦${unitPrice.toStringAsFixed(0)}';
 
     final reviewCount = reviewsPage?.total ?? 0;
     final avgRating = reviewsPage?.entity.avgRating?.toString() ?? '';

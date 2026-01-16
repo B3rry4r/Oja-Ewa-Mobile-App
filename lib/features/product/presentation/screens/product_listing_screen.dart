@@ -480,7 +480,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                   final product = Product(
                     id: searchProduct.id.toString(),
                     title: searchProduct.name,
-                    priceLabel: 'N${searchProduct.price}',
+                    priceLabel: '₦${searchProduct.price}',
                     rating: (searchProduct.avgRating ?? 0).toDouble(),
                     reviewCount: 0, // Not available in search result
                     imageUrl: searchProduct.image,

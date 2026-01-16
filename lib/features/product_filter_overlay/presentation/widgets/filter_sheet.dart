@@ -194,7 +194,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'N${currentRange.start.toInt()}',
+                '₦${currentRange.start.toInt()}',
                 style: const TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
@@ -202,7 +202,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                 ),
               ),
               Text(
-                'N${currentRange.end.toInt()}',
+                '₦${currentRange.end.toInt()}',
                 style: const TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',

@@ -220,7 +220,7 @@ class _CartRow extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'N${_formatPrice(cartItem.unitPrice ?? 0)}',
+                      '₦${_formatPrice(cartItem.unitPrice ?? 0)}',
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF241508)),
                     ),
                     Container(
