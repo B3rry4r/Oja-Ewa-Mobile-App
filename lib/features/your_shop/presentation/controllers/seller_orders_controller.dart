@@ -122,6 +122,13 @@ final sellerOrderActionsProvider = NotifierProvider<SellerOrderActionsNotifier, 
 );
 
 /// Model for seller orders
+double? _parseDouble(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value);
+  return null;
+}
+
 class SellerOrder {
   final int id;
   final String orderNumber;
@@ -168,7 +175,7 @@ class SellerOrder {
           ? ShippingAddress.fromJson(json)
           : null,
       items: itemsList.map((e) => SellerOrderItem.fromJson(e as Map<String, dynamic>)).toList(),
-      totalPrice: (json['total_price'] as num?)?.toDouble() ?? 0,
+      totalPrice: _parseDouble(json['total_price']) ?? 0,
       trackingNumber: json['tracking_number'] as String?,
       shippedAt: json['shipped_at'] != null ? DateTime.tryParse(json['shipped_at'] as String) : null,
       deliveredAt: json['delivered_at'] != null ? DateTime.tryParse(json['delivered_at'] as String) : null,
