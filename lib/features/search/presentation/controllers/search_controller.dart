@@ -11,6 +11,7 @@ typedef SearchFilters = ({
   String? tribe,
   num? priceMin,
   num? priceMax,
+  String? categoryType,
 });
 
 class SearchFiltersController extends Notifier<SearchFilters> {
@@ -22,6 +23,7 @@ class SearchFiltersController extends Notifier<SearchFilters> {
       tribe: null,
       priceMin: null,
       priceMax: null,
+      categoryType: null,
     );
   }
 
@@ -32,6 +34,18 @@ class SearchFiltersController extends Notifier<SearchFilters> {
       tribe: state.tribe,
       priceMin: state.priceMin,
       priceMax: state.priceMax,
+      categoryType: state.categoryType,
+    );
+  }
+
+  void setCategoryType(String? categoryType) {
+    state = (
+      gender: state.gender,
+      style: state.style,
+      tribe: state.tribe,
+      priceMin: state.priceMin,
+      priceMax: state.priceMax,
+      categoryType: categoryType,
     );
   }
 
@@ -42,6 +56,7 @@ class SearchFiltersController extends Notifier<SearchFilters> {
       tribe: null,
       priceMin: null,
       priceMax: null,
+      categoryType: null,
     );
   }
 }
@@ -102,7 +117,7 @@ typedef SearchArgs = ({String query, SearchFilters filters});
 
 /// Search provider - returns empty if not authenticated or no query
 final searchProvider = FutureProvider.family<SearchState, SearchArgs>((ref, args) async {
-  // Check authentication - search requires auth
+  // Check authentication - search requires auth (treat as protected until confirmed otherwise)
   final token = ref.read(accessTokenProvider);
   if (token == null || token.isEmpty) {
     return SearchState.empty;
@@ -123,6 +138,7 @@ final searchProvider = FutureProvider.family<SearchState, SearchArgs>((ref, args
         tribe: f.tribe,
         priceMin: f.priceMin,
         priceMax: f.priceMax,
+        categoryType: f.categoryType,
       );
   return SearchState(
     query: q,
@@ -132,3 +148,39 @@ final searchProvider = FutureProvider.family<SearchState, SearchArgs>((ref, args
     items: page.items,
   );
 });
+
+/// Simpler search results provider for the new search screen
+final searchResultsProvider = AsyncNotifierProvider<SearchResultsNotifier, List<dynamic>>(
+  SearchResultsNotifier.new,
+);
+
+class SearchResultsNotifier extends AsyncNotifier<List<dynamic>> {
+  @override
+  Future<List<dynamic>> build() async => [];
+
+  Future<void> search({required String query, String? categoryType}) async {
+    if (query.trim().isEmpty) {
+      state = const AsyncData([]);
+      return;
+    }
+
+    state = const AsyncLoading();
+
+    try {
+      final repo = ref.read(searchRepositoryProvider);
+      final page = await repo.searchProducts(
+        query: query,
+        page: 1,
+        perPage: 20,
+        categoryType: categoryType,
+      );
+      state = AsyncData(page.items.map((p) => p.toJson()).toList());
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+
+  void clear() {
+    state = const AsyncData([]);
+  }
+}

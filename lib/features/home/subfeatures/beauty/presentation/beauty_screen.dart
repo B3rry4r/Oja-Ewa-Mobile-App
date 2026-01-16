@@ -12,7 +12,7 @@ class BeautyScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final categoriesAsync = ref.watch(categoriesByTypeProvider('beauty'));
+    final categoriesAsync = ref.watch(categoriesByTypeProvider('afro_beauty'));
 
     return categoriesAsync.when(
       loading: () => const Scaffold(
@@ -55,7 +55,7 @@ class BeautyScreen extends ConsumerWidget {
         }
 
         return CategoryScreen(
-          categoryTitle: 'Beauty',
+          categoryTitle: 'Afro Beauty',
           categoryDescription: 'Find beauty businesses around',
           showBusinessTypeFilter: true,
           sections: sections,
@@ -68,10 +68,10 @@ class BeautyScreen extends ConsumerWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ProductListingScreen(
-                  type: 'beauty',
+                  type: 'afro_beauty',
                   slug: slug,
                   pageTitle: item == 'View All' ? section.title : item,
-                  breadcrumb: 'Beauty • ${section.title}',
+                  breadcrumb: 'Afro Beauty • ${section.title}',
                   showBusinessTypeFilter: true,
                   onProductTap: (context, businessId) {
                     Navigator.of(context).push(

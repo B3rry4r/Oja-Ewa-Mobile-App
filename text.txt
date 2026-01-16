@@ -547,3 +547,5 @@ const handleNotificationClick = (notification) => {
 | Delete notification | DELETE | `/api/notifications/{id}` | Yes |
 ' this has data on how we are to update the ui based on approval of business or product, for business once approved, show your business doesnt show the onboarding flow again rather the management flow, which now comes after 
 the onboarding, so you're going to arrange that, then for start selling, it's going to hide the you shop buttonon home screen and show it only when user has been approved
+
+(textiles, afro_beauty, shoes_bags, art, school, sustainability)

@@ -50,4 +50,19 @@ class SearchProduct {
       businessName: seller is Map<String, dynamic> ? seller['business_name'] as String? : null,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'gender': gender,
+      'style': style,
+      'tribe': tribe,
+      'price': price,
+      'image': image,
+      'avg_rating': avgRating,
+      'business_name': businessName,
+    };
+  }
 }

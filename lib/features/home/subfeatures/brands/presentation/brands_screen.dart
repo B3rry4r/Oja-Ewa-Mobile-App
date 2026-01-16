@@ -11,7 +11,7 @@ class BrandsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final categoriesAsync = ref.watch(categoriesByTypeProvider('brand'));
+    final categoriesAsync = ref.watch(categoriesByTypeProvider('shoes_bags'));
 
     return categoriesAsync.when(
       loading: () => const Scaffold(
@@ -54,7 +54,7 @@ class BrandsScreen extends ConsumerWidget {
         }
 
         return CategoryScreen(
-          categoryTitle: 'Brands',
+          categoryTitle: 'Shoes & Bags',
           categoryDescription: 'Discover premium African brands.',
           sections: sections,
           onItemTap: (section, item) {
@@ -66,10 +66,10 @@ class BrandsScreen extends ConsumerWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ProductListingScreen(
-                  type: 'brand',
+                  type: 'shoes_bags',
                   slug: slug,
                   pageTitle: item == 'View All' ? section.title : item,
-                  breadcrumb: 'Brands • ${section.title}',
+                  breadcrumb: 'Shoes & Bags • ${section.title}',
                   showBusinessTypeFilter: false,
                   onProductTap: (context, businessId) {
                     Navigator.of(context).push(

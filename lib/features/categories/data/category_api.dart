@@ -9,6 +9,27 @@ class CategoryApi {
 
   final Dio _dio;
 
+  Future<Map<String, List<CategoryNode>>> getAllCategories() async {
+    try {
+      final res = await _dio.get('/api/categories/all');
+      final data = res.data;
+      if (data is! Map<String, dynamic>) return const {};
+      final payload = data['data'];
+      if (payload is! Map<String, dynamic>) return const {};
+
+      final out = <String, List<CategoryNode>>{};
+      for (final entry in payload.entries) {
+        final v = entry.value;
+        if (v is List) {
+          out[entry.key] = v.whereType<Map<String, dynamic>>().map(CategoryNode.fromJson).toList();
+        }
+      }
+      return out;
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
   Future<List<CategoryNode>> getCategories({required String type}) async {
     try {
       final res = await _dio.get('/api/categories', queryParameters: {'type': type});

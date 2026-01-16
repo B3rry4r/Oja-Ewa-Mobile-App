@@ -10,6 +10,9 @@ import 'business_registration_draft.dart';
 import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/location/location_picker_sheets.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/features/categories/domain/category_node.dart';
+import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
+import 'package:ojaewa/features/categories/presentation/widgets/category_tree_picker_sheet.dart';
 
 class BusinessSellerRegistrationScreen extends ConsumerStatefulWidget {
   const BusinessSellerRegistrationScreen({super.key});
@@ -365,26 +368,28 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
 
   Widget _buildSubmitButton(BuildContext context) {
     return InkWell(
-      onTap: () {
+      onTap: () async {
         if (!_validateStep1()) return;
 
-        final selectedCategory = (ModalRoute.of(context)?.settings.arguments as String?) ?? 'Beauty';
+        final args = ModalRoute.of(context)?.settings.arguments;
+        final draftFromArgs = (args is Map<String, dynamic>)
+            ? BusinessRegistrationDraft.fromJson(args)
+            : null;
+        final selectedCategory = draftFromArgs?.categoryLabel ?? (args as String?) ?? 'Beauty';
 
-        final draft = BusinessRegistrationDraft(
-          categoryLabel: selectedCategory,
-          country: _selectedCountryName,
-          state: _selectedStateName,
-          city: _cityController.text.trim(),
-          address: _addressController.text.trim(),
-          businessEmail: _emailController.text.trim(),
-          businessPhoneNumber: '$_selectedCountryCode${_phoneController.text.trim()}',
-          websiteUrl: _websiteController.text.trim(),
-          instagram: _instagramController.text.trim(),
-          facebook: _facebookController.text.trim(),
-          youtube: null,
-          spotify: null,
-          identityDocumentPath: _identityDocumentLocalPath,
-        );
+        final draft = (draftFromArgs ?? BusinessRegistrationDraft(categoryLabel: selectedCategory))
+          ..country = _selectedCountryName
+          ..state = _selectedStateName
+          ..city = _cityController.text.trim()
+          ..address = _addressController.text.trim()
+          ..businessEmail = _emailController.text.trim()
+          ..businessPhoneNumber = '$_selectedCountryCode${_phoneController.text.trim()}'
+          ..websiteUrl = _websiteController.text.trim()
+          ..instagram = _instagramController.text.trim()
+          ..facebook = _facebookController.text.trim()
+          ..youtube = null
+          ..spotify = null
+          ..identityDocumentPath = _identityDocumentLocalPath;
 
         final route = switch (selectedCategory) {
           'Beauty' => AppRoutes.businessBeautyForm,
@@ -393,6 +398,44 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
           'Music' => AppRoutes.businessMusicForm,
           _ => AppRoutes.businessBeautyForm,
         };
+
+        // If we came in via legacy string-only args, we may not have categoryId/subcategoryId.
+        // Force selection before continuing.
+        if (draft.categoryId == null || draft.subcategoryId == null) {
+          final all = await ref.read(allCategoriesProvider.future);
+          if (!mounted) return;
+
+          List<CategoryNode> roots;
+          switch (selectedCategory) {
+            case 'Beauty':
+              final r = all['afro_beauty'] ?? const [];
+              final svc = r.where((e) => e.slug.contains('afro-beauty-services')).toList();
+              roots = svc.isNotEmpty ? svc : r;
+              break;
+            case 'Brands':
+              roots = all['shoes_bags'] ?? const [];
+              break;
+            case 'Schools':
+              roots = all['school'] ?? const [];
+              break;
+            case 'Music':
+              roots = all['art'] ?? const [];
+              break;
+            default:
+              roots = all[selectedCategory.toLowerCase()] ?? const [];
+          }
+
+          final selectedNode = await showCategoryTreePickerSheet(
+            context: context,
+            title: 'Select Category',
+            roots: roots,
+          );
+          if (selectedNode == null) return;
+
+          draft
+            ..categoryId = selectedNode.parentId == null ? selectedNode.id : selectedNode.parentId
+            ..subcategoryId = selectedNode.id;
+        }
 
         Navigator.of(context).pushNamed(route, arguments: draft.toJson());
       },

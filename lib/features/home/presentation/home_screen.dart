@@ -360,7 +360,7 @@ class HomeScreen extends ConsumerWidget {
         // Market
         _buildCategoryItem(
           context: context,
-          title: 'Market',
+          title: 'Textiles',
           color: const Color(0xFFDD995C),
           iconAsset: AppIcons.market,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.market),
@@ -368,7 +368,7 @@ class HomeScreen extends ConsumerWidget {
         // Beauty
         _buildCategoryItem(
           context: context,
-          title: 'Beauty',
+          title: 'Afro Beauty',
           color: const Color(0xFFA15E22),
           iconAsset: AppIcons.beauty,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.beauty),
@@ -376,7 +376,7 @@ class HomeScreen extends ConsumerWidget {
         // Brands
         _buildCategoryItem(
           context: context,
-          title: 'Brands',
+          title: 'Shoes & Bags',
           color: const Color(0xFFA15E22),
           iconAsset: AppIcons.brands,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.brands),
@@ -384,7 +384,7 @@ class HomeScreen extends ConsumerWidget {
         // Music
         _buildCategoryItem(
           context: context,
-          title: 'Music',
+          title: 'Art',
           color: const Color(0xFFEBC29D),
           iconAsset: AppIcons.music,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.music),

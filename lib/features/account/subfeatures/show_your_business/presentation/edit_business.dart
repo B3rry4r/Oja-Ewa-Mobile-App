@@ -366,6 +366,8 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
 
         final payload = BusinessProfilePayload(
           category: category,
+          categoryId: (data['category_id'] as num?)?.toInt() ?? 0,
+          subcategoryId: (data['subcategory_id'] as num?)?.toInt() ?? 0,
           country: _selectedCountryName,
           state: _selectedStateName,
           city: _cityController.text.trim(),
@@ -407,7 +409,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withOpacity(0.4),
+              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),

@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
+import 'package:ojaewa/features/categories/presentation/widgets/category_tree_picker_sheet.dart';
+import 'package:ojaewa/features/categories/domain/category_node.dart';
+import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/selected_category_forms/business_registration_draft.dart';
 
 import '../../../../../app/router/app_router.dart';
 
-class BusinessCategoryScreen extends StatefulWidget {
+class BusinessCategoryScreen extends ConsumerStatefulWidget {
   const BusinessCategoryScreen({super.key});
 
   @override
-  State<BusinessCategoryScreen> createState() => _BusinessCategoryScreenState();
+  ConsumerState<BusinessCategoryScreen> createState() => _BusinessCategoryScreenState();
 }
 
-class _BusinessCategoryScreenState extends State<BusinessCategoryScreen> {
+class _BusinessCategoryScreenState extends ConsumerState<BusinessCategoryScreen> {
   // Local state to track selection
   String selectedCategory = "Beauty";
 
@@ -122,7 +128,7 @@ class _BusinessCategoryScreenState extends State<BusinessCategoryScreen> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
-                color: isSelected ? Colors.white.withOpacity(0.9) : const Color(0xFF777F84),
+                color: isSelected ? Colors.white.withValues(alpha: 0.9) : const Color(0xFF777F84),
                 fontFamily: 'Campton',
               ),
             ),
@@ -132,12 +138,51 @@ class _BusinessCategoryScreenState extends State<BusinessCategoryScreen> {
     );
   }
 
+  List<CategoryNode> _rootsForLabel(Map<String, List<CategoryNode>> all, String label) {
+    switch (label) {
+      case 'Beauty':
+        // Use afro_beauty -> services branch
+        final roots = all['afro_beauty'] ?? const [];
+        final servicesRoot = roots.where((e) => e.slug.contains('afro-beauty-services')).toList();
+        return servicesRoot.isNotEmpty ? servicesRoot : roots;
+      case 'Brands':
+        return all['shoes_bags'] ?? const [];
+      case 'Schools':
+        return all['school'] ?? const [];
+      case 'Music':
+        return all['art'] ?? const [];
+      default:
+        return all[label.toLowerCase()] ?? const [];
+    }
+  }
+
   Widget _buildSaveButton(BuildContext context) {
     return InkWell(
-      onTap: () {
+      onTap: () async {
+        final all = await ref.read(allCategoriesProvider.future);
+        if (!mounted) return;
+
+        final roots = _rootsForLabel(all, selectedCategory);
+        if (roots.isEmpty) {
+          AppSnackbars.showError(context, 'No categories available');
+          return;
+        }
+
+        final selectedNode = await showCategoryTreePickerSheet(
+          context: context,
+          title: 'Select Category',
+          roots: roots,
+        );
+        if (selectedNode == null) return;
+
+        final draft = BusinessRegistrationDraft(categoryLabel: selectedCategory)
+          ..categoryId = selectedNode.parentId == null ? selectedNode.id : selectedNode.parentId
+          ..subcategoryId = selectedNode.id;
+
+        if (!context.mounted) return;
         Navigator.of(context).pushNamed(
           AppRoutes.businessSellerRegistration,
-          arguments: selectedCategory,
+          arguments: draft.toJson(),
         );
       },
       borderRadius: BorderRadius.circular(8),
@@ -149,7 +194,7 @@ class _BusinessCategoryScreenState extends State<BusinessCategoryScreen> {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.4),
+            color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 8),
           )

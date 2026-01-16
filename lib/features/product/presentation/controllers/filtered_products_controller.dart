@@ -72,6 +72,8 @@ final filteredProductsProvider = FutureProvider.family<FilteredProductsState, Fi
         tribe: filters.tribe,
         priceMin: filters.priceMin,
         priceMax: filters.priceMax,
+        categorySlug: arg.categorySlug,
+        sort: filters.sortBy,
       );
 
   return FilteredProductsState(

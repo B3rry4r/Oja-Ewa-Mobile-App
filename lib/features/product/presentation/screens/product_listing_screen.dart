@@ -88,13 +88,9 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
   }
 
   void _onFiltersChanged() {
-    // Refresh the filtered products when filters change
-    ref.invalidate(
-      filteredProductsProvider((
-        categorySlug: widget.slug,
-        categoryName: widget.pageTitle,
-      )),
-    );
+    // No manual invalidation needed: filteredProductsProvider watches selectedFiltersProvider
+    // and will refresh automatically when filters/sort change.
+    setState(() {});
   }
 
   @override

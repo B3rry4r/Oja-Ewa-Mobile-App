@@ -253,8 +253,16 @@ class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountRev
       }
     }
 
+    if (draft.categoryId == null || draft.subcategoryId == null) {
+      setState(() => _isSubmitting = false);
+      AppSnackbars.showError(context, UiErrorMessage.from('Please select a category'));
+      return;
+    }
+
     final payload = BusinessProfilePayload(
       category: mapCategoryLabelToEnum(draft.categoryLabel),
+      categoryId: draft.categoryId!,
+      subcategoryId: draft.subcategoryId!,
       country: (draft.country ?? '').trim(),
       state: (draft.state ?? '').trim(),
       city: (draft.city ?? '').trim(),

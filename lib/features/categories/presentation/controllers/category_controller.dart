@@ -5,6 +5,11 @@ import '../../data/category_repository_impl.dart';
 import '../../domain/category_items.dart';
 import '../../domain/category_node.dart';
 
+final allCategoriesProvider = FutureProvider<Map<String, List<CategoryNode>>>((ref) async {
+  ref.keepAlive();
+  return ref.watch(categoryRepositoryProvider).getAllCategories();
+});
+
 final categoriesByTypeProvider = FutureProvider.family<List<CategoryNode>, String>((ref, type) async {
   return ref.watch(categoryRepositoryProvider).getCategories(type: type);
 });

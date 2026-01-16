@@ -11,6 +11,9 @@ abstract interface class SearchRepository {
     String? tribe,
     num? priceMin,
     num? priceMax,
+    String? categoryType,
+    String? categorySlug,
+    String? sort,
   });
 
   Future<List<SearchProduct>> suggestions({

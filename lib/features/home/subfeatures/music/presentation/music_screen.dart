@@ -11,7 +11,7 @@ class MusicScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final categoriesAsync = ref.watch(categoriesByTypeProvider('music'));
+    final categoriesAsync = ref.watch(categoriesByTypeProvider('art'));
 
     return categoriesAsync.when(
       loading: () => const Scaffold(
@@ -54,7 +54,7 @@ class MusicScreen extends ConsumerWidget {
         }
 
         return CategoryScreen(
-          categoryTitle: 'Music',
+          categoryTitle: 'Art',
           categoryDescription: 'African music and entertainment.',
           sections: sections,
           onItemTap: (section, item) {
@@ -66,10 +66,10 @@ class MusicScreen extends ConsumerWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ProductListingScreen(
-                  type: 'music',
+                  type: 'art',
                   slug: slug,
                   pageTitle: item == 'View All' ? section.title : item,
-                  breadcrumb: 'Music • ${section.title}',
+                  breadcrumb: 'Art • ${section.title}',
                   showBusinessTypeFilter: false,
                   onProductTap: (context, businessId) {
                     Navigator.of(context).push(

@@ -1,42 +1,20 @@
 /// Carries data collected across the multi-step "Show Your Business" flow.
 ///
-/// This is UI-only for now (API wiring will come later).
+/// UI-only draft + local file paths; mapped to API payload on submit.
 import 'service_list_editor.dart';
 import 'classes_offered_editor.dart';
 
 class BusinessRegistrationDraft {
   BusinessRegistrationDraft({
     required this.categoryLabel,
-    this.country,
-    this.state,
-    this.city,
-    this.address,
-    this.businessEmail,
-    this.businessPhoneNumber,
-    this.websiteUrl,
-    this.instagram,
-    this.facebook,
-    this.youtube,
-    this.spotify,
-    this.identityDocumentPath,
-
-    // Step 2 fields
-    this.businessName,
-    this.businessDescription,
-    this.offeringType,
-    this.productList,
-    this.professionalTitle,
-    this.serviceList,
-    this.schoolType,
-    this.schoolBiography,
-    this.classesOffered,
-    this.musicCategory,
-    this.businessLogoPath,
-    this.businessCertificates,
   });
 
   /// The UI label coming from category picker (e.g. Beauty/Brands/Schools/Music).
   final String categoryLabel;
+
+  /// Backend categorization (from /api/categories/all)
+  int? categoryId;
+  int? subcategoryId;
 
   String? country;
   String? state;
@@ -54,7 +32,7 @@ class BusinessRegistrationDraft {
   String? youtube;
   String? spotify;
 
-  /// Placeholder until upload is implemented.
+  /// Local file path
   String? identityDocumentPath;
 
   // Step 2 common
@@ -79,12 +57,14 @@ class BusinessRegistrationDraft {
   /// music
   String? musicCategory; // dj|artist|producer
 
-  /// uploads placeholders
+  /// uploads local paths
   String? businessLogoPath;
   List<Map<String, dynamic>>? businessCertificates;
 
   Map<String, dynamic> toJson() => {
         'categoryLabel': categoryLabel,
+        'categoryId': categoryId,
+        'subcategoryId': subcategoryId,
         'country': country,
         'state': state,
         'city': city,
@@ -112,52 +92,69 @@ class BusinessRegistrationDraft {
       };
 
   static BusinessRegistrationDraft fromJson(Map<String, dynamic> json) {
-    return BusinessRegistrationDraft(
+    final draft = BusinessRegistrationDraft(
       categoryLabel: (json['categoryLabel'] as String?) ?? 'Beauty',
-      country: json['country'] as String?,
-      state: json['state'] as String?,
-      city: json['city'] as String?,
-      address: json['address'] as String?,
-      businessEmail: json['businessEmail'] as String?,
-      businessPhoneNumber: json['businessPhoneNumber'] as String?,
-      websiteUrl: json['websiteUrl'] as String?,
-      instagram: json['instagram'] as String?,
-      facebook: json['facebook'] as String?,
-      youtube: json['youtube'] as String?,
-      spotify: json['spotify'] as String?,
-      identityDocumentPath: json['identityDocumentPath'] as String?,
-      businessName: json['businessName'] as String?,
-      businessDescription: json['businessDescription'] as String?,
-      offeringType: json['offeringType'] as String?,
-      productList: (json['productList'] is List)
-          ? (json['productList'] as List).whereType<String>().toList()
-          : null,
-      professionalTitle: json['professionalTitle'] as String?,
-      serviceList: (json['serviceList'] is List)
-          ? (json['serviceList'] as List)
-              .whereType<Map<String, dynamic>>()
-              .map((e) => ServiceListItem(
-                    name: (e['name'] as String?) ?? '',
-                    priceRange: (e['price_range'] as String?) ?? '',
-                  ))
-              .toList()
-          : null,
-      schoolType: json['schoolType'] as String?,
-      schoolBiography: json['schoolBiography'] as String?,
-      classesOffered: (json['classesOffered'] is List)
-          ? (json['classesOffered'] as List)
-              .whereType<Map<String, dynamic>>()
-              .map((e) => ClassOfferedItem(
-                    name: (e['name'] as String?) ?? '',
-                    duration: (e['duration'] as String?) ?? '',
-                  ))
-              .toList()
-          : null,
-      musicCategory: json['musicCategory'] as String?,
-      businessLogoPath: json['businessLogoPath'] as String?,
-      businessCertificates: (json['businessCertificates'] is List)
-          ? (json['businessCertificates'] as List).whereType<Map<String, dynamic>>().toList()
-          : null,
     );
+
+    draft.categoryId = (json['categoryId'] as num?)?.toInt();
+    draft.subcategoryId = (json['subcategoryId'] as num?)?.toInt();
+
+    draft.country = json['country'] as String?;
+    draft.state = json['state'] as String?;
+    draft.city = json['city'] as String?;
+    draft.address = json['address'] as String?;
+
+    draft.businessEmail = json['businessEmail'] as String?;
+    draft.businessPhoneNumber = json['businessPhoneNumber'] as String?;
+
+    draft.websiteUrl = json['websiteUrl'] as String?;
+    draft.instagram = json['instagram'] as String?;
+    draft.facebook = json['facebook'] as String?;
+
+    draft.youtube = json['youtube'] as String?;
+    draft.spotify = json['spotify'] as String?;
+
+    draft.identityDocumentPath = json['identityDocumentPath'] as String?;
+
+    draft.businessName = json['businessName'] as String?;
+    draft.businessDescription = json['businessDescription'] as String?;
+
+    draft.offeringType = json['offeringType'] as String?;
+    draft.productList = (json['productList'] is List)
+        ? (json['productList'] as List).whereType<String>().toList()
+        : null;
+
+    draft.professionalTitle = json['professionalTitle'] as String?;
+    draft.serviceList = (json['serviceList'] is List)
+        ? (json['serviceList'] as List)
+            .whereType<Map<String, dynamic>>()
+            .map((e) => ServiceListItem(
+                  name: (e['name'] as String?) ?? '',
+                  priceRange: (e['price_range'] as String?) ?? '',
+                ))
+            .toList()
+        : null;
+
+    draft.schoolType = json['schoolType'] as String?;
+    draft.schoolBiography = json['schoolBiography'] as String?;
+    draft.classesOffered = (json['classesOffered'] is List)
+        ? (json['classesOffered'] as List)
+            .whereType<Map<String, dynamic>>()
+            .map((e) => ClassOfferedItem(
+                  name: (e['name'] as String?) ?? '',
+                  duration: (e['duration'] as String?) ?? '',
+                ))
+            .toList()
+        : null;
+
+    draft.musicCategory = json['musicCategory'] as String?;
+    draft.businessLogoPath = json['businessLogoPath'] as String?;
+    draft.businessCertificates = (json['businessCertificates'] is List)
+        ? (json['businessCertificates'] as List)
+            .whereType<Map<String, dynamic>>()
+            .toList()
+        : null;
+
+    return draft;
   }
 }

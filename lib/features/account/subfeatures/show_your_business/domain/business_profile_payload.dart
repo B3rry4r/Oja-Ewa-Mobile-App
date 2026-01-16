@@ -7,6 +7,8 @@ import '../presentation/selected_category_forms/service_list_editor.dart';
 class BusinessProfilePayload {
   const BusinessProfilePayload({
     required this.category,
+    required this.categoryId,
+    required this.subcategoryId,
     required this.country,
     required this.state,
     required this.city,
@@ -35,6 +37,9 @@ class BusinessProfilePayload {
 
   /// enum: beauty|brand|school|music
   final String category;
+
+  final int categoryId;
+  final int subcategoryId;
 
   final String country;
   final String state;
@@ -86,6 +91,8 @@ class BusinessProfilePayload {
   Map<String, dynamic> toJson() {
     return {
       'category': category,
+      'category_id': categoryId,
+      'subcategory_id': subcategoryId,
       'country': country,
       'state': state,
       'city': city,

@@ -10,7 +10,7 @@ class MarketScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final categoriesAsync = ref.watch(categoriesByTypeProvider('market'));
+    final categoriesAsync = ref.watch(categoriesByTypeProvider('textiles'));
 
     return categoriesAsync.when(
       loading: () => const Scaffold(
@@ -53,8 +53,8 @@ class MarketScreen extends ConsumerWidget {
         }
 
         return CategoryScreen(
-          categoryTitle: 'Market',
-          categoryDescription: 'Shop premium african styles.',
+          categoryTitle: 'Textiles',
+          categoryDescription: 'Shop premium african textiles.',
           sections: sections,
           onItemTap: (section, item) {
             final parent = findParentByTitle(section.title);
@@ -65,10 +65,10 @@ class MarketScreen extends ConsumerWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ProductListingScreen(
-                  type: 'market',
+                  type: 'textiles',
                   slug: slug,
                   pageTitle: item == 'View All' ? section.title : item,
-                  breadcrumb: 'Market • ${section.title}',
+                  breadcrumb: 'Textiles • ${section.title}',
                   showBusinessTypeFilter: false,
                 ),
               ),

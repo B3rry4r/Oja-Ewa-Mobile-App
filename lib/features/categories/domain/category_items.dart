@@ -113,17 +113,13 @@ class CategoryInitiativeItem extends CategoryItem {
 }
 
 CategoryItem parseCategoryItem(String type, Map<String, dynamic> json) {
-  // Based on docs: market => products, sustainability => initiatives, others => businesses
-  switch (type) {
-    case 'market':
-      return CategoryProductItem.fromJson(json);
-    case 'sustainability':
-      return CategoryInitiativeItem.fromJson(json);
-    case 'beauty':
-    case 'brand':
-    case 'school':
-    case 'music':
-    default:
-      return CategoryBusinessItem.fromJson(json);
+  // Infer item type by payload shape (more robust than relying on the listing type).
+  if (json.containsKey('business_name') || json.containsKey('business_logo')) {
+    return CategoryBusinessItem.fromJson(json);
   }
+  if (json.containsKey('title') && json.containsKey('description')) {
+    return CategoryInitiativeItem.fromJson(json);
+  }
+  // Default to product.
+  return CategoryProductItem.fromJson(json);
 }

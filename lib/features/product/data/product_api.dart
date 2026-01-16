@@ -43,4 +43,111 @@ class ProductApi {
       throw mapDioError(e);
     }
   }
+
+  /// Create a new product (seller endpoint)
+  /// POST /api/products
+  Future<Map<String, dynamic>> createProduct({
+    required int categoryId,
+    required String name,
+    required String gender,
+    required String style,
+    required String tribe,
+    required String description,
+    required String imagePath,
+    required List<String> sizes,
+    required String processingTimeType, // 'normal' or 'quick'
+    required int processingDays,
+    required num price,
+    int? discount,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'category_id': categoryId,
+        'name': name,
+        'gender': gender,
+        'style': style,
+        'tribe': tribe,
+        'description': description,
+        'image': await MultipartFile.fromFile(imagePath),
+        'size': sizes.join(','),
+        'processing_time_type': processingTimeType,
+        'processing_days': processingDays,
+        'price': price,
+        if (discount != null) 'discount': discount,
+      });
+
+      final res = await _dio.post('/api/products', data: formData);
+      final data = res.data;
+      if (data is Map<String, dynamic>) {
+        final inner = data['data'];
+        if (inner is Map<String, dynamic>) return inner;
+        return data;
+      }
+      throw const FormatException('Unexpected response');
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  /// Update an existing product
+  /// PUT /api/products/{id}
+  Future<Map<String, dynamic>> updateProduct({
+    required int productId,
+    int? categoryId,
+    String? name,
+    String? gender,
+    String? style,
+    String? tribe,
+    String? description,
+    String? imagePath,
+    List<String>? sizes,
+    String? processingTimeType,
+    int? processingDays,
+    num? price,
+    int? discount,
+  }) async {
+    try {
+      final map = <String, dynamic>{};
+      if (categoryId != null) map['category_id'] = categoryId;
+      if (name != null) map['name'] = name;
+      if (gender != null) map['gender'] = gender;
+      if (style != null) map['style'] = style;
+      if (tribe != null) map['tribe'] = tribe;
+      if (description != null) map['description'] = description;
+      if (sizes != null) map['size'] = sizes.join(',');
+      if (processingTimeType != null) map['processing_time_type'] = processingTimeType;
+      if (processingDays != null) map['processing_days'] = processingDays;
+      if (price != null) map['price'] = price;
+      if (discount != null) map['discount'] = discount;
+
+      FormData formData;
+      if (imagePath != null) {
+        map['image'] = await MultipartFile.fromFile(imagePath);
+        formData = FormData.fromMap(map);
+      } else {
+        formData = FormData.fromMap(map);
+      }
+
+      final res = await _dio.put('/api/products/$productId', data: formData);
+      final data = res.data;
+      if (data is Map<String, dynamic>) {
+        final inner = data['data'];
+        if (inner is Map<String, dynamic>) return inner;
+        return data;
+      }
+      throw const FormatException('Unexpected response');
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  /// Delete a product
+  /// DELETE /api/products/{id}
+  Future<void> deleteProduct(int productId) async {
+    try {
+      await _dio.delete('/api/products/$productId');
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
 }

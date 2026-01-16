@@ -102,7 +102,7 @@ class _OrderConfirmationScreenState
 
             _buildOrderSummary(
               cart: cart,
-              isBusy: isBusy,
+              isBusy: isBusy, 
               onPlaceOrder: isBusy
                   ? null
                   : () async {

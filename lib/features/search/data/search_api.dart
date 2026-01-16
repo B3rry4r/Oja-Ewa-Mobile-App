@@ -18,6 +18,9 @@ class SearchApi {
     String? tribe,
     num? priceMin,
     num? priceMax,
+    String? categoryType,
+    String? categorySlug,
+    String? sort,
   }) async {
     try {
       final res = await _dio.get(
@@ -26,6 +29,9 @@ class SearchApi {
           'q': query,
           'page': page,
           'per_page': perPage,
+          if (categoryType != null && categoryType.isNotEmpty) 'type': categoryType,
+          if (categorySlug != null && categorySlug.isNotEmpty) 'category_slug': categorySlug,
+          if (sort != null && sort.isNotEmpty) 'sort': sort,
           if (gender != null && gender.isNotEmpty) 'gender': gender,
           if (style != null && style.isNotEmpty) 'style': style,
           if (tribe != null && tribe.isNotEmpty) 'tribe': tribe,
@@ -40,14 +46,11 @@ class SearchApi {
       final payload = data['data'];
       if (payload is! Map<String, dynamic>) throw const FormatException('Unexpected response');
 
-      // Items are in payload['data'] (nested)
       final itemsRaw = payload['data'];
       final items = (itemsRaw is List)
           ? itemsRaw.whereType<Map<String, dynamic>>().map(SearchProduct.fromJson).toList()
           : const <SearchProduct>[];
 
-      // Pagination fields are directly in payload, NOT in a nested 'meta' object
-      // API returns: { data: { current_page, data: [...], per_page, total, ... } }
       final currentPage = (payload['current_page'] as num?)?.toInt() ?? page;
       final per = (payload['per_page'] as num?)?.toInt() ?? perPage;
       final total = (payload['total'] as num?)?.toInt() ?? items.length;
@@ -84,7 +87,6 @@ class SearchApi {
         return data.whereType<Map<String, dynamic>>().map(SearchProduct.fromJson).toList();
       }
 
-      // Some backends may wrap in {data: [...]}
       if (data is Map<String, dynamic>) {
         final list = data['data'];
         if (list is List) {

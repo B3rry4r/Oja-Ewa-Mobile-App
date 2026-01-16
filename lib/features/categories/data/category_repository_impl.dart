@@ -12,6 +12,9 @@ class CategoryRepositoryImpl implements CategoryRepository {
   final CategoryApi _api;
 
   @override
+  Future<Map<String, List<CategoryNode>>> getAllCategories() => _api.getAllCategories();
+
+  @override
   Future<List<CategoryNode>> getCategories({required String type}) => _api.getCategories(type: type);
 
   @override

@@ -21,6 +21,9 @@ class SearchRepositoryImpl implements SearchRepository {
     String? tribe,
     num? priceMin,
     num? priceMax,
+    String? categoryType,
+    String? categorySlug,
+    String? sort,
   }) {
     return _api.searchProducts(
       query: query,
@@ -31,6 +34,9 @@ class SearchRepositoryImpl implements SearchRepository {
       tribe: tribe,
       priceMin: priceMin,
       priceMax: priceMax,
+      categoryType: categoryType,
+      categorySlug: categorySlug,
+      sort: sort,
     );
   }
 
