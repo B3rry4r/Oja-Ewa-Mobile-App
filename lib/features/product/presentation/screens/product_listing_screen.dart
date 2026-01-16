@@ -62,6 +62,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
   // Cache for category children to avoid re-fetching
   List<CategoryNode>? _cachedChildren;
   CategoryItemsState? _cachedCategoryState;
+  String? _lastLoadedSlug;
 
   @override
   void initState() {
@@ -252,6 +253,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                     }
 
                     _cachedCategoryState = categoryState;
+                    _lastLoadedSlug = _activeSlug;
                     return _buildContent(categoryState, isLoading: isLoading, filteredAsync: filteredAsync);
                   },
                 ),
@@ -290,6 +292,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
               )
             : null);
 
+    final isRefreshing = isLoading && _lastLoadedSlug != null && _activeSlug != _lastLoadedSlug;
     final showInlineLoader = isLoading;
     // Cache children once loaded to avoid refetching
     if (_cachedChildren == null) {
@@ -370,62 +373,63 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  if (showInlineLoader)
+                  if (isRefreshing)
                     const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
+                      padding: EdgeInsets.symmetric(vertical: 32),
                       child: Center(child: CircularProgressIndicator()),
+                    )
+                  else
+                    Builder(
+                      builder: (context) {
+                        if (hasBusinessFilters) {
+                          final businessAsync = ref.watch(
+                            filteredBusinessesByCategoryProvider((slug: _activeSlug)),
+                          );
+                          return businessAsync.when(
+                            loading: () => const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 48),
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                            error: (e, _) => Center(child: Text('Failed to load: $e')),
+                            data: (items) => _CategoryItemGrid(
+                              type: widget.type,
+                              items: items,
+                              hasMore: false,
+                              isLoadingMore: false,
+                              onTap: _onCategoryItemTap,
+                            ),
+                          );
+                        }
+
+                        if (hasSustFilters) {
+                          final sustAsync = ref.watch(
+                            filteredSustainabilityByCategoryProvider((slug: _activeSlug)),
+                          );
+                          return sustAsync.when(
+                            loading: () => const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 48),
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                            error: (e, _) => Center(child: Text('Failed to load: $e')),
+                            data: (items) => _CategoryItemGrid(
+                              type: widget.type,
+                              items: items,
+                              hasMore: false,
+                              isLoadingMore: false,
+                              onTap: _onCategoryItemTap,
+                            ),
+                          );
+                        }
+
+                        return _CategoryItemGrid(
+                          type: widget.type,
+                          items: categoryState.items,
+                          hasMore: categoryState.hasMore,
+                          isLoadingMore: categoryState.isLoadingMore || showInlineLoader,
+                          onTap: _onCategoryItemTap,
+                        );
+                      },
                     ),
-                  Builder(
-                    builder: (context) {
-                      if (hasBusinessFilters) {
-                        final businessAsync = ref.watch(
-                          filteredBusinessesByCategoryProvider((slug: _activeSlug)),
-                        );
-                        return businessAsync.when(
-                          loading: () => const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 48),
-                            child: Center(child: CircularProgressIndicator()),
-                          ),
-                          error: (e, _) => Center(child: Text('Failed to load: $e')),
-                          data: (items) => _CategoryItemGrid(
-                            type: widget.type,
-                            items: items,
-                            hasMore: false,
-                            isLoadingMore: false,
-                            onTap: _onCategoryItemTap,
-                          ),
-                        );
-                      }
-
-                      if (hasSustFilters) {
-                        final sustAsync = ref.watch(
-                          filteredSustainabilityByCategoryProvider((slug: _activeSlug)),
-                        );
-                        return sustAsync.when(
-                          loading: () => const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 48),
-                            child: Center(child: CircularProgressIndicator()),
-                          ),
-                          error: (e, _) => Center(child: Text('Failed to load: $e')),
-                          data: (items) => _CategoryItemGrid(
-                            type: widget.type,
-                            items: items,
-                            hasMore: false,
-                            isLoadingMore: false,
-                            onTap: _onCategoryItemTap,
-                          ),
-                        );
-                      }
-
-                      return _CategoryItemGrid(
-                        type: widget.type,
-                        items: categoryState.items,
-                        hasMore: categoryState.hasMore,
-                        isLoadingMore: categoryState.isLoadingMore || showInlineLoader,
-                        onTap: _onCategoryItemTap,
-                      );
-                    },
-                  ),
                 ],
               ),
             ),
