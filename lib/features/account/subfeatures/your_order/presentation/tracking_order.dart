@@ -84,7 +84,7 @@ class TrackingOrderScreen extends ConsumerWidget {
                           .toList() ??
                       [];
 
-                  final steps = _mapStagesToTimelineSteps(stages);
+                  final steps = _mapStagesToTimelineSteps(stages, fallbackStatus: trackingData['status'] as String?);
 
                   final firstProductName = orderAsync.asData?.value.isNotEmpty == true
                       ? _firstProductName(orderAsync.asData!.value)
@@ -322,15 +322,16 @@ class TrackingOrderScreen extends ConsumerWidget {
     );
   }
 
-  List<TimelineStep> _mapStagesToTimelineSteps(List<_TrackingStage> stages) {
-    // The original UI expects newest first (Delivered at top). Backend might send oldest->newest.
-    final ordered = [...stages];
-    // If the first stage is "Order Placed", reverse to show Delivered first.
-    final normalized = (ordered.isNotEmpty && ordered.first.title.toLowerCase().contains('order'))
-        ? ordered.reversed.toList()
-        : ordered;
+  List<TimelineStep> _mapStagesToTimelineSteps(
+    List<_TrackingStage> stages, {
+    String? fallbackStatus,
+  }) {
+    if (stages.isEmpty) {
+      return _defaultTimeline(fallbackStatus);
+    }
 
-    return normalized.map((s) {
+    // The backend uses `status`, `timestamp`, `completed`.
+    final normalized = stages.map((s) {
       final isActive = s.completed;
       return TimelineStep(
         title: s.title,
@@ -338,10 +339,59 @@ class TrackingOrderScreen extends ConsumerWidget {
         isCompleted: isActive,
         isCurrent: isActive,
         dotColor: isActive ? const Color(0xFF603814) : const Color(0xFFE9E9E9),
-        textColor: isActive ? Colors.black : const Color(0xFFE9E9E9),
+        textColor: isActive ? const Color(0xFF241508) : const Color(0xFFBEBEBE),
         timeColor: isActive ? const Color(0xFF777F84) : const Color(0xFFDEDEDE),
       );
     }).toList();
+
+    // Ensure proper order (Order Placed -> Processing -> Shipped -> Delivered)
+    final ordered = _orderTimeline(normalized);
+    return ordered;
+  }
+
+  List<TimelineStep> _orderTimeline(List<TimelineStep> steps) {
+    const order = ['Order Placed', 'Processing', 'Shipped', 'Delivered'];
+    final sorted = <TimelineStep>[];
+    for (final label in order) {
+      final match = steps.where((s) => s.title.toLowerCase().contains(label.toLowerCase())).toList();
+      if (match.isNotEmpty) {
+        sorted.add(match.first);
+      }
+    }
+    // Add any unknown steps at end
+    for (final s in steps) {
+      if (!sorted.contains(s)) sorted.add(s);
+    }
+    return sorted;
+  }
+
+  List<TimelineStep> _defaultTimeline(String? status) {
+    final normalized = (status ?? 'pending').toLowerCase();
+    final Map<String, bool> completed = {
+      'order placed': true,
+      'processing': normalized == 'processing' || normalized == 'shipped' || normalized == 'delivered',
+      'shipped': normalized == 'shipped' || normalized == 'delivered',
+      'delivered': normalized == 'delivered',
+    };
+
+    return [
+      _timelineStep('Order Placed', completed['order placed']!),
+      _timelineStep('Processing', completed['processing']!),
+      _timelineStep('Shipped', completed['shipped']!),
+      _timelineStep('Delivered', completed['delivered']!),
+    ];
+  }
+
+  TimelineStep _timelineStep(String title, bool isCompleted) {
+    return TimelineStep(
+      title: title,
+      timestamp: isCompleted ? 'Completed' : '—',
+      isCompleted: isCompleted,
+      isCurrent: isCompleted,
+      dotColor: isCompleted ? const Color(0xFF603814) : const Color(0xFFE9E9E9),
+      textColor: isCompleted ? const Color(0xFF241508) : const Color(0xFFBEBEBE),
+      timeColor: isCompleted ? const Color(0xFF777F84) : const Color(0xFFDEDEDE),
+    );
   }
 }
 

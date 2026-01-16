@@ -322,38 +322,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     );
   }
 
-  Widget _buildDropdownPlaceholder(String label, String text) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Campton',
-            color: Color(0xFF777F84),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontSize: 16,
-              fontFamily: 'Campton',
-              color: Color(0xFFCCCCCC),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   /// Displays the pre-selected category (from category selection screen)
   /// with option to change it via the category tree picker

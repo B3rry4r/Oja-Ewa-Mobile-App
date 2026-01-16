@@ -13,31 +13,25 @@ final sellerOrdersProvider = FutureProvider.autoDispose.family<List<SellerOrder>
   final api = ref.watch(sellerOrdersApiProvider);
   final response = await api.listOrders(status: status, perPage: 50);
 
-  List<Map<String, dynamic>> normalize(dynamic raw) {
+  List<Map<String, dynamic>> extractOrders(dynamic raw) {
     if (raw is List) {
       return raw.whereType<Map<String, dynamic>>().toList();
     }
     if (raw is Map<String, dynamic>) {
       final data = raw['data'];
-      if (data is List) {
-        return data.whereType<Map<String, dynamic>>().toList();
+      if (data != null) {
+        return extractOrders(data);
       }
       final orders = raw['orders'];
-      if (orders is List) {
-        return orders.whereType<Map<String, dynamic>>().toList();
+      if (orders != null) {
+        return extractOrders(orders);
       }
     }
     return const [];
   }
 
-  final data = response['data'];
-  final items = normalize(data);
-  if (items.isNotEmpty) {
-    return items.map(SellerOrder.fromJson).toList();
-  }
-
-  final fallback = normalize(response);
-  return fallback.map(SellerOrder.fromJson).toList();
+  final items = extractOrders(response);
+  return items.map(SellerOrder.fromJson).toList();
 });
 
 /// Provider for getting a single order's details

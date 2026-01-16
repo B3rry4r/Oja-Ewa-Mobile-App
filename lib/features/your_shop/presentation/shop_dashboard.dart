@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
+import 'package:ojaewa/features/account/subfeatures/start_selling/domain/seller_status.dart';
+import 'package:ojaewa/features/your_shop/presentation/controllers/seller_orders_controller.dart';
 
 import '../../../app/router/app_router.dart';
 import '../subfeatures/product/product_listing.dart';
 import '../subfeatures/orders/orders.dart';
-class ShopDashboardScreen extends StatelessWidget {
+
+class ShopDashboardScreen extends ConsumerWidget {
   const ShopDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sellerStatus = ref.watch(sellerStatusProvider);
+    final processingOrders = ref.watch(sellerOrdersProvider('processing'));
+    final allOrders = ref.watch(sellerOrdersProvider(null));
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Main Brand Background
       body: SafeArea(
@@ -32,11 +42,15 @@ class ShopDashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              _buildShopHeader(context),
+              _buildShopHeader(context, sellerStatus),
               const SizedBox(height: 24),
               _buildSearchBar(),
               const SizedBox(height: 24),
-              _buildStatsRow(context),
+              _buildStatsRow(
+                context,
+                allOrders.maybeWhen(data: (o) => o.length, orElse: () => 0),
+                0,
+              ),
               const SizedBox(height: 32),
               const Text(
                 "Orders in Process",
@@ -47,7 +61,7 @@ class ShopDashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              _buildOrdersTable(),
+              _buildOrdersTable(processingOrders),
               const SizedBox(height: 40),
             ],
           ),
@@ -56,12 +70,12 @@ class ShopDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildShopHeader(BuildContext context) {
+  Widget _buildShopHeader(BuildContext context, SellerStatus? sellerStatus) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Text(
-          "Dijee Stitches",
+          'Your Shop',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -107,12 +121,12 @@ class ShopDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsRow(BuildContext context) {
+  Widget _buildStatsRow(BuildContext context, int ordersCount, int productsCount) {
     return Row(
       children: [
         _buildStatCard(
           label: "Products",
-          count: "20",
+          count: productsCount.toString(),
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ProductListingsScreen()),
@@ -122,7 +136,7 @@ class ShopDashboardScreen extends StatelessWidget {
         const SizedBox(width: 16),
         _buildStatCard(
           label: "Orders",
-          count: "100",
+          count: ordersCount.toString(),
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ShopOrdersScreen()),
@@ -182,59 +196,116 @@ class ShopDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOrdersTable() {
-    return Column(
-      children: [
-        // Table Header
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-          color: const Color(0xFFF5E0CE),
-          child: Row(
-            children: const [
-              Expanded(flex: 3, child: Text("Order No", style: _headerStyle)),
-              Expanded(flex: 3, child: Text("Order Date", style: _headerStyle)),
-              Expanded(flex: 3, child: Text("Package", style: _headerStyle)),
-              Expanded(flex: 2, child: Text("Status", style: _headerStyle)),
-            ],
-          ),
-        ),
-        // Table Rows
-        _buildOrderRow("#hg5675894h", "Jan 6 2023", "Quick Quick", true),
-        _buildOrderRow("#hg5675894h", "Jan 6 2023", "Quick Quick", false),
-        _buildOrderRow("#hg5675894h", "Jan 6 2023", "Quick Quick", true),
-      ],
+  Widget _buildOrdersTable(AsyncValue<List<SellerOrder>> ordersAsync) {
+    return ordersAsync.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 24),
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        child: Center(child: Text('Failed to load orders', style: TextStyle(color: Color(0xFF777F84)))),
+      ),
+      data: (orders) {
+        if (orders.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: Center(child: Text('No processing orders', style: TextStyle(color: Color(0xFF777F84)))),
+          );
+        }
+
+        final dateFormat = DateFormat('MMM d');
+        return Column(
+          children: [
+            // Table Header
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+              color: const Color(0xFFF5E0CE),
+              child: Row(
+                children: const [
+                  Expanded(flex: 3, child: Text("Order No", style: _headerStyle)),
+                  Expanded(flex: 3, child: Text("Order Date", style: _headerStyle)),
+                  Expanded(flex: 3, child: Text("Customer", style: _headerStyle)),
+                  Expanded(flex: 2, child: Text("Status", style: _headerStyle)),
+                ],
+              ),
+            ),
+            // Table Rows
+            ...orders.map((o) {
+              return _buildOrderRow(
+                '#${o.orderNumber}',
+                dateFormat.format(o.createdAt),
+                o.customerName ?? '—',
+                o.status,
+              );
+            }).toList(),
+          ],
+        );
+      },
     );
   }
 
   static const _headerStyle = TextStyle(fontSize: 10, color: Color(0xFF777F84));
 
-  Widget _buildOrderRow(String no, String date, String package, bool isGrey) {
+  Widget _buildOrderRow(String no, String date, String customer, String status) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      color: isGrey ? const Color(0xFFFBFBFB) : Colors.white,
+      color: Colors.white,
       child: Row(
         children: [
           Expanded(flex: 3, child: Text(no, style: _cellStyle)),
           Expanded(flex: 3, child: Text(date, style: _cellStyle)),
-          Expanded(flex: 3, child: Text(package, style: _cellStyle)),
+          Expanded(flex: 3, child: Text(customer, style: _cellStyle)),
           Expanded(
             flex: 2,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFF3095CE),
+                color: _statusColor(status),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: const Text(
-                "In Process",
+              child: Text(
+                _statusLabel(status),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white, fontSize: 10),
+                style: const TextStyle(color: Colors.white, fontSize: 10),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Color _statusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'processing':
+        return const Color(0xFF3095CE);
+      case 'shipped':
+        return const Color(0xFF2E7D32);
+      case 'delivered':
+        return const Color(0xFF70B673);
+      case 'cancelled':
+        return const Color(0xFFC95353);
+      case 'pending':
+      default:
+        return const Color(0xFF777F84);
+    }
+  }
+
+  String _statusLabel(String status) {
+    switch (status.toLowerCase()) {
+      case 'processing':
+        return 'Processing';
+      case 'shipped':
+        return 'Shipped';
+      case 'delivered':
+        return 'Delivered';
+      case 'cancelled':
+        return 'Cancelled';
+      case 'pending':
+      default:
+        return 'Pending';
+    }
   }
 
   static const _cellStyle = TextStyle(fontSize: 12, color: Colors.black);
