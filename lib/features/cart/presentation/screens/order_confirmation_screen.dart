@@ -122,7 +122,7 @@ class _OrderConfirmationScreenState
                             .read(orderActionsProvider.notifier)
                             .createOrderAndPaymentLink(
                               items: items,
-                              shippingName: selectedAddress!.fullName,
+                              shippingName: selectedAddress.fullName,
                               shippingPhone: selectedAddress.phone,
                               shippingAddress: selectedAddress.addressLine,
                               shippingCity: selectedAddress.city,
