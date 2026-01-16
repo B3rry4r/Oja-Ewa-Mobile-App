@@ -161,15 +161,16 @@ class SellerOrder {
 
   factory SellerOrder.fromJson(Map<String, dynamic> json) {
     final itemsList = json['items'] as List? ?? json['order_items'] as List? ?? [];
+    final customer = json['customer'] as Map<String, dynamic>?;
     
     return SellerOrder(
       id: json['id'] as int? ?? 0,
       orderNumber: json['order_number'] as String? ?? json['id'].toString(),
       status: json['status'] as String? ?? 'pending',
       createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
-      customerName: json['customer_name'] as String? ?? json['shipping_name'] as String?,
-      customerPhone: json['customer_phone'] as String? ?? json['shipping_phone'] as String?,
-      shippingAddress: json['shipping_address'] != null || json['shipping_city'] != null
+      customerName: json['customer_name'] as String? ?? customer?['name'] as String? ?? json['shipping_name'] as String?,
+      customerPhone: json['customer_phone'] as String? ?? customer?['phone'] as String? ?? json['shipping_phone'] as String?,
+      shippingAddress: (customer != null || json['shipping_address'] != null || json['shipping_city'] != null)
           ? ShippingAddress.fromJson(json)
           : null,
       items: itemsList.map((e) => SellerOrderItem.fromJson(e as Map<String, dynamic>)).toList(),

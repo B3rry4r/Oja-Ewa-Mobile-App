@@ -113,6 +113,17 @@ class CategoryInitiativeItem extends CategoryItem {
 }
 
 CategoryItem parseCategoryItem(String type, Map<String, dynamic> json) {
+  // For product listing types, always treat items as products.
+  const productTypes = {
+    'textiles',
+    'shoes_bags',
+    'afro_beauty_products',
+    'art',
+  };
+  if (productTypes.contains(type)) {
+    return CategoryProductItem.fromJson(json);
+  }
+
   // Infer item type by payload shape (more robust than relying on the listing type).
   if (json.containsKey('business_name') || json.containsKey('business_logo')) {
     return CategoryBusinessItem.fromJson(json);

@@ -22,7 +22,7 @@ class NotificationsScreen extends ConsumerWidget {
     final notifications = ref.watch(notificationsListProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
+      backgroundColor: const Color(0xFF603814),
       body: SafeArea(
         bottom: false,
         child: Column(
