@@ -271,43 +271,6 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
     ]);
   }
 
-  Widget _buildPhoneInput() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Business Phone Number',
-          style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-          ),
-          child: const Row(
-            children: [
-              Icon(Icons.flag, size: 20),
-              SizedBox(width: 8),
-              Text(
-                '+234',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  '8167654354',
-                  style: TextStyle(fontSize: 16, color: Color(0xFFCCCCCC)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildLogoSection() {
     final hasFile = _businessLogoPath != null && _businessLogoPath!.isNotEmpty;
     return Column(

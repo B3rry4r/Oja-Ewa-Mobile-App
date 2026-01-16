@@ -15,6 +15,9 @@ import 'package:ojaewa/features/business_details/presentation/screens/business_d
 import 'package:ojaewa/features/sustainability_details/presentation/screens/sustainability_details_screen.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/filter_sheet.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/sort_sheet.dart';
+import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/business_filter_sheet.dart';
+import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/simple_sort_sheet.dart';
+import 'package:ojaewa/features/categories/presentation/controllers/listing_filters_controller.dart';
 
 /// Product listing screen used for category browsing.
 ///
@@ -95,9 +98,16 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final kind = widget.type == 'sustainability'
+        ? _ListingKind.sustainability
+        : (widget.type == 'school' || widget.slug.contains('services'))
+            ? _ListingKind.business
+            : _ListingKind.product;
+
     final selectedFilters = ref.watch(selectedFiltersProvider);
-    final hasActiveFilters =
-        selectedFilters.hasFilters || selectedFilters.hasSort;
+    final hasActiveFilters = kind == _ListingKind.product
+        ? (selectedFilters.hasFilters || selectedFilters.hasSort)
+        : false;
 
     final categoryItemsAsync = ref.watch(
       categoryItemsProvider((type: widget.type, slug: widget.slug)),
@@ -240,6 +250,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                             showBusinessTypeFilter:
                                 widget.showBusinessTypeFilter,
                             onFiltersChanged: _onFiltersChanged,
+                            kind: kind,
                           ),
 
                           const SizedBox(height: 24),
@@ -408,20 +419,77 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
   }
 }
 
+enum _ListingKind { product, business, sustainability }
+
 class _SortFilterRow extends ConsumerWidget {
   const _SortFilterRow({
     required this.showBusinessTypeFilter,
     required this.onFiltersChanged,
+    required this.kind,
   });
 
   final bool showBusinessTypeFilter;
   final VoidCallback onFiltersChanged;
+  final _ListingKind kind;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedFilters = ref.watch(selectedFiltersProvider);
-    final hasActiveFilters = selectedFilters.hasFilters;
-    final hasActiveSort = selectedFilters.hasSort;
+    if (kind == _ListingKind.product) {
+      final selectedFilters = ref.watch(selectedFiltersProvider);
+      final hasActiveFilters = selectedFilters.hasFilters;
+      final hasActiveSort = selectedFilters.hasSort;
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            _ActionButton(
+              iconAsset: AppIcons.sort,
+              label: hasActiveSort ? 'Sorted' : 'Sort',
+              isActive: hasActiveSort,
+              onTap: () async {
+                await showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => SortOverlay(
+                    onApplySort: (_) => onFiltersChanged(),
+                    onClearSort: onFiltersChanged,
+                  ),
+                );
+              },
+            ),
+            const Spacer(),
+            _ActionButton(
+              iconAsset: AppIcons.filter,
+              label: hasActiveFilters ? 'Filtered' : 'Filters',
+              isActive: hasActiveFilters,
+              onTap: () async {
+                await showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => FilterSheet(
+                    onApplyFilters: (_) => onFiltersChanged(),
+                    onClearFilters: onFiltersChanged,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Business & Sustainability: separate state providers, no category picker.
+    final hasSort = kind == _ListingKind.business
+        ? (ref.watch(businessListingFiltersProvider).sort ?? '').isNotEmpty
+        : (ref.watch(sustainabilityListingFiltersProvider).sort ?? '').isNotEmpty;
+
+    final hasFilters = kind == _ListingKind.business
+        ? ((ref.watch(businessListingFiltersProvider).state ?? '').isNotEmpty ||
+            (ref.watch(businessListingFiltersProvider).city ?? '').isNotEmpty)
+        : false;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -429,37 +497,34 @@ class _SortFilterRow extends ConsumerWidget {
         children: [
           _ActionButton(
             iconAsset: AppIcons.sort,
-            label: hasActiveSort ? 'Sorted' : 'Sort',
-            isActive: hasActiveSort,
+            label: hasSort ? 'Sorted' : 'Sort',
+            isActive: hasSort,
             onTap: () async {
               await showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
-                builder: (_) => SortOverlay(
-                  onApplySort: (_) => onFiltersChanged(),
-                  onClearSort: onFiltersChanged,
-                ),
+                builder: (_) => SimpleSortSheet(isBusiness: kind == _ListingKind.business),
               );
+              onFiltersChanged();
             },
           ),
           const Spacer(),
-          _ActionButton(
-            iconAsset: AppIcons.filter,
-            label: hasActiveFilters ? 'Filtered' : 'Filters',
-            isActive: hasActiveFilters,
-            onTap: () async {
-              await showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (_) => FilterSheet(
-                  onApplyFilters: (_) => onFiltersChanged(),
-                  onClearFilters: onFiltersChanged,
-                ),
-              );
-            },
-          ),
+          if (kind == _ListingKind.business)
+            _ActionButton(
+              iconAsset: AppIcons.filter,
+              label: hasFilters ? 'Filtered' : 'Filters',
+              isActive: hasFilters,
+              onTap: () async {
+                await showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => const BusinessFilterSheet(),
+                );
+                onFiltersChanged();
+              },
+            ),
         ],
       ),
     );
