@@ -116,19 +116,19 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
                       const SizedBox(height: 24),
 
-                      // Search Input
+                      // Search Input (consistent UI)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Container(
-                          height: 50,
+                          height: 49,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
                           decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFFCCCCCC)),
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(25),
-                            border: Border.all(color: const Color(0xFFE0E0E0)),
                           ),
                           child: Row(
                             children: [
-                              const SizedBox(width: 16),
                               SvgPicture.asset(
                                 AppIcons.search,
                                 width: 20,
@@ -151,7 +151,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                     color: Color(0xFF1E2021),
                                   ),
                                   decoration: const InputDecoration(
-                                    hintText: 'Search products...',
+                                    hintText: 'Search Ojá-Ẹwà',
                                     hintStyle: TextStyle(
                                       fontSize: 16,
                                       fontFamily: 'Campton',
@@ -169,7 +169,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                     ref.read(searchResultsProvider.notifier).clear();
                                   },
                                   child: const Padding(
-                                    padding: EdgeInsets.all(12),
+                                    padding: EdgeInsets.symmetric(horizontal: 4),
                                     child: Icon(Icons.close, size: 20, color: Color(0xFF777F84)),
                                   ),
                                 ),
