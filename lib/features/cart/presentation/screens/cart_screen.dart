@@ -401,7 +401,7 @@ class _CheckoutSection extends StatelessWidget {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFFFBFBFB)),
                   ),
                   Text(
-                    'N${_formatPrice(total)}',
+                    '₦${_formatPrice(total)}',
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFFFBFBFB)),
                   ),
                 ],
@@ -409,7 +409,7 @@ class _CheckoutSection extends StatelessWidget {
               const SizedBox(height: 5),
               const Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Delivery fee not included yet', style: TextStyle(fontSize: 12, color: Color(0xFFFBFBFB))),
+                child: Text('+ ₦2,000 delivery fee at checkout', style: TextStyle(fontSize: 12, color: Color(0xFFFBFBFB))),
               ),
               const SizedBox(height: 20),
               GestureDetector(

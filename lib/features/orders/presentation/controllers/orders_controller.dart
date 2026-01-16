@@ -27,10 +27,26 @@ class OrderActionsController extends AsyncNotifier<void> {
     return null;
   }
 
-  Future<PaymentLink> createOrderAndPaymentLink({required List<Map<String, dynamic>> items}) async {
+  Future<PaymentLink> createOrderAndPaymentLink({
+    required List<Map<String, dynamic>> items,
+    required String shippingName,
+    required String shippingPhone,
+    required String shippingAddress,
+    required String shippingCity,
+    required String shippingState,
+    required String shippingCountry,
+  }) async {
     state = const AsyncLoading();
     try {
-      final order = await ref.read(ordersRepositoryProvider).createOrder(items: items);
+      final order = await ref.read(ordersRepositoryProvider).createOrder(
+        items: items,
+        shippingName: shippingName,
+        shippingPhone: shippingPhone,
+        shippingAddress: shippingAddress,
+        shippingCity: shippingCity,
+        shippingState: shippingState,
+        shippingCountry: shippingCountry,
+      );
       final link = await ref.read(ordersRepositoryProvider).createOrderPaymentLink(orderId: order.id);
       // We intentionally do not clear cart automatically here; backend docs suggest clearing after successful order creation.
       // We can do it after payment verification.

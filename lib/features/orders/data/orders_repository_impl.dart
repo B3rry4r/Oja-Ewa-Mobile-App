@@ -13,7 +13,23 @@ class OrdersRepository {
 
   Future<List<OrderSummary>> listOrders({int page = 1}) => _ordersApi.listOrders(page: page);
 
-  Future<OrderSummary> createOrder({required List<Map<String, dynamic>> items}) => _ordersApi.createOrder(items: items);
+  Future<OrderSummary> createOrder({
+    required List<Map<String, dynamic>> items,
+    required String shippingName,
+    required String shippingPhone,
+    required String shippingAddress,
+    required String shippingCity,
+    required String shippingState,
+    required String shippingCountry,
+  }) => _ordersApi.createOrder(
+    items: items,
+    shippingName: shippingName,
+    shippingPhone: shippingPhone,
+    shippingAddress: shippingAddress,
+    shippingCity: shippingCity,
+    shippingState: shippingState,
+    shippingCountry: shippingCountry,
+  );
 
   Future<Map<String, dynamic>> getOrderDetails(int id) => _ordersApi.getOrderDetails(id);
 

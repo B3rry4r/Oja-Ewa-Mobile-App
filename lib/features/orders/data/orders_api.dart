@@ -21,9 +21,30 @@ class OrdersApi {
     }
   }
 
-  Future<OrderSummary> createOrder({required List<Map<String, dynamic>> items}) async {
+  /// Create a new order with items and shipping details
+  /// 
+  /// Required shipping fields:
+  /// - shipping_name, shipping_phone, shipping_address
+  /// - shipping_city, shipping_state, shipping_country
+  Future<OrderSummary> createOrder({
+    required List<Map<String, dynamic>> items,
+    required String shippingName,
+    required String shippingPhone,
+    required String shippingAddress,
+    required String shippingCity,
+    required String shippingState,
+    required String shippingCountry,
+  }) async {
     try {
-      final res = await _dio.post('/api/orders', data: {'items': items});
+      final res = await _dio.post('/api/orders', data: {
+        'items': items,
+        'shipping_name': shippingName,
+        'shipping_phone': shippingPhone,
+        'shipping_address': shippingAddress,
+        'shipping_city': shippingCity,
+        'shipping_state': shippingState,
+        'shipping_country': shippingCountry,
+      });
       final data = res.data;
       if (data is! Map<String, dynamic>) throw const FormatException('Unexpected response');
       final order = data['order'];

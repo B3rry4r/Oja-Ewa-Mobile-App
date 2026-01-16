@@ -120,7 +120,15 @@ class _OrderConfirmationScreenState
                       try {
                         final link = await ref
                             .read(orderActionsProvider.notifier)
-                            .createOrderAndPaymentLink(items: items);
+                            .createOrderAndPaymentLink(
+                              items: items,
+                              shippingName: selectedAddress!.fullName,
+                              shippingPhone: selectedAddress.phone,
+                              shippingAddress: selectedAddress.addressLine,
+                              shippingCity: selectedAddress.city,
+                              shippingState: selectedAddress.state,
+                              shippingCountry: selectedAddress.country,
+                            );
 
                         final uri = Uri.tryParse(link.paymentUrl);
                         if (uri == null || link.paymentUrl.isEmpty) {
@@ -251,7 +259,9 @@ class _OrderConfirmationScreenState
     required bool isBusy,
     required VoidCallback? onPlaceOrder,
   }) {
-    final total = cart?.total ?? 0;
+    final subtotal = cart?.total ?? 0;
+    const deliveryFee = 2000; // Flat delivery fee ₦2,000
+    final total = subtotal + deliveryFee;
 
     return Container(
       decoration: const BoxDecoration(
@@ -278,19 +288,58 @@ class _OrderConfirmationScreenState
                 ),
               ),
               const SizedBox(height: 20),
+              // Subtotal
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Subtotal',
+                    style: TextStyle(fontSize: 14, color: Color(0xFFFBFBFB)),
+                  ),
+                  Text(
+                    '₦${_formatPrice(subtotal)}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFFFBFBFB),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Delivery Fee
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Delivery Fee',
+                    style: TextStyle(fontSize: 14, color: Color(0xFFFBFBFB)),
+                  ),
+                  Text(
+                    '₦${_formatPrice(deliveryFee)}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFFFBFBFB),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              const Divider(color: Color(0xFF8B6B4F), height: 1),
+              const SizedBox(height: 12),
+              // Total
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
                     'Total',
-                    style: TextStyle(fontSize: 14, color: Color(0xFFFBFBFB)),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFFFBFBFB)),
                   ),
                   Text(
-                    'N${_formatPrice(total)}',
+                    '₦${_formatPrice(total)}',
                     style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFFFBFBFB),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFFFDAF40),
                     ),
                   ),
                 ],

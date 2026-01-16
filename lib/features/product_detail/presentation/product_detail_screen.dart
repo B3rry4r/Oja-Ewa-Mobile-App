@@ -797,11 +797,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                     ),
                   ),
                   Text(
-                    '',
+                    '+ ₦2,000 delivery',
                     style: TextStyle(
                       fontSize: 10,
-                      color: const Color(0xFFE9E9E9).withOpacity(0.6),
-                      decoration: TextDecoration.lineThrough,
+                      color: const Color(0xFFE9E9E9).withOpacity(0.8),
                     ),
                   ),
                 ],
