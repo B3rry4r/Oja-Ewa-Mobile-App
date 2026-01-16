@@ -32,9 +32,9 @@ class CategoryProductItem extends CategoryItem {
 
   static CategoryProductItem fromJson(Map<String, dynamic> json) {
     return CategoryProductItem(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      name: (json['name'] as String?) ?? '',
-      image: json['image'] as String?,
+      id: (json['id'] as num?)?.toInt() ?? (json['product_id'] as num?)?.toInt() ?? 0,
+      name: (json['name'] as String?) ?? (json['title'] as String?) ?? '',
+      image: json['image'] as String? ?? json['image_url'] as String?,
       price: json['price']?.toString(),
       avgRating: json['avg_rating'] as num?,
     );

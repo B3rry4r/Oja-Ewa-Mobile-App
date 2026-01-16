@@ -12,17 +12,32 @@ final sellerOrdersApiProvider = Provider<SellerOrdersApi>((ref) {
 final sellerOrdersProvider = FutureProvider.autoDispose.family<List<SellerOrder>, String?>((ref, status) async {
   final api = ref.watch(sellerOrdersApiProvider);
   final response = await api.listOrders(status: status, perPage: 50);
-  
-  final data = response['data'];
-  if (data is Map<String, dynamic>) {
-    final items = data['data'] as List?;
-    if (items != null) {
-      return items.map((e) => SellerOrder.fromJson(e as Map<String, dynamic>)).toList();
+
+  List<Map<String, dynamic>> normalize(dynamic raw) {
+    if (raw is List) {
+      return raw.whereType<Map<String, dynamic>>().toList();
     }
-  } else if (data is List) {
-    return data.map((e) => SellerOrder.fromJson(e as Map<String, dynamic>)).toList();
+    if (raw is Map<String, dynamic>) {
+      final data = raw['data'];
+      if (data is List) {
+        return data.whereType<Map<String, dynamic>>().toList();
+      }
+      final orders = raw['orders'];
+      if (orders is List) {
+        return orders.whereType<Map<String, dynamic>>().toList();
+      }
+    }
+    return const [];
   }
-  return [];
+
+  final data = response['data'];
+  final items = normalize(data);
+  if (items.isNotEmpty) {
+    return items.map(SellerOrder.fromJson).toList();
+  }
+
+  final fallback = normalize(response);
+  return fallback.map(SellerOrder.fromJson).toList();
 });
 
 /// Provider for getting a single order's details

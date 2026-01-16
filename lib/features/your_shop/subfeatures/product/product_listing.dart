@@ -200,7 +200,8 @@ class ProductListingsScreen extends StatelessWidget {
 
   Widget _buildProductTable(BuildContext context, List<ShopProduct> products) {
     if (products.isEmpty) {
-      return const Expanded(
+      return const SizedBox(
+        height: 200,
         child: Center(
           child: Text('No products yet', style: TextStyle(fontSize: 16, color: Color(0xFF777F84))),
         ),
