@@ -9,6 +9,7 @@ import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/app/router/app_router.dart';
 import '../controllers/auth_controller.dart';
 import 'package:ojaewa/core/auth/google_sign_in_providers.dart';
+import 'package:ojaewa/core/errors/app_exception.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
 
@@ -487,6 +488,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               Navigator.of(
                 context,
               ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+            } on AppException catch (e) {
+              // User cancelled - don't show error
+              if (e.message.contains('cancelled')) return;
+              if (!mounted) return;
+              AppSnackbars.showError(context, e.message);
             } catch (e) {
               if (!mounted) return;
               AppSnackbars.showError(context, UiErrorMessage.from(e));
