@@ -163,10 +163,8 @@ class SearchResultsNotifier extends AsyncNotifier<List<dynamic>> {
         perPage: 20,
         categoryType: categoryType,
       );
-      debugPrint('[SearchResultsNotifier] Got ${page.items.length} results for "$query"');
       state = AsyncData(page.items.map((p) => p.toJson()).toList());
     } catch (e, st) {
-      debugPrint('[SearchResultsNotifier] Error: $e');
       state = AsyncError(e, st);
     }
   }

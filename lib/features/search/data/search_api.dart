@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../../core/network/dio_error_mapper.dart';
 import '../domain/search_product.dart';
@@ -40,30 +39,22 @@ class SearchApi {
         if (priceMax != null) 'price_max': priceMax,
       };
       
-      debugPrint('[SearchApi] Request: /api/products/browse?$queryParams');
-      
       final res = await _dio.get(
         '/api/products/browse',
         queryParameters: queryParams,
       );
 
       final data = res.data;
-      debugPrint('[SearchApi] Response status: ${res.statusCode}');
-      
       if (data is! Map<String, dynamic>) {
-        debugPrint('[SearchApi] ERROR: Response is not a Map: ${data.runtimeType}');
         throw const FormatException('Unexpected response');
       }
 
       final payload = data['data'];
       if (payload is! Map<String, dynamic>) {
-        debugPrint('[SearchApi] ERROR: payload["data"] is not a Map: ${payload.runtimeType}');
         throw const FormatException('Unexpected response');
       }
 
       final itemsRaw = payload['data'];
-      debugPrint('[SearchApi] Items count: ${itemsRaw is List ? itemsRaw.length : 0}');
-      
       final items = (itemsRaw is List)
           ? itemsRaw.whereType<Map<String, dynamic>>().map(SearchProduct.fromJson).toList()
           : const <SearchProduct>[];
@@ -72,12 +63,8 @@ class SearchApi {
       final per = (payload['per_page'] as num?)?.toInt() ?? perPage;
       final total = (payload['total'] as num?)?.toInt() ?? items.length;
 
-      debugPrint('[SearchApi] Parsed: ${items.length} items, page $currentPage, total $total');
-      
       return SearchResultPage(items: items, currentPage: currentPage, perPage: per, total: total);
-    } catch (e, stack) {
-      debugPrint('[SearchApi] ERROR: $e');
-      debugPrint('[SearchApi] Stack: $stack');
+    } catch (e) {
       throw mapDioError(e);
     }
   }

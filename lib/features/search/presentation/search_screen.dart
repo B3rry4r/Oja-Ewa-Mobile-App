@@ -446,14 +446,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     // Convert search results to Product for ProductCard
     final products = results
         .whereType<Map<String, dynamic>>()
-        .where((item) => !item.containsKey('business_name')) // Only products
         .map((item) => Product(
-              id: (item['id'] as int? ?? 0).toString(),
+              id: (item['id'] as num? ?? 0).toInt().toString(),
               title: item['name'] as String? ?? '',
               priceLabel: '₦${item['price'] ?? 0}',
               imageUrl: item['image'] as String?,
               rating: (item['avg_rating'] as num?)?.toDouble() ?? 0,
-              reviewCount: (item['review_count'] as int?) ?? 0,
+              reviewCount: (item['review_count'] as num?)?.toInt() ?? 0,
             ))
         .toList();
 
