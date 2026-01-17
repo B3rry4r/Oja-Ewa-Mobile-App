@@ -23,9 +23,6 @@ class SellerOrdersApi {
 
       final res = await _dio.get('/api/seller/orders', queryParameters: queryParams);
       final data = res.data;
-      // Log response for debugging
-      // ignore: avoid_print
-      print('[SellerOrdersApi] Response: $data');
       if (data is Map<String, dynamic>) {
         return data;
       }

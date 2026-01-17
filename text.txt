@@ -549,3 +549,22 @@ const handleNotificationClick = (notification) => {
 the onboarding, so you're going to arrange that, then for start selling, it's going to hide the you shop buttonon home screen and show it only when user has been approved
 
 (textiles, afro_beauty, shoes_bags, art, school, sustainability)
+
+
+
+
+
+
+
+
+
+
+
+
+
+cat > android/key.properties << 'EOF'
+storePassword=08105340452
+keyPassword=08105340452
+keyAlias=upload
+storeFile=upload-keystore.jks
+EOF

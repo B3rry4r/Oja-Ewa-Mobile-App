@@ -115,15 +115,9 @@ class SearchState {
 
 typedef SearchArgs = ({String query, SearchFilters filters});
 
-/// Search provider - returns empty if not authenticated or no query
-/// Note: Product search requires authentication per API docs
+/// Search provider - returns empty if no query
+/// Note: Product search is now public (no auth required)
 final searchProvider = FutureProvider.family<SearchState, SearchArgs>((ref, args) async {
-  // Check authentication - search requires auth per API docs
-  final token = ref.watch(accessTokenProvider);
-  if (token == null || token.isEmpty) {
-    return SearchState.empty;
-  }
-
   final q = args.query.trim();
   if (q.isEmpty) return SearchState.empty;
 
@@ -162,13 +156,6 @@ class SearchResultsNotifier extends AsyncNotifier<List<dynamic>> {
   Future<void> search({required String query, String? categoryType}) async {
     if (query.trim().isEmpty) {
       state = const AsyncData([]);
-      return;
-    }
-
-    // Check authentication - search requires auth per API docs
-    final token = ref.read(accessTokenProvider);
-    if (token == null || token.isEmpty) {
-      state = AsyncError('Please sign in to search products', StackTrace.current);
       return;
     }
 

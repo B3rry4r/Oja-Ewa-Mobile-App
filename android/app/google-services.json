@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "443526782067",
+    "project_id": "oja-ewa",
+    "storage_bucket": "oja-ewa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:443526782067:android:fb0fcfd661b49cb6f1de06",
+        "android_client_info": {
+          "package_name": "com.wawuafrica.ojaewa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "443526782067-v1t744oikqspg3ghs98a4mulmkop36k1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wawuafrica.ojaewa",
+            "certificate_hash": "1008a5192af413a9538afc365e142b6e20603f71"
+          }
+        },
+        {
+          "client_id": "443526782067-duvbgc0grl97ebpcjnqovov88aj0sfgn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5uqYT7YgfcaTFhuRcHQX7rvw5SGSowkU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "443526782067-duvbgc0grl97ebpcjnqovov88aj0sfgn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "443526782067-ga3m3iqcgh47cgflsq4us1736sv01hda.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.wawuafrica.ojaewa"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -64,6 +64,15 @@
 				<string>ojaewa</string>
 			</array>
 		</dict>
+		<!-- Google Sign-In URL Scheme -->
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.443526782067-ga3m3iqcgh47cgflsq4us1736sv01hda</string>
+			</array>
+		</dict>
 	</array>
 </dict>
 </plist>
