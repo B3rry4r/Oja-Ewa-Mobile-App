@@ -333,9 +333,11 @@ class TrackingOrderScreen extends ConsumerWidget {
     // The backend uses `status`, `timestamp`, `completed`.
     final normalized = stages.map((s) {
       final isActive = s.completed;
+      final timestampRaw = s.date ?? s.description ?? '';
+      final timestamp = (timestampRaw.trim().isEmpty || timestampRaw.trim() == '_') ? '—' : timestampRaw;
       return TimelineStep(
         title: s.title,
-        timestamp: s.date ?? s.description ?? '—',
+        timestamp: timestamp,
         isCompleted: isActive,
         isCurrent: isActive,
         dotColor: isActive ? const Color(0xFF603814) : const Color(0xFFE9E9E9),
@@ -367,6 +369,14 @@ class TrackingOrderScreen extends ConsumerWidget {
 
   List<TimelineStep> _defaultTimeline(String? status) {
     final normalized = (status ?? 'pending').toLowerCase();
+
+    if (normalized == 'cancelled' || normalized == 'canceled') {
+      return [
+        _timelineStep('Order Placed', true, isCurrent: false),
+        _timelineStep('Cancelled', true, isCurrent: true),
+      ];
+    }
+
     final Map<String, bool> completed = {
       'order placed': true,
       'processing': normalized == 'processing' || normalized == 'shipped' || normalized == 'delivered',
@@ -374,20 +384,22 @@ class TrackingOrderScreen extends ConsumerWidget {
       'delivered': normalized == 'delivered',
     };
 
-    return [
-      _timelineStep('Order Placed', completed['order placed']!),
-      _timelineStep('Processing', completed['processing']!),
-      _timelineStep('Shipped', completed['shipped']!),
-      _timelineStep('Delivered', completed['delivered']!),
+    final steps = [
+      _timelineStep('Order Placed', completed['order placed']!, isCurrent: normalized == 'pending'),
+      _timelineStep('Processing', completed['processing']!, isCurrent: normalized == 'processing'),
+      _timelineStep('Shipped', completed['shipped']!, isCurrent: normalized == 'shipped'),
+      _timelineStep('Delivered', completed['delivered']!, isCurrent: normalized == 'delivered'),
     ];
+
+    return steps;
   }
 
-  TimelineStep _timelineStep(String title, bool isCompleted) {
+  TimelineStep _timelineStep(String title, bool isCompleted, {bool isCurrent = false}) {
     return TimelineStep(
       title: title,
       timestamp: isCompleted ? 'Completed' : '—',
       isCompleted: isCompleted,
-      isCurrent: isCompleted,
+      isCurrent: isCurrent,
       dotColor: isCompleted ? const Color(0xFF603814) : const Color(0xFFE9E9E9),
       textColor: isCompleted ? const Color(0xFF241508) : const Color(0xFFBEBEBE),
       timeColor: isCompleted ? const Color(0xFF777F84) : const Color(0xFFDEDEDE),
@@ -409,11 +421,13 @@ class _TrackingStage {
   });
 
   factory _TrackingStage.fromJson(Map<String, dynamic> json) {
+    final title = (json['title'] as String?) ?? (json['status'] as String?) ?? '';
+    final date = (json['date'] as String?) ?? (json['timestamp'] as String?) ?? (json['updated_at'] as String?);
     return _TrackingStage(
-      title: (json['title'] as String?) ?? '',
+      title: title.isEmpty ? 'Order Placed' : title,
       description: json['description'] as String?,
       completed: (json['completed'] as bool?) ?? false,
-      date: json['date'] as String?,
+      date: date,
     );
   }
 }

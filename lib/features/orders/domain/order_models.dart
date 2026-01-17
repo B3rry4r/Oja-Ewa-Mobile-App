@@ -71,6 +71,7 @@ class OrderItem {
 class OrderSummary {
   const OrderSummary({
     required this.id,
+    required this.orderNumber,
     required this.totalPrice,
     required this.status,
     required this.paymentReference,
@@ -80,6 +81,7 @@ class OrderSummary {
   });
 
   final int id;
+  final String? orderNumber;
   final num? totalPrice;
   final String? status;
   final String? paymentReference;
@@ -94,9 +96,10 @@ class OrderSummary {
   }
 
   static OrderSummary fromJson(Map<String, dynamic> json) {
-    final rawItems = json['order_items'];
+    final rawItems = json['order_items'] ?? json['items'];
     return OrderSummary(
       id: _parseNum(json['id'])?.toInt() ?? 0,
+      orderNumber: json['order_number'] as String?,
       totalPrice: _parseNum(json['total_price']),
       status: json['status'] as String?,
       paymentReference: json['payment_reference'] as String?,

@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/orders/domain/order_models.dart';
 import 'package:ojaewa/features/orders/presentation/controllers/orders_controller.dart';
 import 'package:ojaewa/features/orders/presentation/order_status_ui.dart';
-import 'package:ojaewa/features/product_detail/presentation/product_detail_screen.dart';
 
 class OrderDetailsScreen extends ConsumerWidget {
   const OrderDetailsScreen({super.key});
@@ -92,8 +90,18 @@ class OrderDetailsScreen extends ConsumerWidget {
 
             final order = OrderSummary.fromJson(data);
 
-            // Try to extract an address if backend provides one.
-            final shippingTo = (data['shipping_address'] ?? data['address']) as String?;
+            // Build shipping address from available fields
+            final shippingAddress = data['shipping_address'] as String? ?? data['address'] as String?;
+            final shippingCity = data['shipping_city'] as String?;
+            final shippingState = data['shipping_state'] as String?;
+            final shippingCountry = data['shipping_country'] as String?;
+            final shippingToParts = [
+              shippingAddress,
+              shippingCity,
+              shippingState,
+              shippingCountry,
+            ].whereType<String>().where((part) => part.trim().isNotEmpty).toList();
+            final shippingTo = shippingToParts.isEmpty ? null : shippingToParts.join(', ');
 
             return Column(
               children: [
@@ -133,107 +141,14 @@ class OrderDetailsScreen extends ConsumerWidget {
                         const SizedBox(height: 16),
 
                         // Payment section
-                        _buildPaymentDetails(order.totalPrice ?? 0),
+                        _buildPaymentDetails(order.totalPrice ?? 0, order.paymentReference),
 
-                        // Bottom spacing for buttons
-                        const SizedBox(height: 100),
+                        const SizedBox(height: 16),
                       ],
                     ),
                   ),
                 ),
 
-                // Bottom action buttons (UI unchanged)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF603814),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(22),
-                      topRight: Radius.circular(22),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      // Buy Again button
-                      Expanded(
-                        child: Container(
-                          height: 57,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFFFDAF40)),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                final first = order.items.isNotEmpty ? order.items.first : null;
-                                if (first == null) return;
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => ProductDetailsScreen(productId: first.productId),
-                                  ),
-                                );
-                              },
-                              borderRadius: BorderRadius.circular(8),
-                              child: const Center(
-                                child: Text(
-                                  'Buy Again',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'Campton',
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFFFDAF40),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(width: 16),
-
-                      // Track button
-                      Expanded(
-                        child: Container(
-                          height: 57,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFDAF40),
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFFDAF40).withValues(alpha: 0.5),
-                                blurRadius: 16,
-                                offset: Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () => Navigator.of(context).pushNamed(
-                                AppRoutes.trackingOrder,
-                                arguments: {'orderId': order.id},
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                              child: const Center(
-                                child: Text(
-                                  'Track',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'Campton',
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFFFFFBF5),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             );
           },
@@ -243,8 +158,12 @@ class OrderDetailsScreen extends ConsumerWidget {
   }
 
   Widget _buildOrderInformation(BuildContext context, OrderSummary order) {
-    final orderedOn = order.createdAt?.toIso8601String() ?? '—';
-    final orderNumber = '#${order.id}';
+    final orderedOn = order.createdAt != null
+        ? '${order.createdAt!.day.toString().padLeft(2, '0')}/'
+          '${order.createdAt!.month.toString().padLeft(2, '0')}/'
+          '${order.createdAt!.year}'
+        : '—';
+    final orderNumber = order.orderNumber ?? '#${order.id}';
     final statusLabel = OrderStatusUi.label(order.status);
 
     return Container(
@@ -387,6 +306,7 @@ class OrderDetailsScreen extends ConsumerWidget {
 
   Widget _buildShippingAddress(String? shippingTo) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xFFCCCCCC)),
@@ -424,6 +344,7 @@ class OrderDetailsScreen extends ConsumerWidget {
 
   Widget _buildItemsInOrder(List<OrderItem> items) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xFFCCCCCC)),
@@ -535,10 +456,11 @@ class OrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPaymentDetails(num total) {
+  Widget _buildPaymentDetails(num total, String? paymentReference) {
     final subtotal = total;
 
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xFFCCCCCC)),
@@ -548,7 +470,7 @@ class OrderDetailsScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Payment',
+            'Payment Details',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
@@ -559,23 +481,41 @@ class OrderDetailsScreen extends ConsumerWidget {
 
           const SizedBox(height: 16),
 
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          if (paymentReference != null && paymentReference.isNotEmpty) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Payment Reference',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF3C4042),
+                  ),
+                ),
+                Flexible(
+                  child: Text(
+                    paymentReference,
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF3C4042),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'Payment Methods',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF3C4042),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              const Text(
-                'Pay with Card',
+                'Subtotal',
                 style: TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
@@ -583,99 +523,66 @@ class OrderDetailsScreen extends ConsumerWidget {
                   color: Color(0xFF3C4042),
                 ),
               ),
+              Text(
+                '₦$subtotal',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF3C4042),
+                ),
+              ),
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
 
-          const Text(
-            'Payment Details',
-            style: TextStyle(
-              fontSize: 14,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF3C4042),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Shipping',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF3C4042),
+                ),
+              ),
+              const Text(
+                '₦0',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF3C4042),
+                ),
+              ),
+            ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
-          Column(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Subtotal',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF3C4042),
-                    ),
-                  ),
-                  Text(
-                    '₦$subtotal',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF3C4042),
-                    ),
-                  ),
-                ],
+              const Text(
+                'Total Price',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF3C4042),
+                ),
               ),
-
-              const SizedBox(height: 8),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Shipping',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF3C4042),
-                    ),
-                  ),
-                  const Text(
-                    '₦0',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF3C4042),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 8),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Total Price',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF3C4042),
-                    ),
-                  ),
-                  Text(
-                    '₦$total',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF3C4042),
-                    ),
-                  ),
-                ],
+              Text(
+                '₦$total',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF3C4042),
+                ),
               ),
             ],
           ),
