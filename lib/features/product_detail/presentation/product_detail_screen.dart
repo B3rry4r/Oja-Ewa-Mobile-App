@@ -34,9 +34,53 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     // Do not change layout; only populate data.
-    final details = ref
-        .watch(productDetailsProvider(widget.productId))
-        .maybeWhen(data: (d) => d, orElse: () => null);
+    final detailsAsync = ref.watch(productDetailsProvider(widget.productId));
+
+    if (detailsAsync.isLoading) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFFFF8F1),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (detailsAsync.hasError) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFFFF8F1),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.error_outline, size: 48, color: Color(0xFF777F84)),
+                const SizedBox(height: 12),
+                const Text(
+                  'Unable to load product details',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF241508),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Please check your connection and try again.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Color(0xFF777F84)),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () => ref.refresh(productDetailsProvider(widget.productId)),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final details = detailsAsync.value!;
 
     final isWishlisted = ref.watch(
       isWishlistedProvider((
