@@ -36,6 +36,7 @@ class AuthTokenInterceptor extends Interceptor {
     // auth
     '/api/login',
     '/api/register',
+    '/api/oauth/google',
   ];
 
   bool _isPublicPath(String path) {

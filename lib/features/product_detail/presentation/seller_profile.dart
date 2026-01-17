@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
@@ -179,7 +180,7 @@ class SellerProfileScreen extends ConsumerWidget {
                                     (p) => Product(
                                       id: p.id.toString(),
                                       title: p.name,
-                                      priceLabel: p.price?.toString() ?? '',
+                                      priceLabel: formatPrice(p.price),
                                       rating: (p.avgRating ?? 0).toDouble(),
                                       reviewCount: 0,
                                       imageUrl: p.image,
