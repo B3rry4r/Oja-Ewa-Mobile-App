@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
@@ -103,7 +104,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
 
                       final hasReviewButton = status == 'delivered';
                       final itemCount = '${o.items.length} item${o.items.length == 1 ? '' : 's'}';
-                      final totalAmount = '₦${(o.totalPrice ?? 0).toString()}';
+                      final totalAmount = formatPrice(o.totalPrice ?? 0);
 
                       return InkWell(
                         onTap: () => Navigator.of(context).pushNamed(

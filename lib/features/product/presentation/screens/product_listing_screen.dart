@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -500,7 +501,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                   final product = Product(
                     id: searchProduct.id.toString(),
                     title: searchProduct.name,
-                    priceLabel: '₦${searchProduct.price}',
+                    priceLabel: formatPrice(searchProduct.price as num?),
                     rating: (searchProduct.avgRating ?? 0).toDouble(),
                     reviewCount: 0, // Not available in search result
                     imageUrl: searchProduct.image,
@@ -855,7 +856,7 @@ class _CategoryItemGrid extends StatelessWidget {
         return Product(
           id: p.id.toString(),
           title: p.name,
-          priceLabel: p.price ?? '',
+          priceLabel: formatPrice(num.tryParse(p.price ?? '')), 
           rating: (p.avgRating ?? 0).toDouble(),
           reviewCount: 0,
           imageUrl: p.image,

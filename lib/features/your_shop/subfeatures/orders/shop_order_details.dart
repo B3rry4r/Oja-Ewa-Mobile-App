@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:intl/intl.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
@@ -111,7 +112,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
           ...order.items.map((item) => _buildItemTile(item)),
 
           const SizedBox(height: 20),
-          _buildDetailTile("Total", '₦${order.totalPrice.toStringAsFixed(0)}'),
+          _buildDetailTile("Total", formatPrice(order.totalPrice)),
 
           if (order.trackingNumber != null)
             _buildDetailTile("Tracking Number", order.trackingNumber!),
@@ -239,7 +240,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  '₦${item.price.toStringAsFixed(0)}',
+                  formatPrice(item.price),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

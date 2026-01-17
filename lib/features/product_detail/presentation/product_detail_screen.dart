@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
@@ -65,14 +66,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     final totalPrice = unitPrice == null ? null : (unitPrice * quantity);
 
     // Bottom bar uses total (quantity-aware). One decimal for stability.
-    final priceLabel = totalPrice == null
-        ? ''
-        : '₦${totalPrice.toStringAsFixed(0)}';
+    final priceLabel = totalPrice == null ? '' : formatPrice(totalPrice);
 
     // Processing cards should show unit price (not multiplied) to keep original meaning.
     final unitPriceLabel = unitPrice == null
         ? ''
-        : '₦${unitPrice.toStringAsFixed(0)}';
+        : formatPrice(unitPrice);
 
     final reviewCount = reviewsPage?.total ?? 0;
     final avgRating = reviewsPage?.entity.avgRating?.toString() ?? '';
@@ -711,7 +710,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
       return Product(
         id: ((s['id'] as num?)?.toInt() ?? 0).toString(),
         title: (s['name'] as String?) ?? '',
-        priceLabel: (s['price']?.toString() ?? ''),
+        priceLabel: formatPrice(s['price'] as num?),
         rating: 0,
         reviewCount: 0,
         imageUrl: (s['image'] as String?),
@@ -886,7 +885,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                     ),
                   ),
                   Text(
-                    '+ ₦2,000 delivery',
+                    '+ ${formatPrice(2000)} delivery',
                     style: TextStyle(
                       fontSize: 10,
                       color: const Color(0xFFE9E9E9).withValues(alpha: 0.8),

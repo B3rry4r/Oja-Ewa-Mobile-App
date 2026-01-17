@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/orders/domain/order_models.dart';
 import 'package:ojaewa/features/orders/presentation/controllers/orders_controller.dart';
@@ -414,7 +415,7 @@ class OrderDetailsScreen extends ConsumerWidget {
               const SizedBox(height: 8),
 
               Text(
-                '₦$price',
+                formatPrice(price),
                 style: const TextStyle(
                   fontSize: 16,
                   fontFamily: 'Campton',
@@ -524,7 +525,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                 ),
               ),
               Text(
-                '₦$subtotal',
+                formatPrice(subtotal),
                 style: const TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
@@ -576,7 +577,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                 ),
               ),
               Text(
-                '₦$total',
+                formatPrice(total),
                 style: const TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',

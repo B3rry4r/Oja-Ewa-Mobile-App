@@ -7,6 +7,7 @@ import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
 import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
@@ -449,7 +450,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         .map((item) => Product(
               id: (item['id'] as num? ?? 0).toInt().toString(),
               title: item['name'] as String? ?? '',
-              priceLabel: '₦${item['price'] ?? 0}',
+              priceLabel: formatPrice(item['price'] as num?),
               imageUrl: item['image'] as String?,
               rating: (item['avg_rating'] as num?)?.toDouble() ?? 0,
               reviewCount: (item['review_count'] as num?)?.toInt() ?? 0,

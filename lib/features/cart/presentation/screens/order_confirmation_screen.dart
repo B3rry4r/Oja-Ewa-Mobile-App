@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -11,16 +12,6 @@ import 'package:ojaewa/features/cart/domain/cart.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
 import 'package:ojaewa/features/orders/presentation/controllers/orders_controller.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/checkout_controller.dart';
-
-/// Format number to 1 decimal place, removing trailing zeros
-String _formatPrice(num value) {
-  final formatted = value.toStringAsFixed(1);
-  // Remove .0 if whole number
-  if (formatted.endsWith('.0')) {
-    return formatted.substring(0, formatted.length - 2);
-  }
-  return formatted;
-}
 
 class OrderConfirmationScreen extends ConsumerStatefulWidget {
   const OrderConfirmationScreen({super.key, this.hasAddress = true});
@@ -310,7 +301,7 @@ class _OrderConfirmationScreenState
                     style: TextStyle(fontSize: 14, color: Color(0xFFFBFBFB)),
                   ),
                   Text(
-                    '₦${_formatPrice(subtotal)}',
+                    formatPrice(subtotal),
                     style: const TextStyle(
                       fontSize: 14,
                       color: Color(0xFFFBFBFB),
@@ -328,7 +319,7 @@ class _OrderConfirmationScreenState
                     style: TextStyle(fontSize: 14, color: Color(0xFFFBFBFB)),
                   ),
                   Text(
-                    '₦${_formatPrice(deliveryFee)}',
+                    formatPrice(deliveryFee),
                     style: const TextStyle(
                       fontSize: 14,
                       color: Color(0xFFFBFBFB),
@@ -352,7 +343,7 @@ class _OrderConfirmationScreenState
                     ),
                   ),
                   Text(
-                    '₦${_formatPrice(total)}',
+                    formatPrice(total),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,

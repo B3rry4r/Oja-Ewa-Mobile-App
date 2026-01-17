@@ -1,5 +1,6 @@
 // filter_sheet.dart
 import 'package:flutter/material.dart';
+import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
@@ -231,7 +232,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '₦${currentRange.start.toInt()}',
+                formatPrice(currentRange.start.toInt()),
                 style: const TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
@@ -239,7 +240,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                 ),
               ),
               Text(
-                '₦${currentRange.end.toInt()}',
+                formatPrice(currentRange.end.toInt()),
                 style: const TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',

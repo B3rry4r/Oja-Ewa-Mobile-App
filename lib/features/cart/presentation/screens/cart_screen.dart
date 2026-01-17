@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
@@ -6,16 +7,6 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/cart/domain/cart.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
-
-/// Format number to 1 decimal place, removing trailing zeros
-String _formatPrice(num value) {
-  final formatted = value.toStringAsFixed(1);
-  // Remove .0 if whole number
-  if (formatted.endsWith('.0')) {
-    return formatted.substring(0, formatted.length - 2);
-  }
-  return formatted;
-}
 
 /// Renamed/moved Shopping Bag screen. UI is unchanged.
 class CartScreen extends ConsumerWidget {
@@ -257,7 +248,7 @@ class _CartRow extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '₦${_formatPrice(cartItem.unitPrice ?? 0)}',
+                      formatPrice(cartItem.unitPrice ?? 0),
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -484,7 +475,7 @@ class _CheckoutSection extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '₦${_formatPrice(total)}',
+                    formatPrice(total),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -494,11 +485,11 @@ class _CheckoutSection extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 5),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '+ ₦2,000 delivery fee at checkout',
-                  style: TextStyle(fontSize: 12, color: Color(0xFFFBFBFB)),
+                  '+ ${formatPrice(2000)} delivery fee at checkout',
+                  style: const TextStyle(fontSize: 12, color: Color(0xFFFBFBFB)),
                 ),
               ),
               const SizedBox(height: 20),
