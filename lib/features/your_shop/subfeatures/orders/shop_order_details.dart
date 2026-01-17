@@ -261,45 +261,9 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
     SellerOrder order,
     bool isActing,
   ) {
-    if (order.status == 'delivered' || order.status == 'cancelled') {
-      return const SizedBox.shrink(); // No actions for completed orders
-    }
-
-    return Column(
-      children: [
-        // Primary action based on status
-        if (order.canAccept)
-          _buildPrimaryButton(
-            label: isActing ? 'Processing...' : 'Accept Order',
-            onTap: isActing ? null : () => _acceptOrder(context, ref, order.id),
-          ),
-        if (order.canShip)
-          _buildPrimaryButton(
-            label: isActing ? 'Processing...' : 'Mark as Shipped',
-            onTap: isActing
-                ? null
-                : () => _showShipDialog(context, ref, order.id),
-          ),
-        if (order.canDeliver)
-          _buildPrimaryButton(
-            label: isActing ? 'Processing...' : 'Mark as Delivered',
-            onTap: isActing
-                ? null
-                : () => _deliverOrder(context, ref, order.id),
-          ),
-
-        const SizedBox(height: 16),
-
-        // Cancel button (if applicable)
-        if (order.canCancel)
-          _buildSecondaryButton(
-            label: 'Cancel Order',
-            onTap: isActing
-                ? null
-                : () => _showCancelDialog(context, ref, order.id),
-          ),
-      ],
-    );
+    // Order status management is now handled by admin
+    // Sellers can only view order details
+    return const SizedBox.shrink();
   }
 
   Future<void> _acceptOrder(
