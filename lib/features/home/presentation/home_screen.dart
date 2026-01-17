@@ -241,9 +241,32 @@ class HomeScreen extends ConsumerWidget {
                 onTap: () async {
                   final actionUrl = ad.actionUrl;
                   if (actionUrl != null && actionUrl.isNotEmpty) {
-                    final uri = Uri.tryParse(actionUrl);
-                    if (uri != null) {
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                    // Handle relative URLs as in-app navigation
+                    if (actionUrl.startsWith('/')) {
+                      // Relative URL - navigate within the app
+                      // Map known paths to app routes
+                      if (actionUrl.contains('textiles')) {
+                        Navigator.of(context).pushNamed(AppRoutes.market);
+                      } else if (actionUrl.contains('beauty')) {
+                        Navigator.of(context).pushNamed(AppRoutes.beauty);
+                      } else if (actionUrl.contains('shoes') || actionUrl.contains('bags')) {
+                        Navigator.of(context).pushNamed(AppRoutes.brands);
+                      } else if (actionUrl.contains('art')) {
+                        Navigator.of(context).pushNamed(AppRoutes.music);
+                      } else if (actionUrl.contains('school')) {
+                        Navigator.of(context).pushNamed(AppRoutes.schools);
+                      } else if (actionUrl.contains('sustain')) {
+                        Navigator.of(context).pushNamed(AppRoutes.sustainability);
+                      } else {
+                        // Default to home for unknown relative paths
+                        Navigator.of(context).pushNamed(AppRoutes.home);
+                      }
+                    } else {
+                      // Absolute URL - open externally
+                      final uri = Uri.tryParse(actionUrl);
+                      if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
                     }
                   }
                 },

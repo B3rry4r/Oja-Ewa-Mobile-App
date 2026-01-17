@@ -51,7 +51,7 @@ import '../../features/account/subfeatures/start_selling/presentation/seller_app
 import '../../features/account/subfeatures/show_your_business/presentation/business_approval_status_screen.dart';
 import '../../features/your_shop/subfeatures/manage_shop/manage_shop.dart';
 import '../../features/your_shop/subfeatures/manage_shop/sub_features/delete_shop.dart';
-import '../../features/your_shop/subfeatures/manage_shop/sub_features/edit_business.dart';
+import '../../features/account/subfeatures/show_your_business/presentation/edit_business.dart';
 import '../../features/your_shop/subfeatures/add_edit_product/seller_category_selection.dart';
 
 /// Central place for route names.

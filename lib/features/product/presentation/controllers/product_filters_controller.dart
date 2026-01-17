@@ -33,6 +33,10 @@ class SelectedFiltersNotifier extends Notifier<SelectedFilters> {
     state = state.copyWith(tribe: tribe, clearTribe: tribe == null);
   }
 
+  void setFabricType(String? fabricType) {
+    state = state.copyWith(fabricType: fabricType, clearFabricType: fabricType == null);
+  }
+
   void setPriceRange(double? min, double? max) {
     state = state.copyWith(
       priceMin: min,
@@ -49,6 +53,7 @@ class SelectedFiltersNotifier extends Notifier<SelectedFilters> {
     String? gender,
     String? style,
     String? tribe,
+    String? fabricType,
     double? priceMin,
     double? priceMax,
   }) {
@@ -56,6 +61,7 @@ class SelectedFiltersNotifier extends Notifier<SelectedFilters> {
       gender: gender,
       style: style,
       tribe: tribe,
+      fabricType: fabricType,
       priceMin: priceMin,
       priceMax: priceMax,
       sortBy: state.sortBy, // Preserve sort

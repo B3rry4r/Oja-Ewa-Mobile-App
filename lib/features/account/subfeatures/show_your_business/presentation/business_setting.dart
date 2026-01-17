@@ -200,6 +200,7 @@ class BusinessSettingsScreen extends ConsumerWidget {
     
     switch (category) {
       case 'beauty':
+      case 'afro_beauty_services':
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => BusinessProfileBeautyScreen(businessId: business.id),
@@ -213,14 +214,28 @@ class BusinessSettingsScreen extends ConsumerWidget {
           ),
         );
         break;
-      case 'brand':
       case 'school':
-      default:
-        // For brands and schools, use the route-based navigation
-        // These screens will be implemented similarly later
+        // School detail screen - under development
+        // Navigate to schools screen with businessId for now
         Navigator.of(context).pushNamed(
-          AppRoutes.beauty, // Fallback to beauty screen pattern for now
+          AppRoutes.schools,
           arguments: {'businessId': business.id},
+        );
+        break;
+      case 'art':
+      case 'brand':
+        // Art/Brand - sustainability screen for now (under development)
+        Navigator.of(context).pushNamed(
+          AppRoutes.sustainability,
+          arguments: {'businessId': business.id},
+        );
+        break;
+      default:
+        // Fallback to beauty screen for any unhandled category
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => BusinessProfileBeautyScreen(businessId: business.id),
+          ),
         );
         break;
     }

@@ -364,6 +364,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
             onFiltersChanged: _onFiltersChanged,
             kind: kind,
             excludeStyles: widget.type == 'textiles' ? {'Fabrics'} : const {},
+            categoryType: widget.type,
           ),
           const SizedBox(height: 24),
           if (hasActiveFilters && effectiveFilteredAsync != null)
@@ -562,12 +563,14 @@ class _SortFilterRow extends ConsumerWidget {
     required this.onFiltersChanged,
     required this.kind,
     required this.excludeStyles,
+    required this.categoryType,
   });
 
   final bool showBusinessTypeFilter;
   final VoidCallback onFiltersChanged;
   final _ListingKind kind;
   final Set<String> excludeStyles;
+  final String categoryType;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -610,6 +613,7 @@ class _SortFilterRow extends ConsumerWidget {
                     onApplyFilters: (_) => onFiltersChanged(),
                     onClearFilters: onFiltersChanged,
                     excludeStyles: excludeStyles,
+                    categoryType: categoryType,
                   ),
                 );
               },

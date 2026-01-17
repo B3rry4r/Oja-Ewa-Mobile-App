@@ -151,7 +151,11 @@ class _BlogScreenState extends ConsumerState<BlogScreen> {
                             _tabButton(
                               label: 'Favorite Posts',
                               active: _showFavorites,
-                              onTap: () => setState(() => _showFavorites = true),
+                              onTap: () {
+                                // Refresh favorites from server when switching to tab
+                                ref.invalidate(blogFavoritesProvider);
+                                setState(() => _showFavorites = true);
+                              },
                             ),
                           ],
                         ),

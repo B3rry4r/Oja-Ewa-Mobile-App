@@ -51,10 +51,10 @@ class CartScreen extends ConsumerWidget {
                 child: isInitialLoading
                     ? const Center(child: CircularProgressIndicator())
                     : hasError
-                        ? const Center(child: Text('Failed to load cart'))
-                        : cart == null
-                            ? const Center(child: Text('Your cart is empty.'))
-                            : _CartBody(cart: cart),
+                    ? const Center(child: Text('Failed to load cart'))
+                    : cart == null
+                    ? const Center(child: Text('Your cart is empty.'))
+                    : _CartBody(cart: cart),
               ),
             ),
             _CheckoutSection(cart: cart),
@@ -130,7 +130,13 @@ class _CartRow extends ConsumerWidget {
     final product = cartItem.product;
 
     // Parse available sizes from product
-    final availableSizes = product.size?.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList() ?? [];
+    final availableSizes =
+        product.size
+            ?.split(',')
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)
+            .toList() ??
+        [];
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -182,18 +188,27 @@ class _CartRow extends ConsumerWidget {
                     Expanded(
                       child: Text(
                         product.name,
-                        style: const TextStyle(fontSize: 16, color: Color(0xFF241508)),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF241508),
+                        ),
                       ),
                     ),
                     IconButton(
                       onPressed: () {
                         // Optimistic: remove immediately, revert on failure
-                        ref.read(optimisticCartActionsProvider.notifier).removeItem(
-                          context: context,
-                          cartItemId: cartItem.id,
-                        );
+                        ref
+                            .read(optimisticCartActionsProvider.notifier)
+                            .removeItem(
+                              context: context,
+                              cartItemId: cartItem.id,
+                            );
                       },
-                      icon: const Icon(Icons.delete_outline, size: 20, color: Color(0xFF241508)),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        size: 20,
+                        color: Color(0xFF241508),
+                      ),
                     ),
                   ],
                 ),
@@ -201,9 +216,17 @@ class _CartRow extends ConsumerWidget {
                 if (availableSizes.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   GestureDetector(
-                    onTap: () => _showSizeSelector(context, ref, cartItem, availableSizes),
+                    onTap: () => _showSizeSelector(
+                      context,
+                      ref,
+                      cartItem,
+                      availableSizes,
+                    ),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(color: const Color(0xFFDEDEDE)),
@@ -213,10 +236,17 @@ class _CartRow extends ConsumerWidget {
                         children: [
                           Text(
                             'Size: ${cartItem.selectedSize.isNotEmpty ? cartItem.selectedSize : "Select"}',
-                            style: const TextStyle(fontSize: 14, color: Color(0xFF3C4042)),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF3C4042),
+                            ),
                           ),
                           const SizedBox(width: 4),
-                          const Icon(Icons.keyboard_arrow_down, size: 18, color: Color(0xFF3C4042)),
+                          const Icon(
+                            Icons.keyboard_arrow_down,
+                            size: 18,
+                            color: Color(0xFF3C4042),
+                          ),
                         ],
                       ),
                     ),
@@ -228,10 +258,17 @@ class _CartRow extends ConsumerWidget {
                   children: [
                     Text(
                       '₦${_formatPrice(cartItem.unitPrice ?? 0)}',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF241508)),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF241508),
+                      ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(color: const Color(0xFFDEDEDE)),
@@ -244,34 +281,51 @@ class _CartRow extends ConsumerWidget {
                                 ? null
                                 : () {
                                     // Optimistic: update immediately
-                                    ref.read(optimisticCartActionsProvider.notifier).updateQuantity(
-                                      context: context,
-                                      cartItemId: cartItem.id,
-                                      newQuantity: cartItem.quantity - 1,
-                                    );
+                                    ref
+                                        .read(
+                                          optimisticCartActionsProvider
+                                              .notifier,
+                                        )
+                                        .updateQuantity(
+                                          context: context,
+                                          cartItemId: cartItem.id,
+                                          newQuantity: cartItem.quantity - 1,
+                                        );
                                   },
                             child: Icon(
                               Icons.remove,
                               size: 20,
-                              color: cartItem.quantity <= 1 ? const Color(0xFFCCCCCC) : const Color(0xFF3C4042),
+                              color: cartItem.quantity <= 1
+                                  ? const Color(0xFFCCCCCC)
+                                  : const Color(0xFF3C4042),
                             ),
                           ),
                           const SizedBox(width: 24),
                           Text(
                             '${cartItem.quantity}',
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF3C4042)),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF3C4042),
+                            ),
                           ),
                           const SizedBox(width: 24),
                           GestureDetector(
                             onTap: () {
                               // Optimistic: update immediately
-                              ref.read(optimisticCartActionsProvider.notifier).updateQuantity(
-                                context: context,
-                                cartItemId: cartItem.id,
-                                newQuantity: cartItem.quantity + 1,
-                              );
+                              ref
+                                  .read(optimisticCartActionsProvider.notifier)
+                                  .updateQuantity(
+                                    context: context,
+                                    cartItemId: cartItem.id,
+                                    newQuantity: cartItem.quantity + 1,
+                                  );
                             },
-                            child: const Icon(Icons.add, size: 20, color: Color(0xFF3C4042)),
+                            child: const Icon(
+                              Icons.add,
+                              size: 20,
+                              color: Color(0xFF3C4042),
+                            ),
                           ),
                         ],
                       ),
@@ -286,7 +340,12 @@ class _CartRow extends ConsumerWidget {
     );
   }
 
-  void _showSizeSelector(BuildContext context, WidgetRef ref, CartItem cartItem, List<String> sizes) {
+  void _showSizeSelector(
+    BuildContext context,
+    WidgetRef ref,
+    CartItem cartItem,
+    List<String> sizes,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -336,17 +395,24 @@ class _CartRow extends ConsumerWidget {
                     onTap: () {
                       Navigator.of(ctx).pop();
                       // Optimistic: update immediately
-                      ref.read(optimisticCartActionsProvider.notifier).updateSize(
-                        context: context,
-                        cartItemId: cartItem.id,
-                        newSize: size,
-                      );
+                      ref
+                          .read(optimisticCartActionsProvider.notifier)
+                          .updateSize(
+                            context: context,
+                            cartItemId: cartItem.id,
+                            newSize: size,
+                          );
                     },
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFFFDF3E7) : Colors.transparent,
+                        color: isSelected
+                            ? const Color(0xFFFDF3E7)
+                            : Colors.transparent,
                       ),
                       child: Row(
                         children: [
@@ -355,13 +421,19 @@ class _CartRow extends ConsumerWidget {
                               size,
                               style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
                                 color: const Color(0xFF241508),
                               ),
                             ),
                           ),
                           if (isSelected)
-                            const Icon(Icons.check, size: 20, color: Color(0xFFA15E22)),
+                            const Icon(
+                              Icons.check,
+                              size: 20,
+                              color: Color(0xFFA15E22),
+                            ),
                         ],
                       ),
                     ),
@@ -405,31 +477,46 @@ class _CheckoutSection extends StatelessWidget {
                 children: [
                   const Text(
                     'Subtotal',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFFFBFBFB)),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFFFBFBFB),
+                    ),
                   ),
                   Text(
                     '₦${_formatPrice(total)}',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFFFBFBFB)),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFFBFBFB),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               const Align(
                 alignment: Alignment.centerLeft,
-                child: Text('+ ₦2,000 delivery fee at checkout', style: TextStyle(fontSize: 12, color: Color(0xFFFBFBFB))),
+                child: Text(
+                  '+ ₦2,000 delivery fee at checkout',
+                  style: TextStyle(fontSize: 12, color: Color(0xFFFBFBFB)),
+                ),
               ),
               const SizedBox(height: 20),
               GestureDetector(
                 onTap: isEmpty
                     ? null
                     : () {
-                        Navigator.of(context).pushNamed(AppRoutes.orderConfirmation);
+                        Navigator.of(
+                          context,
+                        ).pushNamed(AppRoutes.orderConfirmation);
                       },
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   decoration: BoxDecoration(
-                    color: isEmpty ? const Color(0xFFCCCCCC) : const Color(0xFFFDAF40),
+                    color: isEmpty
+                        ? const Color(0xFFCCCCCC)
+                        : const Color(0xFFFDAF40),
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: isEmpty
                         ? null
@@ -442,7 +529,14 @@ class _CheckoutSection extends StatelessWidget {
                           ],
                   ),
                   child: const Center(
-                    child: Text('Checkout', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFFFFFBF5))),
+                    child: Text(
+                      'Checkout',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFFFFBF5),
+                      ),
+                    ),
                   ),
                 ),
               ),

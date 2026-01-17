@@ -6,6 +6,7 @@ class ProductFilters {
     required this.genders,
     required this.styles,
     required this.tribes,
+    required this.fabricTypes,
     required this.priceRange,
     required this.sortOptions,
   });
@@ -13,6 +14,7 @@ class ProductFilters {
   final List<String> genders;
   final List<String> styles;
   final List<String> tribes;
+  final List<String> fabricTypes;
   final PriceRange priceRange;
   final List<SortOption> sortOptions;
 
@@ -21,6 +23,7 @@ class ProductFilters {
       genders: (json['genders'] as List?)?.cast<String>() ?? const [],
       styles: (json['styles'] as List?)?.cast<String>() ?? const [],
       tribes: (json['tribes'] as List?)?.cast<String>() ?? const [],
+      fabricTypes: (json['fabric_types'] as List?)?.cast<String>() ?? const [],
       priceRange: PriceRange.fromJson(json['price_range'] as Map<String, dynamic>? ?? {}),
       sortOptions: (json['sort_options'] as List?)
               ?.whereType<Map<String, dynamic>>()
@@ -34,6 +37,7 @@ class ProductFilters {
     genders: [],
     styles: [],
     tribes: [],
+    fabricTypes: [],
     priceRange: PriceRange.empty,
     sortOptions: [],
   );
@@ -43,6 +47,7 @@ class ProductFilters {
     genders: ['Men', 'Women', 'Unisex'],
     styles: ['Traditional', 'Western', 'Casual', 'Formal', 'Fabrics'],
     tribes: ['Yoruba', 'Igbo', 'Hausa', 'Edo', 'Efik', 'Tiv', 'Ijaw', 'Fulani', 'Kanuri', 'Nupe'],
+    fabricTypes: ['Ankara', 'Kente', 'Adire', 'Aso-Oke', 'Lace', 'Cotton', 'Silk', 'Velvet'],
     priceRange: PriceRange(min: 0, max: 500000),
     sortOptions: [
       SortOption(value: 'newest', label: 'Newest'),
@@ -93,6 +98,7 @@ class SelectedFilters {
     this.gender,
     this.style,
     this.tribe,
+    this.fabricType,
     this.priceMin,
     this.priceMax,
     this.sortBy,
@@ -101,6 +107,7 @@ class SelectedFilters {
   final String? gender;
   final String? style;
   final String? tribe;
+  final String? fabricType;
   final double? priceMin;
   final double? priceMax;
   final String? sortBy;
@@ -109,6 +116,7 @@ class SelectedFilters {
       gender != null ||
       style != null ||
       tribe != null ||
+      fabricType != null ||
       priceMin != null ||
       priceMax != null;
 
@@ -118,12 +126,14 @@ class SelectedFilters {
     String? gender,
     String? style,
     String? tribe,
+    String? fabricType,
     double? priceMin,
     double? priceMax,
     String? sortBy,
     bool clearGender = false,
     bool clearStyle = false,
     bool clearTribe = false,
+    bool clearFabricType = false,
     bool clearPrice = false,
     bool clearSort = false,
   }) {
@@ -131,6 +141,7 @@ class SelectedFilters {
       gender: clearGender ? null : (gender ?? this.gender),
       style: clearStyle ? null : (style ?? this.style),
       tribe: clearTribe ? null : (tribe ?? this.tribe),
+      fabricType: clearFabricType ? null : (fabricType ?? this.fabricType),
       priceMin: clearPrice ? null : (priceMin ?? this.priceMin),
       priceMax: clearPrice ? null : (priceMax ?? this.priceMax),
       sortBy: clearSort ? null : (sortBy ?? this.sortBy),

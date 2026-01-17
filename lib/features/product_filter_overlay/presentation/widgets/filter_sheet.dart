@@ -17,11 +17,18 @@ class FilterSheet extends ConsumerStatefulWidget {
   /// Styles to exclude from selection
   final Set<String> excludeStyles;
 
+  /// Category type to show relevant filters:
+  /// - textiles: all filters including fabric_type
+  /// - shoes_bags: all filters except fabric_type  
+  /// - afro_beauty_products, art: price only
+  final String? categoryType;
+
   const FilterSheet({
     super.key,
     this.onApplyFilters,
     this.onClearFilters,
     this.excludeStyles = const {},
+    this.categoryType,
   });
 
   @override
@@ -33,6 +40,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   String? _selectedGender;
   String? _selectedStyle;
   String? _selectedTribe;
+  String? _selectedFabricType;
   RangeValues? _priceRange;
 
   @override
@@ -43,6 +51,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     _selectedGender = currentFilters.gender;
     _selectedStyle = currentFilters.style;
     _selectedTribe = currentFilters.tribe;
+    _selectedFabricType = currentFilters.fabricType;
     if (currentFilters.priceMin != null || currentFilters.priceMax != null) {
       _priceRange = RangeValues(
         currentFilters.priceMin ?? 0,
@@ -77,6 +86,14 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   }
 
   Widget _buildFilterSheet(ProductFilters filters) {
+    // Determine which filters to show based on category type
+    // - textiles: all filters including fabric_type
+    // - shoes_bags: all filters except fabric_type
+    // - afro_beauty_products, art: price only (no extended fields)
+    final type = widget.categoryType?.toLowerCase() ?? 'textiles';
+    final showExtendedFilters = type == 'textiles' || type == 'shoes_bags';
+    final showFabricType = type == 'textiles';
+
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -94,8 +111,8 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
             // Header with title and close button
             _buildHeader(),
 
-            // Gender filter section
-            if (filters.genders.isNotEmpty) ...[
+            // Gender filter section (textiles & shoes_bags only)
+            if (showExtendedFilters && filters.genders.isNotEmpty) ...[
               _buildSectionTitle('Gender'),
               const SizedBox(height: 8),
               _buildChipFilters(
@@ -106,8 +123,8 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               const SizedBox(height: 24),
             ],
 
-            // Style filter section
-            if (filters.styles.isNotEmpty) ...[
+            // Style filter section (textiles & shoes_bags only)
+            if (showExtendedFilters && filters.styles.isNotEmpty) ...[
               _buildSectionTitle('Style'),
               const SizedBox(height: 8),
               _buildChipFilters(
@@ -118,8 +135,8 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               const SizedBox(height: 24),
             ],
 
-            // Tribe filter section
-            if (filters.tribes.isNotEmpty) ...[
+            // Tribe filter section (textiles & shoes_bags only)
+            if (showExtendedFilters && filters.tribes.isNotEmpty) ...[
               _buildSectionTitle('Tribe'),
               const SizedBox(height: 8),
               _buildChipFilters(
@@ -130,7 +147,19 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               const SizedBox(height: 24),
             ],
 
-            // Price range filter
+            // Fabric Type filter section (textiles only)
+            if (showFabricType && filters.fabricTypes.isNotEmpty) ...[
+              _buildSectionTitle('Fabric Type'),
+              const SizedBox(height: 8),
+              _buildChipFilters(
+                options: filters.fabricTypes,
+                selected: _selectedFabricType,
+                onSelected: (value) => setState(() => _selectedFabricType = value),
+              ),
+              const SizedBox(height: 24),
+            ],
+
+            // Price range filter (all categories)
             _buildSectionTitle('Price Range'),
             const SizedBox(height: 8),
             _buildPriceRangeFilter(filters.priceRange),
@@ -283,6 +312,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                   _selectedGender = null;
                   _selectedStyle = null;
                   _selectedTribe = null;
+                  _selectedFabricType = null;
                   _priceRange = null;
                 });
                 ref.read(selectedFiltersProvider.notifier).clearFilters();
@@ -319,6 +349,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                   gender: _selectedGender,
                   style: _selectedStyle,
                   tribe: _selectedTribe,
+                  fabricType: _selectedFabricType,
                   priceMin: _priceRange?.start,
                   priceMax: _priceRange?.end,
                   sortBy: ref.read(selectedFiltersProvider).sortBy, // Preserve sort
@@ -328,6 +359,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                   gender: _selectedGender,
                   style: _selectedStyle,
                   tribe: _selectedTribe,
+                  fabricType: _selectedFabricType,
                   priceMin: _priceRange?.start,
                   priceMax: _priceRange?.end,
                 );

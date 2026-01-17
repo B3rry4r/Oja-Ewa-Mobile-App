@@ -746,12 +746,28 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               price: price,
               discount: discount,
             );
+        
+        // Upload image if provided
+        if (_imagePath != null && _imagePath!.isNotEmpty) {
+          try {
+            await ref.read(sellerProductActionsProvider.notifier).uploadProductImage(
+              productId: productIdInt,
+              filePath: _imagePath!,
+            );
+          } catch (e) {
+            // Image upload failed but product was updated - show warning
+            if (mounted) {
+              AppSnackbars.showError(context, 'Product updated but image upload failed');
+            }
+          }
+        }
+        
         if (mounted) {
           AppSnackbars.showSuccess(context, 'Product updated successfully');
           Navigator.of(context).pop(true);
         }
       } else {
-        await ref.read(sellerProductActionsProvider.notifier).createProduct(
+        final result = await ref.read(sellerProductActionsProvider.notifier).createProduct(
               categoryId: _categoryId!,
               name: _nameController.text.trim(),
               // Only pass extended fields if required
@@ -766,6 +782,23 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               price: price,
               discount: discount,
             );
+        
+        // Upload image if provided - get product ID from result
+        final productId = result['product']?['id'] as int? ?? result['id'] as int?;
+        if (_imagePath != null && _imagePath!.isNotEmpty && productId != null) {
+          try {
+            await ref.read(sellerProductActionsProvider.notifier).uploadProductImage(
+              productId: productId,
+              filePath: _imagePath!,
+            );
+          } catch (e) {
+            // Image upload failed but product was created - show warning
+            if (mounted) {
+              AppSnackbars.showError(context, 'Product created but image upload failed');
+            }
+          }
+        }
+        
         if (mounted) {
           AppSnackbars.showSuccess(context, 'Product added successfully');
           Navigator.of(context).pop(true);

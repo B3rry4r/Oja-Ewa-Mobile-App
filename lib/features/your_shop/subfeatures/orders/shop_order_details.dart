@@ -85,7 +85,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
             _buildDetailTile("Shipping Address", order.shippingAddress!.fullAddress),
           
           const SizedBox(height: 20),
-          const Text('Items', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, fontFamily: 'Campton')),
+          const Text('Items', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, fontFamily: 'Campton', color: Color(0xFF241508))),
           const SizedBox(height: 12),
           ...order.items.map((item) => _buildItemTile(item)),
           
@@ -147,9 +147,9 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFEEEEEE)),
+        border: Border.all(color: const Color(0xFFCCCCCC)),
       ),
       child: Row(
         children: [
@@ -171,12 +171,12 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.productName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'Campton')),
+                Text(item.productName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'Campton', color: Color(0xFF241508))),
                 const SizedBox(height: 4),
                 Text('Qty: ${item.quantity}${item.size != null ? ' • Size: ${item.size}' : ''}',
                     style: const TextStyle(fontSize: 14, color: Color(0xFF777F84), fontFamily: 'Campton')),
                 Text('₦${item.price.toStringAsFixed(0)}',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: 'Campton')),
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: 'Campton', color: Color(0xFF241508))),
               ],
             ),
           ),
@@ -286,27 +286,136 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
 
   Future<void> _showCancelDialog(BuildContext context, WidgetRef ref, int orderId) async {
     final reasonController = TextEditingController();
-    final result = await showDialog<bool>(
+    final result = await showGeneralDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Cancel Order'),
-        content: TextField(
-          controller: reasonController,
-          decoration: const InputDecoration(
-            labelText: 'Reason for cancellation',
-            hintText: 'e.g., Out of stock',
+      barrierDismissible: true,
+      barrierLabel: 'CancelOrderModal',
+      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, anim1, anim2) {
+        return Scaffold(
+          backgroundColor: const Color(0xFF1E2021).withOpacity(0.8),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                width: 342,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFBF5),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Cancel Order',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 33,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF603814),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Please provide a reason for cancellation',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF1E2021),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFCCCCCC)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: TextField(
+                        controller: reasonController,
+                        maxLines: 3,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Campton',
+                          color: Color(0xFF1E2021),
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: 'e.g., Out of stock',
+                          hintStyle: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Campton',
+                            color: Color(0xFF777F84),
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.all(16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => Navigator.of(context).pop(false),
+                            child: Container(
+                              height: 57,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: const Color(0xFFCCCCCC)),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Back',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF595F63),
+                                    fontFamily: 'Campton',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => Navigator.of(context).pop(true),
+                            child: Container(
+                              height: 57,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFC95353),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Cancel Order',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFFFFFBF5),
+                                    fontFamily: 'Campton',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
           ),
-          maxLines: 3,
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Back')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Cancel Order'),
-          ),
-        ],
-      ),
+        );
+      },
     );
     
     if (result == true && context.mounted) {

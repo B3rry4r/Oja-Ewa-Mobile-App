@@ -48,6 +48,14 @@ class SellerProductRepository {
     );
   }
 
+  /// Upload product image after creation
+  Future<String> uploadProductImage({
+    required int productId,
+    required String filePath,
+  }) {
+    return _api.uploadProductImage(productId: productId, filePath: filePath);
+  }
+
   Future<Map<String, dynamic>> updateProduct({
     required int productId,
     int? categoryId,

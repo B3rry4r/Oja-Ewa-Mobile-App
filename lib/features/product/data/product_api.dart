@@ -100,10 +100,36 @@ class ProductApi {
     }
   }
 
+  /// Upload product image
+  /// POST /api/products/{id}/upload
+  /// 
+  /// Uploads an image file for a product. Must be called after product creation.
+  /// Accepts: jpg, jpeg, png, webp (max 5MB)
+  Future<String> uploadProductImage({
+    required int productId,
+    required String filePath,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(filePath),
+      });
+
+      final res = await _dio.post('/api/products/$productId/upload', data: formData);
+      final data = res.data;
+      if (data is Map<String, dynamic>) {
+        final imageUrl = data['data']?['image_url'] as String?;
+        if (imageUrl != null) return imageUrl;
+      }
+      throw const FormatException('Failed to get image URL from response');
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
   /// Update an existing product
   /// PUT /api/products/{id}
   /// 
-  /// Note: Image upload requires a separate endpoint (TODO for backend).
+  /// Note: Image upload is done separately via uploadProductImage().
   Future<Map<String, dynamic>> updateProduct({
     required int productId,
     int? categoryId,

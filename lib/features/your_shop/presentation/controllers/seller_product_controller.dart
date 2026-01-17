@@ -55,6 +55,21 @@ class SellerProductActionsNotifier extends AsyncNotifier<void> {
     }
   }
 
+  /// Upload product image after creation
+  Future<String> uploadProductImage({
+    required int productId,
+    required String filePath,
+  }) async {
+    try {
+      return await ref.read(sellerProductRepositoryProvider).uploadProductImage(
+        productId: productId,
+        filePath: filePath,
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<Map<String, dynamic>> updateProduct({
     required int productId,
     int? categoryId,

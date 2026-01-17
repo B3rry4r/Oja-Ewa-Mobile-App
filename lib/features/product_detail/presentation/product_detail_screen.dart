@@ -144,33 +144,36 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
                       const SizedBox(height: 24),
 
-                      // Size selection
-                      const Text(
-                        'Size',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF1E2021),
-                        ),
-                      ),
-
-                      const SizedBox(height: 5),
-
-                      _buildSizeSelector(details?.size),
-
-                      const SizedBox(height: 8),
-
-                      const Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          'View Size Chart',
+                      // Size selection - only show if product has sizes (textiles, shoes_bags)
+                      // Art and beauty products don't have sizes
+                      if (details?.size != null && details!.size!.isNotEmpty) ...[
+                        const Text(
+                          'Size',
                           style: TextStyle(
-                            fontSize: 10,
-                            color: Color(0xFF777F84),
+                            fontSize: 12,
+                            color: Color(0xFF1E2021),
                           ),
                         ),
-                      ),
 
-                      const SizedBox(height: 28),
+                        const SizedBox(height: 5),
+
+                        _buildSizeSelector(details.size),
+
+                        const SizedBox(height: 8),
+
+                        const Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            'View Size Chart',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Color(0xFF777F84),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 28),
+                      ],
 
                       // Processing time section
                       const Column(
