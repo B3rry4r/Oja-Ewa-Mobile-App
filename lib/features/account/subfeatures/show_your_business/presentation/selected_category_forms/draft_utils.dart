@@ -1,11 +1,15 @@
 import 'business_registration_draft.dart';
 
+/// Maps UI category labels to backend API category enum values.
+/// Backend accepts: school, art, afro_beauty_services
 String mapCategoryLabelToEnum(String label) {
   return switch (label) {
-    'Beauty' => 'beauty',
-    'Brands' => 'brand',
+    'Beauty' => 'afro_beauty_services',
     'Schools' => 'school',
-    'Music' => 'music',
+    'Art' => 'art',
+    // Legacy mappings (no longer valid for business profiles)
+    'Brands' => 'art', // Brands was moved to art category
+    'Music' => 'art',  // Music was moved to art category
     _ => label.toLowerCase(),
   };
 }

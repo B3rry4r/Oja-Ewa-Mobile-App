@@ -47,9 +47,11 @@ class ProductApi {
   /// Create a new product (seller endpoint)
   /// POST /api/products
   /// 
-  /// Fields style, tribe, size are required for textiles & shoes_bags
-  /// fabric_type is required for textiles only
+  /// Fields style, tribe, size, fabric_type are required for textiles & shoes_bags
   /// NOT required for afro_beauty_products and art.
+  /// 
+  /// Note: Image upload requires a separate endpoint. The current API accepts
+  /// image as a URL string. TODO: Backend needs to add multipart file upload support.
   Future<Map<String, dynamic>> createProduct({
     required int categoryId,
     required String name,
@@ -57,7 +59,7 @@ class ProductApi {
     String? tribe,
     String? fabricType,
     required String description,
-    required String imagePath,
+    String? imagePath, // Local file path - requires backend upload endpoint
     List<String>? sizes,
     required String processingTimeType, // 'normal' or 'quick_quick'
     required int processingDays,
@@ -69,7 +71,6 @@ class ProductApi {
         'category_id': categoryId,
         'name': name,
         'description': description,
-        'image': await MultipartFile.fromFile(imagePath),
         'processing_time_type': processingTimeType,
         'processing_days': processingDays,
         'price': price,
@@ -82,9 +83,11 @@ class ProductApi {
       if (sizes != null && sizes.isNotEmpty) map['size'] = sizes.join(',');
       if (discount != null) map['discount'] = discount;
       
-      final formData = FormData.fromMap(map);
+      // TODO: Backend needs to support multipart file upload for images
+      // For now, image upload is not supported - products will be created without images
+      // and images need to be uploaded via a separate endpoint (like business profile does)
 
-      final res = await _dio.post('/api/products', data: formData);
+      final res = await _dio.post('/api/products', data: map);
       final data = res.data;
       if (data is Map<String, dynamic>) {
         final inner = data['data'];
@@ -99,6 +102,8 @@ class ProductApi {
 
   /// Update an existing product
   /// PUT /api/products/{id}
+  /// 
+  /// Note: Image upload requires a separate endpoint (TODO for backend).
   Future<Map<String, dynamic>> updateProduct({
     required int productId,
     int? categoryId,
@@ -107,7 +112,7 @@ class ProductApi {
     String? tribe,
     String? fabricType,
     String? description,
-    String? imagePath,
+    String? imagePath, // Local file path - requires backend upload endpoint
     List<String>? sizes,
     String? processingTimeType,
     int? processingDays,
@@ -127,16 +132,10 @@ class ProductApi {
       if (processingDays != null) map['processing_days'] = processingDays;
       if (price != null) map['price'] = price;
       if (discount != null) map['discount'] = discount;
+      
+      // TODO: Backend needs to support multipart file upload for images
 
-      FormData formData;
-      if (imagePath != null) {
-        map['image'] = await MultipartFile.fromFile(imagePath);
-        formData = FormData.fromMap(map);
-      } else {
-        formData = FormData.fromMap(map);
-      }
-
-      final res = await _dio.put('/api/products/$productId', data: formData);
+      final res = await _dio.put('/api/products/$productId', data: map);
       final data = res.data;
       if (data is Map<String, dynamic>) {
         final inner = data['data'];

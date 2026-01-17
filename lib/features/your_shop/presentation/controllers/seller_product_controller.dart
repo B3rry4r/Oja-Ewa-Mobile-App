@@ -13,9 +13,10 @@ class SellerProductActionsNotifier extends AsyncNotifier<void> {
 
   /// Create a new product.
   /// 
-  /// Fields style, tribe, sizes are required for textiles & shoes_bags
-  /// fabric_type is required for textiles only
+  /// Fields style, tribe, sizes, fabric_type are required for textiles & shoes_bags
   /// NOT required for afro_beauty_products and art.
+  /// 
+  /// Note: Image upload requires backend support. Image path is stored for future upload.
   Future<Map<String, dynamic>> createProduct({
     required int categoryId,
     required String name,
@@ -23,7 +24,7 @@ class SellerProductActionsNotifier extends AsyncNotifier<void> {
     String? tribe,
     String? fabricType,
     required String description,
-    required String imagePath,
+    String? imagePath,
     List<String>? sizes,
     required String processingTimeType,
     required int processingDays,

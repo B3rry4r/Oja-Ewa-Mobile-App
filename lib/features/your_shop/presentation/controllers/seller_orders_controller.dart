@@ -161,11 +161,26 @@ class SellerOrder {
   });
 
   factory SellerOrder.fromJson(Map<String, dynamic> json) {
-    final itemsList = json['items'] as List? ?? json['order_items'] as List? ?? [];
+    final itemsRaw = json['items'] ?? json['order_items'];
+    final List<Map<String, dynamic>> itemsList;
+    if (itemsRaw is List) {
+      itemsList = itemsRaw.whereType<Map<String, dynamic>>().toList();
+    } else {
+      itemsList = [];
+    }
     final customer = json['customer'] as Map<String, dynamic>?;
     
+    // Helper to parse int from various types
+    int? parseInt(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return value;
+      if (value is num) return value.toInt();
+      if (value is String) return int.tryParse(value);
+      return null;
+    }
+    
     return SellerOrder(
-      id: json['id'] as int? ?? 0,
+      id: parseInt(json['id']) ?? 0,
       orderNumber: json['order_number'] as String? ?? json['id'].toString(),
       status: json['status'] as String? ?? 'pending',
       createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
@@ -174,7 +189,7 @@ class SellerOrder {
       shippingAddress: (customer != null || json['shipping_address'] != null || json['shipping_city'] != null)
           ? ShippingAddress.fromJson(json)
           : null,
-      items: itemsList.map((e) => SellerOrderItem.fromJson(e as Map<String, dynamic>)).toList(),
+      items: itemsList.map((e) => SellerOrderItem.fromJson(e)).toList(),
       totalPrice: _parseDouble(json['total_price']) ?? 0,
       trackingNumber: json['tracking_number'] as String?,
       shippedAt: json['shipped_at'] != null ? DateTime.tryParse(json['shipped_at'] as String) : null,
@@ -239,13 +254,39 @@ class SellerOrderItem {
   factory SellerOrderItem.fromJson(Map<String, dynamic> json) {
     final product = json['product'] as Map<String, dynamic>?;
     
+    // Helper to parse int from various types
+    int? parseInt(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return value;
+      if (value is num) return value.toInt();
+      if (value is String) return int.tryParse(value);
+      return null;
+    }
+    
+    // Helper to parse double from various types
+    double? parseDouble(dynamic value) {
+      if (value == null) return null;
+      if (value is double) return value;
+      if (value is num) return value.toDouble();
+      if (value is String) return double.tryParse(value);
+      return null;
+    }
+    
+    // Size can be String, int (for shoe sizes), or null
+    String? parseSize(dynamic value) {
+      if (value == null) return null;
+      if (value is String) return value;
+      if (value is num) return value.toString();
+      return null;
+    }
+    
     return SellerOrderItem(
-      productId: json['product_id'] as int? ?? product?['id'] as int? ?? 0,
+      productId: parseInt(json['product_id']) ?? parseInt(product?['id']) ?? 0,
       productName: json['product_name'] as String? ?? product?['name'] as String? ?? 'Unknown Product',
       productImage: json['product_image'] as String? ?? product?['image'] as String?,
-      quantity: json['quantity'] as int? ?? 1,
-      size: json['size'] as String?,
-      price: (json['price'] as num?)?.toDouble() ?? (json['unit_price'] as num?)?.toDouble() ?? 0,
+      quantity: parseInt(json['quantity']) ?? 1,
+      size: parseSize(json['size']),
+      price: parseDouble(json['price']) ?? parseDouble(json['unit_price']) ?? 0,
     );
   }
 }

@@ -65,7 +65,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
 
   bool get isEditing => widget.productId != null;
   
-  /// Whether to show style, tribe, size fields
+  /// Whether to show style, tribe, size, gender fields
   /// Required for textiles and shoes_bags
   /// NOT required for afro_beauty_products and art
   bool get _requiresExtendedFields => 
@@ -587,15 +587,15 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             const SizedBox(width: 16),
             Expanded(
               child: GestureDetector(
-                onTap: () => setState(() => _processingTimeType = 'quick'),
+                onTap: () => setState(() => _processingTimeType = 'quick_quick'),
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: _processingTimeType == 'quick'
+                    color: _processingTimeType == 'quick_quick'
                         ? const Color(0xFFFDAF40)
                         : Colors.transparent,
                     border: Border.all(
-                      color: _processingTimeType == 'quick'
+                      color: _processingTimeType == 'quick_quick'
                           ? const Color(0xFFFDAF40)
                           : const Color(0xFFCCCCCC),
                     ),
@@ -603,12 +603,12 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   ),
                   child: Center(
                     child: Text(
-                      'Quick',
+                      'Quick Quick',
                       style: TextStyle(
                         fontSize: 14,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w500,
-                        color: _processingTimeType == 'quick'
+                        color: _processingTimeType == 'quick_quick'
                             ? Colors.white
                             : const Color(0xFF1E2021),
                       ),
@@ -759,7 +759,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               tribe: _requiresExtendedFields ? _selectedTribe : null,
               fabricType: _requiresFabricType ? _selectedFabricType : null,
               description: _descriptionController.text.trim(),
-              imagePath: _imagePath!,
+              imagePath: _imagePath,
               sizes: _requiresExtendedFields ? _selectedSizes : null,
               processingTimeType: _processingTimeType,
               processingDays: processingDays,

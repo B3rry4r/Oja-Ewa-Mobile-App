@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
 import '../presentation/selected_category_forms/classes_offered_editor.dart';
@@ -35,7 +37,7 @@ class BusinessProfilePayload {
     this.spotify,
   });
 
-  /// enum: beauty|brand|school|music
+  /// enum: school|art|afro_beauty_services (per API validation)
   final String category;
 
   final int categoryId;
@@ -88,6 +90,9 @@ class BusinessProfilePayload {
   /// Converts payload to JSON for POST /api/business.
   /// Note: identity_document, business_logo, and business_certificates are NOT included here.
   /// They are uploaded separately via POST /api/business/{id}/upload after creation.
+  /// 
+  /// IMPORTANT: The API expects certain list fields (product_list, service_list, 
+  /// classes_offered, business_certificates) to be JSON-encoded strings, not native arrays.
   Map<String, dynamic> toJson() {
     return {
       'category': category,
@@ -106,12 +111,16 @@ class BusinessProfilePayload {
       if (businessName.isNotEmpty) 'business_name': businessName,
       if (businessDescription.isNotEmpty) 'business_description': businessDescription,
       if (offeringType != null && offeringType!.isNotEmpty) 'offering_type': offeringType,
-      if (productList != null) 'product_list': productList,
-      if (serviceList != null) 'service_list': serviceList!.map((e) => e.toJson()).toList(),
+      // API requires these list fields as JSON-encoded strings
+      if (productList != null && productList!.isNotEmpty) 
+        'product_list': jsonEncode(productList),
+      if (serviceList != null && serviceList!.isNotEmpty) 
+        'service_list': jsonEncode(serviceList!.map((e) => e.toJson()).toList()),
       if (professionalTitle != null && professionalTitle!.isNotEmpty) 'professional_title': professionalTitle,
       if (schoolType != null && schoolType!.isNotEmpty) 'school_type': schoolType,
       if (schoolBiography != null && schoolBiography!.isNotEmpty) 'school_biography': schoolBiography,
-      if (classesOffered != null) 'classes_offered': classesOffered!.map((e) => e.toJson()).toList(),
+      if (classesOffered != null && classesOffered!.isNotEmpty) 
+        'classes_offered': jsonEncode(classesOffered!.map((e) => e.toJson()).toList()),
       if (musicCategory != null && musicCategory!.isNotEmpty) 'music_category': musicCategory,
       if (youtube != null && youtube!.isNotEmpty) 'youtube': youtube,
       if (spotify != null && spotify!.isNotEmpty) 'spotify': spotify,
