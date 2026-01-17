@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Oja-Ewa</string>
+	<string>Ojá-Ẹwà</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -46,11 +46,11 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Oja-Ewa needs access to your photo library to let you select and upload images for your profile, products, and business listings.</string>
+	<string>Ojá-Ẹwà needs access to your photo library to let you select and upload images for your profile, products, and business listings.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Oja-Ewa may save images to your photo library when you download or export images from the app.</string>
+	<string>Ojá-Ẹwà may save images to your photo library when you download or export images from the app.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Oja-Ewa needs access to your camera to let you take photos for your profile, products, and business listings.</string>
+	<string>Ojá-Ẹwà needs access to your camera to let you take photos for your profile, products, and business listings.</string>
 
 	<key>CFBundleURLTypes</key>
 	<array>
