@@ -15,7 +15,8 @@ AppException mapDioError(Object error) {
     final message = _sanitizeMessage(_extractMessage(data) ?? error.message ?? 'Network error', statusCode);
 
     if (statusCode != null && statusCode >= 500) {
-      return ServerException(message, code: statusCode.toString(), cause: error);
+      // Avoid misleading messages like "Unauthorized" from server errors
+      return ServerException('Server error. Please try again.', code: statusCode.toString(), cause: error);
     }
 
     return NetworkException(message, code: statusCode?.toString(), cause: error);
