@@ -44,7 +44,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             children: [
               // Back Button at the top
               _buildBackButton(),
-              
+
               // Main Card Content
               _buildSignInCard(),
             ],
@@ -79,7 +79,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -91,55 +91,55 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 40),
-            
+
             // Welcome Image/Icon
             _buildWelcomeIcon(),
-            
+
             const SizedBox(height: 30),
-            
+
             // Welcome Text
             _buildWelcomeText(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Email Input
             _buildEmailInput(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Password Input
             _buildPasswordInput(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Forgot Password
             _buildForgotPassword(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Remember Me Checkbox
             _buildRememberMe(),
-            
+
             const SizedBox(height: 40),
-            
+
             // Sign In Button
             _buildSignInButton(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Divider with "or" text
             _buildDivider(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Google Sign In Button
             _buildGoogleSignIn(),
-            
+
             const SizedBox(height: 20),
-            
+
             // Sign Up Link
             _buildSignUpLink(),
-            
+
             const SizedBox(height: 40), // Bottom spacing
           ],
         ),
@@ -151,10 +151,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     return SizedBox(
       width: 41.6,
       height: 61.89,
-      child: SvgPicture.asset(
-        AppImages.appLogoAlt,
-        fit: BoxFit.contain,
-      ),
+      child: SvgPicture.asset(AppImages.appLogoAlt, fit: BoxFit.contain),
     );
   }
 
@@ -230,9 +227,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Enter your email',
-                      hintStyle: TextStyle(
-                        color: Color(0xFFCCCCCC),
-                      ),
+                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
                     ),
                   ),
                 ),
@@ -290,9 +285,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Type your password',
-                      hintStyle: TextStyle(
-                        color: Color(0xFFCCCCCC),
-                      ),
+                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
                     ),
                   ),
                 ),
@@ -304,7 +297,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     });
                   },
                   icon: Icon(
-                    _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                    _obscurePassword
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
                     size: 20,
                     color: const Color(0xFF777F84),
                   ),
@@ -403,7 +398,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.3),
+            color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -422,17 +417,20 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFFFBF5)),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0xFFFFFBF5),
+                    ),
                   )
                 : const Text(
-              'Sign in',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Campton',
-                color: Color(0xFFFFFBF5), // #fffbf5
-              ),
-            ),
+                    'Sign in',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Campton',
+                      color: Color(0xFFFFFBF5), // #fffbf5
+                    ),
+                  ),
           ),
         ),
       ),
@@ -442,12 +440,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Widget _buildDivider() {
     return Row(
       children: [
-        Expanded(
-          child: Container(
-            height: 1,
-            color: const Color(0xFFB5B5B5),
-          ),
-        ),
+        Expanded(child: Container(height: 1, color: const Color(0xFFB5B5B5))),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
@@ -460,12 +453,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             ),
           ),
         ),
-        Expanded(
-          child: Container(
-            height: 1,
-            color: const Color(0xFFB5B5B5),
-          ),
-        ),
+        Expanded(child: Container(height: 1, color: const Color(0xFFB5B5B5))),
       ],
     );
   }
@@ -496,7 +484,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               final idToken = await google.signInAndGetIdToken();
               await authFlow.googleSignIn(idToken: idToken);
               if (!mounted) return;
-              Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
             } catch (e) {
               if (!mounted) return;
               AppSnackbars.showError(context, UiErrorMessage.from(e));
@@ -505,11 +495,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                AppIcons.google,
-                width: 20,
-                height: 20,
-              ),
+              SvgPicture.asset(AppIcons.google, width: 20, height: 20),
               const SizedBox(width: 16),
               Text(
                 'Sign in with Google',
@@ -571,7 +557,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Future<void> _handleSignIn() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
-    
+
     if (email.isEmpty || password.isEmpty) {
       // Show validation error
       ScaffoldMessenger.of(context).showSnackBar(
@@ -582,11 +568,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       );
       return;
     }
-    
+
     try {
-      await ref.read(authFlowControllerProvider.notifier).login(email: email, password: password);
+      await ref
+          .read(authFlowControllerProvider.notifier)
+          .login(email: email, password: password);
       if (!mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
     } catch (e) {
       if (!mounted) return;
       AppSnackbars.showError(context, UiErrorMessage.from(e));

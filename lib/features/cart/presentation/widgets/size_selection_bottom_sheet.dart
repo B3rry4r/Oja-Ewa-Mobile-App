@@ -3,26 +3,27 @@ import 'package:flutter/material.dart';
 /// A Bottom Sheet for selecting product sizes.
 /// Package: ojaewa
 class SizeSelectionBottomSheet extends StatefulWidget {
-  const SizeSelectionBottomSheet({
-    super.key,
-    required this.initialSize,
-  });
+  const SizeSelectionBottomSheet({super.key, required this.initialSize});
 
   final String initialSize;
 
   /// Shows the modal and returns the selected size when the user taps "Update".
-  static Future<String?> show(BuildContext context, {required String initialSize}) {
+  static Future<String?> show(
+    BuildContext context, {
+    required String initialSize,
+  }) {
     return showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(0.7),
+      barrierColor: Colors.black.withValues(alpha: 0.7),
       builder: (context) => SizeSelectionBottomSheet(initialSize: initialSize),
     );
   }
 
   @override
-  State<SizeSelectionBottomSheet> createState() => _SizeSelectionBottomSheetState();
+  State<SizeSelectionBottomSheet> createState() =>
+      _SizeSelectionBottomSheetState();
 }
 
 class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
@@ -138,7 +139,9 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
           ),
         ),
         GestureDetector(
-          onTap: () {/* Open Size Chart */},
+          onTap: () {
+            /* Open Size Chart */
+          },
           child: const Text(
             'View Size Chart',
             style: TextStyle(
@@ -167,7 +170,9 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: isSelected ? const Color(0xFFA15E22) : Colors.transparent,
-              border: isSelected ? null : Border.all(color: const Color(0xFFCCCCCC)),
+              border: isSelected
+                  ? null
+                  : Border.all(color: const Color(0xFFCCCCCC)),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -194,7 +199,7 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.4),
+            color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),

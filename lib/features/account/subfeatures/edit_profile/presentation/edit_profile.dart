@@ -186,7 +186,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.5),
+            color: const Color(0xFFFDAF40).withValues(alpha: 0.5),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),

@@ -137,7 +137,9 @@ class AddressesScreen extends ConsumerWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: const Color(0xFFCCCCCC)),
-                    color: address.isDefault ? const Color(0xFFFDAF40) : Colors.transparent,
+                    color: address.isDefault
+                        ? const Color(0xFFFDAF40)
+                        : Colors.transparent,
                   ),
                   child: address.isDefault
                       ? const Icon(Icons.check, size: 16, color: Colors.white)
@@ -169,22 +171,32 @@ class AddressesScreen extends ConsumerWidget {
                 onTap: () async {
                   final updated = await Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => AddEditAddressScreen(initialAddress: address),
+                      builder: (_) =>
+                          AddEditAddressScreen(initialAddress: address),
                     ),
                   );
 
                   if (updated == true && context.mounted) {
                     // Pop back to order confirmation flow if needed.
                     final args = ModalRoute.of(context)?.settings.arguments;
-                    final returnToOrderConfirmation = args is Map && args['returnTo'] == 'orderConfirmation';
-                    if (returnToOrderConfirmation) Navigator.of(context).pop(true);
+                    final returnToOrderConfirmation =
+                        args is Map && args['returnTo'] == 'orderConfirmation';
+                    if (returnToOrderConfirmation)
+                      Navigator.of(context).pop(true);
                   }
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 8,
+                  ),
                   child: const Row(
                     children: [
-                      Icon(Icons.edit_outlined, size: 20, color: Color(0xFF3C4042)),
+                      Icon(
+                        Icons.edit_outlined,
+                        size: 20,
+                        color: Color(0xFF3C4042),
+                      ),
                       SizedBox(width: 9),
                       Text(
                         'Edit',
@@ -245,7 +257,7 @@ class AddressesScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.3),
+            color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -262,7 +274,8 @@ class AddressesScreen extends ConsumerWidget {
 
             if (updated == true && context.mounted) {
               final args = ModalRoute.of(context)?.settings.arguments;
-              final returnToOrderConfirmation = args is Map && args['returnTo'] == 'orderConfirmation';
+              final returnToOrderConfirmation =
+                  args is Map && args['returnTo'] == 'orderConfirmation';
               if (returnToOrderConfirmation) Navigator.of(context).pop(true);
             }
           },

@@ -14,7 +14,8 @@ class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key});
 
   @override
-  ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  ConsumerState<ResetPasswordScreen> createState() =>
+      _ResetPasswordScreenState();
 }
 
 class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
@@ -38,12 +39,12 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 74),
-                
+
                 // Back Button
                 _buildBackButton(context),
-                
+
                 const SizedBox(height: 49),
-                
+
                 // Title
                 Text(
                   'Reset password',
@@ -56,9 +57,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     color: const Color(0xFF3C230C), // #3c230c
                   ),
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 // Instructions
                 Text(
                   'Enter your registered email',
@@ -70,19 +71,19 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     color: const Color(0xFF1E2021), // #1e2021
                   ),
                 ),
-                
+
                 const SizedBox(height: 37),
-                
+
                 // Email Input Group
                 _buildEmailInputGroup(),
-                
+
                 const SizedBox(height: 146),
-                
+
                 // Send Code Button
                 _buildSendCodeButton(context),
-                
+
                 const SizedBox(height: 246),
-                
+
                 // Decorative Background Image (low opacity)
                 _buildBackgroundImage(),
               ],
@@ -173,13 +174,18 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
               final email = _emailController.text.trim();
               if (email.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter your email'), backgroundColor: Color(0xFFFDAF40)),
+                  const SnackBar(
+                    content: Text('Please enter your email'),
+                    backgroundColor: Color(0xFFFDAF40),
+                  ),
                 );
                 return;
               }
 
               try {
-                await ref.read(authFlowControllerProvider.notifier).forgotPassword(email: email);
+                await ref
+                    .read(authFlowControllerProvider.notifier)
+                    .forgotPassword(email: email);
                 if (!mounted) return;
                 Navigator.of(context).pushNamed(
                   AppRoutes.verificationCode,
@@ -191,34 +197,43 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
               }
             },
       child: Container(
-      width: double.infinity,
-      height: 57,
-      decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40), // #fdaf40
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.2), // #fdaf40 with 20% opacity
-            offset: const Offset(0, 8),
-            blurRadius: 16,
-          ),
-        ],
-      ),
-      child: Center(
-        child: auth.isLoading
-            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFFFBF5)))
-            : Text(
-          'Send code',
-          style: TextStyle(
-            fontFamily: 'Campton',
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            height: 1.2,
-            color: const Color(0xFFFFFBF5), // #fffbf5
-          ),
+        width: double.infinity,
+        height: 57,
+        decoration: BoxDecoration(
+          color: const Color(0xFFFDAF40), // #fdaf40
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(
+                0xFFFDAF40,
+              ).withValues(alpha: 0.2), // #fdaf40 with 20% opacity
+              offset: const Offset(0, 8),
+              blurRadius: 16,
+            ),
+          ],
+        ),
+        child: Center(
+          child: auth.isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Color(0xFFFFFBF5),
+                  ),
+                )
+              : Text(
+                  'Send code',
+                  style: TextStyle(
+                    fontFamily: 'Campton',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    color: const Color(0xFFFFFBF5), // #fffbf5
+                  ),
+                ),
         ),
       ),
-    ),
     );
   }
 

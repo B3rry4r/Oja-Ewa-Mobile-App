@@ -77,7 +77,11 @@ class _MusicBusinessDetailsScreenState
             ),
             const SizedBox(height: 16),
 
-            _buildInputField("Music School/Studio Name", "Enter name", controller: _businessNameController),
+            _buildInputField(
+              "Music School/Studio Name",
+              "Enter name",
+              controller: _businessNameController,
+            ),
             const SizedBox(height: 24),
 
             const Text(
@@ -248,7 +252,11 @@ class _MusicBusinessDetailsScreenState
             height: 140,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(11),
-              border: Border.all(color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF89858A)),
+              border: Border.all(
+                color: hasFile
+                    ? const Color(0xFF4CAF50)
+                    : const Color(0xFF89858A),
+              ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -256,12 +264,17 @@ class _MusicBusinessDetailsScreenState
                 Icon(
                   hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
                   size: 24,
-                  color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF777F84),
+                  color: hasFile
+                      ? const Color(0xFF4CAF50)
+                      : const Color(0xFF777F84),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   hasFile ? 'Logo selected' : 'Browse Document',
-                  style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF1E2021),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
@@ -282,8 +295,7 @@ class _MusicBusinessDetailsScreenState
     int maxLines = 1,
     String? helperText,
     TextEditingController? controller,
-  }) { 
-
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -353,7 +365,10 @@ class _MusicBusinessDetailsScreenState
     }
 
     if (description.length < 100) {
-      AppSnackbars.showError(context, 'Business description must be at least 100 characters');
+      AppSnackbars.showError(
+        context,
+        'Business description must be at least 100 characters',
+      );
       return false;
     }
 
@@ -365,17 +380,26 @@ class _MusicBusinessDetailsScreenState
 
     // Backend requires at least one of youtube/spotify.
     if (youtube.isEmpty && spotify.isEmpty) {
-      AppSnackbars.showError(context, 'Please provide at least one platform link (YouTube or Spotify)');
+      AppSnackbars.showError(
+        context,
+        'Please provide at least one platform link (YouTube or Spotify)',
+      );
       return false;
     }
 
     if (youtube.isNotEmpty && !_isValidUrl(youtube)) {
-      AppSnackbars.showError(context, 'Please enter a valid YouTube URL (include https://)');
+      AppSnackbars.showError(
+        context,
+        'Please enter a valid YouTube URL (include https://)',
+      );
       return false;
     }
 
     if (spotify.isNotEmpty && !_isValidUrl(spotify)) {
-      AppSnackbars.showError(context, 'Please enter a valid Spotify URL (include https://)');
+      AppSnackbars.showError(
+        context,
+        'Please enter a valid Spotify URL (include https://)',
+      );
       return false;
     }
 
@@ -394,21 +418,21 @@ class _MusicBusinessDetailsScreenState
         if (!_validateForm()) return;
 
         final draft = draftFromArgs(
-            ModalRoute.of(context)?.settings.arguments,
-            categoryLabelFallback: 'Music',
-          );
-          final updated = draft
-            ..businessName = _businessNameController.text.trim()
-            ..businessDescription = _businessDescriptionController.text.trim()
-            ..musicCategory = _musicCategoryValue
-            ..youtube = _youtubeController.text.trim()
-            ..spotify = _spotifyController.text.trim()
-            ..businessLogoPath = _businessLogoPath;
+          ModalRoute.of(context)?.settings.arguments,
+          categoryLabelFallback: 'Music',
+        );
+        final updated = draft
+          ..businessName = _businessNameController.text.trim()
+          ..businessDescription = _businessDescriptionController.text.trim()
+          ..musicCategory = _musicCategoryValue
+          ..youtube = _youtubeController.text.trim()
+          ..spotify = _spotifyController.text.trim()
+          ..businessLogoPath = _businessLogoPath;
 
-          Navigator.of(context).pushNamed(
-            AppRoutes.businessAccountReview,
-            arguments: updated.toJson(),
-          );
+        Navigator.of(context).pushNamed(
+          AppRoutes.businessAccountReview,
+          arguments: updated.toJson(),
+        );
       },
       borderRadius: BorderRadius.circular(8),
       child: Container(
@@ -419,7 +443,7 @@ class _MusicBusinessDetailsScreenState
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withOpacity(0.35),
+              color: const Color(0xFFFDAF40).withValues(alpha: 0.35),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),

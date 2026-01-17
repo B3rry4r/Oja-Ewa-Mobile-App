@@ -19,7 +19,7 @@ class OnboardingScreen extends StatelessWidget {
             children: [
               // Hero Section
               _buildHeroSection(),
-              
+
               // Content Section with proper spacing
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -27,15 +27,13 @@ class OnboardingScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 60), // Spacing from image to title
-                    
                     // Main Headline
                     _buildHeadline(),
-                    
+
                     const SizedBox(height: 90), // Spacing from title to buttons
-                    
                     // Action Buttons
                     _buildActionButtons(context),
-                    
+
                     const SizedBox(height: 32), // Bottom spacing
                   ],
                 ),
@@ -64,7 +62,7 @@ class OnboardingScreen extends StatelessWidget {
             fit: BoxFit.cover,
           ),
         ),
-        
+
         // Page Indicator Dots
         Positioned(
           top: 500, // Aligns with the bottom of the image
@@ -87,33 +85,27 @@ class OnboardingScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(17),
           ),
         ),
-        
+
         const SizedBox(width: 20),
-        
+
         // Inactive dot (with border)
         Container(
           width: 12,
           height: 12,
           decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color(0xFFFDAF40),
-              width: 1.5,
-            ),
+            border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
             borderRadius: BorderRadius.circular(17),
           ),
         ),
-        
+
         const SizedBox(width: 20),
-        
+
         // Inactive dot (with border)
         Container(
           width: 12,
           height: 12,
           decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color(0xFFFDAF40),
-              width: 1.5,
-            ),
+            border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
             borderRadius: BorderRadius.circular(17),
           ),
         ),
@@ -146,7 +138,7 @@ class OnboardingScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFFDAF40).withOpacity(0.3),
+                color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
                 blurRadius: 16,
                 offset: const Offset(0, 8),
               ),
@@ -173,9 +165,9 @@ class OnboardingScreen extends StatelessWidget {
             ),
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Secondary Buttons Row
         Row(
           children: [
@@ -212,9 +204,9 @@ class OnboardingScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(width: 16),
-            
+
             // Continue as Guest Button
             Expanded(
               child: Container(

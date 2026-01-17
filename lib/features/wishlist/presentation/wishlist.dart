@@ -96,10 +96,9 @@ class WishlistScreen extends ConsumerWidget {
     final accessToken = ref.watch(accessTokenProvider);
     final isAuthenticated = accessToken != null && accessToken.isNotEmpty;
     final unreadCount = isAuthenticated
-        ? ref.watch(unreadCountProvider).maybeWhen(
-              data: (count) => count,
-              orElse: () => 0,
-            )
+        ? ref
+              .watch(unreadCountProvider)
+              .maybeWhen(data: (count) => count, orElse: () => 0)
         : 0;
 
     return Container(
@@ -119,8 +118,9 @@ class WishlistScreen extends ConsumerWidget {
                   children: [
                     HeaderIconButton(
                       asset: AppIcons.notification,
-                      onTap: () =>
-                          Navigator.of(context).pushNamed(AppRoutes.notifications),
+                      onTap: () => Navigator.of(
+                        context,
+                      ).pushNamed(AppRoutes.notifications),
                       iconColor: Colors.white,
                     ),
                     if (unreadCount > 0)
@@ -154,8 +154,7 @@ class WishlistScreen extends ConsumerWidget {
                 const SizedBox(width: 8),
                 HeaderIconButton(
                   asset: AppIcons.bag,
-                  onTap: () =>
-                      Navigator.of(context).pushNamed(AppRoutes.cart),
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.cart),
                   iconColor: Colors.white,
                 ),
               ],
@@ -223,7 +222,9 @@ class WishlistScreen extends ConsumerWidget {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => ProductDetailsScreen(productId: int.tryParse(product.id) ?? 0),
+                      builder: (_) => ProductDetailsScreen(
+                        productId: int.tryParse(product.id) ?? 0,
+                      ),
                     ),
                   );
                 },
@@ -390,7 +391,7 @@ class WishlistScreen extends ConsumerWidget {
             backgroundColor: const Color(0xFFFDAF40), // #FDAF40
             foregroundColor: const Color(0xFFFFFBF5), // #FFFBF5
             elevation: 8,
-            shadowColor: const Color(0xFFFDAF40).withOpacity(0.6),
+            shadowColor: const Color(0xFFFDAF40).withValues(alpha: 0.6),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),

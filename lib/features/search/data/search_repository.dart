@@ -9,6 +9,7 @@ abstract interface class SearchRepository {
     String? gender,
     String? style,
     String? tribe,
+    String? fabricType,
     num? priceMin,
     num? priceMax,
     String? categoryType,

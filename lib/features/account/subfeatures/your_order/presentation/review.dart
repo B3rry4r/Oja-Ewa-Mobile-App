@@ -73,7 +73,9 @@ class WriteReviewScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 10,
                               fontFamily: 'Campton',
-                              color: const Color(0xFF595F63).withOpacity(0.8),
+                              color: const Color(
+                                0xFF595F63,
+                              ).withValues(alpha: 0.8),
                             ),
                           ),
                         ),
@@ -202,7 +204,7 @@ class WriteReviewScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.3),
+            color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),

@@ -29,7 +29,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
   final _websiteController = TextEditingController();
   final _businessNameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _productListController = TextEditingController();
+  final _professionalTitleController = TextEditingController();
   String _selectedCountryFlag = '';
   String _selectedStateName = '';
   String _selectedCountryCode = '';
@@ -60,7 +60,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
         _websiteController.text = (data['website_url'] as String?) ?? '';
         _businessNameController.text = (data['business_name'] as String?) ?? '';
         _descriptionController.text = (data['business_description'] as String?) ?? '';
-        _productListController.text = (data['product_list'] as String?) ?? '';
+        _professionalTitleController.text = (data['professional_title'] as String?) ?? '';
         _initialized = true;
       },
     );
@@ -134,10 +134,10 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
                   ),
                   const SizedBox(height: 16),
                   _buildTextField(
-                    'Product List',
-                    'List your products here',
-                    maxLines: 4,
-                    controller: _productListController,
+                    'Professional Title',
+                    'e.g. Makeup Artist, Hair Stylist',
+                    maxLines: 1,
+                    controller: _professionalTitleController,
                   ),
 
                   const SizedBox(height: 32),
@@ -342,10 +342,12 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
           facebook: _facebookController.text.trim().isEmpty ? null : _facebookController.text.trim(),
           businessName: _businessNameController.text.trim(),
           businessDescription: _descriptionController.text.trim(),
-          offeringType: offeringType,
+          offeringType: offeringType.isEmpty ? 'providing_service' : offeringType,
           productList: const [],
           serviceList: const [],
-          professionalTitle: data['professional_title'] as String?,
+          professionalTitle: _professionalTitleController.text.trim().isEmpty 
+              ? (data['professional_title'] as String?) 
+              : _professionalTitleController.text.trim(),
           schoolType: data['school_type'] as String?,
           schoolBiography: data['school_biography'] as String?,
           classesOffered: const [],

@@ -29,7 +29,11 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, BusinessDetails business) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    BusinessDetails business,
+  ) {
     final businessName = business.businessName;
     final description = business.businessDescription ?? '';
     final services = business.serviceList; // List<ServiceItem>
@@ -75,12 +79,20 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                                 width: double.infinity,
                                 height: 198,
                                 errorBuilder: (_, __, ___) => const Center(
-                                  child: Icon(Icons.image, size: 80, color: Colors.white54),
+                                  child: Icon(
+                                    Icons.image,
+                                    size: 80,
+                                    color: Colors.white54,
+                                  ),
                                 ),
                               ),
                             )
                           : const Center(
-                              child: Icon(Icons.image, size: 80, color: Colors.white54),
+                              child: Icon(
+                                Icons.image,
+                                size: 80,
+                                color: Colors.white54,
+                              ),
                             ),
                     ),
 
@@ -137,14 +149,10 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                     const SizedBox(height: 20),
 
                     // Description section
-                    _buildSection(
-                      title: 'Description',
-                      content: description,
-                    ),
+                    _buildSection(title: 'Description', content: description),
 
                     // Products/Services section
-                    if (services.isNotEmpty)
-                      _buildServicesSection(services),
+                    if (services.isNotEmpty) _buildServicesSection(services),
 
                     // Contact Details section
                     _buildContactDetailsSection(
@@ -224,34 +232,37 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          ...services.map((service) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    service.name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFF1E2021),
-                      height: 1.5,
+          ...services.map(
+            (service) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      service.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF1E2021),
+                        height: 1.5,
+                      ),
                     ),
                   ),
-                ),
-                if (service.priceRange != null && service.priceRange!.isNotEmpty)
-                  Text(
-                    service.priceRange!,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF603814),
+                  if (service.priceRange != null &&
+                      service.priceRange!.isNotEmpty)
+                    Text(
+                      service.priceRange!,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF603814),
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );
@@ -482,14 +493,16 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
   }
 
   Widget _buildReviewsSection(BuildContext context, WidgetRef ref) {
-    final reviewsPage = ref.watch(reviewsProvider((type: 'business', id: businessId))).maybeWhen(
-          data: (d) => d,
-          orElse: () => null,
-        );
+    final reviewsPage = ref
+        .watch(reviewsProvider((type: 'business', id: businessId)))
+        .maybeWhen(data: (d) => d, orElse: () => null);
 
     final reviewCount = reviewsPage?.total ?? 0;
-    final avgRating = reviewsPage?.entity.avgRating?.toStringAsFixed(1) ?? '0.0';
-    final firstReview = (reviewsPage?.items.isNotEmpty ?? false) ? reviewsPage!.items.first : null;
+    final avgRating =
+        reviewsPage?.entity.avgRating?.toStringAsFixed(1) ?? '0.0';
+    final firstReview = (reviewsPage?.items.isNotEmpty ?? false)
+        ? reviewsPage!.items.first
+        : null;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -554,10 +567,15 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                     children: [
                       Text(
                         firstReview.user?.displayName ?? '',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF3C4042)),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF3C4042),
+                        ),
                       ),
                       Text(
-                        firstReview.createdAt != null ? _formatDate(firstReview.createdAt!) : '',
+                        firstReview.createdAt != null
+                            ? _formatDate(firstReview.createdAt!)
+                            : '',
                         style: TextStyle(fontSize: 10, color: Colors.grey[400]),
                       ),
                     ],
@@ -620,7 +638,20 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
   }
 
   String _formatDate(DateTime dt) {
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     final m = months[(dt.month - 1).clamp(0, 11)];
     return '$m ${dt.day}, ${dt.year}';
   }
@@ -689,7 +720,7 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(8),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFFDAF40).withOpacity(0.3),
+                          color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
                           blurRadius: 16,
                           offset: const Offset(0, 8),
                         ),

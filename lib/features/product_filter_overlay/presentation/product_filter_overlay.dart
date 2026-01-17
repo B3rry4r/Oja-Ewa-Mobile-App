@@ -10,7 +10,7 @@ class ProductFilterOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: const Color(0xFF1E2021).withOpacity(0.8),
+      color: const Color(0xFF1E2021).withValues(alpha: 0.8),
       child: SingleChildScrollView(
         child: Container(
           margin: const EdgeInsets.all(16),
@@ -54,7 +54,7 @@ class ProductFilterOverlay extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Active filter tag
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -100,10 +100,8 @@ class ProductFilterOverlay extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
-         
         ],
       ),
     );
@@ -125,9 +123,9 @@ class ProductFilterOverlay extends StatelessWidget {
               color: Color(0xFF301C0A),
             ),
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // First row of category tags
           Wrap(
             spacing: 8,
@@ -139,9 +137,9 @@ class ProductFilterOverlay extends StatelessWidget {
               _buildCategoryTag('Music', isActive: false),
             ],
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Second row of category tags
           Wrap(
             spacing: 8,
@@ -151,9 +149,9 @@ class ProductFilterOverlay extends StatelessWidget {
               _buildCategoryTag('Sustainability', isActive: false),
             ],
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Price range heading
           const Text(
             'Price Range',
@@ -164,9 +162,9 @@ class ProductFilterOverlay extends StatelessWidget {
               color: Color(0xFF301C0A),
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Price range slider
           Container(
             height: 7,
@@ -233,9 +231,9 @@ class ProductFilterOverlay extends StatelessWidget {
               color: Color(0xFF301C0A),
             ),
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Rating filter chips
           Wrap(
             spacing: 8,
@@ -262,11 +260,7 @@ class ProductFilterOverlay extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.star,
-            size: 12,
-            color: Color(0xFFFFDB80),
-          ),
+          const Icon(Icons.star, size: 12, color: Color(0xFFFFDB80)),
           const SizedBox(width: 4),
           Text(
             ratingRange,

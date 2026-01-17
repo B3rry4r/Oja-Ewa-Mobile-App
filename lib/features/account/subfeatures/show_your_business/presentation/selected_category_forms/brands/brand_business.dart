@@ -13,16 +13,19 @@ class BrandBusinessDetailsScreen extends StatefulWidget {
   const BrandBusinessDetailsScreen({super.key});
 
   @override
-  State<BrandBusinessDetailsScreen> createState() => _BrandBusinessDetailsScreenState();
+  State<BrandBusinessDetailsScreen> createState() =>
+      _BrandBusinessDetailsScreenState();
 }
 
-class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen> {
+class _BrandBusinessDetailsScreenState
+    extends State<BrandBusinessDetailsScreen> {
   String _selectedOffering = 'Selling Product';
 
   final _businessNameController = TextEditingController();
   final _businessDescriptionController = TextEditingController();
   final List<String> _products = [''];
-  final TextEditingController _professionalTitleController = TextEditingController();
+  final TextEditingController _professionalTitleController =
+      TextEditingController();
   final List<ServiceListItem> _services = [ServiceListItem()];
 
   // File upload paths
@@ -70,7 +73,11 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
             const SizedBox(height: 20),
 
             // Form Fields
-            _buildInputField("Business Name", "Enter business name", controller: _businessNameController),
+            _buildInputField(
+              "Business Name",
+              "Enter business name",
+              controller: _businessNameController,
+            ),
             const SizedBox(height: 24),
             _buildInputField(
               "Business Description",
@@ -87,9 +94,15 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
               style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
             ),
             const SizedBox(height: 12),
-            _buildOfferingOption("Selling Product", Icons.shopping_bag_outlined),
+            _buildOfferingOption(
+              "Selling Product",
+              Icons.shopping_bag_outlined,
+            ),
             const SizedBox(height: 8),
-            _buildOfferingOption("Providing Service", Icons.build_circle_outlined),
+            _buildOfferingOption(
+              "Providing Service",
+              Icons.build_circle_outlined,
+            ),
             const SizedBox(height: 24),
 
             if (_selectedOffering == 'Providing Service') ...[
@@ -126,7 +139,8 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
               selectedPath: _businessCertificatePath,
               onTap: () async {
                 final path = await pickSingleFilePath();
-                if (path != null) setState(() => _businessCertificatePath = path);
+                if (path != null)
+                  setState(() => _businessCertificatePath = path);
               },
             ),
             const SizedBox(height: 24),
@@ -266,18 +280,27 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          border: Border.all(color: isSelected ? const Color(0xFFA15E22) : const Color(0xFFCCCCCC)),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFFA15E22)
+                : const Color(0xFFCCCCCC),
+          ),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           children: [
             Icon(
               isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: isSelected ? const Color(0xFFA15E22) : const Color(0xFF777F84),
+              color: isSelected
+                  ? const Color(0xFFA15E22)
+                  : const Color(0xFF777F84),
               size: 20,
             ),
             const SizedBox(width: 12),
-            Text(title, style: const TextStyle(fontSize: 16, color: Color(0xFF241508))),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 16, color: Color(0xFF241508)),
+            ),
           ],
         ),
       ),
@@ -336,14 +359,20 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 24),
             decoration: BoxDecoration(
-              border: Border.all(color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF89858A)),
+              border: Border.all(
+                color: hasFile
+                    ? const Color(0xFF4CAF50)
+                    : const Color(0xFF89858A),
+              ),
               borderRadius: BorderRadius.circular(11),
             ),
             child: Column(
               children: [
                 Icon(
                   hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
-                  color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF603814),
+                  color: hasFile
+                      ? const Color(0xFF4CAF50)
+                      : const Color(0xFF603814),
                   size: 30,
                 ),
                 const SizedBox(height: 8),
@@ -351,7 +380,9 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
                   hasFile ? "File selected" : "Browse Document",
                   style: TextStyle(
                     fontSize: 16,
-                    color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF1E2021),
+                    color: hasFile
+                        ? const Color(0xFF4CAF50)
+                        : const Color(0xFF1E2021),
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -402,12 +433,17 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
     }
 
     if (businessDescription.length < 100) {
-      AppSnackbars.showError(context, 'Business description must be at least 100 characters');
+      AppSnackbars.showError(
+        context,
+        'Business description must be at least 100 characters',
+      );
       return false;
     }
 
     if (_selectedOffering == 'Selling Product') {
-      final validProducts = _products.where((p) => p.trim().isNotEmpty).toList();
+      final validProducts = _products
+          .where((p) => p.trim().isNotEmpty)
+          .toList();
       if (validProducts.isEmpty) {
         AppSnackbars.showError(context, 'Please add at least one product');
         return false;
@@ -420,7 +456,9 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
         AppSnackbars.showError(context, 'Please enter your professional title');
         return false;
       }
-      final validServices = _services.where((s) => s.name.trim().isNotEmpty).toList();
+      final validServices = _services
+          .where((s) => s.name.trim().isNotEmpty)
+          .toList();
       if (validServices.isEmpty) {
         AppSnackbars.showError(context, 'Please add at least one service');
         return false;
@@ -441,25 +479,30 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
         if (!_validateForm()) return;
 
         final draft = draftFromArgs(
-            ModalRoute.of(context)?.settings.arguments,
-            categoryLabelFallback: 'Brands',
-          );
-          final updated = draft
-            ..businessName = _businessNameController.text.trim()
-            ..businessDescription = _businessDescriptionController.text.trim()
-            ..offeringType = mapOfferingLabelToEnum(_selectedOffering)
-            ..productList = _products.where((p) => p.trim().isNotEmpty).toList()
-            ..professionalTitle = _professionalTitleController.text.trim()
-            ..serviceList = _services
-            ..businessLogoPath = _businessLogoPath
-            ..businessCertificates = _businessCertificatePath != null 
-                ? [{'path': _businessCertificatePath, 'name': 'Business Certificate'}] 
-                : null;
+          ModalRoute.of(context)?.settings.arguments,
+          categoryLabelFallback: 'Brands',
+        );
+        final updated = draft
+          ..businessName = _businessNameController.text.trim()
+          ..businessDescription = _businessDescriptionController.text.trim()
+          ..offeringType = mapOfferingLabelToEnum(_selectedOffering)
+          ..productList = _products.where((p) => p.trim().isNotEmpty).toList()
+          ..professionalTitle = _professionalTitleController.text.trim()
+          ..serviceList = _services
+          ..businessLogoPath = _businessLogoPath
+          ..businessCertificates = _businessCertificatePath != null
+              ? [
+                  {
+                    'path': _businessCertificatePath,
+                    'name': 'Business Certificate',
+                  },
+                ]
+              : null;
 
-          Navigator.of(context).pushNamed(
-            AppRoutes.businessAccountReview,
-            arguments: updated.toJson(),
-          );
+        Navigator.of(context).pushNamed(
+          AppRoutes.businessAccountReview,
+          arguments: updated.toJson(),
+        );
       },
       borderRadius: BorderRadius.circular(8),
       child: Container(
@@ -470,7 +513,7 @@ class _BrandBusinessDetailsScreenState extends State<BrandBusinessDetailsScreen>
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withOpacity(0.4),
+              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),

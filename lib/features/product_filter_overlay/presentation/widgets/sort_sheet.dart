@@ -10,15 +10,11 @@ import 'package:ojaewa/features/product/presentation/controllers/product_filters
 class SortOverlay extends ConsumerStatefulWidget {
   /// Callback when sort is applied
   final Function(String selectedSort)? onApplySort;
-  
+
   /// Callback when sort is cleared
   final VoidCallback? onClearSort;
 
-  const SortOverlay({
-    super.key,
-    this.onApplySort,
-    this.onClearSort,
-  });
+  const SortOverlay({super.key, this.onApplySort, this.onClearSort});
 
   @override
   ConsumerState<SortOverlay> createState() => _SortOverlayState();
@@ -37,7 +33,7 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
   void _onApplyPressed() {
     // Apply sort to the provider
     ref.read(selectedFiltersProvider.notifier).setSortBy(_selectedSort);
-    
+
     if (widget.onApplySort != null && _selectedSort != null) {
       widget.onApplySort!(_selectedSort!);
     }
@@ -66,12 +62,10 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
             Expanded(
               child: GestureDetector(
                 onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  color: Colors.transparent,
-                ),
+                child: Container(color: Colors.transparent),
               ),
             ),
-            
+
             // Sort overlay content - use defaults directly, no async needed
             _buildSortOverlay(sortOptions),
           ],
@@ -97,12 +91,12 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
           children: [
             // Header with title and close button
             _buildHeader(),
-            
+
             // Sort options list
             const SizedBox(height: 16),
             _buildSortOptions(sortOptions),
             const SizedBox(height: 40),
-            
+
             // Action buttons
             _buildActionButtons(),
           ],
@@ -127,7 +121,7 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
               color: Color(0xFF301C0A),
             ),
           ),
-          
+
           // Close button
           HeaderIconButton(
             asset: AppIcons.back,
@@ -156,9 +150,14 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
               },
               borderRadius: BorderRadius.circular(8),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 12,
+                ),
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFFFDF3E7) : Colors.transparent,
+                  color: isSelected
+                      ? const Color(0xFFFDF3E7)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -170,7 +169,9 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isSelected ? const Color(0xFFA15E22) : const Color(0xFFCCCCCC),
+                          color: isSelected
+                              ? const Color(0xFFA15E22)
+                              : const Color(0xFFCCCCCC),
                           width: 2,
                         ),
                       ),
@@ -194,7 +195,9 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Campton',
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
                         color: const Color(0xFF1E2021),
                       ),
                     ),
@@ -235,9 +238,9 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
               ),
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           // Show Results button
           Expanded(
             flex: 2,
@@ -250,7 +253,7 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 elevation: 4,
-                shadowColor: const Color(0xFFFDAF40).withOpacity(0.5),
+                shadowColor: const Color(0xFFFDAF40).withValues(alpha: 0.5),
               ),
               child: const Text(
                 'Show Results',
@@ -267,5 +270,4 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
       ),
     );
   }
-
 }

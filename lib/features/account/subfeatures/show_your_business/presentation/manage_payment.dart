@@ -10,7 +10,8 @@ class ManagePaymentScreen extends ConsumerStatefulWidget {
   const ManagePaymentScreen({super.key});
 
   @override
-  ConsumerState<ManagePaymentScreen> createState() => _ManagePaymentScreenState();
+  ConsumerState<ManagePaymentScreen> createState() =>
+      _ManagePaymentScreenState();
 }
 
 class _ManagePaymentScreenState extends ConsumerState<ManagePaymentScreen> {
@@ -42,8 +43,9 @@ class _ManagePaymentScreenState extends ConsumerState<ManagePaymentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 140), // Spacing to match top: 214 intent
-
+                  const SizedBox(
+                    height: 140,
+                  ), // Spacing to match top: 214 intent
                   // Expiration and Status Text
                   const Text(
                     'Your payment will expire on 24th july, 2023\n'
@@ -65,8 +67,14 @@ class _ManagePaymentScreenState extends ConsumerState<ManagePaymentScreen> {
                     value: _plan,
                     items: const [
                       DropdownMenuItem(value: 'basic', child: Text('Basic')),
-                      DropdownMenuItem(value: 'premium', child: Text('Premium')),
-                      DropdownMenuItem(value: 'enterprise', child: Text('Enterprise')),
+                      DropdownMenuItem(
+                        value: 'premium',
+                        child: Text('Premium'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'enterprise',
+                        child: Text('Enterprise'),
+                      ),
                     ],
                     onChanged: (v) => setState(() => _plan = v ?? 'basic'),
                   ),
@@ -75,8 +83,14 @@ class _ManagePaymentScreenState extends ConsumerState<ManagePaymentScreen> {
                   DropdownButton<String>(
                     value: _cycle,
                     items: const [
-                      DropdownMenuItem(value: 'monthly', child: Text('Monthly')),
-                      DropdownMenuItem(value: 'quarterly', child: Text('Quarterly')),
+                      DropdownMenuItem(
+                        value: 'monthly',
+                        child: Text('Monthly'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'quarterly',
+                        child: Text('Quarterly'),
+                      ),
                       DropdownMenuItem(value: 'yearly', child: Text('Yearly')),
                     ],
                     onChanged: (v) => setState(() => _cycle = v ?? 'monthly'),
@@ -88,14 +102,17 @@ class _ManagePaymentScreenState extends ConsumerState<ManagePaymentScreen> {
                   GestureDetector(
                     onTap: () async {
                       final args = ModalRoute.of(context)?.settings.arguments;
-                      final businessId = (args is Map ? args['businessId'] : null) as int?;
+                      final businessId =
+                          (args is Map ? args['businessId'] : null) as int?;
                       if (businessId == null) return;
 
-                      await ref.read(businessManagementActionsProvider.notifier).renewSubscription(
-                        businessId: businessId,
-                        subscriptionType: _plan,
-                        billingCycle: _cycle,
-                      );
+                      await ref
+                          .read(businessManagementActionsProvider.notifier)
+                          .renewSubscription(
+                            businessId: businessId,
+                            subscriptionType: _plan,
+                            billingCycle: _cycle,
+                          );
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Subscription updated')),
@@ -109,10 +126,12 @@ class _ManagePaymentScreenState extends ConsumerState<ManagePaymentScreen> {
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFFDAF40).withOpacity(0.4),
+                            color: const Color(
+                              0xFFFDAF40,
+                            ).withValues(alpha: 0.4),
                             blurRadius: 16,
                             offset: const Offset(0, 8),
-                          )
+                          ),
                         ],
                       ),
                       child: const Center(

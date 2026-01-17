@@ -13,10 +13,12 @@ class SellerRegistrationScreen extends ConsumerStatefulWidget {
   const SellerRegistrationScreen({super.key});
 
   @override
-  ConsumerState<SellerRegistrationScreen> createState() => _SellerRegistrationScreenState();
+  ConsumerState<SellerRegistrationScreen> createState() =>
+      _SellerRegistrationScreenState();
 }
 
-class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScreen> {
+class _SellerRegistrationScreenState
+    extends ConsumerState<SellerRegistrationScreen> {
   final _cityController = TextEditingController();
   String? _identityDocumentLocalPath;
   final _addressController = TextEditingController();
@@ -24,7 +26,7 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
   final _phoneController = TextEditingController();
   final _instagramController = TextEditingController();
   final _facebookController = TextEditingController();
-  
+
   // Location selections
   // Location selections - empty by default
   String _selectedCountryName = '';
@@ -68,10 +70,17 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
                   const SizedBox(height: 16),
                   _buildLocationDropdown(
                     label: 'Country',
-                    value: _selectedCountryName.isEmpty ? 'Select Country' : _selectedCountryName,
-                    flag: _selectedCountryFlag.isEmpty ? null : _selectedCountryFlag,
+                    value: _selectedCountryName.isEmpty
+                        ? 'Select Country'
+                        : _selectedCountryName,
+                    flag: _selectedCountryFlag.isEmpty
+                        ? null
+                        : _selectedCountryFlag,
                     onTap: () async {
-                      final country = await CountryPickerSheet.show(context, selectedCountry: _selectedCountryName);
+                      final country = await CountryPickerSheet.show(
+                        context,
+                        selectedCountry: _selectedCountryName,
+                      );
                       if (country != null) {
                         setState(() {
                           _selectedCountryName = country.name;
@@ -85,24 +94,44 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
                   const SizedBox(height: 20),
                   _buildLocationDropdown(
                     label: 'State',
-                    value: _selectedStateName.isEmpty ? 'Select State' : _selectedStateName,
+                    value: _selectedStateName.isEmpty
+                        ? 'Select State'
+                        : _selectedStateName,
                     onTap: () async {
-                      if (_selectedCountryName.isEmpty) return; // Must select country first
-                      final state = await StatePickerSheet.show(context, countryName: _selectedCountryName, selectedState: _selectedStateName);
-                      if (state != null) setState(() => _selectedStateName = state.name);
+                      if (_selectedCountryName.isEmpty)
+                        return; // Must select country first
+                      final state = await StatePickerSheet.show(
+                        context,
+                        countryName: _selectedCountryName,
+                        selectedState: _selectedStateName,
+                      );
+                      if (state != null)
+                        setState(() => _selectedStateName = state.name);
                     },
                   ),
                   const SizedBox(height: 20),
-                  _buildTextInput("City", "Your City", controller: _cityController),
+                  _buildTextInput(
+                    "City",
+                    "Your City",
+                    controller: _cityController,
+                  ),
                   const SizedBox(height: 20),
-                  _buildTextInput("Address Line", "Street, house number etc", controller: _addressController),
+                  _buildTextInput(
+                    "Address Line",
+                    "Street, house number etc",
+                    controller: _addressController,
+                  ),
 
                   const SizedBox(height: 40),
 
                   // --- Contacts Section ---
                   _buildSectionHeader("Contacts"),
                   const SizedBox(height: 16),
-                  _buildTextInput("Business Email", "you@example.com", controller: _emailController),
+                  _buildTextInput(
+                    "Business Email",
+                    "you@example.com",
+                    controller: _emailController,
+                  ),
                   const SizedBox(height: 20),
                   _buildPhoneInputWithPicker(
                     "Business Phone Number",
@@ -114,9 +143,17 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
                   // --- Social handles Section ---
                   _buildSectionHeader("Social handles"),
                   const SizedBox(height: 16),
-                  _buildTextInput("Instagram", "Your Instagram URL", controller: _instagramController),
+                  _buildTextInput(
+                    "Instagram",
+                    "Your Instagram URL",
+                    controller: _instagramController,
+                  ),
                   const SizedBox(height: 20),
-                  _buildTextInput("Facebook", "Your Facebook URL", controller: _facebookController),
+                  _buildTextInput(
+                    "Facebook",
+                    "Your Facebook URL",
+                    controller: _facebookController,
+                  ),
 
                   const SizedBox(height: 40),
 
@@ -164,7 +201,11 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
           alignment: Alignment.center,
           child: Text(
             num,
-            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         const SizedBox(width: 8),
@@ -193,11 +234,18 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
     );
   }
 
-  Widget _buildTextInput(String label, String hint, {TextEditingController? controller}) {
+  Widget _buildTextInput(
+    String label,
+    String hint, {
+    TextEditingController? controller,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+        Text(
+          label,
+          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+        ),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
@@ -211,7 +259,10 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
             hintStyle: const TextStyle(color: Color(0xFFCCCCCC)),
             filled: true,
             fillColor: Colors.transparent,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 16,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
@@ -231,7 +282,10 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+        Text(
+          label,
+          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+        ),
         const SizedBox(height: 8),
         GestureDetector(
           onTap: onTap,
@@ -247,7 +301,15 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
                   Text(flag, style: const TextStyle(fontSize: 20)),
                   const SizedBox(width: 12),
                 ],
-                Expanded(child: Text(value, style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)))),
+                Expanded(
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF1E2021),
+                    ),
+                  ),
+                ),
                 const Icon(Icons.keyboard_arrow_down, color: Color(0xFF777F84)),
               ],
             ),
@@ -257,12 +319,18 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
     );
   }
 
-  Widget _buildPhoneInputWithPicker(String label, {required TextEditingController controller}) {
+  Widget _buildPhoneInputWithPicker(
+    String label, {
+    required TextEditingController controller,
+  }) {
     final hasCountryCode = _selectedCountryCode.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+        Text(
+          label,
+          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+        ),
         const SizedBox(height: 8),
         Container(
           height: 49,
@@ -275,20 +343,47 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
             children: [
               GestureDetector(
                 onTap: () async {
-                  final country = await CountryCodePickerSheet.show(context, selectedDialCode: _selectedCountryCode);
-                  if (country != null) setState(() { _selectedCountryCode = country.dialCode; _selectedCountryFlag = country.flag; });
+                  final country = await CountryCodePickerSheet.show(
+                    context,
+                    selectedDialCode: _selectedCountryCode,
+                  );
+                  if (country != null)
+                    setState(() {
+                      _selectedCountryCode = country.dialCode;
+                      _selectedCountryFlag = country.flag;
+                    });
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (hasCountryCode) ...[
-                      Text(_selectedCountryFlag, style: const TextStyle(fontSize: 18)),
+                      Text(
+                        _selectedCountryFlag,
+                        style: const TextStyle(fontSize: 18),
+                      ),
                       const SizedBox(width: 6),
-                      Text(_selectedCountryCode, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF241508))),
+                      Text(
+                        _selectedCountryCode,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF241508),
+                        ),
+                      ),
                     ] else
-                      const Text('Code', style: TextStyle(fontSize: 16, color: Color(0xFFCCCCCC))),
+                      const Text(
+                        'Code',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFFCCCCCC),
+                        ),
+                      ),
                     const SizedBox(width: 4),
-                    const Icon(Icons.keyboard_arrow_down, size: 18, color: Color(0xFF777F84)),
+                    const Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 18,
+                      color: Color(0xFF777F84),
+                    ),
                   ],
                 ),
               ),
@@ -297,8 +392,17 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
                 child: TextFormField(
                   controller: controller,
                   keyboardType: TextInputType.phone,
-                  style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
-                  decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero, hintText: 'Enter phone number', hintStyle: TextStyle(color: Color(0xFFCCCCCC))),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF1E2021),
+                  ),
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                    hintText: 'Enter phone number',
+                    hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
+                  ),
                 ),
               ),
             ],
@@ -308,48 +412,58 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
     );
   }
 
-  Widget _buildPhoneInput(String label, String code, {required TextEditingController controller}) {
+  Widget _buildPhoneInput(
+    String label,
+    String code, {
+    required TextEditingController controller,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+        Text(
+          label,
+          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+        ),
         const SizedBox(height: 8),
-       Container(
-         height: 49,
-         padding: const EdgeInsets.symmetric(horizontal: 20),
-         decoration: BoxDecoration(
-           borderRadius: BorderRadius.circular(8),
-           border: Border.all(color: const Color(0xFFCCCCCC)),
-         ),
-         alignment: Alignment.center,
-         child: Row(
-           children: [
-             Text(
-               code,
-               style: const TextStyle(
-                 fontSize: 16,
-                 fontWeight: FontWeight.w600,
-                 color: Color(0xFF241508),
-               ),
-             ),
-             const SizedBox(width: 8),
-             Expanded(
-               child: TextFormField(
-                 controller: controller,
-                 keyboardType: TextInputType.phone,
-                 style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
-                 decoration: const InputDecoration(
-                   border: InputBorder.none,
-                   isDense: true,
-                   contentPadding: EdgeInsets.zero,
-                   hintText: 'Enter phone number',
-                   hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
-                 ),
-               ),
-             ),
-           ],
-         ),
-       ),
+        Container(
+          height: 49,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFCCCCCC)),
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            children: [
+              Text(
+                code,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF241508),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextFormField(
+                  controller: controller,
+                  keyboardType: TextInputType.phone,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF1E2021),
+                  ),
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                    hintText: 'Enter phone number',
+                    hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -379,11 +493,20 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.cloud_upload_outlined, size: 24, color: Color(0xFF777F84)),
+                const Icon(
+                  Icons.cloud_upload_outlined,
+                  size: 24,
+                  color: Color(0xFF777F84),
+                ),
                 const SizedBox(height: 12),
                 Text(
-                  _identityDocumentLocalPath == null ? 'Browse Document' : 'Document selected',
-                  style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+                  _identityDocumentLocalPath == null
+                      ? 'Browse Document'
+                      : 'Document selected',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF1E2021),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 const Row(
@@ -413,18 +536,21 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
   Widget _buildSubmitButton(BuildContext context) {
     return InkWell(
       onTap: () {
-        final draft = sellerDraftFromArgs(ModalRoute.of(context)?.settings.arguments)
-          ..country = 'Nigeria'
-          ..state = 'FCT'
-          ..city = _cityController.text.trim()
-          ..address = _addressController.text.trim()
-          ..businessEmail = _emailController.text.trim()
-          ..businessPhoneNumber = _phoneController.text.trim()
-          ..instagram = _instagramController.text.trim()
-          ..facebook = _facebookController.text.trim()
-          ..identityDocumentPath = _identityDocumentLocalPath;
+        final draft =
+            sellerDraftFromArgs(ModalRoute.of(context)?.settings.arguments)
+              ..country = 'Nigeria'
+              ..state = 'FCT'
+              ..city = _cityController.text.trim()
+              ..address = _addressController.text.trim()
+              ..businessEmail = _emailController.text.trim()
+              ..businessPhoneNumber = _phoneController.text.trim()
+              ..instagram = _instagramController.text.trim()
+              ..facebook = _facebookController.text.trim()
+              ..identityDocumentPath = _identityDocumentLocalPath;
 
-        Navigator.of(context).pushNamed(AppRoutes.businessDetails, arguments: draft.toJson());
+        Navigator.of(
+          context,
+        ).pushNamed(AppRoutes.businessDetails, arguments: draft.toJson());
       },
       borderRadius: BorderRadius.circular(8),
       child: Container(
@@ -435,10 +561,10 @@ class _SellerRegistrationScreenState extends ConsumerState<SellerRegistrationScr
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withOpacity(0.4),
+              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         child: const Center(

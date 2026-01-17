@@ -9,7 +9,7 @@ import '../../features/orders/presentation/controllers/orders_controller.dart';
 import '../ui/snackbars.dart';
 
 /// Handles deep links for the app, particularly Paystack payment callbacks.
-/// 
+///
 /// Expected callback URL format: ojaewa://payment/callback?reference=xxx&status=success
 class DeepLinkHandler {
   DeepLinkHandler(this._ref);
@@ -17,14 +17,14 @@ class DeepLinkHandler {
   final Ref _ref;
   final AppLinks _appLinks = AppLinks();
   StreamSubscription<Uri>? _subscription;
-  
+
   GlobalKey<NavigatorState>? _navigatorKey;
 
   /// Initialize the deep link handler with a navigator key for navigation
   void init(GlobalKey<NavigatorState> navigatorKey) {
     _navigatorKey = navigatorKey;
     _subscription = _appLinks.uriLinkStream.listen(_handleDeepLink);
-    
+
     // Also check for initial link (app opened via deep link)
     _checkInitialLink();
   }
@@ -52,12 +52,12 @@ class DeepLinkHandler {
         _handlePaymentCallback(uri);
       }
     }
-    
+
     // Handle school payment callback: ojaewa://school/payment/callback?reference=xxx
     if (uri.host == 'school') {
       final pathSegments = uri.pathSegments;
-      if (pathSegments.length >= 2 && 
-          pathSegments[0] == 'payment' && 
+      if (pathSegments.length >= 2 &&
+          pathSegments[0] == 'payment' &&
           pathSegments[1] == 'callback') {
         _handleSchoolPaymentCallback(uri);
       }
@@ -84,8 +84,10 @@ class DeepLinkHandler {
 
     try {
       // Verify payment with backend
-      final result = await _ref.read(orderActionsProvider.notifier).verifyPayment(reference: reference);
-      
+      final result = await _ref
+          .read(orderActionsProvider.notifier)
+          .verifyPayment(reference: reference);
+
       // Hide loading
       if (context.mounted) {
         Navigator.of(context).pop(); // Close loading dialog
@@ -94,7 +96,10 @@ class DeepLinkHandler {
       if (result.status == 'success' || status == 'success') {
         _showPaymentSuccess(context, result.orderId);
       } else {
-        _showPaymentFailed(context, 'Payment verification failed. Status: ${result.status}');
+        _showPaymentFailed(
+          context,
+          'Payment verification failed. Status: ${result.status}',
+        );
       }
     } catch (e) {
       // Hide loading
@@ -127,7 +132,7 @@ class DeepLinkHandler {
       // Verify payment with backend using school registration API
       final api = _ref.read(schoolRegistrationApiProvider);
       final result = await api.verifyPayment(reference: reference);
-      
+
       // Hide loading
       if (context.mounted) {
         Navigator.of(context).pop(); // Close loading dialog
@@ -139,7 +144,10 @@ class DeepLinkHandler {
       if (paymentStatus == 'success' || status == 'success') {
         _showSchoolPaymentSuccess(context);
       } else {
-        _showPaymentFailed(context, 'School payment verification failed. Status: $paymentStatus');
+        _showPaymentFailed(
+          context,
+          'School payment verification failed. Status: $paymentStatus',
+        );
       }
     } catch (e) {
       // Hide loading
@@ -155,7 +163,7 @@ class DeepLinkHandler {
       context: context,
       barrierDismissible: false,
       barrierLabel: 'Loading',
-      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
       pageBuilder: (context, anim1, anim2) {
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -203,7 +211,7 @@ class DeepLinkHandler {
       context: context,
       barrierDismissible: false,
       barrierLabel: 'PaymentSuccess',
-      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
       pageBuilder: (context, anim1, anim2) {
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -225,7 +233,7 @@ class DeepLinkHandler {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4CAF50).withOpacity(0.1),
+                        color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -263,16 +271,19 @@ class DeepLinkHandler {
                           child: GestureDetector(
                             onTap: () {
                               Navigator.of(context).pop();
-                              _navigatorKey?.currentState?.pushNamedAndRemoveUntil(
-                                '/',
-                                (route) => false,
-                              );
+                              _navigatorKey?.currentState
+                                  ?.pushNamedAndRemoveUntil(
+                                    '/',
+                                    (route) => false,
+                                  );
                             },
                             child: Container(
                               height: 57,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xFFCCCCCC)),
+                                border: Border.all(
+                                  color: const Color(0xFFCCCCCC),
+                                ),
                               ),
                               child: const Center(
                                 child: Text(
@@ -293,10 +304,11 @@ class DeepLinkHandler {
                           child: GestureDetector(
                             onTap: () {
                               Navigator.of(context).pop();
-                              _navigatorKey?.currentState?.pushNamedAndRemoveUntil(
-                                '/orders',
-                                (route) => route.isFirst,
-                              );
+                              _navigatorKey?.currentState
+                                  ?.pushNamedAndRemoveUntil(
+                                    '/orders',
+                                    (route) => route.isFirst,
+                                  );
                             },
                             child: Container(
                               height: 57,
@@ -305,7 +317,9 @@ class DeepLinkHandler {
                                 borderRadius: BorderRadius.circular(8),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFDAF40).withOpacity(0.4),
+                                    color: const Color(
+                                      0xFFFDAF40,
+                                    ).withValues(alpha: 0.4),
                                     blurRadius: 16,
                                     offset: const Offset(0, 8),
                                   ),
@@ -343,7 +357,7 @@ class DeepLinkHandler {
       context: context,
       barrierDismissible: false,
       barrierLabel: 'SchoolPaymentSuccess',
-      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
       pageBuilder: (context, anim1, anim2) {
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -365,7 +379,7 @@ class DeepLinkHandler {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4CAF50).withOpacity(0.1),
+                        color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -413,7 +427,9 @@ class DeepLinkHandler {
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFFDAF40).withOpacity(0.4),
+                              color: const Color(
+                                0xFFFDAF40,
+                              ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                             ),
@@ -448,7 +464,7 @@ class DeepLinkHandler {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'PaymentFailed',
-      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
       pageBuilder: (context, anim1, anim2) {
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -470,7 +486,7 @@ class DeepLinkHandler {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE53935).withOpacity(0.1),
+                        color: const Color(0xFFE53935).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -512,7 +528,9 @@ class DeepLinkHandler {
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFFDAF40).withOpacity(0.4),
+                              color: const Color(
+                                0xFFFDAF40,
+                              ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                             ),

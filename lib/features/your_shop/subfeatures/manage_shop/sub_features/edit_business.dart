@@ -33,39 +33,64 @@ class EditBusinessScreen extends StatelessWidget {
                   children: [
                     const SizedBox(height: 24),
                     _buildSectionHeader("Business Location"),
-                    _buildInputField("Country", hint: "Nigeria", isDropdown: true),
+                    _buildInputField(
+                      "Country",
+                      hint: "Nigeria",
+                      isDropdown: true,
+                    ),
                     _buildInputField("State", hint: "FCT", isDropdown: true),
                     _buildInputField("City", hint: "Your City"),
-                    _buildInputField("Address Line", hint: "Street, house number etc"),
-                    
+                    _buildInputField(
+                      "Address Line",
+                      hint: "Street, house number etc",
+                    ),
+
                     const SizedBox(height: 32),
                     _buildSectionHeader("Mobiles"),
-                    _buildInputField("Business Email", hint: "sanusimot@gmail.com"),
+                    _buildInputField(
+                      "Business Email",
+                      hint: "sanusimot@gmail.com",
+                    ),
                     _buildPhoneField("Business Phone Number"),
-                    
+
                     const SizedBox(height: 32),
                     _buildSectionHeader("Social handles"),
                     _buildInputField("Instagram", hint: "Your Instagram URL"),
                     _buildInputField("Facebook", hint: "Your Facebook URL"),
-                    
+
                     const SizedBox(height: 32),
                     _buildSectionHeader("About Business"),
-                    _buildInputField("Business Name", hint: "Your Business Name"),
-                    _buildInputField("Description", hint: "Share details of your experience", maxLines: 4),
+                    _buildInputField(
+                      "Business Name",
+                      hint: "Your Business Name",
+                    ),
+                    _buildInputField(
+                      "Description",
+                      hint: "Share details of your experience",
+                      maxLines: 4,
+                    ),
                     const Align(
                       alignment: Alignment.centerRight,
-                      child: Text("100 characters required", 
-                        style: TextStyle(fontSize: 10, color: Color(0xFF595F63))),
+                      child: Text(
+                        "100 characters required",
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Color(0xFF595F63),
+                        ),
+                      ),
                     ),
-                    
+
                     const SizedBox(height: 32),
                     _buildLogoSection(),
-                    
+
                     const SizedBox(height: 32),
                     _buildSectionHeader("Account"),
                     _buildInputField("Bank Name", hint: "Your Bank"),
-                    _buildInputField("Account Number", hint: "Your Account Number"),
-                    
+                    _buildInputField(
+                      "Account Number",
+                      hint: "Your Account Number",
+                    ),
+
                     const SizedBox(height: 40),
                     _buildSaveButton(),
                     const SizedBox(height: 40),
@@ -78,7 +103,6 @@ class EditBusinessScreen extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildSectionHeader(String title) {
     return Padding(
@@ -95,21 +119,40 @@ class EditBusinessScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInputField(String label, {required String hint, bool isDropdown = false, int maxLines = 1}) {
+  Widget _buildInputField(
+    String label, {
+    required String hint,
+    bool isDropdown = false,
+    int maxLines = 1,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 14, color: Color(0xFF777F84))),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 14, color: Color(0xFF777F84)),
+          ),
           const SizedBox(height: 8),
           TextField(
             maxLines: maxLines,
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: const TextStyle(color: Color(0xFFCCCCCC), fontSize: 16),
-              suffixIcon: isDropdown ? const Icon(Icons.keyboard_arrow_down, color: Color(0xFF777F84)) : null,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              hintStyle: const TextStyle(
+                color: Color(0xFFCCCCCC),
+                fontSize: 16,
+              ),
+              suffixIcon: isDropdown
+                  ? const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Color(0xFF777F84),
+                    )
+                  : null,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
+              ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
@@ -131,7 +174,10 @@ class EditBusinessScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 14, color: Color(0xFF777F84))),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 14, color: Color(0xFF777F84)),
+          ),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -141,9 +187,15 @@ class EditBusinessScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.flag, size: 20), // Placeholder for country asset
+                const Icon(
+                  Icons.flag,
+                  size: 20,
+                ), // Placeholder for country asset
                 const SizedBox(width: 8),
-                const Text("+234", style: TextStyle(fontSize: 16, color: Color(0xFF241508))),
+                const Text(
+                  "+234",
+                  style: TextStyle(fontSize: 16, color: Color(0xFF241508)),
+                ),
                 const SizedBox(width: 12),
                 const Expanded(
                   child: TextField(
@@ -166,7 +218,10 @@ class EditBusinessScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Business Logo", style: TextStyle(fontSize: 14, color: Color(0xFF777F84))),
+        const Text(
+          "Business Logo",
+          style: TextStyle(fontSize: 14, color: Color(0xFF777F84)),
+        ),
         const SizedBox(height: 8),
         Row(
           children: [
@@ -186,13 +241,19 @@ class EditBusinessScreen extends StatelessWidget {
                 backgroundColor: Colors.transparent,
                 foregroundColor: const Color(0xFFFDAF40),
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 20,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                   side: const BorderSide(color: Color(0xFFFDAF40)),
                 ),
               ),
-              child: const Text("Change", style: TextStyle(fontWeight: FontWeight.w600)),
+              child: const Text(
+                "Change",
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
           ],
         ),
@@ -209,10 +270,10 @@ class EditBusinessScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.4),
+            color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 8),
-          )
+          ),
         ],
       ),
       child: const Center(

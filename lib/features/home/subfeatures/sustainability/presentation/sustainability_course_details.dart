@@ -10,7 +10,10 @@ import 'package:ojaewa/features/sustainability_details/presentation/controllers/
 
 /// Sustainability Course Detail Screen - Shows information about a course/event
 class SustainabilityCourseDetailScreen extends ConsumerWidget {
-  const SustainabilityCourseDetailScreen({super.key, required this.initiativeId});
+  const SustainabilityCourseDetailScreen({
+    super.key,
+    required this.initiativeId,
+  });
 
   final int initiativeId;
 
@@ -22,13 +25,18 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
       loading: () => const LoadingStateWidget(),
       error: (e, _) => ErrorStateWidget(
         message: 'Failed to load initiative details',
-        onRetry: () => ref.invalidate(sustainabilityDetailsProvider(initiativeId)),
+        onRetry: () =>
+            ref.invalidate(sustainabilityDetailsProvider(initiativeId)),
       ),
       data: (initiative) => _buildContent(context, ref, initiative),
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, SustainabilityDetails initiative) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    SustainabilityDetails initiative,
+  ) {
     final title = initiative.title;
     final description = initiative.description ?? '';
     final category = initiative.category ?? '';
@@ -47,36 +55,37 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 104), // Space for standard header
-                  
                   // Course Header with Image
                   _buildCourseHeader(title, imageUrl),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Description Section
                   _buildDescriptionSection(description),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Event Details Section
                   _buildEventDetailsSection(category, status, progress),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Reviews Section
                   _buildReviewsSection(context, ref),
-                  
-                  const SizedBox(height: 180), // Space for bottom card and button
+
+                  const SizedBox(
+                    height: 180,
+                  ), // Space for bottom card and button
                 ],
               ),
             ),
-            
+
             // Fixed Top App Bar
             const AppHeader(
               backgroundColor: Color(0xFFFFF8F1),
               iconColor: Color(0xFF241508),
             ),
-            
+
             // Fixed Bottom Action Card
             _buildBottomActionCard(context),
           ],
@@ -108,14 +117,10 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
               ),
             )
           else
-            const AppImagePlaceholder(
-              width: 168,
-              height: 198,
-              borderRadius: 8,
-            ),
-          
+            const AppImagePlaceholder(width: 168, height: 198, borderRadius: 8),
+
           const SizedBox(width: 7),
-          
+
           // Course Info
           Expanded(
             child: Column(
@@ -131,9 +136,9 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                     height: 1.2,
                   ),
                 ),
-                
+
                 const SizedBox(height: 30),
-                
+
                 // Rating
                 Row(
                   children: [
@@ -216,12 +221,16 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEventDetailsSection(String category, String status, int progress) {
+  Widget _buildEventDetailsSection(
+    String category,
+    String status,
+    int progress,
+  ) {
     // Capitalize first letter of category
-    final displayCategory = category.isNotEmpty 
+    final displayCategory = category.isNotEmpty
         ? '${category[0].toUpperCase()}${category.substring(1)}'
         : 'General';
-    final displayStatus = status.isNotEmpty 
+    final displayStatus = status.isNotEmpty
         ? '${status[0].toUpperCase()}${status.substring(1)}'
         : 'Active';
 
@@ -244,27 +253,27 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
               color: Color(0xFF1E2021),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Category
           _buildEventDetailRow(
             icon: Icons.category_outlined,
             label: 'Category',
             value: displayCategory,
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Status
           _buildEventDetailRow(
             icon: Icons.check_circle_outline,
             label: 'Status',
             value: displayStatus,
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Progress
           _buildEventDetailRow(
             icon: Icons.trending_up,
@@ -283,11 +292,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
   }) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 20,
-          color: const Color(0xFFA15E22),
-        ),
+        Icon(icon, size: 20, color: const Color(0xFFA15E22)),
         const SizedBox(width: 12),
         Text(
           label,
@@ -313,14 +318,16 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildReviewsSection(BuildContext context, WidgetRef ref) {
-    final reviewsPage = ref.watch(reviewsProvider((type: 'initiative', id: initiativeId))).maybeWhen(
-          data: (d) => d,
-          orElse: () => null,
-        );
+    final reviewsPage = ref
+        .watch(reviewsProvider((type: 'initiative', id: initiativeId)))
+        .maybeWhen(data: (d) => d, orElse: () => null);
 
     final reviewCount = reviewsPage?.total ?? 0;
-    final avgRating = reviewsPage?.entity.avgRating?.toStringAsFixed(1) ?? '0.0';
-    final firstReview = (reviewsPage?.items.isNotEmpty ?? false) ? reviewsPage!.items.first : null;
+    final avgRating =
+        reviewsPage?.entity.avgRating?.toStringAsFixed(1) ?? '0.0';
+    final firstReview = (reviewsPage?.items.isNotEmpty ?? false)
+        ? reviewsPage!.items.first
+        : null;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -381,14 +388,16 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            
+
             if (firstReview != null) ...[
               const SizedBox(height: 24),
-              
+
               // First review from API
               _buildReviewItem(
                 name: firstReview.user?.displayName ?? '',
-                date: firstReview.createdAt != null ? _formatDate(firstReview.createdAt!) : '',
+                date: firstReview.createdAt != null
+                    ? _formatDate(firstReview.createdAt!)
+                    : '',
                 rating: firstReview.rating ?? 0,
                 title: firstReview.headline ?? '',
                 review: firstReview.body ?? '',
@@ -401,7 +410,20 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
   }
 
   String _formatDate(DateTime dt) {
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     final m = months[(dt.month - 1).clamp(0, 11)];
     return '$m ${dt.day}, ${dt.year}';
   }
@@ -440,9 +462,9 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 8),
-        
+
         // Star rating
         Row(
           children: List.generate(
@@ -457,10 +479,10 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
             ),
           ),
         ),
-        
+
         if (title.isNotEmpty) ...[
           const SizedBox(height: 12),
-          
+
           // Review title
           Text(
             title,
@@ -472,10 +494,10 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
             ),
           ),
         ],
-        
+
         if (review.isNotEmpty) ...[
           const SizedBox(height: 8),
-          
+
           // Review text
           Text(
             review,
@@ -507,7 +529,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 38), // Extra padding at top
-            
             // Learn More Button
             SizedBox(
               width: double.infinity,
@@ -523,7 +544,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   elevation: 8,
-                  shadowColor: const Color(0xFFFDAF40).withOpacity(0.3),
+                  shadowColor: const Color(0xFFFDAF40).withValues(alpha: 0.3),
                 ),
                 child: const Text(
                   'Learn More',
@@ -536,7 +557,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 8),
           ],
         ),
@@ -544,26 +565,18 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
     );
   }
 
-
   void _showLearnMoreDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text(
           'Course Information',
-          style: TextStyle(
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontFamily: 'Campton', fontWeight: FontWeight.w600),
         ),
         content: const Text(
           'Would you like to enroll in this course or get more details?',
-          style: TextStyle(
-            fontFamily: 'Campton',
-          ),
+          style: TextStyle(fontFamily: 'Campton'),
         ),
         actions: [
           TextButton(
@@ -572,10 +585,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
             },
             child: const Text(
               'Cancel',
-              style: TextStyle(
-                fontFamily: 'Campton',
-                color: Color(0xFF777F84),
-              ),
+              style: TextStyle(fontFamily: 'Campton', color: Color(0xFF777F84)),
             ),
           ),
           ElevatedButton(
@@ -591,10 +601,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
             ),
             child: const Text(
               'Enroll Now',
-              style: TextStyle(
-                fontFamily: 'Campton',
-                color: Colors.white,
-              ),
+              style: TextStyle(fontFamily: 'Campton', color: Colors.white),
             ),
           ),
         ],

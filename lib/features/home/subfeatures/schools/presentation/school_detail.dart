@@ -29,10 +29,15 @@ class SchoolDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, BusinessDetails business) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    BusinessDetails business,
+  ) {
     final schoolName = business.businessName;
     // Use school_biography if available, otherwise fall back to business_description
-    final biography = business.schoolBiography ?? business.businessDescription ?? '';
+    final biography =
+        business.schoolBiography ?? business.businessDescription ?? '';
     final classes = business.classesOffered; // List<ClassItem>
     final email = business.businessEmail ?? '';
     final phone = business.businessPhone ?? '';
@@ -74,7 +79,9 @@ class SchoolDetailScreen extends ConsumerWidget {
                   // Reviews Section
                   _buildReviewsSection(context, ref),
 
-                  const SizedBox(height: 280), // Space for bottom registration card
+                  const SizedBox(
+                    height: 280,
+                  ), // Space for bottom registration card
                 ],
               ),
             ),
@@ -108,7 +115,11 @@ class SchoolDetailScreen extends ConsumerWidget {
                 width: 168,
                 height: 198,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const AppImagePlaceholder(width: 168, height: 198, borderRadius: 8),
+                errorBuilder: (_, __, ___) => const AppImagePlaceholder(
+                  width: 168,
+                  height: 198,
+                  borderRadius: 8,
+                ),
               ),
             )
           else
@@ -237,37 +248,40 @@ class SchoolDetailScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          ...classes.map((classItem) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    classItem.name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF1E2021),
-                      height: 1.4,
+          ...classes.map(
+            (classItem) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      classItem.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Campton',
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF1E2021),
+                        height: 1.4,
+                      ),
                     ),
                   ),
-                ),
-                if (classItem.duration != null && classItem.duration!.isNotEmpty)
-                  Text(
-                    classItem.duration!,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF603814),
+                  if (classItem.duration != null &&
+                      classItem.duration!.isNotEmpty)
+                    Text(
+                      classItem.duration!,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Campton',
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF603814),
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );
@@ -386,14 +400,16 @@ class SchoolDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildReviewsSection(BuildContext context, WidgetRef ref) {
-    final reviewsPage = ref.watch(reviewsProvider((type: 'business', id: businessId))).maybeWhen(
-          data: (d) => d,
-          orElse: () => null,
-        );
+    final reviewsPage = ref
+        .watch(reviewsProvider((type: 'business', id: businessId)))
+        .maybeWhen(data: (d) => d, orElse: () => null);
 
     final reviewCount = reviewsPage?.total ?? 0;
-    final avgRating = reviewsPage?.entity.avgRating?.toStringAsFixed(1) ?? '0.0';
-    final firstReview = (reviewsPage?.items.isNotEmpty ?? false) ? reviewsPage!.items.first : null;
+    final avgRating =
+        reviewsPage?.entity.avgRating?.toStringAsFixed(1) ?? '0.0';
+    final firstReview = (reviewsPage?.items.isNotEmpty ?? false)
+        ? reviewsPage!.items.first
+        : null;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -480,7 +496,9 @@ class SchoolDetailScreen extends ConsumerWidget {
               // First review from API
               _buildReviewItem(
                 name: firstReview.user?.displayName ?? '',
-                date: firstReview.createdAt != null ? _formatDate(firstReview.createdAt!) : '',
+                date: firstReview.createdAt != null
+                    ? _formatDate(firstReview.createdAt!)
+                    : '',
                 rating: firstReview.rating ?? 0,
                 title: firstReview.headline ?? '',
                 review: firstReview.body ?? '',
@@ -493,7 +511,20 @@ class SchoolDetailScreen extends ConsumerWidget {
   }
 
   String _formatDate(DateTime dt) {
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     final m = months[(dt.month - 1).clamp(0, 11)];
     return '$m ${dt.day}, ${dt.year}';
   }
@@ -584,7 +615,11 @@ class SchoolDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBottomRegistrationCard(BuildContext context, String? websiteUrl, int? schoolBusinessId) {
+  Widget _buildBottomRegistrationCard(
+    BuildContext context,
+    String? websiteUrl,
+    int? schoolBusinessId,
+  ) {
     return Positioned(
       bottom: 0,
       left: 0,
@@ -644,7 +679,7 @@ class SchoolDetailScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   elevation: 8,
-                  shadowColor: const Color(0xFFFDAF40).withOpacity(0.3),
+                  shadowColor: const Color(0xFFFDAF40).withValues(alpha: 0.3),
                 ),
                 child: const Text(
                   'Register via Ojá-Ẹwà',
@@ -673,7 +708,9 @@ class SchoolDetailScreen extends ConsumerWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  disabledForegroundColor: const Color(0xFFFDAF40).withOpacity(0.5),
+                  disabledForegroundColor: const Color(
+                    0xFFFDAF40,
+                  ).withValues(alpha: 0.5),
                 ),
                 child: const Text(
                   'Visit School',

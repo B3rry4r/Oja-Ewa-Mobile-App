@@ -53,8 +53,9 @@ class _OrderConfirmationScreenState
 
     // Get selected/default address
     final addresses = addressesAsync.asData?.value ?? [];
-    final selectedAddress = addresses.where((a) => a.isDefault).firstOrNull ?? 
-                            (addresses.isNotEmpty ? addresses.first : null);
+    final selectedAddress =
+        addresses.where((a) => a.isDefault).firstOrNull ??
+        (addresses.isNotEmpty ? addresses.first : null);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
@@ -82,32 +83,35 @@ class _OrderConfirmationScreenState
               child: isCartLoading
                   ? const Center(child: CircularProgressIndicator())
                   : hasCartError
-                      ? const Center(child: Text('Failed to load cart'))
-                      : cart == null || cart.items.isEmpty
-                          ? const Center(child: Text('Cart is empty'))
-                          : SingleChildScrollView(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 24),
-                                  _buildAddressSection(context, selectedAddress),
-                                  const SizedBox(height: 32),
-                                  _buildItemsSection(cart.items.length),
-                                  const SizedBox(height: 32),
-                                ],
-                              ),
-                            ),
+                  ? const Center(child: Text('Failed to load cart'))
+                  : cart == null || cart.items.isEmpty
+                  ? const Center(child: Text('Cart is empty'))
+                  : SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 24),
+                          _buildAddressSection(context, selectedAddress),
+                          const SizedBox(height: 32),
+                          _buildItemsSection(cart.items.length),
+                          const SizedBox(height: 32),
+                        ],
+                      ),
+                    ),
             ),
 
             _buildOrderSummary(
               cart: cart,
-              isBusy: isBusy, 
+              isBusy: isBusy,
               onPlaceOrder: isBusy
                   ? null
                   : () async {
                       if (selectedAddress == null) {
-                        AppSnackbars.showError(context, 'Please add a delivery address');
+                        AppSnackbars.showError(
+                          context,
+                          'Please add a delivery address',
+                        );
                         return;
                       }
 
@@ -133,7 +137,10 @@ class _OrderConfirmationScreenState
                         final uri = Uri.tryParse(link.paymentUrl);
                         if (uri == null || link.paymentUrl.isEmpty) {
                           if (context.mounted) {
-                            AppSnackbars.showError(context, 'Failed to generate payment link');
+                            AppSnackbars.showError(
+                              context,
+                              'Failed to generate payment link',
+                            );
                           }
                           return;
                         }
@@ -143,7 +150,10 @@ class _OrderConfirmationScreenState
                         );
                       } catch (e) {
                         if (context.mounted) {
-                          AppSnackbars.showError(context, 'Failed to create order: ${e.toString()}');
+                          AppSnackbars.showError(
+                            context,
+                            'Failed to create order: ${e.toString()}',
+                          );
                         }
                       }
                     },
@@ -156,7 +166,7 @@ class _OrderConfirmationScreenState
 
   Widget _buildAddressSection(BuildContext context, Address? address) {
     final hasAddress = address != null;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -224,7 +234,10 @@ class _OrderConfirmationScreenState
                       ),
                     ),
                   ),
-                  const Icon(Icons.keyboard_arrow_right, color: Color(0xFF777F84)),
+                  const Icon(
+                    Icons.keyboard_arrow_right,
+                    color: Color(0xFF777F84),
+                  ),
                 ],
               ),
             ),
@@ -332,7 +345,11 @@ class _OrderConfirmationScreenState
                 children: [
                   const Text(
                     'Total',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFFFBFBFB)),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFFBFBFB),
+                    ),
                   ),
                   Text(
                     '₦${_formatPrice(total)}',
@@ -355,7 +372,7 @@ class _OrderConfirmationScreenState
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFDAF40).withOpacity(0.3),
+                        color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
                         blurRadius: 16,
                         offset: const Offset(0, 8),
                       ),

@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/features/search/data/search_repository_impl.dart';
 import 'package:ojaewa/features/search/domain/search_product.dart';
 import 'product_filters_controller.dart';
@@ -46,33 +45,27 @@ class FilteredProductsState {
   );
 }
 
-/// Args for filtered products: category slug acts as search query context
-typedef FilteredProductsArgs = ({String categorySlug, String categoryName});
+/// Args for filtered products: categoryType is the API type (textiles, shoes_bags, etc.)
+typedef FilteredProductsArgs = ({String categoryType, String categoryName});
 
-/// Provider for filtered/sorted products using the search API
+/// Provider for filtered/sorted products using the browse API
 final filteredProductsProvider = FutureProvider.family<FilteredProductsState, FilteredProductsArgs>((ref, arg) async {
-  // Check auth
-  final token = ref.read(accessTokenProvider);
-  if (token == null || token.isEmpty) {
-    return FilteredProductsState.empty;
-  }
-
   // Watch filters so we rebuild when they change
   final filters = ref.watch(selectedFiltersProvider);
 
-  // Use category name as search query
-  final query = arg.categoryName;
-
+  // Use empty query to get all products, filtered by category type
+  // When user searches, the query will be passed
   final result = await ref.read(searchRepositoryProvider).searchProducts(
-        query: query,
+        query: '', // Empty for browse, search term when filtering
         page: 1,
         perPage: 15,
         gender: filters.gender,
         style: filters.style,
         tribe: filters.tribe,
+        fabricType: filters.fabricType,
         priceMin: filters.priceMin,
         priceMax: filters.priceMax,
-        categorySlug: arg.categorySlug,
+        categoryType: arg.categoryType, // Use type for filtering (textiles, shoes_bags, etc.)
         sort: filters.sortBy,
       );
 

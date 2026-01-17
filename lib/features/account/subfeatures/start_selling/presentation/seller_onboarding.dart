@@ -21,15 +21,20 @@ class SellerOnboardingScreen extends ConsumerWidget {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!context.mounted) return;
           if (status.isApprovedAndActive) {
-            Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.yourShopDashboard, (r) => false);
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              AppRoutes.yourShopDashboard,
+              (r) => false,
+            );
           } else {
-            Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.sellerApprovalStatus, (r) => false);
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              AppRoutes.sellerApprovalStatus,
+              (r) => false,
+            );
           }
         });
       },
     );
 
-    
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
@@ -41,7 +46,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
                 backgroundColor: Color(0xFFFFF8F1),
                 iconColor: Color(0xFF241508),
               ),
-              
+
               // Main content
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -49,7 +54,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 32),
-                    
+
                     // Main title
                     const Text(
                       'Sell on Ojá-Ẹwà',
@@ -60,9 +65,9 @@ class SellerOnboardingScreen extends ConsumerWidget {
                         color: Color(0xFF241508),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Subtitle
                     const Text(
                       'Tell your Story on Ojá-Ẹwà. Where makers build their legacy. List your work, tell your story, reach the world.',
@@ -73,17 +78,17 @@ class SellerOnboardingScreen extends ConsumerWidget {
                         color: Color(0xFF1E2021),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // "How it works" section
                     _buildHowItWorksSection(),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Start Selling button
                     _buildStartSellingButton(context),
-                    
+
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -94,7 +99,6 @@ class SellerOnboardingScreen extends ConsumerWidget {
       ),
     );
   }
-
 
   Widget _buildHowItWorksSection() {
     const List<HowItWorksStep> steps = [
@@ -133,9 +137,9 @@ class SellerOnboardingScreen extends ConsumerWidget {
             color: Color(0xFF241508),
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Step note
         const Text(
           '*Selling is strictly for fashion designers',
@@ -146,14 +150,13 @@ class SellerOnboardingScreen extends ConsumerWidget {
             color: Color(0xFF1E2021),
           ),
         ),
-        
+
         const SizedBox(height: 40),
-        
+
         // Steps list
         Column(
           children: [
-            for (int i = 0; i < steps.length; i++)
-              _buildStepItem(steps[i]),
+            for (int i = 0; i < steps.length; i++) _buildStepItem(steps[i]),
           ],
         ),
       ],
@@ -186,9 +189,9 @@ class SellerOnboardingScreen extends ConsumerWidget {
               ),
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           // Step description
           Expanded(
             child: Text(
@@ -214,7 +217,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.3),
+            color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -250,8 +253,5 @@ class HowItWorksStep {
   final String number;
   final String description;
 
-  const HowItWorksStep({
-    required this.number,
-    required this.description,
-  });
+  const HowItWorksStep({required this.number, required this.description});
 }

@@ -32,7 +32,7 @@ class ConfirmationModal extends StatelessWidget {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'ConfirmationModal',
-      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
       transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (context, anim1, anim2) {
         return ConfirmationModal(
@@ -49,7 +49,7 @@ class ConfirmationModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1E2021).withOpacity(0.8),
+      backgroundColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -125,10 +125,12 @@ class ConfirmationModal extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFFDAF40).withOpacity(0.4),
+                                color: const Color(
+                                  0xFFFDAF40,
+                                ).withValues(alpha: 0.4),
                                 blurRadius: 16,
                                 offset: const Offset(0, 8),
-                              )
+                              ),
                             ],
                           ),
                           child: Center(

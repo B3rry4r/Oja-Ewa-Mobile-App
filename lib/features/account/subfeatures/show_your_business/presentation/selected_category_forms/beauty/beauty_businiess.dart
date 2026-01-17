@@ -6,7 +6,6 @@ import 'package:ojaewa/core/ui/snackbars.dart';
 
 import '../../../../../../../app/router/app_router.dart';
 import '../service_list_editor.dart';
-import '../product_list_editor.dart';
 import '../draft_utils.dart';
 
 class BeautyBusinessDetailsScreen extends StatefulWidget {
@@ -17,11 +16,8 @@ class BeautyBusinessDetailsScreen extends StatefulWidget {
 }
 
 class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScreen> {
-  String _selectedOffering = "Selling Product";
-
   final _businessNameController = TextEditingController();
   final _businessDescriptionController = TextEditingController();
-  final List<String> _products = [''];
 
   final TextEditingController _professionalTitleController = TextEditingController();
   final List<ServiceListItem> _services = [ServiceListItem()];
@@ -70,33 +66,24 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
             _buildInputField("Business Name", "Enter business name", controller: _businessNameController),
             const SizedBox(height: 24),
             
-            // Type of Offering Section
+            // Professional Title (for service providers)
+            _buildInputField(
+              "Professional Title",
+              "e.g. Makeup Artist, Hair Stylist",
+              maxLines: 1,
+              controller: _professionalTitleController,
+            ),
+            const SizedBox(height: 24),
+            
+            // Service List
             const Text(
-              "Select type of offering",
+              "Service List",
               style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
             ),
-            const SizedBox(height: 12),
-            _buildOfferingOption("Selling Product", Icons.shopping_bag_outlined),
             const SizedBox(height: 8),
-            _buildOfferingOption("Providing Service", Icons.build_circle_outlined),
-            
+            ServiceListEditor(items: _services),
             const SizedBox(height: 24),
-            if (_selectedOffering == 'Providing Service') ...[
-              _buildInputField(
-                "Professional Title",
-                "e.g. Makeup Artist",
-                maxLines: 1,
-                controller: _professionalTitleController,
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                "Service List",
-                style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
-              ),
-              const SizedBox(height: 8),
-              ServiceListEditor(items: _services),
-              const SizedBox(height: 24),
-            ],
+            
             _buildInputField(
               "Business Description", 
               "Share Short description of your business", 
@@ -104,16 +91,6 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
               helperText: "100 characters required",
               controller: _businessDescriptionController,
             ),
-            
-            if (_selectedOffering == 'Selling Product') ...[
-              const SizedBox(height: 24),
-              const Text(
-                "What do you sell?",
-                style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
-              ),
-              const SizedBox(height: 8),
-              ProductListEditor(items: _products),
-            ],
             
             const SizedBox(height: 32),
             _buildUploadSection(
@@ -190,27 +167,6 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
   }
 
 
-  Widget _buildOfferingOption(String title, IconData icon) {
-    final isSelected = _selectedOffering == title;
-    return InkWell(
-      onTap: () => setState(() => _selectedOffering = title),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          border: Border.all(color: isSelected ? const Color(0xFFA15E22) : const Color(0xFFCCCCCC)),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Icon(isSelected ? Icons.radio_button_checked : Icons.radio_button_off, 
-                 color: isSelected ? const Color(0xFFA15E22) : const Color(0xFF777F84), size: 20),
-            const SizedBox(width: 12),
-            Text(title, style: const TextStyle(fontSize: 16, color: Color(0xFF241508))),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildUploadSection({
     required String title,
@@ -294,27 +250,6 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
     );
   }
 
-  Widget _buildDropdownField(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(border: Border.all(color: const Color(0xFFCCCCCC)), borderRadius: BorderRadius.circular(8)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(value, style: const TextStyle(color: Color(0xFFCCCCCC), fontSize: 16)),
-              const Icon(Icons.keyboard_arrow_down, color: Color(0xFF777F84)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   bool _validateForm() {
     final businessName = _businessNameController.text.trim();
     final businessDescription = _businessDescriptionController.text.trim();
@@ -334,25 +269,16 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
       return false;
     }
     
-    if (_selectedOffering == 'Selling Product') {
-      final validProducts = _products.where((p) => p.trim().isNotEmpty).toList();
-      if (validProducts.isEmpty) {
-        AppSnackbars.showError(context, 'Please add at least one product');
-        return false;
-      }
+    // Afro Beauty businesses only provide services
+    final professionalTitle = _professionalTitleController.text.trim();
+    if (professionalTitle.isEmpty) {
+      AppSnackbars.showError(context, 'Please enter your professional title');
+      return false;
     }
-    
-    if (_selectedOffering == 'Providing Service') {
-      final professionalTitle = _professionalTitleController.text.trim();
-      if (professionalTitle.isEmpty) {
-        AppSnackbars.showError(context, 'Please enter your professional title');
-        return false;
-      }
-      final validServices = _services.where((s) => s.name.trim().isNotEmpty).toList();
-      if (validServices.isEmpty) {
-        AppSnackbars.showError(context, 'Please add at least one service');
-        return false;
-      }
+    final validServices = _services.where((s) => s.name.trim().isNotEmpty).toList();
+    if (validServices.isEmpty) {
+      AppSnackbars.showError(context, 'Please add at least one service');
+      return false;
     }
     
     if (_businessLogoPath == null) {
@@ -375,8 +301,8 @@ class _BeautyBusinessDetailsScreenState extends State<BeautyBusinessDetailsScree
           final updated = draft
             ..businessName = _businessNameController.text.trim()
             ..businessDescription = _businessDescriptionController.text.trim()
-            ..offeringType = mapOfferingLabelToEnum(_selectedOffering)
-            ..productList = _products.where((p) => p.trim().isNotEmpty).toList()
+            ..offeringType = 'providing_service' // Afro Beauty only provides services
+            ..productList = const [] // Products handled via seller flow
             ..professionalTitle = _professionalTitleController.text.trim()
             ..serviceList = _services
             ..businessLogoPath = _businessLogoPath

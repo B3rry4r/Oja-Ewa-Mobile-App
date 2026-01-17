@@ -20,7 +20,8 @@ class ProductDetailsScreen extends ConsumerStatefulWidget {
   final int productId;
 
   @override
-  ConsumerState<ProductDetailsScreen> createState() => _ProductDetailScreenState();
+  ConsumerState<ProductDetailsScreen> createState() =>
+      _ProductDetailScreenState();
 }
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
@@ -32,19 +33,24 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     // Do not change layout; only populate data.
-    final details = ref.watch(productDetailsProvider(widget.productId)).maybeWhen(
-          data: (d) => d,
-          orElse: () => null,
-        );
+    final details = ref
+        .watch(productDetailsProvider(widget.productId))
+        .maybeWhen(data: (d) => d, orElse: () => null);
 
-    final isWishlisted = ref.watch(isWishlistedProvider((type: WishlistableType.product, id: widget.productId)));
+    final isWishlisted = ref.watch(
+      isWishlistedProvider((
+        type: WishlistableType.product,
+        id: widget.productId,
+      )),
+    );
 
-    final reviewsPage = ref.watch(reviewsProvider((type: 'product', id: widget.productId))).maybeWhen(
-          data: (d) => d,
-          orElse: () => null,
-        );
+    final reviewsPage = ref
+        .watch(reviewsProvider((type: 'product', id: widget.productId)))
+        .maybeWhen(data: (d) => d, orElse: () => null);
 
-    final firstReview = (reviewsPage?.items.isNotEmpty ?? false) ? reviewsPage!.items.first : null;
+    final firstReview = (reviewsPage?.items.isNotEmpty ?? false)
+        ? reviewsPage!.items.first
+        : null;
 
     final productTitle = (details?.name ?? '').trim();
     final sellerName = (details?.sellerBusinessName ?? '').trim();
@@ -59,16 +65,22 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     final totalPrice = unitPrice == null ? null : (unitPrice * quantity);
 
     // Bottom bar uses total (quantity-aware). One decimal for stability.
-    final priceLabel = totalPrice == null ? '' : '₦${totalPrice.toStringAsFixed(0)}';
+    final priceLabel = totalPrice == null
+        ? ''
+        : '₦${totalPrice.toStringAsFixed(0)}';
 
     // Processing cards should show unit price (not multiplied) to keep original meaning.
-    final unitPriceLabel = unitPrice == null ? '' : '₦${unitPrice.toStringAsFixed(0)}';
+    final unitPriceLabel = unitPrice == null
+        ? ''
+        : '₦${unitPrice.toStringAsFixed(0)}';
 
     final reviewCount = reviewsPage?.total ?? 0;
     final avgRating = reviewsPage?.entity.avgRating?.toString() ?? '';
 
     final reviewUser = (firstReview?.user?.displayName ?? '');
-    final reviewDate = firstReview?.createdAt == null ? '' : _formatDate(firstReview!.createdAt!);
+    final reviewDate = firstReview?.createdAt == null
+        ? ''
+        : _formatDate(firstReview!.createdAt!);
     final reviewHeadline = (firstReview?.headline ?? '');
     final reviewBody = (firstReview?.body ?? '').trim();
 
@@ -110,7 +122,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                           ),
                           GestureDetector(
                             onTap: () async {
-                              await ref.read(wishlistIdsProvider.notifier).toggle(
+                              await ref
+                                  .read(wishlistIdsProvider.notifier)
+                                  .toggle(
                                     type: WishlistableType.product,
                                     id: widget.productId,
                                   );
@@ -120,10 +134,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                               height: 40,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xFFDEDEDE)),
+                                border: Border.all(
+                                  color: const Color(0xFFDEDEDE),
+                                ),
                               ),
                               child: Icon(
-                                isWishlisted ? Icons.favorite : Icons.favorite_border,
+                                isWishlisted
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
                                 size: 20,
                                 color: const Color(0xFFA15E22),
                               ),
@@ -146,7 +164,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
                       // Size selection - only show if product has sizes (textiles, shoes_bags)
                       // Art and beauty products don't have sizes
-                      if (details?.size != null && details!.size!.isNotEmpty) ...[
+                      if (details?.size != null &&
+                          details!.size!.isNotEmpty) ...[
                         const Text(
                           'Size',
                           style: TextStyle(
@@ -241,7 +260,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                         body: reviewBody,
                         onMore: () => Navigator.of(context).pushNamed(
                           AppRoutes.reviews,
-                          arguments: {'type': 'product', 'id': widget.productId},
+                          arguments: {
+                            'type': 'product',
+                            'id': widget.productId,
+                          },
                         ),
                       ),
 
@@ -252,7 +274,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                           final sellerId = details?.sellerProfileId;
                           if (sellerId == null || sellerId == 0) return;
                           Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => SellerProfileScreen(sellerId: sellerId)),
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  SellerProfileScreen(sellerId: sellerId),
+                            ),
                           );
                         },
                       ),
@@ -311,7 +336,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
               children: [
                 HeaderIconButton(
                   asset: AppIcons.notification,
-                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.notifications),
                 ),
                 const SizedBox(width: 8),
                 HeaderIconButton(
@@ -335,13 +361,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
         color: const Color(0xFFD9D9D9),
         image: (imageUrl == null)
             ? null
-            : DecorationImage(
-                image: NetworkImage(imageUrl),
-                fit: BoxFit.cover,
-              ),
+            : DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover),
       ),
       child: imageUrl == null
-          ? const Center(child: Icon(Icons.image, size: 80, color: Colors.white54))
+          ? const Center(
+              child: Icon(Icons.image, size: 80, color: Colors.white54),
+            )
           : null,
     );
   }
@@ -377,7 +402,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
               color: isSelected ? const Color(0xFFA15E22) : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: isSelected ? const Color(0xFFA15E22) : const Color(0xFFCCCCCC),
+                color: isSelected
+                    ? const Color(0xFFA15E22)
+                    : const Color(0xFFCCCCCC),
               ),
             ),
             child: Center(
@@ -385,7 +412,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 size,
                 style: TextStyle(
                   fontSize: 14,
-                  color: isSelected ? const Color(0xFFFBFBFB) : const Color(0xFF1E2021),
+                  color: isSelected
+                      ? const Color(0xFFFBFBFB)
+                      : const Color(0xFF1E2021),
                 ),
               ),
             ),
@@ -396,10 +425,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
   }
 
   Widget _buildProcessingOptions(String priceLabel) {
-    final days = ref.read(productDetailsProvider(widget.productId)).maybeWhen(
-          data: (d) => d.processingDays,
-          orElse: () => null,
-        );
+    final days = ref
+        .read(productDetailsProvider(widget.productId))
+        .maybeWhen(data: (d) => d.processingDays, orElse: () => null);
     final duration = days == null ? '' : '$days days';
 
     return Row(
@@ -441,7 +469,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? const Color(0xFF603814) : const Color(0xFFDEDEDE),
+            color: isSelected
+                ? const Color(0xFF603814)
+                : const Color(0xFFDEDEDE),
           ),
         ),
         child: Column(
@@ -462,7 +492,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(duration, style: const TextStyle(fontSize: 12, color: Color(0xFF777F84))),
+                    Text(
+                      duration,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF777F84),
+                      ),
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       price,
@@ -480,11 +516,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected ? const Color(0xFF603814) : const Color(0xFF777F84),
+                      color: isSelected
+                          ? const Color(0xFF603814)
+                          : const Color(0xFF777F84),
                     ),
                   ),
                   child: isSelected
-                      ? const Icon(Icons.circle, size: 14, color: Color(0xFF603814))
+                      ? const Icon(
+                          Icons.circle,
+                          size: 14,
+                          color: Color(0xFF603814),
+                        )
                       : null,
                 ),
               ],
@@ -495,7 +537,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     );
   }
 
-  Widget _buildExpandableSection(String title, IconData icon, {VoidCallback? onTap}) {
+  Widget _buildExpandableSection(
+    String title,
+    IconData icon, {
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
@@ -584,8 +630,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 onTap: onMore,
                 behavior: HitTestBehavior.opaque,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: const Text(
                     'More',
                     style: TextStyle(
@@ -607,14 +658,27 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(user, style: const TextStyle(fontSize: 12, color: Color(0xFF3C4042))),
-                    Text(date, style: TextStyle(fontSize: 10, color: Colors.grey[400])),
+                    Text(
+                      user,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF3C4042),
+                      ),
+                    ),
+                    Text(
+                      date,
+                      style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: List.generate(5, (index) {
-                    return const Icon(Icons.star, size: 11, color: Color(0xFFFFDB80));
+                    return const Icon(
+                      Icons.star,
+                      size: 11,
+                      color: Color(0xFFFFDB80),
+                    );
                   }),
                 ),
                 const SizedBox(height: 12),
@@ -627,7 +691,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(body, style: const TextStyle(fontSize: 14, color: Color(0xFF1E2021))),
+                Text(
+                  body,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF1E2021),
+                  ),
+                ),
               ],
             ),
           ],
@@ -672,7 +742,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
               final id = int.tryParse(product.id);
               if (id == null) return;
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => ProductDetailsScreen(productId: id)),
+                MaterialPageRoute(
+                  builder: (_) => ProductDetailsScreen(productId: id),
+                ),
               );
             },
             onFavoriteTap: () {},
@@ -699,7 +771,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
             children: [
               // Quantity selector
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(color: const Color(0xFFFBFBFB)),
@@ -710,7 +785,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                       onTap: () {
                         if (quantity > 1) setState(() => quantity--);
                       },
-                      child: const Icon(Icons.remove, color: Color(0xFFFBFBFB), size: 20),
+                      child: const Icon(
+                        Icons.remove,
+                        color: Color(0xFFFBFBFB),
+                        size: 20,
+                      ),
                     ),
                     const SizedBox(width: 24),
                     Text(
@@ -724,7 +803,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                     const SizedBox(width: 24),
                     GestureDetector(
                       onTap: () => setState(() => quantity++),
-                      child: const Icon(Icons.add, color: Color(0xFFFBFBFB), size: 20),
+                      child: const Icon(
+                        Icons.add,
+                        color: Color(0xFFFBFBFB),
+                        size: 20,
+                      ),
                     ),
                   ],
                 ),
@@ -734,13 +817,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
               Expanded(
                 child: GestureDetector(
                   onTap: () async {
-                    final processingTimeType = selectedProcessing.toLowerCase().contains('quick') ||
+                    final processingTimeType =
+                        selectedProcessing.toLowerCase().contains('quick') ||
                             selectedProcessing.toLowerCase().contains('express')
                         ? 'express'
                         : 'normal';
 
                     try {
-                      await ref.read(cartActionsProvider.notifier).addItem(
+                      await ref
+                          .read(cartActionsProvider.notifier)
+                          .addItem(
                             productId: widget.productId,
                             quantity: quantity,
                             selectedSize: selectedSize,
@@ -766,7 +852,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                       borderRadius: BorderRadius.circular(8),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFFDAF40).withOpacity(0.3),
+                          color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
                           blurRadius: 16,
                           offset: const Offset(0, 8),
                         ),
@@ -803,7 +889,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                     '+ ₦2,000 delivery',
                     style: TextStyle(
                       fontSize: 10,
-                      color: const Color(0xFFE9E9E9).withOpacity(0.8),
+                      color: const Color(0xFFE9E9E9).withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -818,7 +904,20 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
 String _formatDate(DateTime dt) {
   // lightweight formatting: "Aug 19, 2023"
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
   final m = months[(dt.month - 1).clamp(0, 11)];
   return '$m ${dt.day}, ${dt.year}';
 }

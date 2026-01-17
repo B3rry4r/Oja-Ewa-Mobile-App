@@ -78,29 +78,31 @@ class ProductListingsScreen extends StatelessWidget {
       onTap: () {
         // Navigate to category selection first, then to add product
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const SellerCategorySelectionScreen()),
+          MaterialPageRoute(
+            builder: (_) => const SellerCategorySelectionScreen(),
+          ),
         );
       },
       borderRadius: BorderRadius.circular(8),
       child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40),
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFDAF40),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: const Text(
+          "Add Product",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        ),
       ),
-      child: const Text(
-        "Add Product",
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-      ),
-    ),
-   );
+    );
   }
 
   Widget _buildSearchBar() {
@@ -146,7 +148,7 @@ class ProductListingsScreen extends StatelessWidget {
         showModalBottomSheet<String>(
           context: context,
           backgroundColor: Colors.transparent,
-          barrierColor: Colors.black.withOpacity(0.7),
+          barrierColor: Colors.black.withValues(alpha: 0.7),
           isScrollControlled: true,
           builder: (_) => const SortOverlay(),
         );
@@ -203,7 +205,10 @@ class ProductListingsScreen extends StatelessWidget {
       return const SizedBox(
         height: 200,
         child: Center(
-          child: Text('No products yet', style: TextStyle(fontSize: 16, color: Color(0xFF777F84))),
+          child: Text(
+            'No products yet',
+            style: TextStyle(fontSize: 16, color: Color(0xFF777F84)),
+          ),
         ),
       );
     }
@@ -236,13 +241,23 @@ class ProductListingsScreen extends StatelessWidget {
           };
           final textColor = p.status == 'Pending' ? Colors.black : Colors.white;
           final isAlt = p.id.hashCode.isEven;
-          return _buildProductRow(context, p, color, isAlt, textColor: textColor);
+          return _buildProductRow(
+            context,
+            p,
+            color,
+            isAlt,
+            textColor: textColor,
+          );
         }),
       ],
     );
   }
 
-  static const _headerStyle = TextStyle(fontSize: 10, color: Color(0xFF777F84), fontWeight: FontWeight.bold);
+  static const _headerStyle = TextStyle(
+    fontSize: 10,
+    color: Color(0xFF777F84),
+    fontWeight: FontWeight.bold,
+  );
 
   Widget _buildProductRow(
     BuildContext context,
@@ -258,7 +273,10 @@ class ProductListingsScreen extends StatelessWidget {
         children: [
           Expanded(
             flex: 3,
-            child: Text(product.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+            child: Text(
+              product.name,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+            ),
           ),
           Expanded(
             flex: 2,
@@ -272,7 +290,11 @@ class ProductListingsScreen extends StatelessWidget {
                 ),
                 child: Text(
                   product.status,
-                  style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ),
@@ -330,7 +352,10 @@ class ProductListingsScreen extends StatelessWidget {
         children: [
           Icon(icon, size: 16, color: const Color(0xFF3C4042)),
           const SizedBox(width: 4),
-          Text(label, style: const TextStyle(fontSize: 12, color: Color(0xFF3C4042))),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, color: Color(0xFF3C4042)),
+          ),
         ],
       ),
     );

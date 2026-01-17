@@ -61,14 +61,13 @@ class NotificationsSettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNotificationsList(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget _buildNotificationsList(BuildContext context, WidgetRef ref) {
     // Use optimistic provider for immediate UI updates
     final prefs = ref.watch(optimisticPreferencesProvider);
-    final isLoading = ref.watch(notificationPreferencesProvider).isLoading && prefs == null;
-    final hasError = ref.watch(notificationPreferencesProvider).hasError && prefs == null;
+    final isLoading =
+        ref.watch(notificationPreferencesProvider).isLoading && prefs == null;
+    final hasError =
+        ref.watch(notificationPreferencesProvider).hasError && prefs == null;
 
     if (isLoading) {
       return const Padding(
@@ -95,40 +94,41 @@ class NotificationsSettingsScreen extends ConsumerWidget {
     }
 
     final p = prefs;
-        final items = <_PrefItem>[
-          _PrefItem(
-            title: 'Allow Push Notifications',
-            value: p.allowPushNotifications,
-            updater: (v) => p.copyWith(allowPushNotifications: v),
-          ),
-          _PrefItem(
-            title: 'New Products',
-            value: p.newProducts,
-            updater: (v) => p.copyWith(newProducts: v),
-          ),
-          _PrefItem(
-            title: 'Discount and Sales',
-            value: p.discountAndSales,
-            updater: (v) => p.copyWith(discountAndSales: v),
-          ),
-          _PrefItem(
-            title: 'New Blog Posts',
-            value: p.newBlogPosts,
-            updater: (v) => p.copyWith(newBlogPosts: v),
-          ),
-          _PrefItem(
-            title: 'New Orders',
-            value: p.newOrders,
-            updater: (v) => p.copyWith(newOrders: v),
-          ),
-        ];
+    final items = <_PrefItem>[
+      _PrefItem(
+        title: 'Allow Push Notifications',
+        value: p.allowPushNotifications,
+        updater: (v) => p.copyWith(allowPushNotifications: v),
+      ),
+      _PrefItem(
+        title: 'New Products',
+        value: p.newProducts,
+        updater: (v) => p.copyWith(newProducts: v),
+      ),
+      _PrefItem(
+        title: 'Discount and Sales',
+        value: p.discountAndSales,
+        updater: (v) => p.copyWith(discountAndSales: v),
+      ),
+      _PrefItem(
+        title: 'New Blog Posts',
+        value: p.newBlogPosts,
+        updater: (v) => p.copyWith(newBlogPosts: v),
+      ),
+      _PrefItem(
+        title: 'New Orders',
+        value: p.newOrders,
+        updater: (v) => p.copyWith(newOrders: v),
+      ),
+    ];
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
           const SizedBox(height: 16),
-          for (final item in items) _buildPrefRow(context: context, ref: ref, item: item),
+          for (final item in items)
+            _buildPrefRow(context: context, ref: ref, item: item),
         ],
       ),
     );
@@ -163,32 +163,38 @@ class NotificationsSettingsScreen extends ConsumerWidget {
                   .read(notificationsActionsProvider.notifier)
                   .updatePreferences(updated)
                   .catchError((e) {
-                if (!context.mounted) return;
-                AppSnackbars.showError(context, UiErrorMessage.from(e));
-              });
+                    if (!context.mounted) return;
+                    AppSnackbars.showError(context, UiErrorMessage.from(e));
+                  });
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 48,
               height: 28,
               decoration: BoxDecoration(
-                color: item.value ? const Color(0xFFA15E22) : const Color(0xFFD9CFC5),
+                color: item.value
+                    ? const Color(0xFFA15E22)
+                    : const Color(0xFFD9CFC5),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: AnimatedAlign(
                 duration: const Duration(milliseconds: 200),
-                alignment: item.value ? Alignment.centerRight : Alignment.centerLeft,
+                alignment: item.value
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2),
                   child: Container(
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: item.value ? const Color(0xFFFDAF40) : const Color(0xFFFFF8F1),
+                      color: item.value
+                          ? const Color(0xFFFDAF40)
+                          : const Color(0xFFFFF8F1),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
+                          color: Colors.black.withValues(alpha: 0.15),
                           blurRadius: 3,
                           offset: const Offset(0, 1),
                         ),

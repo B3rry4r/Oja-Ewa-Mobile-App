@@ -12,10 +12,12 @@ class SchoolBusinessDetailsScreen extends StatefulWidget {
   const SchoolBusinessDetailsScreen({super.key});
 
   @override
-  State<SchoolBusinessDetailsScreen> createState() => _SchoolBusinessDetailsScreenState();
+  State<SchoolBusinessDetailsScreen> createState() =>
+      _SchoolBusinessDetailsScreenState();
 }
 
-class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScreen> {
+class _SchoolBusinessDetailsScreenState
+    extends State<SchoolBusinessDetailsScreen> {
   String _selectedSchoolType = "Fashion";
 
   final _schoolNameController = TextEditingController();
@@ -51,7 +53,7 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
             const SizedBox(height: 20),
             _buildStepperHeader(),
             const SizedBox(height: 32),
-            
+
             const Text(
               "About Business",
               style: TextStyle(
@@ -80,10 +82,10 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
             ),
             const SizedBox(height: 8),
             _buildSchoolTypeGrid(),
-            
+
             const SizedBox(height: 24),
             _buildInputField(
-              "School Biography", 
+              "School Biography",
               "Share Short description of your business",
               maxLines: 3,
               helperText: "100 characters required",
@@ -107,7 +109,8 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
               selectedPath: _recognitionCertificatePath,
               onTap: () async {
                 final path = await pickSingleFilePath();
-                if (path != null) setState(() => _recognitionCertificatePath = path);
+                if (path != null)
+                  setState(() => _recognitionCertificatePath = path);
               },
             ),
             const SizedBox(height: 24),
@@ -119,7 +122,7 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
                 if (path != null) setState(() => _businessLogoPath = path);
               },
             ),
-            
+
             const SizedBox(height: 40),
             _buildContinueButton(context),
             const SizedBox(height: 40),
@@ -140,7 +143,12 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
     );
   }
 
-  Widget _buildStep(IconData? icon, String label, bool isActive, {String? stepNumber}) {
+  Widget _buildStep(
+    IconData? icon,
+    String label,
+    bool isActive, {
+    String? stepNumber,
+  }) {
     return Row(
       children: [
         Container(
@@ -151,9 +159,15 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
             borderRadius: BorderRadius.circular(4),
           ),
           child: Center(
-            child: icon != null 
-              ? Icon(icon, color: Colors.white, size: 16)
-              : Text(stepNumber ?? "", style: TextStyle(color: isActive ? Colors.white : const Color(0xFF777F84), fontSize: 10)),
+            child: icon != null
+                ? Icon(icon, color: Colors.white, size: 16)
+                : Text(
+                    stepNumber ?? "",
+                    style: TextStyle(
+                      color: isActive ? Colors.white : const Color(0xFF777F84),
+                      fontSize: 10,
+                    ),
+                  ),
           ),
         ),
         const SizedBox(width: 4),
@@ -166,7 +180,7 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
             color: isActive ? const Color(0xFF603814) : const Color(0xFF777F84),
             fontWeight: isActive ? FontWeight.w500 : FontWeight.w400,
           ),
-        )
+        ),
       ],
     );
   }
@@ -184,7 +198,9 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               border: Border.all(
-                color: isSelected ? const Color(0xFFA15E22) : const Color(0xFF777F84),
+                color: isSelected
+                    ? const Color(0xFFA15E22)
+                    : const Color(0xFF777F84),
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(25),
@@ -195,7 +211,9 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
                 Icon(
                   isSelected ? Icons.check_circle : Icons.add_circle_outline,
                   size: 18,
-                  color: isSelected ? const Color(0xFFA15E22) : const Color(0xFF777F84),
+                  color: isSelected
+                      ? const Color(0xFFA15E22)
+                      : const Color(0xFF777F84),
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -226,14 +244,21 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+          Text(
+            title,
+            style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+          ),
           const SizedBox(height: 8),
           Container(
             width: double.infinity,
             height: 140,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(11),
-              border: Border.all(color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF89858A)),
+              border: Border.all(
+                color: hasFile
+                    ? const Color(0xFF4CAF50)
+                    : const Color(0xFF89858A),
+              ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -241,12 +266,17 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
                 Icon(
                   hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
                   size: 24,
-                  color: hasFile ? const Color(0xFF4CAF50) : const Color(0xFF777F84),
+                  color: hasFile
+                      ? const Color(0xFF4CAF50)
+                      : const Color(0xFF777F84),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   hasFile ? 'Document selected' : 'Browse Document',
-                  style: const TextStyle(fontSize: 16, color: Color(0xFF1E2021)),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF1E2021),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
@@ -261,11 +291,20 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
     );
   }
 
-  Widget _buildInputField(String label, String hint, {int maxLines = 1, String? helperText, TextEditingController? controller}) {
+  Widget _buildInputField(
+    String label,
+    String hint, {
+    int maxLines = 1,
+    String? helperText,
+    TextEditingController? controller,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+        Text(
+          label,
+          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+        ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
@@ -289,12 +328,15 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
             ),
           ),
         ),
-        if (helperText != null) 
+        if (helperText != null)
           Align(
             alignment: Alignment.centerRight,
             child: Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Text(helperText, style: const TextStyle(fontSize: 10, color: Color(0xFF595F63))),
+              child: Text(
+                helperText,
+                style: const TextStyle(fontSize: 10, color: Color(0xFF595F63)),
+              ),
             ),
           ),
       ],
@@ -304,7 +346,9 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
   bool _validateForm() {
     final name = _schoolNameController.text.trim();
     final bio = _schoolBiographyController.text.trim();
-    final hasCert = _recognitionCertificatePath != null && _recognitionCertificatePath!.isNotEmpty;
+    final hasCert =
+        _recognitionCertificatePath != null &&
+        _recognitionCertificatePath!.isNotEmpty;
     final hasLogo = _businessLogoPath != null && _businessLogoPath!.isNotEmpty;
 
     if (name.isEmpty) {
@@ -318,18 +362,26 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
     }
 
     if (bio.length < 100) {
-      AppSnackbars.showError(context, 'School biography must be at least 100 characters');
+      AppSnackbars.showError(
+        context,
+        'School biography must be at least 100 characters',
+      );
       return false;
     }
 
-    final validClasses = _classes.where((c) => c.name.trim().isNotEmpty).toList();
+    final validClasses = _classes
+        .where((c) => c.name.trim().isNotEmpty)
+        .toList();
     if (validClasses.isEmpty) {
       AppSnackbars.showError(context, 'Please add at least one class offered');
       return false;
     }
 
     if (!hasCert) {
-      AppSnackbars.showError(context, 'Please upload a certificate / recognition document');
+      AppSnackbars.showError(
+        context,
+        'Please upload a certificate / recognition document',
+      );
       return false;
     }
 
@@ -347,26 +399,29 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
         if (!_validateForm()) return;
 
         final draft = draftFromArgs(
-            ModalRoute.of(context)?.settings.arguments,
-            categoryLabelFallback: 'Schools',
-          );
-          final updated = draft
-            ..businessName = _schoolNameController.text.trim()
-            ..businessDescription = _schoolBiographyController.text.trim()
-            ..schoolType = _selectedSchoolType.toLowerCase()
-            ..schoolBiography = _schoolBiographyController.text.trim()
-            ..classesOffered = _classes
-            ..businessLogoPath = _businessLogoPath
-            ..businessCertificates = _recognitionCertificatePath != null
-                ? [
-                    {'path': _recognitionCertificatePath, 'name': 'Certificate / Recognition'}
-                  ]
-                : null;
+          ModalRoute.of(context)?.settings.arguments,
+          categoryLabelFallback: 'Schools',
+        );
+        final updated = draft
+          ..businessName = _schoolNameController.text.trim()
+          ..businessDescription = _schoolBiographyController.text.trim()
+          ..schoolType = _selectedSchoolType.toLowerCase()
+          ..schoolBiography = _schoolBiographyController.text.trim()
+          ..classesOffered = _classes
+          ..businessLogoPath = _businessLogoPath
+          ..businessCertificates = _recognitionCertificatePath != null
+              ? [
+                  {
+                    'path': _recognitionCertificatePath,
+                    'name': 'Certificate / Recognition',
+                  },
+                ]
+              : null;
 
-          Navigator.of(context).pushNamed(
-            AppRoutes.businessAccountReview,
-            arguments: updated.toJson(),
-          );
+        Navigator.of(context).pushNamed(
+          AppRoutes.businessAccountReview,
+          arguments: updated.toJson(),
+        );
       },
       borderRadius: BorderRadius.circular(8),
       child: Container(
@@ -377,10 +432,10 @@ class _SchoolBusinessDetailsScreenState extends State<SchoolBusinessDetailsScree
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withOpacity(0.4),
+              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         child: const Center(

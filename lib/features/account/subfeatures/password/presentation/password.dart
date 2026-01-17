@@ -13,7 +13,8 @@ class ChangePasswordScreen extends ConsumerStatefulWidget {
   const ChangePasswordScreen({super.key});
 
   @override
-  ConsumerState<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+  ConsumerState<ChangePasswordScreen> createState() =>
+      _ChangePasswordScreenState();
 }
 
 class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
@@ -54,7 +55,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     }
 
     try {
-      await ref.read(passwordControllerProvider.notifier).changePassword(
+      await ref
+          .read(passwordControllerProvider.notifier)
+          .changePassword(
             currentPassword: current,
             newPassword: next,
             passwordConfirmation: confirm,
@@ -101,21 +104,24 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       label: 'Old Password',
                       controller: _currentController,
                       obscure: _obscureCurrent,
-                      onToggle: () => setState(() => _obscureCurrent = !_obscureCurrent),
+                      onToggle: () =>
+                          setState(() => _obscureCurrent = !_obscureCurrent),
                     ),
                     const SizedBox(height: 24),
                     _buildPasswordField(
                       label: 'New Password',
                       controller: _newController,
                       obscure: _obscureNew,
-                      onToggle: () => setState(() => _obscureNew = !_obscureNew),
+                      onToggle: () =>
+                          setState(() => _obscureNew = !_obscureNew),
                     ),
                     const SizedBox(height: 24),
                     _buildPasswordField(
                       label: 'Confirm New Password',
                       controller: _confirmController,
                       obscure: _obscureConfirm,
-                      onToggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                      onToggle: () =>
+                          setState(() => _obscureConfirm = !_obscureConfirm),
                     ),
                     const SizedBox(height: 80),
                     _buildSaveButton(isLoading: state.isLoading),
@@ -208,7 +214,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.3),
+            color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -226,7 +232,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
                   )
                 : const Text(
                     'Save Password',

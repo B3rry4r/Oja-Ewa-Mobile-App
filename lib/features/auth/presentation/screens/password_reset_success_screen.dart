@@ -26,7 +26,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                   width: 234,
                   height: 347,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFDAF40).withOpacity(0.1),
+                    color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(150),
                     ),
@@ -41,31 +41,31 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
                   children: [
                     const SizedBox(height: 30),
-                    
+
                     // Back Button
                     Align(
                       alignment: Alignment.centerLeft,
                       child: _buildBackButton(context),
                     ),
-                    
+
                     // Success Illustration
                     _buildSuccessIllustration(),
-                    
+
                     // Content Section
                     _buildContentSection(),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Sign In Button
                     _buildSignInButton(context),
-                    
+
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -96,7 +96,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
             height: 180,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFFDAF40).withOpacity(0.1),
+              color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
             ),
           ),
           Container(
@@ -104,7 +104,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
             height: 140,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFFDAF40).withOpacity(0.2),
+              color: const Color(0xFFFDAF40).withValues(alpha: 0.2),
             ),
           ),
           Container(
@@ -115,11 +115,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
               color: const Color(0xFFFDAF40),
             ),
             child: const Center(
-              child: Icon(
-                Icons.check_rounded,
-                size: 60,
-                color: Colors.white,
-              ),
+              child: Icon(Icons.check_rounded, size: 60, color: Colors.white),
             ),
           ),
         ],
@@ -142,9 +138,9 @@ class PasswordResetSuccessScreen extends StatelessWidget {
             height: 1.2,
           ),
         ),
-        
+
         const SizedBox(height: 24),
-        
+
         // Description
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -160,9 +156,9 @@ class PasswordResetSuccessScreen extends StatelessWidget {
             ),
           ),
         ),
-        
+
         const SizedBox(height: 40),
-        
+
         // Additional Tips (Added for better UX)
         _buildTipsSection(),
       ],
@@ -177,12 +173,12 @@ class PasswordResetSuccessScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFDAF40).withOpacity(0.2),
+          color: const Color(0xFFFDAF40).withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -234,11 +230,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: const Color(0xFF777F84),
-        ),
+        Icon(icon, size: 16, color: const Color(0xFF777F84)),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
@@ -265,7 +257,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.3),
+            color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -279,10 +271,9 @@ class PasswordResetSuccessScreen extends StatelessWidget {
             // Navigate to sign in screen
             // This would typically navigate to the sign in screen
             // and clear the navigation stack
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              AppRoutes.signIn,
-              (route) => false,
-            );
+            Navigator.of(
+              context,
+            ).pushNamedAndRemoveUntil(AppRoutes.signIn, (route) => false);
           },
           child: Center(
             child: Text(

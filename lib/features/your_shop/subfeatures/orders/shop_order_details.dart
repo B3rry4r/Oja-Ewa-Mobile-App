@@ -34,16 +34,21 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Failed to load order', style: TextStyle(color: Colors.grey[600])),
+                      Text(
+                        'Failed to load order',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
                       const SizedBox(height: 8),
                       TextButton(
-                        onPressed: () => ref.invalidate(sellerOrderDetailsProvider(orderId)),
+                        onPressed: () =>
+                            ref.invalidate(sellerOrderDetailsProvider(orderId)),
                         child: const Text('Retry'),
                       ),
                     ],
                   ),
                 ),
-                data: (order) => _buildOrderDetails(context, ref, order, isActing),
+                data: (order) =>
+                    _buildOrderDetails(context, ref, order, isActing),
               ),
             ),
           ],
@@ -52,7 +57,12 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildOrderDetails(BuildContext context, WidgetRef ref, SellerOrder order, bool isActing) {
+  Widget _buildOrderDetails(
+    BuildContext context,
+    WidgetRef ref,
+    SellerOrder order,
+    bool isActing,
+  ) {
     final dateFormat = DateFormat('MMM d, yyyy');
 
     return SingleChildScrollView(
@@ -74,7 +84,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
           // Status chip
           _buildStatusChip(order.status),
           const SizedBox(height: 30),
-          
+
           // Details List
           _buildDetailTile("Order Date", dateFormat.format(order.createdAt)),
           if (order.customerName != null)
@@ -82,21 +92,32 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
           if (order.customerPhone != null)
             _buildDetailTile("Phone", order.customerPhone!),
           if (order.shippingAddress != null)
-            _buildDetailTile("Shipping Address", order.shippingAddress!.fullAddress),
-          
+            _buildDetailTile(
+              "Shipping Address",
+              order.shippingAddress!.fullAddress,
+            ),
+
           const SizedBox(height: 20),
-          const Text('Items', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, fontFamily: 'Campton', color: Color(0xFF241508))),
+          const Text(
+            'Items',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Campton',
+              color: Color(0xFF241508),
+            ),
+          ),
           const SizedBox(height: 12),
           ...order.items.map((item) => _buildItemTile(item)),
-          
+
           const SizedBox(height: 20),
           _buildDetailTile("Total", '₦${order.totalPrice.toStringAsFixed(0)}'),
-          
+
           if (order.trackingNumber != null)
             _buildDetailTile("Tracking Number", order.trackingNumber!),
-          
+
           const SizedBox(height: 40),
-          
+
           // Action Buttons based on status
           _buildActionButtons(context, ref, order, isActing),
           const SizedBox(height: 40),
@@ -128,17 +149,41 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
   Map<String, dynamic> _getStatusConfig(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
-        return {'label': 'Pending', 'bgColor': const Color(0xFFE3F2FD), 'textColor': const Color(0xFF1565C0)};
+        return {
+          'label': 'Pending',
+          'bgColor': const Color(0xFFE3F2FD),
+          'textColor': const Color(0xFF1565C0),
+        };
       case 'processing':
-        return {'label': 'Processing', 'bgColor': const Color(0xFFFFF1CC), 'textColor': const Color(0xFF856404)};
+        return {
+          'label': 'Processing',
+          'bgColor': const Color(0xFFFFF1CC),
+          'textColor': const Color(0xFF856404),
+        };
       case 'shipped':
-        return {'label': 'Shipped', 'bgColor': const Color(0xFFE8F5E9), 'textColor': const Color(0xFF2E7D32)};
+        return {
+          'label': 'Shipped',
+          'bgColor': const Color(0xFFE8F5E9),
+          'textColor': const Color(0xFF2E7D32),
+        };
       case 'delivered':
-        return {'label': 'Delivered', 'bgColor': const Color(0xFFD4EDDA), 'textColor': const Color(0xFF155724)};
+        return {
+          'label': 'Delivered',
+          'bgColor': const Color(0xFFD4EDDA),
+          'textColor': const Color(0xFF155724),
+        };
       case 'cancelled':
-        return {'label': 'Cancelled', 'bgColor': const Color(0xFFFFEBEE), 'textColor': const Color(0xFFC62828)};
+        return {
+          'label': 'Cancelled',
+          'bgColor': const Color(0xFFFFEBEE),
+          'textColor': const Color(0xFFC62828),
+        };
       default:
-        return {'label': status, 'bgColor': const Color(0xFFEEEEEE), 'textColor': const Color(0xFF757575)};
+        return {
+          'label': status,
+          'bgColor': const Color(0xFFEEEEEE),
+          'textColor': const Color(0xFF757575),
+        };
     }
   }
 
@@ -161,7 +206,11 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
                 width: 60,
                 height: 60,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const AppImagePlaceholder(width: 60, height: 60, borderRadius: 8),
+                errorBuilder: (_, __, ___) => const AppImagePlaceholder(
+                  width: 60,
+                  height: 60,
+                  borderRadius: 8,
+                ),
               ),
             )
           else
@@ -171,12 +220,33 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.productName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'Campton', color: Color(0xFF241508))),
+                Text(
+                  item.productName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Campton',
+                    color: Color(0xFF241508),
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text('Qty: ${item.quantity}${item.size != null ? ' • Size: ${item.size}' : ''}',
-                    style: const TextStyle(fontSize: 14, color: Color(0xFF777F84), fontFamily: 'Campton')),
-                Text('₦${item.price.toStringAsFixed(0)}',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: 'Campton', color: Color(0xFF241508))),
+                Text(
+                  'Qty: ${item.quantity}${item.size != null ? ' • Size: ${item.size}' : ''}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF777F84),
+                    fontFamily: 'Campton',
+                  ),
+                ),
+                Text(
+                  '₦${item.price.toStringAsFixed(0)}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Campton',
+                    color: Color(0xFF241508),
+                  ),
+                ),
               ],
             ),
           ),
@@ -185,7 +255,12 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, WidgetRef ref, SellerOrder order, bool isActing) {
+  Widget _buildActionButtons(
+    BuildContext context,
+    WidgetRef ref,
+    SellerOrder order,
+    bool isActing,
+  ) {
     if (order.status == 'delivered' || order.status == 'cancelled') {
       return const SizedBox.shrink(); // No actions for completed orders
     }
@@ -201,27 +276,37 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
         if (order.canShip)
           _buildPrimaryButton(
             label: isActing ? 'Processing...' : 'Mark as Shipped',
-            onTap: isActing ? null : () => _showShipDialog(context, ref, order.id),
+            onTap: isActing
+                ? null
+                : () => _showShipDialog(context, ref, order.id),
           ),
         if (order.canDeliver)
           _buildPrimaryButton(
             label: isActing ? 'Processing...' : 'Mark as Delivered',
-            onTap: isActing ? null : () => _deliverOrder(context, ref, order.id),
+            onTap: isActing
+                ? null
+                : () => _deliverOrder(context, ref, order.id),
           ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Cancel button (if applicable)
         if (order.canCancel)
           _buildSecondaryButton(
             label: 'Cancel Order',
-            onTap: isActing ? null : () => _showCancelDialog(context, ref, order.id),
+            onTap: isActing
+                ? null
+                : () => _showCancelDialog(context, ref, order.id),
           ),
       ],
     );
   }
 
-  Future<void> _acceptOrder(BuildContext context, WidgetRef ref, int orderId) async {
+  Future<void> _acceptOrder(
+    BuildContext context,
+    WidgetRef ref,
+    int orderId,
+  ) async {
     try {
       await ref.read(sellerOrderActionsProvider.notifier).acceptOrder(orderId);
       if (context.mounted) {
@@ -234,7 +319,11 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _showShipDialog(BuildContext context, WidgetRef ref, int orderId) async {
+  Future<void> _showShipDialog(
+    BuildContext context,
+    WidgetRef ref,
+    int orderId,
+  ) async {
     final trackingController = TextEditingController();
     final result = await showDialog<bool>(
       context: context,
@@ -248,18 +337,28 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Ship')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Ship'),
+          ),
         ],
       ),
     );
-    
+
     if (result == true && context.mounted) {
       try {
-        await ref.read(sellerOrderActionsProvider.notifier).shipOrder(
-          orderId,
-          trackingNumber: trackingController.text.isNotEmpty ? trackingController.text : null,
-        );
+        await ref
+            .read(sellerOrderActionsProvider.notifier)
+            .shipOrder(
+              orderId,
+              trackingNumber: trackingController.text.isNotEmpty
+                  ? trackingController.text
+                  : null,
+            );
         if (context.mounted) {
           AppSnackbars.showSuccess(context, 'Order marked as shipped');
         }
@@ -271,7 +370,11 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _deliverOrder(BuildContext context, WidgetRef ref, int orderId) async {
+  Future<void> _deliverOrder(
+    BuildContext context,
+    WidgetRef ref,
+    int orderId,
+  ) async {
     try {
       await ref.read(sellerOrderActionsProvider.notifier).deliverOrder(orderId);
       if (context.mounted) {
@@ -279,22 +382,29 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
       }
     } catch (e) {
       if (context.mounted) {
-        AppSnackbars.showError(context, 'Failed to mark order as delivered: $e');
+        AppSnackbars.showError(
+          context,
+          'Failed to mark order as delivered: $e',
+        );
       }
     }
   }
 
-  Future<void> _showCancelDialog(BuildContext context, WidgetRef ref, int orderId) async {
+  Future<void> _showCancelDialog(
+    BuildContext context,
+    WidgetRef ref,
+    int orderId,
+  ) async {
     final reasonController = TextEditingController();
     final result = await showGeneralDialog<bool>(
       context: context,
       barrierDismissible: true,
       barrierLabel: 'CancelOrderModal',
-      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
       transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (context, anim1, anim2) {
         return Scaffold(
-          backgroundColor: const Color(0xFF1E2021).withOpacity(0.8),
+          backgroundColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
           body: Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -366,7 +476,9 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
                               height: 57,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xFFCCCCCC)),
+                                border: Border.all(
+                                  color: const Color(0xFFCCCCCC),
+                                ),
                               ),
                               child: const Center(
                                 child: Text(
@@ -417,14 +529,19 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
         );
       },
     );
-    
+
     if (result == true && context.mounted) {
       if (reasonController.text.isEmpty) {
-        AppSnackbars.showError(context, 'Please provide a reason for cancellation');
+        AppSnackbars.showError(
+          context,
+          'Please provide a reason for cancellation',
+        );
         return;
       }
       try {
-        await ref.read(sellerOrderActionsProvider.notifier).cancelOrder(orderId, reasonController.text);
+        await ref
+            .read(sellerOrderActionsProvider.notifier)
+            .cancelOrder(orderId, reasonController.text);
         if (context.mounted) {
           AppSnackbars.showSuccess(context, 'Order cancelled');
         }
@@ -443,7 +560,9 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
         width: double.infinity,
         height: 55,
         decoration: BoxDecoration(
-          color: onTap == null ? const Color(0xFFCCCCCC) : const Color(0xFFFDAF40),
+          color: onTap == null
+              ? const Color(0xFFCCCCCC)
+              : const Color(0xFFFDAF40),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Center(

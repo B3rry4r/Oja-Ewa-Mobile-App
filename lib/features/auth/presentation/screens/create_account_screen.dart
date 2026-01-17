@@ -17,7 +17,8 @@ class CreateAccountScreen extends ConsumerStatefulWidget {
   const CreateAccountScreen({super.key});
 
   @override
-  ConsumerState<CreateAccountScreen> createState() => _CreateAccountScreenState();
+  ConsumerState<CreateAccountScreen> createState() =>
+      _CreateAccountScreenState();
 }
 
 class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
@@ -65,7 +66,9 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
     }
 
     try {
-      await ref.read(authFlowControllerProvider.notifier).register(
+      await ref
+          .read(authFlowControllerProvider.notifier)
+          .register(
             firstname: _firstNameController.text.trim(),
             lastname: _lastNameController.text.trim(),
             email: _emailController.text.trim(),
@@ -74,7 +77,9 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
       if (!mounted) return;
       AppSnackbars.showSuccess(context, 'Account created successfully');
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
     } catch (e) {
       if (!mounted) return;
       AppSnackbars.showError(context, UiErrorMessage.from(e));
@@ -89,7 +94,9 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       final idToken = await google.signInAndGetIdToken();
       await authFlow.googleSignIn(idToken: idToken);
       if (!mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
     } catch (e) {
       if (!mounted) return;
       AppSnackbars.showError(context, UiErrorMessage.from(e));
@@ -244,10 +251,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
     return SizedBox(
       width: 41.6,
       height: 63.58,
-      child: SvgPicture.asset(
-        AppImages.appLogoAlt,
-        fit: BoxFit.contain,
-      ),
+      child: SvgPicture.asset(AppImages.appLogoAlt, fit: BoxFit.contain),
     );
   }
 
@@ -325,10 +329,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
         Container(
           height: 49,
           decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color(0xFFCCCCCC),
-              width: 1,
-            ),
+            border: Border.all(color: const Color(0xFFCCCCCC), width: 1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Padding(
@@ -680,12 +681,12 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       decoration: BoxDecoration(
         color: _isFormValid
             ? const Color(0xFFFDAF40)
-            : const Color(0xFFFDAF40).withOpacity(0.3),
+            : const Color(0xFFFDAF40).withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         boxShadow: _isFormValid
             ? [
                 BoxShadow(
-                  color: const Color(0xFFFDAF40).withOpacity(0.3),
+                  color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),
@@ -702,19 +703,22 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                 ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFFFBF5)),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0xFFFFFBF5),
+                    ),
                   )
                 : Text(
-              'Create Account',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Campton',
-                color: _isFormValid
-                    ? const Color(0xFFFFFBF5)
-                    : const Color(0xFFFFFBF5).withOpacity(0.6),
-              ),
-            ),
+                    'Create Account',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Campton',
+                      color: _isFormValid
+                          ? const Color(0xFFFFFBF5)
+                          : const Color(0xFFFFFBF5).withValues(alpha: 0.6),
+                    ),
+                  ),
           ),
         ),
       ),
@@ -761,11 +765,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                AppIcons.google,
-                width: 20,
-                height: 20,
-              ),
+              SvgPicture.asset(AppIcons.google, width: 20, height: 20),
               const SizedBox(width: 12),
               Text(
                 'Continue with Google',

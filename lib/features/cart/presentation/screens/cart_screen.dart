@@ -522,7 +522,7 @@ class _CheckoutSection extends StatelessWidget {
                         ? null
                         : [
                             BoxShadow(
-                              color: const Color(0xFFFDAF40).withOpacity(0.3),
+                              color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                             ),

@@ -12,12 +12,16 @@ class VerificationCodeScreen extends ConsumerStatefulWidget {
   const VerificationCodeScreen({super.key});
 
   @override
-  ConsumerState<VerificationCodeScreen> createState() => _VerificationCodeScreenState();
+  ConsumerState<VerificationCodeScreen> createState() =>
+      _VerificationCodeScreenState();
 }
 
-class _VerificationCodeScreenState extends ConsumerState<VerificationCodeScreen> {
-  final List<TextEditingController> _codeControllers =
-      List.generate(4, (_) => TextEditingController());
+class _VerificationCodeScreenState
+    extends ConsumerState<VerificationCodeScreen> {
+  final List<TextEditingController> _codeControllers = List.generate(
+    4,
+    (_) => TextEditingController(),
+  );
   final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
   String _enteredCode = '';
 
@@ -64,7 +68,10 @@ class _VerificationCodeScreenState extends ConsumerState<VerificationCodeScreen>
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is! PasswordResetArgs) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Missing email for reset flow'), backgroundColor: Color(0xFFFDAF40)),
+        const SnackBar(
+          content: Text('Missing email for reset flow'),
+          backgroundColor: Color(0xFFFDAF40),
+        ),
       );
       return;
     }
@@ -103,7 +110,7 @@ class _VerificationCodeScreenState extends ConsumerState<VerificationCodeScreen>
                   width: 307,
                   height: 455,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFDAF40).withOpacity(0.1),
+                    color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(150),
                     ),
@@ -118,7 +125,7 @@ class _VerificationCodeScreenState extends ConsumerState<VerificationCodeScreen>
                 ),
               ),
             ),
-            
+
             SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -126,30 +133,30 @@ class _VerificationCodeScreenState extends ConsumerState<VerificationCodeScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 30),
-                    
+
                     // Back Button
                     _buildBackButton(),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Title Section
                     _buildTitleSection(),
-                    
+
                     const SizedBox(height: 50),
-                    
+
                     // Code Input Fields
                     _buildCodeInputFields(),
-                    
+
                     const SizedBox(height: 60),
-                    
+
                     // Resend Code Section
                     _buildResendCodeSection(),
-                    
+
                     const SizedBox(height: 60),
-                    
+
                     // Verify Button (added for better UX)
                     _buildVerifyButton(),
-                    
+
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -304,17 +311,19 @@ class _VerificationCodeScreenState extends ConsumerState<VerificationCodeScreen>
 
   Widget _buildVerifyButton() {
     final isComplete = _enteredCode.length == 4;
-    
+
     return Container(
       width: double.infinity,
       height: 57,
       decoration: BoxDecoration(
-        color: isComplete ? const Color(0xFFFDAF40) : const Color(0xFFFDAF40).withOpacity(0.3),
+        color: isComplete
+            ? const Color(0xFFFDAF40)
+            : const Color(0xFFFDAF40).withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         boxShadow: isComplete
             ? [
                 BoxShadow(
-                  color: const Color(0xFFFDAF40).withOpacity(0.3),
+                  color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),
@@ -333,7 +342,9 @@ class _VerificationCodeScreenState extends ConsumerState<VerificationCodeScreen>
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Campton',
-                color: isComplete ? const Color(0xFFFFFBF5) : const Color(0xFFFFFBF5).withOpacity(0.6),
+                color: isComplete
+                    ? const Color(0xFFFFFBF5)
+                    : const Color(0xFFFFFBF5).withValues(alpha: 0.6),
               ),
             ),
           ),

@@ -66,14 +66,17 @@ class DeactivateShopScreen extends ConsumerWidget {
                       ConfirmationModal.show(
                         context,
                         title: 'Deactivate shop',
-                        message: 'Are you sure you want to deactivate your shop?',
+                        message:
+                            'Are you sure you want to deactivate your shop?',
                         confirmLabel: 'Deactivate',
                         onConfirm: () async {
                           if (businessId == null) {
                             Navigator.of(context).pop();
                             return;
                           }
-                          await ref.read(businessManagementActionsProvider.notifier).deactivate(businessId);
+                          await ref
+                              .read(businessManagementActionsProvider.notifier)
+                              .deactivate(businessId);
                           if (!context.mounted) return;
                           Navigator.of(context).pushNamedAndRemoveUntil(
                             AppRoutes.home,
@@ -91,10 +94,12 @@ class DeactivateShopScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFFDAF40).withOpacity(0.4),
+                            color: const Color(
+                              0xFFFDAF40,
+                            ).withValues(alpha: 0.4),
                             blurRadius: 16,
                             offset: const Offset(0, 8),
-                          )
+                          ),
                         ],
                       ),
                       child: const Center(

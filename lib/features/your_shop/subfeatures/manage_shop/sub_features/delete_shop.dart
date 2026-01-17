@@ -25,7 +25,7 @@ class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
     "Switching to another platform",
     "Technical issues",
     "Too expensive",
-    "Other"
+    "Other",
   ];
 
   Future<void> _deleteShop() async {
@@ -34,18 +34,19 @@ class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
     setState(() => _isDeleting = true);
 
     try {
-      await ref.read(sellerStatusApiProvider).deleteSellerProfile(reason: selectedReason);
-      
+      await ref
+          .read(sellerStatusApiProvider)
+          .deleteSellerProfile(reason: selectedReason);
+
       // Invalidate the seller status provider to refresh state
       ref.invalidate(mySellerStatusProvider);
-      
+
       if (mounted) {
         AppSnackbars.showSuccess(context, 'Shop deleted successfully');
         // Navigate back to home
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          AppRoutes.home,
-          (route) => false,
-        );
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
       }
     } catch (e) {
       if (mounted) {
@@ -68,7 +69,7 @@ class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
               backgroundColor: Color(0xFFFFF8F1),
               iconColor: Color(0xFF241508),
             ),
-            
+
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -76,28 +77,28 @@ class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),
-              
-              // Title: Why are you leaving
-              const Text(
-                "Why are you leaving",
-                style: TextStyle(
-                  fontSize: 33,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
-                  fontFamily: 'Campton',
-                ),
-              ),
-              const SizedBox(height: 32),
 
-              // Reasons List
-              Expanded(
-                child: ListView.builder(
-                  itemCount: reasons.length,
-                  itemBuilder: (context, index) {
-                    return _buildReasonRow(reasons[index]);
-                  },
-                ),
-              ),
+                    // Title: Why are you leaving
+                    const Text(
+                      "Why are you leaving",
+                      style: TextStyle(
+                        fontSize: 33,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF241508),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Reasons List
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: reasons.length,
+                        itemBuilder: (context, index) {
+                          return _buildReasonRow(reasons[index]);
+                        },
+                      ),
+                    ),
 
                     // Action Button
                     _buildDeleteButton(context),
@@ -114,7 +115,7 @@ class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
 
   Widget _buildReasonRow(String reason) {
     final bool isSelected = selectedReason == reason;
-    
+
     return GestureDetector(
       onTap: () => setState(() => selectedReason = reason),
       child: Container(
@@ -129,14 +130,18 @@ class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
-                  color: isSelected ? const Color(0xFFFDAF40) : const Color(0xFF777F84),
+                  color: isSelected
+                      ? const Color(0xFFFDAF40)
+                      : const Color(0xFF777F84),
                   width: 2,
                 ),
-                color: isSelected ? const Color(0xFFFDAF40) : Colors.transparent,
+                color: isSelected
+                    ? const Color(0xFFFDAF40)
+                    : Colors.transparent,
               ),
-              child: isSelected 
-                ? const Icon(Icons.check, size: 16, color: Colors.white) 
-                : null,
+              child: isSelected
+                  ? const Icon(Icons.check, size: 16, color: Colors.white)
+                  : null,
             ),
             const SizedBox(width: 12),
             // Reason Text
@@ -157,33 +162,38 @@ class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
 
   Widget _buildDeleteButton(BuildContext context) {
     final isDisabled = selectedReason == null || _isDeleting;
-    
+
     return InkWell(
-      onTap: isDisabled ? null : () {
-        ConfirmationModal.show(
-          context,
-          title: 'Delete Shop',
-          message: 'Are you sure you want to delete your shop? This action cannot be undone.',
-          confirmLabel: 'Delete',
-          onConfirm: _deleteShop,
-        );
-      },
+      onTap: isDisabled
+          ? null
+          : () {
+              ConfirmationModal.show(
+                context,
+                title: 'Delete Shop',
+                message:
+                    'Are you sure you want to delete your shop? This action cannot be undone.',
+                confirmLabel: 'Delete',
+                onConfirm: _deleteShop,
+              );
+            },
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,
         height: 57,
         decoration: BoxDecoration(
-          color: isDisabled 
-              ? const Color(0xFFFDAF40).withOpacity(0.5) 
+          color: isDisabled
+              ? const Color(0xFFFDAF40).withValues(alpha: 0.5)
               : const Color(0xFFFDAF40),
           borderRadius: BorderRadius.circular(8),
-          boxShadow: isDisabled ? null : [
-            BoxShadow(
-              color: const Color(0xFFFDAF40).withOpacity(0.4),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
-            )
-          ],
+          boxShadow: isDisabled
+              ? null
+              : [
+                  BoxShadow(
+                    color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
+                    blurRadius: 16,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
         ),
         child: Center(
           child: _isDeleting

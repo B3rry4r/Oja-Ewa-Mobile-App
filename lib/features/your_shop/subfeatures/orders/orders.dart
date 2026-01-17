@@ -60,15 +60,21 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
                     const SizedBox(height: 32),
                     Expanded(
                       child: ordersAsync.when(
-                        loading: () => const Center(child: CircularProgressIndicator()),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('Failed to load orders', style: TextStyle(color: Colors.grey[600])),
+                              Text(
+                                'Failed to load orders',
+                                style: TextStyle(color: Colors.grey[600]),
+                              ),
                               const SizedBox(height: 8),
                               TextButton(
-                                onPressed: () => ref.invalidate(sellerOrdersProvider(_selectedStatus)),
+                                onPressed: () => ref.invalidate(
+                                  sellerOrdersProvider(_selectedStatus),
+                                ),
                                 child: const Text('Retry'),
                               ),
                             ],
@@ -104,7 +110,11 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
               controller: _searchController,
               decoration: const InputDecoration(
                 hintText: "Search orders...",
-                hintStyle: TextStyle(color: Color(0xFFCCCCCC), fontSize: 16, fontFamily: 'Campton'),
+                hintStyle: TextStyle(
+                  color: Color(0xFFCCCCCC),
+                  fontSize: 16,
+                  fontFamily: 'Campton',
+                ),
                 border: InputBorder.none,
               ),
               onChanged: (value) => setState(() {}),
@@ -141,7 +151,9 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
         decoration: BoxDecoration(
           color: isSelected ? const Color(0xFFA15E22) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
-          border: isSelected ? null : Border.all(color: const Color(0xFFCCCCCC)),
+          border: isSelected
+              ? null
+              : Border.all(color: const Color(0xFFCCCCCC)),
         ),
         child: Text(
           label,
@@ -159,9 +171,14 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
     final searchTerm = _searchController.text.toLowerCase();
     final filteredOrders = searchTerm.isEmpty
         ? orders
-        : orders.where((o) =>
-            o.orderNumber.toLowerCase().contains(searchTerm) ||
-            (o.customerName?.toLowerCase().contains(searchTerm) ?? false)).toList();
+        : orders
+              .where(
+                (o) =>
+                    o.orderNumber.toLowerCase().contains(searchTerm) ||
+                    (o.customerName?.toLowerCase().contains(searchTerm) ??
+                        false),
+              )
+              .toList();
 
     if (filteredOrders.isEmpty) {
       return Center(
@@ -170,14 +187,18 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
           children: [
             Icon(Icons.inbox_outlined, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            Text('No orders found', style: TextStyle(fontSize: 16, color: Colors.grey[600])),
+            Text(
+              'No orders found',
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            ),
           ],
         ),
       );
     }
 
     return RefreshIndicator(
-      onRefresh: () async => ref.invalidate(sellerOrdersProvider(_selectedStatus)),
+      onRefresh: () async =>
+          ref.invalidate(sellerOrdersProvider(_selectedStatus)),
       child: Column(
         children: [
           // Table Header
@@ -206,7 +227,9 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
                   date: dateFormat.format(order.createdAt),
                   customer: order.customerName ?? '—',
                   status: order.status,
-                  backgroundColor: index.isEven ? const Color(0xFFFBFBFB) : const Color(0xFFF4F4F4),
+                  backgroundColor: index.isEven
+                      ? const Color(0xFFFBFBFB)
+                      : const Color(0xFFF4F4F4),
                 );
               },
             ),
@@ -233,23 +256,35 @@ class _OrderRow extends StatelessWidget {
 
   Color get _statusColor {
     switch (status.toLowerCase()) {
-      case 'pending': return const Color(0xFF1565C0);
-      case 'processing': return const Color(0xFF3095CE);
-      case 'shipped': return const Color(0xFF2E7D32);
-      case 'delivered': return const Color(0xFF70B673);
-      case 'cancelled': return const Color(0xFFC95353);
-      default: return const Color(0xFF757575);
+      case 'pending':
+        return const Color(0xFF1565C0);
+      case 'processing':
+        return const Color(0xFF3095CE);
+      case 'shipped':
+        return const Color(0xFF2E7D32);
+      case 'delivered':
+        return const Color(0xFF70B673);
+      case 'cancelled':
+        return const Color(0xFFC95353);
+      default:
+        return const Color(0xFF757575);
     }
   }
 
   String get _statusLabel {
     switch (status.toLowerCase()) {
-      case 'pending': return 'Pending';
-      case 'processing': return 'Processing';
-      case 'shipped': return 'Shipped';
-      case 'delivered': return 'Delivered';
-      case 'cancelled': return 'Cancelled';
-      default: return status;
+      case 'pending':
+        return 'Pending';
+      case 'processing':
+        return 'Processing';
+      case 'shipped':
+        return 'Shipped';
+      case 'delivered':
+        return 'Delivered';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status;
     }
   }
 
@@ -258,7 +293,9 @@ class _OrderRow extends StatelessWidget {
     return InkWell(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => ShopOrderDetailsScreen(orderId: orderId)),
+          MaterialPageRoute(
+            builder: (_) => ShopOrderDetailsScreen(orderId: orderId),
+          ),
         );
       },
       child: Container(
@@ -273,14 +310,21 @@ class _OrderRow extends StatelessWidget {
               flex: 2,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: _statusColor,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     _statusLabel,
-                    style: const TextStyle(color: Colors.white, fontSize: 10, fontFamily: 'Campton'),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontFamily: 'Campton',
+                    ),
                   ),
                 ),
               ),
@@ -310,7 +354,9 @@ class _Cell extends StatelessWidget {
           style: TextStyle(
             fontSize: isHeader ? 10 : 12,
             fontWeight: FontWeight.w400,
-            color: isHeader ? const Color(0xFF777F84) : const Color(0xFF000000).withOpacity(0.97),
+            color: isHeader
+                ? const Color(0xFF777F84)
+                : const Color(0xFF000000).withValues(alpha: 0.97),
             fontFamily: 'Campton',
           ),
           overflow: TextOverflow.ellipsis,

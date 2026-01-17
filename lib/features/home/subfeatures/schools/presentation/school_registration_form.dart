@@ -17,25 +17,27 @@ class SchoolRegistrationFormScreen extends ConsumerStatefulWidget {
   final int? businessId;
 
   @override
-  ConsumerState<SchoolRegistrationFormScreen> createState() => _SchoolRegistrationFormScreenState();
+  ConsumerState<SchoolRegistrationFormScreen> createState() =>
+      _SchoolRegistrationFormScreenState();
 }
 
-class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistrationFormScreen> {
+class _SchoolRegistrationFormScreenState
+    extends ConsumerState<SchoolRegistrationFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   // Form controllers
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  
+
   // Location selections
   // Location selections - empty by default
   String _selectedCountryName = '';
   String _selectedStateName = '';
   String _selectedCountryCode = '';
   String _selectedCountryFlag = '';
-  
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -67,7 +69,7 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                 ),
               ),
             ),
-            
+
             // Scrollable Form Content
             Expanded(
               child: SingleChildScrollView(
@@ -78,7 +80,7 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 24),
-                      
+
                       // Subtitle
                       const Text(
                         'Fill in your details to continue',
@@ -89,9 +91,9 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                           color: Color(0xFF1E2021),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Country Dropdown
                       _buildLocationDropdown(
                         label: 'Country',
@@ -107,32 +109,35 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                               _selectedCountryName = country.name;
                               _selectedCountryFlag = country.flag;
                               _selectedCountryCode = country.dialCode;
-                              _selectedStateName = ''; // Reset state when country changes
+                              _selectedStateName =
+                                  ''; // Reset state when country changes
                             });
                           }
                         },
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Full Name Field
                       _buildTextField(
                         label: 'Full Name',
                         controller: _nameController,
                         placeholder: 'Your Name here',
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Phone Number Field
                       _buildPhoneField(),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // State Dropdown
                       _buildLocationDropdown(
                         label: 'State',
-                        value: _selectedStateName.isEmpty ? 'Select State' : _selectedStateName,
+                        value: _selectedStateName.isEmpty
+                            ? 'Select State'
+                            : _selectedStateName,
                         onTap: () async {
                           final state = await StatePickerSheet.show(
                             context,
@@ -146,30 +151,30 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                           }
                         },
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // City Field
                       _buildTextField(
                         label: 'City',
                         controller: _cityController,
                         placeholder: 'Your City',
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Address Line Field
                       _buildTextField(
                         label: 'Address Line',
                         controller: _addressController,
                         placeholder: 'Street, house number etc',
                       ),
-                      
+
                       const SizedBox(height: 40),
-                      
+
                       // Make Payment Button
                       _buildPaymentButton(),
-                      
+
                       const SizedBox(height: 32),
                     ],
                   ),
@@ -361,9 +366,9 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                   ),
                 ),
               ),
-              
+
               const SizedBox(width: 8),
-              
+
               // Phone Number Input
               Expanded(
                 child: TextFormField(
@@ -404,7 +409,6 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                   },
                 ),
               ),
-              
             ],
           ),
         ),
@@ -414,7 +418,9 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
 
   Widget _buildPaymentButton() {
     final registrationState = ref.watch(schoolRegistrationProvider);
-    final isLoading = registrationState.isSubmitting || registrationState.isGeneratingPaymentLink;
+    final isLoading =
+        registrationState.isSubmitting ||
+        registrationState.isGeneratingPaymentLink;
 
     return SizedBox(
       width: double.infinity,
@@ -430,9 +436,7 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFFDAF40),
           disabledBackgroundColor: const Color(0xFFFDAF40).withAlpha(150),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 8,
           shadowColor: const Color(0xFFFDAF40).withAlpha(77),
         ),
@@ -460,7 +464,7 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
 
   Future<void> _handlePayment() async {
     final notifier = ref.read(schoolRegistrationProvider.notifier);
-    
+
     // Build full phone number
     final fullPhoneNumber = '$_selectedCountryCode${_phoneController.text}';
 
@@ -478,7 +482,9 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
     if (!success) {
       if (!mounted) return;
       final err = ref.read(schoolRegistrationProvider).error;
-      _showErrorSnackbar(err ?? 'Failed to submit registration. Please try again.');
+      _showErrorSnackbar(
+        err ?? 'Failed to submit registration. Please try again.',
+      );
       return;
     }
 
@@ -515,7 +521,7 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
       context: context,
       barrierDismissible: true,
       barrierLabel: 'EmailPrompt',
-      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
       pageBuilder: (context, anim1, anim2) {
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -593,7 +599,9 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                               height: 57,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xFFCCCCCC)),
+                                border: Border.all(
+                                  color: const Color(0xFFCCCCCC),
+                                ),
                               ),
                               child: const Center(
                                 child: Text(
@@ -625,7 +633,9 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                                 borderRadius: BorderRadius.circular(8),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFDAF40).withOpacity(0.4),
+                                    color: const Color(
+                                      0xFFFDAF40,
+                                    ).withValues(alpha: 0.4),
                                     blurRadius: 16,
                                     offset: const Offset(0, 8),
                                   ),
@@ -660,10 +670,7 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
 
   void _showErrorSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 
@@ -672,7 +679,7 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
       context: context,
       barrierDismissible: false,
       barrierLabel: 'RegistrationSubmitted',
-      barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
       pageBuilder: (context, anim1, anim2) {
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -694,7 +701,7 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4CAF50).withOpacity(0.1),
+                        color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -741,7 +748,9 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFFDAF40).withOpacity(0.4),
+                              color: const Color(
+                                0xFFFDAF40,
+                              ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                             ),
@@ -781,7 +790,7 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
         context: context,
         barrierDismissible: false,
         barrierLabel: 'PaymentInitiated',
-        barrierColor: const Color(0xFF1E2021).withOpacity(0.8),
+        barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
         pageBuilder: (context, anim1, anim2) {
           return Scaffold(
             backgroundColor: Colors.transparent,
@@ -803,7 +812,7 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40).withOpacity(0.1),
+                          color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -838,7 +847,9 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).pop();
-                          Navigator.of(context).pop(); // Go back to school detail
+                          Navigator.of(
+                            context,
+                          ).pop(); // Go back to school detail
                         },
                         child: Container(
                           width: double.infinity,
@@ -848,7 +859,9 @@ class _SchoolRegistrationFormScreenState extends ConsumerState<SchoolRegistratio
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFFDAF40).withOpacity(0.4),
+                                color: const Color(
+                                  0xFFFDAF40,
+                                ).withValues(alpha: 0.4),
                                 blurRadius: 16,
                                 offset: const Offset(0, 8),
                               ),

@@ -19,7 +19,7 @@ class FilterSheet extends ConsumerStatefulWidget {
 
   /// Category type to show relevant filters:
   /// - textiles: all filters including fabric_type
-  /// - shoes_bags: all filters except fabric_type  
+  /// - shoes_bags: all filters except fabric_type
   /// - afro_beauty_products, art: price only
   final String? categoryType;
 
@@ -66,7 +66,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     final filters = ProductFilters.defaults;
 
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.7),
+      backgroundColor: Colors.black.withValues(alpha: 0.7),
       body: SafeArea(
         child: Column(
           children: [
@@ -128,7 +128,9 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               _buildSectionTitle('Style'),
               const SizedBox(height: 8),
               _buildChipFilters(
-                options: filters.styles.where((s) => !widget.excludeStyles.contains(s)).toList(),
+                options: filters.styles
+                    .where((s) => !widget.excludeStyles.contains(s))
+                    .toList(),
                 selected: _selectedStyle,
                 onSelected: (value) => setState(() => _selectedStyle = value),
               ),
@@ -154,7 +156,8 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               _buildChipFilters(
                 options: filters.fabricTypes,
                 selected: _selectedFabricType,
-                onSelected: (value) => setState(() => _selectedFabricType = value),
+                onSelected: (value) =>
+                    setState(() => _selectedFabricType = value),
               ),
               const SizedBox(height: 24),
             ],
@@ -190,10 +193,14 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFFA15E22) : Colors.transparent,
+                color: isSelected
+                    ? const Color(0xFFA15E22)
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: isSelected ? const Color(0xFFA15E22) : const Color(0xFFCCCCCC),
+                  color: isSelected
+                      ? const Color(0xFFA15E22)
+                      : const Color(0xFFCCCCCC),
                 ),
               ),
               child: Text(
@@ -213,8 +220,9 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   }
 
   Widget _buildPriceRangeFilter(PriceRange priceRange) {
-    final currentRange = _priceRange ?? RangeValues(priceRange.min, priceRange.max);
-    
+    final currentRange =
+        _priceRange ?? RangeValues(priceRange.min, priceRange.max);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -352,17 +360,21 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                   fabricType: _selectedFabricType,
                   priceMin: _priceRange?.start,
                   priceMax: _priceRange?.end,
-                  sortBy: ref.read(selectedFiltersProvider).sortBy, // Preserve sort
+                  sortBy: ref
+                      .read(selectedFiltersProvider)
+                      .sortBy, // Preserve sort
                 );
-                
-                ref.read(selectedFiltersProvider.notifier).applyFilters(
-                  gender: _selectedGender,
-                  style: _selectedStyle,
-                  tribe: _selectedTribe,
-                  fabricType: _selectedFabricType,
-                  priceMin: _priceRange?.start,
-                  priceMax: _priceRange?.end,
-                );
+
+                ref
+                    .read(selectedFiltersProvider.notifier)
+                    .applyFilters(
+                      gender: _selectedGender,
+                      style: _selectedStyle,
+                      tribe: _selectedTribe,
+                      fabricType: _selectedFabricType,
+                      priceMin: _priceRange?.start,
+                      priceMax: _priceRange?.end,
+                    );
 
                 widget.onApplyFilters?.call(filters);
                 Navigator.of(context).pop(filters);
@@ -374,7 +386,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 elevation: 4,
-                shadowColor: const Color(0xFFFDAF40).withOpacity(0.5),
+                shadowColor: const Color(0xFFFDAF40).withValues(alpha: 0.5),
               ),
               child: const Text(
                 'Show Results',

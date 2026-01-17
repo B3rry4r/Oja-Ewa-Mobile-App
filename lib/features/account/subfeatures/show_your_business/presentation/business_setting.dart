@@ -56,7 +56,8 @@ class BusinessSettingsScreen extends ConsumerWidget {
             alignment: Alignment.topRight,
             child: GestureDetector(
               // Add business should restart creation flow
-              onTap: () => Navigator.of(context).pushNamed(AppRoutes.businessCategory),
+              onTap: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.businessCategory),
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
@@ -67,7 +68,7 @@ class BusinessSettingsScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFDAF40).withOpacity(0.4),
+                      color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
                       blurRadius: 16,
                       offset: const Offset(0, 8),
                     ),
@@ -112,98 +113,106 @@ class BusinessSettingsScreen extends ConsumerWidget {
         }
 
         return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      itemCount: businesses.length,
-      separatorBuilder: (_, __) => const Divider(color: Color(0xFFDEDEDE), height: 1),
-      itemBuilder: (context, index) {
-        final b = businesses[index];
-        final status = b.storeStatus;
-        
-        Color chipBg;
-        Color chipFg;
-        String chipText;
-        switch (status) {
-          case 'approved':
-            chipBg = const Color(0xFF2ECC71).withAlpha(25);
-            chipFg = const Color(0xFF2ECC71);
-            chipText = 'Approved';
-            break;
-          case 'pending':
-            chipBg = const Color(0xFFFDAF40).withAlpha(25);
-            chipFg = const Color(0xFFFDAF40);
-            chipText = 'Pending';
-            break;
-          case 'deactivated':
-            chipBg = const Color(0xFFE74C3C).withAlpha(25);
-            chipFg = const Color(0xFFE74C3C);
-            chipText = 'Deactivated';
-            break;
-          default:
-            chipBg = const Color(0xFF777F84).withAlpha(25);
-            chipFg = const Color(0xFF777F84);
-            chipText = status.isEmpty ? 'Unknown' : status;
-        }
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          itemCount: businesses.length,
+          separatorBuilder: (_, __) =>
+              const Divider(color: Color(0xFFDEDEDE), height: 1),
+          itemBuilder: (context, index) {
+            final b = businesses[index];
+            final status = b.storeStatus;
 
-        return ListTile(
-          contentPadding: const EdgeInsets.symmetric(vertical: 8),
-          onTap: () {
-            // Navigate to category-specific detail screen
-            _navigateToBusinessDetail(context, b);
+            Color chipBg;
+            Color chipFg;
+            String chipText;
+            switch (status) {
+              case 'approved':
+                chipBg = const Color(0xFF2ECC71).withAlpha(25);
+                chipFg = const Color(0xFF2ECC71);
+                chipText = 'Approved';
+                break;
+              case 'pending':
+                chipBg = const Color(0xFFFDAF40).withAlpha(25);
+                chipFg = const Color(0xFFFDAF40);
+                chipText = 'Pending';
+                break;
+              case 'deactivated':
+                chipBg = const Color(0xFFE74C3C).withAlpha(25);
+                chipFg = const Color(0xFFE74C3C);
+                chipText = 'Deactivated';
+                break;
+              default:
+                chipBg = const Color(0xFF777F84).withAlpha(25);
+                chipFg = const Color(0xFF777F84);
+                chipText = status.isEmpty ? 'Unknown' : status;
+            }
+
+            return ListTile(
+              contentPadding: const EdgeInsets.symmetric(vertical: 8),
+              onTap: () {
+                // Navigate to category-specific detail screen
+                _navigateToBusinessDetail(context, b);
+              },
+              title: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      b.businessName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Campton',
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF241508),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: chipBg,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      chipText,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontFamily: 'Campton',
+                        fontWeight: FontWeight.w600,
+                        color: chipFg,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.more_horiz, color: Color(0xFF1E2021)),
+                onPressed: () => _showBusinessActions(context, b),
+              ),
+            );
           },
-          title: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  b.businessName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Campton',
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF241508),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: chipBg,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  chipText,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'Campton',
-                    fontWeight: FontWeight.w600,
-                    color: chipFg,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          trailing: IconButton(
-            icon: const Icon(Icons.more_horiz, color: Color(0xFF1E2021)),
-            onPressed: () => _showBusinessActions(context, b),
-          ),
         );
-      },
-    );
       },
     );
   }
 
   /// Navigate to the category-specific business detail screen
-  void _navigateToBusinessDetail(BuildContext context, BusinessStatus business) {
+  void _navigateToBusinessDetail(
+    BuildContext context,
+    BusinessStatus business,
+  ) {
     final category = business.category.toLowerCase();
-    
+
     switch (category) {
       case 'beauty':
       case 'afro_beauty_services':
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => BusinessProfileBeautyScreen(businessId: business.id),
+            builder: (_) =>
+                BusinessProfileBeautyScreen(businessId: business.id),
           ),
         );
         break;
@@ -217,10 +226,9 @@ class BusinessSettingsScreen extends ConsumerWidget {
       case 'school':
         // School detail screen - under development
         // Navigate to schools screen with businessId for now
-        Navigator.of(context).pushNamed(
-          AppRoutes.schools,
-          arguments: {'businessId': business.id},
-        );
+        Navigator.of(
+          context,
+        ).pushNamed(AppRoutes.schools, arguments: {'businessId': business.id});
         break;
       case 'art':
       case 'brand':
@@ -234,7 +242,8 @@ class BusinessSettingsScreen extends ConsumerWidget {
         // Fallback to beauty screen for any unhandled category
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => BusinessProfileBeautyScreen(businessId: business.id),
+            builder: (_) =>
+                BusinessProfileBeautyScreen(businessId: business.id),
           ),
         );
         break;

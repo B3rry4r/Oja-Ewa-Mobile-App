@@ -16,6 +16,7 @@ class SearchApi {
     String? gender,
     String? style,
     String? tribe,
+    String? fabricType,
     num? priceMin,
     num? priceMax,
     String? categoryType,
@@ -24,17 +25,18 @@ class SearchApi {
   }) async {
     try {
       final res = await _dio.get(
-        '/api/products/search',
+        '/api/products/browse',
         queryParameters: {
-          'q': query,
+          'search': query,
           'page': page,
           'per_page': perPage,
           if (categoryType != null && categoryType.isNotEmpty) 'type': categoryType,
           if (categorySlug != null && categorySlug.isNotEmpty) 'category_slug': categorySlug,
-          if (sort != null && sort.isNotEmpty) 'sort': sort,
+          if (sort != null && sort.isNotEmpty) 'sort_by': sort,
           if (gender != null && gender.isNotEmpty) 'gender': gender,
           if (style != null && style.isNotEmpty) 'style': style,
           if (tribe != null && tribe.isNotEmpty) 'tribe': tribe,
+          if (fabricType != null && fabricType.isNotEmpty) 'fabric_type': fabricType,
           if (priceMin != null) 'price_min': priceMin,
           if (priceMax != null) 'price_max': priceMax,
         },

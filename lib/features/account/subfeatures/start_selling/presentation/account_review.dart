@@ -18,7 +18,8 @@ class AccountReviewScreen extends ConsumerStatefulWidget {
   const AccountReviewScreen({super.key});
 
   @override
-  ConsumerState<AccountReviewScreen> createState() => _AccountReviewScreenState();
+  ConsumerState<AccountReviewScreen> createState() =>
+      _AccountReviewScreenState();
 }
 
 class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
@@ -104,7 +105,7 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
 
   Widget _stepItem(int num, String label, {required bool isComplete}) {
     final Color activeColor = const Color(0xFF603814);
-    
+
     return Row(
       children: [
         Container(
@@ -115,12 +116,16 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
             borderRadius: BorderRadius.circular(4),
           ),
           alignment: Alignment.center,
-          child: (num < 3) 
-            ? const Icon(Icons.check, color: Colors.white, size: 16)
-            : Text(
-                num.toString(),
-                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-              ),
+          child: (num < 3)
+              ? const Icon(Icons.check, color: Colors.white, size: 16)
+              : Text(
+                  num.toString(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ),
         const SizedBox(width: 8),
         Text(
@@ -136,7 +141,12 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
     );
   }
 
-  Widget _buildGoHomeButton(BuildContext context, WidgetRef ref, SellerRegistrationDraft draft, bool isLoading) {
+  Widget _buildGoHomeButton(
+    BuildContext context,
+    WidgetRef ref,
+    SellerRegistrationDraft draft,
+    bool isLoading,
+  ) {
     return InkWell(
       onTap: isLoading
           ? null
@@ -152,7 +162,8 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
                 facebook: draft.facebook,
                 identityDocument: draft.identityDocumentPath,
                 businessName: draft.businessName ?? '',
-                businessRegistrationNumber: draft.businessRegistrationNumber ?? '',
+                businessRegistrationNumber:
+                    draft.businessRegistrationNumber ?? '',
                 businessCertificate: draft.businessCertificatePath,
                 businessLogo: draft.businessLogoPath,
                 bankName: draft.bankName ?? '',
@@ -161,10 +172,14 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
 
               try {
                 // 1) Create profile
-                await ref.read(sellerProfileControllerProvider.notifier).submit(payload);
+                await ref
+                    .read(sellerProfileControllerProvider.notifier)
+                    .submit(payload);
 
                 // 2) Upload files (best effort; these endpoints also update profile fields)
-                final uploadRepo = ref.read(sellerProfileUploadRepositoryProvider);
+                final uploadRepo = ref.read(
+                  sellerProfileUploadRepositoryProvider,
+                );
                 if ((draft.identityDocumentPath ?? '').isNotEmpty) {
                   await uploadRepo.upload(
                     type: 'identity_document',
@@ -187,9 +202,14 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
                 }
 
                 if (!context.mounted) return;
-                AppSnackbars.showSuccess(context, 'Seller application submitted');
-                Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
-              } catch (e) {  
+                AppSnackbars.showSuccess(
+                  context,
+                  'Seller application submitted',
+                );
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+              } catch (e) {
                 if (!context.mounted) return;
                 AppSnackbars.showError(context, UiErrorMessage.from(e));
               }
@@ -203,10 +223,10 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withOpacity(0.4),
+              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         child: const Center(
@@ -223,7 +243,10 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
     );
   }
 
-  Widget _buildSubmitButton(BuildContext context, SellerRegistrationDraft draft) {
+  Widget _buildSubmitButton(
+    BuildContext context,
+    SellerRegistrationDraft draft,
+  ) {
     return InkWell(
       onTap: _isSubmitting ? null : () => _submitSeller(context, draft),
       borderRadius: BorderRadius.circular(8),
@@ -231,14 +254,16 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
         width: double.infinity,
         height: 57,
         decoration: BoxDecoration(
-          color: _isSubmitting ? const Color(0xFFFDAF40).withAlpha(150) : const Color(0xFFFDAF40),
+          color: _isSubmitting
+              ? const Color(0xFFFDAF40).withAlpha(150)
+              : const Color(0xFFFDAF40),
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFFFDAF40).withAlpha(102),
               blurRadius: 16,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         child: Center(
@@ -248,7 +273,9 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
                   height: 24,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFFBF5)),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Color(0xFFFFFBF5),
+                    ),
                   ),
                 )
               : const Text(
@@ -267,7 +294,9 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
 
   Widget _buildDoneButton(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false),
+      onTap: () => Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false),
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,
@@ -280,7 +309,7 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
               color: const Color(0xFFFDAF40).withAlpha(102),
               blurRadius: 16,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         child: const Center(
@@ -298,7 +327,10 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
     );
   }
 
-  Future<void> _submitSeller(BuildContext context, SellerRegistrationDraft draft) async {
+  Future<void> _submitSeller(
+    BuildContext context,
+    SellerRegistrationDraft draft,
+  ) async {
     setState(() => _isSubmitting = true);
 
     final payload = SellerProfilePayload(
@@ -312,7 +344,8 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
       facebook: draft.facebook,
       identityDocument: draft.identityDocumentPath,
       businessName: (draft.businessName ?? '').trim(),
-      businessRegistrationNumber: (draft.businessRegistrationNumber ?? '').trim(),
+      businessRegistrationNumber: (draft.businessRegistrationNumber ?? '')
+          .trim(),
       businessCertificate: draft.businessCertificatePath,
       businessLogo: draft.businessLogoPath,
       bankName: (draft.bankName ?? '').trim(),

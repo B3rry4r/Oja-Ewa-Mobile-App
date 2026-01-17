@@ -28,7 +28,11 @@ class MusicArtistProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, BusinessDetails business) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    BusinessDetails business,
+  ) {
     final artistName = business.businessName;
     final biography = business.businessDescription ?? '';
     final email = business.businessEmail ?? '';
@@ -67,7 +71,12 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
 
                   // Social Links Section (YouTube & Spotify for music, plus Instagram & Facebook)
-                  _buildSocialLinksSection(instagram, facebook, youtube, spotify),
+                  _buildSocialLinksSection(
+                    instagram,
+                    facebook,
+                    youtube,
+                    spotify,
+                  ),
 
                   const SizedBox(height: 16),
 
@@ -87,7 +96,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
 
             // Fixed Bottom Contact Card
             _buildBottomContactCard(context, phone),
-
           ],
         ),
       ),
@@ -109,7 +117,11 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                 width: 168,
                 height: 198,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const AppImagePlaceholder(width: 168, height: 198, borderRadius: 8),
+                errorBuilder: (_, __, ___) => const AppImagePlaceholder(
+                  width: 168,
+                  height: 198,
+                  borderRadius: 8,
+                ),
               ),
             )
           else
@@ -360,7 +372,12 @@ class MusicArtistProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSocialLinksSection(String instagram, String facebook, String? youtube, String? spotify) {
+  Widget _buildSocialLinksSection(
+    String instagram,
+    String facebook,
+    String? youtube,
+    String? spotify,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -410,7 +427,9 @@ class MusicArtistProfileScreen extends ConsumerWidget {
             icon: Icons.camera_alt_outlined,
             platform: 'Instagram',
             handle: instagram,
-            onTap: () => _launchUrl('https://instagram.com/${instagram.replaceAll('@', '')}'),
+            onTap: () => _launchUrl(
+              'https://instagram.com/${instagram.replaceAll('@', '')}',
+            ),
           ),
 
           const SizedBox(height: 16),
@@ -457,11 +476,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
               color: const Color(0xFF603814),
               borderRadius: BorderRadius.circular(4),
             ),
-            child: Icon(
-              icon,
-              size: 18,
-              color: Colors.white,
-            ),
+            child: Icon(icon, size: 18, color: Colors.white),
           ),
 
           const SizedBox(width: 12),
@@ -506,14 +521,16 @@ class MusicArtistProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildReviewsSection(BuildContext context, WidgetRef ref) {
-    final reviewsPage = ref.watch(reviewsProvider((type: 'business', id: businessId))).maybeWhen(
-          data: (d) => d,
-          orElse: () => null,
-        );
+    final reviewsPage = ref
+        .watch(reviewsProvider((type: 'business', id: businessId)))
+        .maybeWhen(data: (d) => d, orElse: () => null);
 
     final reviewCount = reviewsPage?.total ?? 0;
-    final avgRating = reviewsPage?.entity.avgRating?.toStringAsFixed(1) ?? '0.0';
-    final firstReview = (reviewsPage?.items.isNotEmpty ?? false) ? reviewsPage!.items.first : null;
+    final avgRating =
+        reviewsPage?.entity.avgRating?.toStringAsFixed(1) ?? '0.0';
+    final firstReview = (reviewsPage?.items.isNotEmpty ?? false)
+        ? reviewsPage!.items.first
+        : null;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -581,7 +598,9 @@ class MusicArtistProfileScreen extends ConsumerWidget {
               // First review from API
               _buildReviewItem(
                 name: firstReview.user?.displayName ?? '',
-                date: firstReview.createdAt != null ? _formatDate(firstReview.createdAt!) : '',
+                date: firstReview.createdAt != null
+                    ? _formatDate(firstReview.createdAt!)
+                    : '',
                 rating: firstReview.rating ?? 0,
                 title: firstReview.headline ?? '',
                 review: firstReview.body ?? '',
@@ -594,7 +613,20 @@ class MusicArtistProfileScreen extends ConsumerWidget {
   }
 
   String _formatDate(DateTime dt) {
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     final m = months[(dt.month - 1).clamp(0, 11)];
     return '$m ${dt.day}, ${dt.year}';
   }
@@ -742,7 +774,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   elevation: 8,
-                  shadowColor: const Color(0xFFFDAF40).withOpacity(0.3),
+                  shadowColor: const Color(0xFFFDAF40).withValues(alpha: 0.3),
                   padding: const EdgeInsets.symmetric(vertical: 18),
                 ),
                 child: Row(
@@ -795,5 +827,4 @@ class MusicArtistProfileScreen extends ConsumerWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
-
 }

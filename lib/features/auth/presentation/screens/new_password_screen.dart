@@ -85,7 +85,10 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is! NewPasswordArgs) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Missing reset token'), backgroundColor: Color(0xFFFDAF40)),
+        const SnackBar(
+          content: Text('Missing reset token'),
+          backgroundColor: Color(0xFFFDAF40),
+        ),
       );
       return;
     }
@@ -101,7 +104,10 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
       );
 
       if (!mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.passwordResetSuccess, (route) => false);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.passwordResetSuccess,
+        (route) => false,
+      );
     } catch (e) {
       if (!mounted) return;
       AppSnackbars.showError(context, UiErrorMessage.from(e));
@@ -125,7 +131,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
                   width: 234,
                   height: 347,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFDAF40).withOpacity(0.1),
+                    color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(150),
                     ),
@@ -471,12 +477,12 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
       decoration: BoxDecoration(
         color: _isPasswordValid
             ? const Color(0xFFFDAF40)
-            : const Color(0xFFFDAF40).withOpacity(0.3),
+            : const Color(0xFFFDAF40).withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         boxShadow: _isPasswordValid
             ? [
                 BoxShadow(
-                  color: const Color(0xFFFDAF40).withOpacity(0.3),
+                  color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),
@@ -497,7 +503,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
                 fontFamily: 'Campton',
                 color: _isPasswordValid
                     ? const Color(0xFFFFFBF5)
-                    : const Color(0xFFFFFBF5).withOpacity(0.6),
+                    : const Color(0xFFFFFBF5).withValues(alpha: 0.6),
               ),
             ),
           ),

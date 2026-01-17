@@ -197,7 +197,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
     final filteredAsync = hasActiveFilters
         ? ref.watch(
             filteredProductsProvider((
-              categorySlug: _activeSlug,
+              categoryType: widget.type,
               categoryName: widget.pageTitle,
             )),
           )
@@ -286,7 +286,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
         (hasActiveFilters
             ? ref.watch(
                 filteredProductsProvider((
-                  categorySlug: _activeSlug,
+                  categoryType: widget.type,
                   categoryName: widget.pageTitle,
                 )),
               )

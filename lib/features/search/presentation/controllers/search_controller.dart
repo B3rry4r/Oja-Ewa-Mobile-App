@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ojaewa/core/auth/auth_providers.dart';
 import '../../data/search_repository_impl.dart';
 import '../../domain/search_product.dart';
 

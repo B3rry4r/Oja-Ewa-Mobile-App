@@ -20,15 +20,19 @@ class BusinessOnboardingScreen extends ConsumerWidget {
           if (!context.mounted) return;
           final hasApproved = items.any((b) => b.storeStatus == 'approved');
           if (hasApproved) {
-            Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.businessSettings, (r) => false);
+            Navigator.of(
+              context,
+            ).pushNamedAndRemoveUntil(AppRoutes.businessSettings, (r) => false);
           } else {
-            Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.businessApprovalStatus, (r) => false);
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              AppRoutes.businessApprovalStatus,
+              (r) => false,
+            );
           }
         });
       },
     );
 
-    
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Main background
       body: SafeArea(
@@ -142,7 +146,7 @@ class BusinessOnboardingScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withOpacity(0.4),
+              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),

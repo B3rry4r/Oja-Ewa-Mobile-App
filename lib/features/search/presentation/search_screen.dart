@@ -18,8 +18,9 @@ import 'package:ojaewa/features/search/presentation/controllers/search_suggestio
 const _categoryTypes = [
   {'key': 'all', 'label': 'All'},
   {'key': 'textiles', 'label': 'Textiles'},
-  {'key': 'afro_beauty', 'label': 'Afro Beauty'},
+  {'key': 'afro_beauty_products', 'label': 'Afro Beauty'},
   {'key': 'shoes_bags', 'label': 'Shoes & Bags'},
+  {'key': 'art', 'label': 'Art'},
 ];
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -240,11 +241,50 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                   ),
                                 ),
                                 error: (e, _) => Center(
-                                  child: Text(
-                                    'Search failed: $e',
-                                    style: const TextStyle(
-                                      fontFamily: 'Campton',
-                                      color: Color(0xFF777F84),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(32),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.error_outline,
+                                          size: 48,
+                                          color: Color(0xFF777F84),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        const Text(
+                                          'Something went wrong',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontFamily: 'Campton',
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF241508),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        const Text(
+                                          'Please try again or search with different terms',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontFamily: 'Campton',
+                                            color: Color(0xFF777F84),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        TextButton(
+                                          onPressed: _performSearch,
+                                          child: const Text(
+                                            'Try Again',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontFamily: 'Campton',
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFFFDAF40),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
