@@ -153,23 +153,20 @@ class SearchResultsNotifier extends AsyncNotifier<List<dynamic>> {
   Future<List<dynamic>> build() async => [];
 
   Future<void> search({required String query, String? categoryType}) async {
-    if (query.trim().isEmpty) {
-      state = const AsyncData([]);
-      return;
-    }
-
     state = const AsyncLoading();
 
     try {
       final repo = ref.read(searchRepositoryProvider);
       final page = await repo.searchProducts(
-        query: query,
+        query: query.trim(),
         page: 1,
         perPage: 20,
         categoryType: categoryType,
       );
+      debugPrint('[SearchResultsNotifier] Got ${page.items.length} results for "$query"');
       state = AsyncData(page.items.map((p) => p.toJson()).toList());
     } catch (e, st) {
+      debugPrint('[SearchResultsNotifier] Error: $e');
       state = AsyncError(e, st);
     }
   }
