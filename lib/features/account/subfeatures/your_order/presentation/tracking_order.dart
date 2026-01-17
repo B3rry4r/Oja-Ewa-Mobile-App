@@ -293,15 +293,17 @@ class TrackingOrderScreen extends ConsumerWidget {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                step.timestamp,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontFamily: 'Campton',
-                  color: step.timeColor,
+              if (step.isCompleted) ...[
+                const SizedBox(height: 4),
+                Text(
+                  step.timestamp,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'Campton',
+                    color: step.timeColor,
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
         ),
