@@ -136,7 +136,7 @@ class HomeScreen extends ConsumerWidget {
                 builder: (context, ref, _) {
                   // Watch the async provider directly to ensure rebuild on data arrival
                   final sellerStatusAsync = ref.watch(mySellerStatusProvider);
-                  
+
                   return sellerStatusAsync.when(
                     loading: () => const SizedBox.shrink(),
                     error: (_, __) => const SizedBox.shrink(),
@@ -147,7 +147,9 @@ class HomeScreen extends ConsumerWidget {
                       }
                       return HeaderIconButton(
                         asset: AppIcons.shop,
-                        onTap: () => Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard),
+                        onTap: () => Navigator.of(
+                          context,
+                        ).pushNamed(AppRoutes.yourShopDashboard),
                       );
                     },
                   );
@@ -158,12 +160,12 @@ class HomeScreen extends ConsumerWidget {
               Consumer(
                 builder: (context, ref, _) {
                   final accessToken = ref.watch(accessTokenProvider);
-                  final isAuthenticated = accessToken != null && accessToken.isNotEmpty;
+                  final isAuthenticated =
+                      accessToken != null && accessToken.isNotEmpty;
                   final unreadCount = isAuthenticated
-                      ? ref.watch(unreadCountProvider).maybeWhen(
-                            data: (count) => count,
-                            orElse: () => 0,
-                          )
+                      ? ref
+                            .watch(unreadCountProvider)
+                            .maybeWhen(data: (count) => count, orElse: () => 0)
                       : 0;
 
                   return Stack(
@@ -171,7 +173,9 @@ class HomeScreen extends ConsumerWidget {
                     children: [
                       HeaderIconButton(
                         asset: AppIcons.notification,
-                        onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+                        onTap: () => Navigator.of(
+                          context,
+                        ).pushNamed(AppRoutes.notifications),
                       ),
                       if (unreadCount > 0)
                         Positioned(
@@ -206,8 +210,7 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(width: 8),
               HeaderIconButton(
                 asset: AppIcons.bag,
-                onTap: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.cart),
+                onTap: () => Navigator.of(context).pushNamed(AppRoutes.cart),
               ),
             ],
           ),
@@ -249,14 +252,17 @@ class HomeScreen extends ConsumerWidget {
                         Navigator.of(context).pushNamed(AppRoutes.market);
                       } else if (actionUrl.contains('beauty')) {
                         Navigator.of(context).pushNamed(AppRoutes.beauty);
-                      } else if (actionUrl.contains('shoes') || actionUrl.contains('bags')) {
+                      } else if (actionUrl.contains('shoes') ||
+                          actionUrl.contains('bags')) {
                         Navigator.of(context).pushNamed(AppRoutes.brands);
                       } else if (actionUrl.contains('art')) {
                         Navigator.of(context).pushNamed(AppRoutes.music);
                       } else if (actionUrl.contains('school')) {
                         Navigator.of(context).pushNamed(AppRoutes.schools);
                       } else if (actionUrl.contains('sustain')) {
-                        Navigator.of(context).pushNamed(AppRoutes.sustainability);
+                        Navigator.of(
+                          context,
+                        ).pushNamed(AppRoutes.sustainability);
                       } else {
                         // Default to home for unknown relative paths
                         Navigator.of(context).pushNamed(AppRoutes.home);
@@ -264,8 +270,12 @@ class HomeScreen extends ConsumerWidget {
                     } else {
                       // Absolute URL - open externally
                       final uri = Uri.tryParse(actionUrl);
-                      if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
-                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      if (uri != null &&
+                          (uri.scheme == 'http' || uri.scheme == 'https')) {
+                        await launchUrl(
+                          uri,
+                          mode: LaunchMode.externalApplication,
+                        );
                       }
                     }
                   }
@@ -503,23 +513,7 @@ class HomeScreen extends ConsumerWidget {
           color: color,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(child: SvgPicture.asset(iconAsset)),
-            const SizedBox(height: 16),
-          ],
-        ),
+        child: Image.asset(iconAsset, fit: BoxFit.cover),
       ),
     );
   }
