@@ -35,6 +35,11 @@ class ProductApi {
         final product = data['product'];
         if (product is Map<String, dynamic>) return product;
 
+        // If backend returns an error payload without data/product, surface it
+        if (data['message'] != null) {
+          throw FormatException(data['message'] as String);
+        }
+
         // Fallback: assume already a product map.
         return data;
       }

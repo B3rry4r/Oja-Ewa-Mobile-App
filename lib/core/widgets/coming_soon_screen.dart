@@ -46,7 +46,7 @@ class ComingSoonScreen extends StatelessWidget {
                     const SizedBox(height: 32),
                     // Coming Soon Text
                     const Text(
-                      'Coming Soon',
+                      'COMING SOON',
                       style: TextStyle(
                         fontSize: 24,
                         fontFamily: 'Campton',
