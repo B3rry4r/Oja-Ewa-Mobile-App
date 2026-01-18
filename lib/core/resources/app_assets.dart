@@ -9,12 +9,12 @@ abstract class AppIcons {
   static const String bag = 'assets/icons/bag.svg';
   static const String apologies = 'assets/icons/Apologies.png';
   static const String blog = 'assets/icons/blog.svg';
-  static const String beauty = 'assets/icons/Afro.PNG';
-  static const String brands = 'assets/icons/Shoes.PNG';
-  static const String market = 'assets/icons/Textiles.PNG';
-  static const String music = 'assets/icons/Art.PNG';
-  static const String sustainability = 'assets/icons/Sustain.PNG';
-  static const String schools = 'assets/icons/Schools.PNG';
+  static const String beauty = 'assets/icons/Afro.png';
+  static const String brands = 'assets/icons/Shoes.png';
+  static const String market = 'assets/icons/Textiles.png';
+  static const String music = 'assets/icons/Arts.png';
+  static const String sustainability = 'assets/icons/Sustain.png';
+  static const String schools = 'assets/icons/Schools.png';
   static const String connectToUs = 'assets/icons/connect_to_us.svg';
   static const String editYourProfile = 'assets/icons/edit_your_profile.svg';
   static const String emailUs = 'assets/icons/email_us.svg';
@@ -42,7 +42,7 @@ abstract class AppIcons {
 
 abstract class AppImages {
   // assets/icons/*.png
-  static const String onboarding = 'assets/icons/LP3.PNG';
+  static const String onboarding = 'assets/icons/LP3.png';
   static const String logoOutline = 'assets/icons/logo_outline.png';
 
   // assets/app_icon/*
