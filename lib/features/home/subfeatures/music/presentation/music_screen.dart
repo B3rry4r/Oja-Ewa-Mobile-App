@@ -54,7 +54,7 @@ class MusicScreen extends ConsumerWidget {
         }
 
         return CategoryScreen(
-          categoryTitle: 'Art',
+          categoryTitle: 'Art Market',
           categoryDescription: 'African music and entertainment.',
           sections: sections,
           onItemTap: (section, item) {
