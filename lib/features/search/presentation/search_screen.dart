@@ -15,6 +15,13 @@ import 'package:ojaewa/features/product_detail/presentation/product_detail_scree
 import 'package:ojaewa/features/search/presentation/controllers/search_controller.dart';
 import 'package:ojaewa/features/search/presentation/controllers/search_suggestions_controller.dart';
 
+/// Helper function to safely parse numeric values from dynamic data
+num? _parseNum(dynamic v) {
+  if (v is num) return v;
+  if (v is String) return num.tryParse(v);
+  return null;
+}
+
 /// Category types available for search filtering
 const _categoryTypes = [
   {'key': 'all', 'label': 'All'},
@@ -450,7 +457,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         .map((item) => Product(
               id: (item['id'] as num? ?? 0).toInt().toString(),
               title: item['name'] as String? ?? '',
-              priceLabel: formatPrice(item['price'] as num?),
+              priceLabel: formatPrice(_parseNum(item['price'])),
               imageUrl: item['image'] as String?,
               rating: (item['avg_rating'] as num?)?.toDouble() ?? 0,
               reviewCount: (item['review_count'] as num?)?.toInt() ?? 0,

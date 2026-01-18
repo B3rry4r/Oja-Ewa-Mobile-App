@@ -22,6 +22,13 @@ import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/simp
 import 'package:ojaewa/features/categories/presentation/controllers/listing_filters_controller.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/business_sustainability_search_providers.dart';
 
+/// Helper function to safely parse numeric values from dynamic data
+num? _parseNum(dynamic v) {
+  if (v is num) return v;
+  if (v is String) return num.tryParse(v);
+  return null;
+}
+
 /// Product listing screen used for category browsing.
 ///
 /// UI should stay as-is; this wiring replaces hardcoded placeholder data with
@@ -501,7 +508,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                   final product = Product(
                     id: searchProduct.id.toString(),
                     title: searchProduct.name,
-                    priceLabel: formatPrice(searchProduct.price as num?),
+                    priceLabel: formatPrice(_parseNum(searchProduct.price)),
                     rating: (searchProduct.avgRating ?? 0).toDouble(),
                     reviewCount: 0, // Not available in search result
                     imageUrl: searchProduct.image,

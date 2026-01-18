@@ -750,11 +750,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
   }
 
   Widget _buildRelatedProducts(List<Map<String, dynamic>> suggestions) {
+    num? parseNum(dynamic v) {
+      if (v is num) return v;
+      if (v is String) return num.tryParse(v);
+      return null;
+    }
+    
     final products = suggestions.take(2).map((s) {
       return Product(
         id: ((s['id'] as num?)?.toInt() ?? 0).toString(),
         title: (s['name'] as String?) ?? '',
-        priceLabel: formatPrice(s['price'] as num?),
+        priceLabel: formatPrice(parseNum(s['price'])),
         rating: 0,
         reviewCount: 0,
         imageUrl: (s['image'] as String?),
