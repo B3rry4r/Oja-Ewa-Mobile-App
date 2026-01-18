@@ -56,7 +56,7 @@ class OnboardingScreen extends StatelessWidget {
             bottomRight: Radius.circular(25),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(15.0),
             child: Image.asset(
               AppImages.onboarding,
               width: double.infinity,
