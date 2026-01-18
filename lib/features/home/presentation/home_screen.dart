@@ -509,6 +509,7 @@ class HomeScreen extends ConsumerWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Container(
+        clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(8),
