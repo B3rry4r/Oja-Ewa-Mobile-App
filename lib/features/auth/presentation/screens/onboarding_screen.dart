@@ -55,63 +55,66 @@ class OnboardingScreen extends StatelessWidget {
             bottomLeft: Radius.circular(25),
             bottomRight: Radius.circular(25),
           ),
-          child: Image.asset(
-            AppImages.onboarding,
-            width: double.infinity,
-            // height: 499,
-            fit: BoxFit.cover,
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Image.asset(
+              AppImages.onboarding,
+              width: double.infinity,
+              // height: 499,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
 
         // Page Indicator Dots
-        Positioned(
-          top: 500, // Aligns with the bottom of the image
-          child: _buildPageIndicator(),
-        ),
+        // Positioned(
+        //   top: 500, // Aligns with the bottom of the image
+        //   child: _buildPageIndicator(),
+        // ),
       ],
     );
   }
 
-  Widget _buildPageIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Active dot
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: const Color(0xFFFDAF40),
-            borderRadius: BorderRadius.circular(17),
-          ),
-        ),
+  // Widget _buildPageIndicator() {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       // Active dot
+  //       Container(
+  //         width: 12,
+  //         height: 12,
+  //         decoration: BoxDecoration(
+  //           color: const Color(0xFFFDAF40),
+  //           borderRadius: BorderRadius.circular(17),
+  //         ),
+  //       ),
 
-        const SizedBox(width: 20),
+  //       const SizedBox(width: 20),
 
-        // Inactive dot (with border)
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
-            borderRadius: BorderRadius.circular(17),
-          ),
-        ),
+  //       // Inactive dot (with border)
+  //       Container(
+  //         width: 12,
+  //         height: 12,
+  //         decoration: BoxDecoration(
+  //           border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
+  //           borderRadius: BorderRadius.circular(17),
+  //         ),
+  //       ),
 
-        const SizedBox(width: 20),
+  //       const SizedBox(width: 20),
 
-        // Inactive dot (with border)
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
-            borderRadius: BorderRadius.circular(17),
-          ),
-        ),
-      ],
-    );
-  }
+  //       // Inactive dot (with border)
+  //       Container(
+  //         width: 12,
+  //         height: 12,
+  //         decoration: BoxDecoration(
+  //           border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
+  //           borderRadius: BorderRadius.circular(17),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildHeadline() {
     return Text(
