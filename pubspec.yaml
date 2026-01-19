@@ -38,6 +38,11 @@ dependencies:
   shared_preferences: ^2.2.2
   app_links: ^6.1.1
   
+  # In-App Purchases
+  in_app_purchase: ^3.2.0
+  in_app_purchase_android: ^0.3.6
+  in_app_purchase_storekit: ^0.3.18
+  
   #Utils
   change_app_package_name: ^1.5.0
 
