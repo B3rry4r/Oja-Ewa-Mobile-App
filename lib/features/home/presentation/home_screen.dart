@@ -20,6 +20,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
+      floatingActionButton: _buildAiChatFab(context),
       body: SafeArea(
         bottom: false,
         child: Container(
@@ -41,7 +42,12 @@ class HomeScreen extends ConsumerWidget {
                       // Promo Cards (Horizontal Scroll) - now API driven via /api/adverts
                       _buildAdvertsOrFallback(ref),
 
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 24),
+
+                      // For You - AI Personalized Section
+                      _buildForYouSection(context, ref),
+
+                      const SizedBox(height: 24),
 
                       // Hero Title
                       Padding(
@@ -516,6 +522,107 @@ class HomeScreen extends ConsumerWidget {
         ),
         child: Image.asset(iconAsset, fit: BoxFit.cover),
       ),
+    );
+  }
+
+  /// For You - AI Personalized recommendations section
+  Widget _buildForYouSection(BuildContext context, WidgetRef ref) {
+    final token = ref.watch(accessTokenProvider);
+    final isLoggedIn = token != null && token.isNotEmpty;
+
+    // Only show for logged-in users
+    if (!isLoggedIn) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: InkWell(
+        onTap: () => Navigator.of(context).pushNamed(AppRoutes.personalizedRecommendations),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFFFDAF40), Color(0xFFFFCC80)],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFFDAF40).withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.auto_awesome,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'For You',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'Campton',
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'AI-curated picks based on your style',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontFamily: 'Campton',
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white,
+                size: 18,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Floating Action Button for AI Cultural Assistant
+  Widget _buildAiChatFab(BuildContext context) {
+    return FloatingActionButton.extended(
+      onPressed: () => Navigator.of(context).pushNamed(AppRoutes.aiChat),
+      backgroundColor: const Color(0xFFFDAF40),
+      foregroundColor: Colors.white,
+      icon: const Icon(Icons.psychology, size: 24),
+      label: const Text(
+        'Ask AI',
+        style: TextStyle(
+          fontSize: 14,
+          fontFamily: 'Campton',
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      elevation: 4,
     );
   }
 }
