@@ -184,6 +184,11 @@ class AccountScreen extends ConsumerWidget {
                         _buildSectionHeader('Settings'),
                         _buildSettingsList(context),
 
+                        // AI Features section
+                        const SizedBox(height: 24),
+                        _buildSectionHeader('AI Features'),
+                        _buildAiFeaturesList(context),
+
                         // Business section
                         const SizedBox(height: 24),
                         _buildSectionHeader('Ojá-Ẹwà Business'),
@@ -302,6 +307,99 @@ class AccountScreen extends ConsumerWidget {
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.changePassword),
         ),
       ],
+    );
+  }
+
+  Widget _buildAiFeaturesList(BuildContext context) {
+    return Column(
+      children: [
+        _buildMenuItemWithIcon(
+          icon: Icons.psychology,
+          label: 'Cultural AI Assistant',
+          subtitle: 'Get fashion advice with Nigerian context',
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.aiChat),
+        ),
+        _buildMenuItemWithIcon(
+          icon: Icons.auto_awesome,
+          label: 'Your Style Profile',
+          subtitle: 'Discover your personalized style DNA',
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.styleDnaQuiz),
+        ),
+        _buildMenuItemWithIcon(
+          icon: Icons.recommend,
+          label: 'For You',
+          subtitle: 'AI-curated recommendations',
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.personalizedRecommendations),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMenuItemWithIcon({
+    required IconData icon,
+    required String label,
+    String? subtitle,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      height: subtitle != null ? 64 : 48,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDAF40).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  size: 22,
+                  color: const Color(0xFFFDAF40),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Campton',
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF241508),
+                      ),
+                    ),
+                    if (subtitle != null)
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontFamily: 'Campton',
+                          color: const Color(0xFF241508).withOpacity(0.6),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                size: 14,
+                color: Color(0xFFCCCCCC),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
