@@ -20,7 +20,11 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
-      floatingActionButton: _buildAiChatFab(context),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: AppBottomNavBar.height + 8),
+        child: _buildAiChatFab(context),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
         bottom: false,
         child: Container(

@@ -381,8 +381,15 @@ class _PersonalizedRecommendationsScreenState
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            const Icon(Icons.error_outline, size: 48, color: Color(0xFFE57373)),
-            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE57373).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.cloud_off, size: 48, color: Color(0xFFE57373)),
+            ),
+            const SizedBox(height: 20),
             const Text(
               'Unable to load recommendations',
               style: TextStyle(
@@ -394,12 +401,29 @@ class _PersonalizedRecommendationsScreenState
             ),
             const SizedBox(height: 8),
             Text(
-              error.toString(),
+              'Please check your connection and try again',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
                 fontFamily: 'Campton',
                 color: const Color(0xFF241508).withOpacity(0.6),
+              ),
+            ),
+            const SizedBox(height: 20),
+            OutlinedButton.icon(
+              onPressed: () {
+                final user = ref.read(userProfileProvider).value;
+                final userId = user?.id.toString() ?? '';
+                ref.invalidate(personalizedRecommendationsProvider(userId));
+              },
+              icon: const Icon(Icons.refresh, size: 18),
+              label: const Text('Retry'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFFFDAF40),
+                side: const BorderSide(color: Color(0xFFFDAF40)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ),
           ],

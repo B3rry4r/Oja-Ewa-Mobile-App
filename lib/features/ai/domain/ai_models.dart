@@ -172,23 +172,44 @@ class StyleDnaProfile {
   final List<String>? fashionGoals;
   final DateTime? updatedAt;
 
-  factory StyleDnaProfile.fromJson(Map<String, dynamic> json) {
+  factory StyleDnaProfile.fromJson(dynamic jsonData) {
+    // Handle case where jsonData might not be a Map
+    if (jsonData is! Map<String, dynamic>) {
+      return const StyleDnaProfile(
+        userId: '',
+        styleProfile: 'Style profile not available',
+      );
+    }
+    
+    final json = jsonData;
+    
+    // Safely parse list of strings
+    List<String>? parseStringList(dynamic value) {
+      if (value is List) {
+        return value.map((e) => e.toString()).toList();
+      }
+      return null;
+    }
+    
+    // Safely parse DateTime
+    DateTime? parseDateTime(dynamic value) {
+      if (value == null) return null;
+      try {
+        return DateTime.parse(value.toString());
+      } catch (_) {
+        return null;
+      }
+    }
+    
     return StyleDnaProfile(
       userId: json['userId']?.toString() ?? json['user_id']?.toString() ?? '',
-      styleProfile: json['styleProfile'] as String? ?? json['style_profile'] as String? ?? '',
-      colorSeason: json['colorSeason'] as String? ?? json['color_season'] as String?,
-      preferredStyles: (json['preferredStyles'] as List<dynamic>?)?.cast<String>() ??
-          (json['preferred_styles'] as List<dynamic>?)?.cast<String>(),
-      preferredTribes: (json['preferredTribes'] as List<dynamic>?)?.cast<String>() ??
-          (json['preferred_tribes'] as List<dynamic>?)?.cast<String>(),
-      bodyType: json['bodyType'] as String? ?? json['body_type'] as String?,
-      fashionGoals: (json['fashionGoals'] as List<dynamic>?)?.cast<String>() ??
-          (json['fashion_goals'] as List<dynamic>?)?.cast<String>(),
-      updatedAt: json['updatedAt'] != null 
-          ? DateTime.parse(json['updatedAt'] as String)
-          : json['updated_at'] != null 
-              ? DateTime.parse(json['updated_at'] as String)
-              : null,
+      styleProfile: json['styleProfile']?.toString() ?? json['style_profile']?.toString() ?? '',
+      colorSeason: json['colorSeason']?.toString() ?? json['color_season']?.toString(),
+      preferredStyles: parseStringList(json['preferredStyles'] ?? json['preferred_styles']),
+      preferredTribes: parseStringList(json['preferredTribes'] ?? json['preferred_tribes']),
+      bodyType: json['bodyType']?.toString() ?? json['body_type']?.toString(),
+      fashionGoals: parseStringList(json['fashionGoals'] ?? json['fashion_goals']),
+      updatedAt: parseDateTime(json['updatedAt'] ?? json['updated_at']),
     );
   }
 }
@@ -231,18 +252,36 @@ class PersonalizedRecommendation {
   final String? style;
   final String? tribe;
 
-  factory PersonalizedRecommendation.fromJson(Map<String, dynamic> json) {
+  factory PersonalizedRecommendation.fromJson(dynamic jsonData) {
+    // Handle case where jsonData might be a String or other non-map type
+    if (jsonData is! Map<String, dynamic>) {
+      return const PersonalizedRecommendation(
+        id: '',
+        name: 'Unknown Product',
+        price: 0.0,
+        matchScore: 0.0,
+      );
+    }
+    
+    final json = jsonData;
+    
+    // Safely parse price which might come as String
+    double parsePrice(dynamic value) {
+      if (value is num) return value.toDouble();
+      if (value is String) return double.tryParse(value) ?? 0.0;
+      return 0.0;
+    }
+    
     return PersonalizedRecommendation(
       id: json['id']?.toString() ?? '',
-      name: json['name'] as String? ?? '',
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      matchScore: (json['matchScore'] as num?)?.toDouble() ?? 
-          (json['match_score'] as num?)?.toDouble() ?? 0.0,
-      imageUrl: json['imageUrl'] as String? ?? json['image_url'] as String?,
-      reason: json['reason'] as String?,
-      category: json['category'] as String?,
-      style: json['style'] as String?,
-      tribe: json['tribe'] as String?,
+      name: json['name']?.toString() ?? '',
+      price: parsePrice(json['price']),
+      matchScore: parsePrice(json['matchScore'] ?? json['match_score']),
+      imageUrl: json['imageUrl']?.toString() ?? json['image_url']?.toString(),
+      reason: json['reason']?.toString(),
+      category: json['category']?.toString(),
+      style: json['style']?.toString(),
+      tribe: json['tribe']?.toString(),
     );
   }
 }

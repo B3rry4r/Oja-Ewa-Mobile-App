@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/dio_clients.dart';
@@ -13,6 +14,24 @@ class AiApi {
 
   final Dio _dio;
 
+  /// Log helper for AI API calls
+  void _log(String method, String endpoint, {dynamic data, dynamic response, dynamic error}) {
+    final timestamp = DateTime.now().toIso8601String();
+    debugPrint('═══════════════════════════════════════════════════════════');
+    debugPrint('🤖 [AI API] $timestamp');
+    debugPrint('📍 $method $endpoint');
+    if (data != null) {
+      debugPrint('📤 Request: $data');
+    }
+    if (response != null) {
+      debugPrint('📥 Response: $response');
+    }
+    if (error != null) {
+      debugPrint('❌ Error: $error');
+    }
+    debugPrint('═══════════════════════════════════════════════════════════');
+  }
+
   // ============================================================
   // CULTURAL CONTEXT AI (Chat)
   // ============================================================
@@ -23,35 +42,57 @@ class AiApi {
     String? userId,
     String? context,
   }) async {
-    final response = await _dio.post('/ai/buyer/chat', data: {
+    const endpoint = '/ai/buyer/chat';
+    final requestData = {
       'message': message,
       if (userId != null) 'userId': userId,
       if (context != null) 'context': context,
-    });
+    };
     
-    final data = response.data as Map<String, dynamic>;
-    return AiChatMessage(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      content: data['response'] as String? ?? '',
-      isUser: false,
-      timestamp: DateTime.now(),
-      suggestions: (data['suggestions'] as List<dynamic>?)?.cast<String>(),
-      products: (data['products'] as List<dynamic>?)
-          ?.map((p) => AiSuggestedProduct.fromJson(p as Map<String, dynamic>))
-          .toList(),
-    );
+    _log('POST', endpoint, data: requestData);
+    
+    try {
+      final response = await _dio.post(endpoint, data: requestData);
+      final data = response.data as Map<String, dynamic>;
+      
+      _log('POST', endpoint, response: data);
+      
+      return AiChatMessage(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        content: data['response'] as String? ?? '',
+        isUser: false,
+        timestamp: DateTime.now(),
+        suggestions: (data['suggestions'] as List<dynamic>?)?.cast<String>(),
+        products: (data['products'] as List<dynamic>?)
+            ?.map((p) => AiSuggestedProduct.fromJson(p as Map<String, dynamic>))
+            .toList(),
+      );
+    } catch (e) {
+      _log('POST', endpoint, error: e);
+      rethrow;
+    }
   }
 
   /// Get chat history for a user
   Future<List<AiChatMessage>> getChatHistory(String userId) async {
-    final response = await _dio.get('/ai/buyer/chat/history/$userId');
+    final endpoint = '/ai/buyer/chat/history/$userId';
     
-    final data = response.data as Map<String, dynamic>;
-    final history = data['history'] as List<dynamic>? ?? [];
+    _log('GET', endpoint);
     
-    return history
-        .map((m) => AiChatMessage.fromJson(m as Map<String, dynamic>))
-        .toList();
+    try {
+      final response = await _dio.get(endpoint);
+      final data = response.data as Map<String, dynamic>;
+      
+      _log('GET', endpoint, response: data);
+      
+      final history = data['history'] as List<dynamic>? ?? [];
+      return history
+          .map((m) => AiChatMessage.fromJson(m as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      _log('GET', endpoint, error: e);
+      rethrow;
+    }
   }
 
   // ============================================================
@@ -69,7 +110,8 @@ class AiApi {
     String? occasion,
     List<String>? colors,
   }) async {
-    final response = await _dio.post('/ai/seller/product/description', data: {
+    const endpoint = '/ai/seller/product/description';
+    final requestData = {
       'name': name,
       'style': style,
       'tribe': tribe,
@@ -78,25 +120,43 @@ class AiApi {
       if (materials != null) 'materials': materials,
       if (occasion != null) 'occasion': occasion,
       if (colors != null) 'colors': colors,
-    });
+    };
     
-    return AiProductDescription.fromJson(response.data as Map<String, dynamic>);
+    _log('POST', endpoint, data: requestData);
+    
+    try {
+      final response = await _dio.post(endpoint, data: requestData);
+      _log('POST', endpoint, response: response.data);
+      return AiProductDescription.fromJson(response.data as Map<String, dynamic>);
+    } catch (e) {
+      _log('POST', endpoint, error: e);
+      rethrow;
+    }
   }
 
   /// Generate batch product descriptions (up to 10)
   Future<List<AiProductDescription>> generateBatchDescriptions(
     List<ProductDescriptionRequest> products,
   ) async {
-    final response = await _dio.post('/ai/seller/product/description/batch', data: {
-      'products': products.map((p) => p.toJson()).toList(),
-    });
+    const endpoint = '/ai/seller/product/description/batch';
+    final requestData = {'products': products.map((p) => p.toJson()).toList()};
     
-    final data = response.data as Map<String, dynamic>;
-    final descriptions = data['descriptions'] as List<dynamic>? ?? [];
+    _log('POST', endpoint, data: requestData);
     
-    return descriptions
-        .map((d) => AiProductDescription.fromJson(d as Map<String, dynamic>))
-        .toList();
+    try {
+      final response = await _dio.post(endpoint, data: requestData);
+      final data = response.data as Map<String, dynamic>;
+      
+      _log('POST', endpoint, response: data);
+      
+      final descriptions = data['descriptions'] as List<dynamic>? ?? [];
+      return descriptions
+          .map((d) => AiProductDescription.fromJson(d as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      _log('POST', endpoint, error: e);
+      rethrow;
+    }
   }
 
   // ============================================================
@@ -108,12 +168,22 @@ class AiApi {
     required String userId,
     required List<StyleQuizAnswer> answers,
   }) async {
-    final response = await _dio.post('/ai/buyer/style-quiz', data: {
+    const endpoint = '/ai/buyer/style-quiz';
+    final requestData = {
       'userId': userId,
       'answers': answers.map((a) => a.toJson()).toList(),
-    });
+    };
     
-    return StyleDnaProfile.fromJson(response.data as Map<String, dynamic>);
+    _log('POST', endpoint, data: requestData);
+    
+    try {
+      final response = await _dio.post(endpoint, data: requestData);
+      _log('POST', endpoint, response: response.data);
+      return StyleDnaProfile.fromJson(response.data as Map<String, dynamic>);
+    } catch (e) {
+      _log('POST', endpoint, error: e);
+      rethrow;
+    }
   }
 
   /// Get personalized recommendations for a user
@@ -122,29 +192,52 @@ class AiApi {
     int? limit,
     String? category,
   }) async {
+    final endpoint = '/ai/buyer/recommendations/$userId';
     final queryParams = <String, dynamic>{};
     if (limit != null) queryParams['limit'] = limit;
     if (category != null) queryParams['category'] = category;
     
-    final response = await _dio.get(
-      '/ai/buyer/recommendations/$userId',
-      queryParameters: queryParams.isEmpty ? null : queryParams,
-    );
+    _log('GET', endpoint, data: queryParams.isNotEmpty ? queryParams : null);
     
-    final data = response.data as Map<String, dynamic>;
-    final recommendations = data['recommendations'] as List<dynamic>? ?? [];
-    
-    return recommendations
-        .map((r) => PersonalizedRecommendation.fromJson(r as Map<String, dynamic>))
-        .toList();
+    try {
+      final response = await _dio.get(
+        endpoint,
+        queryParameters: queryParams.isEmpty ? null : queryParams,
+      );
+      
+      _log('GET', endpoint, response: response.data);
+      
+      final data = response.data;
+      // Handle both direct list response and wrapped response
+      List<dynamic> recommendations;
+      if (data is List) {
+        recommendations = data;
+      } else if (data is Map<String, dynamic>) {
+        recommendations = data['recommendations'] as List<dynamic>? ?? [];
+      } else {
+        recommendations = [];
+      }
+      
+      return recommendations
+          .map((r) => PersonalizedRecommendation.fromJson(r as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      _log('GET', endpoint, error: e);
+      rethrow;
+    }
   }
 
   /// Get user's style DNA profile
   Future<StyleDnaProfile?> getStyleProfile(String userId) async {
+    final endpoint = '/ai/buyer/style-profile/$userId';
+    _log('GET', endpoint);
+    
     try {
-      final response = await _dio.get('/ai/buyer/style-profile/$userId');
+      final response = await _dio.get(endpoint);
+      _log('GET', endpoint, response: response.data);
       return StyleDnaProfile.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
+      _log('GET', endpoint, error: e);
       if (e.response?.statusCode == 404) return null;
       rethrow;
     }
@@ -152,8 +245,17 @@ class AiApi {
 
   /// Get personal trend forecasting
   Future<TrendData> getPersonalTrends(String userId) async {
-    final response = await _dio.get('/ai/buyer/trends/personal/$userId');
-    return TrendData.fromJson(response.data as Map<String, dynamic>);
+    final endpoint = '/ai/buyer/trends/personal/$userId';
+    _log('GET', endpoint);
+    
+    try {
+      final response = await _dio.get(endpoint);
+      _log('GET', endpoint, response: response.data);
+      return TrendData.fromJson(response.data as Map<String, dynamic>);
+    } catch (e) {
+      _log('GET', endpoint, error: e);
+      rethrow;
+    }
   }
 
   // ============================================================
@@ -162,8 +264,17 @@ class AiApi {
 
   /// Get trending styles for a category
   Future<TrendData> getCategoryTrends(String category) async {
-    final response = await _dio.get('/ai/seller/trends/$category');
-    return TrendData.fromJson(response.data as Map<String, dynamic>);
+    final endpoint = '/ai/seller/trends/$category';
+    _log('GET', endpoint);
+    
+    try {
+      final response = await _dio.get(endpoint);
+      _log('GET', endpoint, response: response.data);
+      return TrendData.fromJson(response.data as Map<String, dynamic>);
+    } catch (e) {
+      _log('GET', endpoint, error: e);
+      rethrow;
+    }
   }
 
   /// Get inventory forecast
@@ -172,36 +283,74 @@ class AiApi {
     String? category,
     int? daysAhead,
   }) async {
-    final response = await _dio.post('/ai/seller/inventory/forecast', data: {
+    const endpoint = '/ai/seller/inventory/forecast';
+    final requestData = {
       'sellerId': sellerId,
       if (category != null) 'category': category,
       if (daysAhead != null) 'daysAhead': daysAhead,
-    });
+    };
     
-    final data = response.data as Map<String, dynamic>;
-    final forecasts = data['forecasts'] as List<dynamic>? ?? [];
+    _log('POST', endpoint, data: requestData);
     
-    return forecasts
-        .map((f) => InventoryForecast.fromJson(f as Map<String, dynamic>))
-        .toList();
+    try {
+      final response = await _dio.post(endpoint, data: requestData);
+      _log('POST', endpoint, response: response.data);
+      
+      final data = response.data as Map<String, dynamic>;
+      final forecasts = data['forecasts'] as List<dynamic>? ?? [];
+      
+      return forecasts
+          .map((f) => InventoryForecast.fromJson(f as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      _log('POST', endpoint, error: e);
+      rethrow;
+    }
   }
 
   /// Get seller performance comparison
   Future<SellerPerformance> getSellerPerformance(String sellerId) async {
-    final response = await _dio.get('/ai/seller/trends/seller/$sellerId');
-    return SellerPerformance.fromJson(response.data as Map<String, dynamic>);
+    final endpoint = '/ai/seller/trends/seller/$sellerId';
+    _log('GET', endpoint);
+    
+    try {
+      final response = await _dio.get(endpoint);
+      _log('GET', endpoint, response: response.data);
+      return SellerPerformance.fromJson(response.data as Map<String, dynamic>);
+    } catch (e) {
+      _log('GET', endpoint, error: e);
+      rethrow;
+    }
   }
 
   /// Get color trend prediction
   Future<DemandPrediction> getColorTrendPrediction(String category) async {
-    final response = await _dio.post('/ai/seller/demand/forecast-color/$category');
-    return DemandPrediction.fromJson(response.data as Map<String, dynamic>);
+    final endpoint = '/ai/seller/demand/forecast-color/$category';
+    _log('POST', endpoint);
+    
+    try {
+      final response = await _dio.post(endpoint);
+      _log('POST', endpoint, response: response.data);
+      return DemandPrediction.fromJson(response.data as Map<String, dynamic>);
+    } catch (e) {
+      _log('POST', endpoint, error: e);
+      rethrow;
+    }
   }
 
   /// Get size demand prediction
   Future<DemandPrediction> getSizeDemandPrediction(String category) async {
-    final response = await _dio.post('/ai/seller/demand/forecast-size/$category');
-    return DemandPrediction.fromJson(response.data as Map<String, dynamic>);
+    final endpoint = '/ai/seller/demand/forecast-size/$category';
+    _log('POST', endpoint);
+    
+    try {
+      final response = await _dio.post(endpoint);
+      _log('POST', endpoint, response: response.data);
+      return DemandPrediction.fromJson(response.data as Map<String, dynamic>);
+    } catch (e) {
+      _log('POST', endpoint, error: e);
+      rethrow;
+    }
   }
 
   /// Get inventory optimization suggestions
@@ -209,18 +358,37 @@ class AiApi {
     required String sellerId,
     required double budget,
   }) async {
-    final response = await _dio.post('/ai/seller/demand/inventory-optimize', data: {
+    const endpoint = '/ai/seller/demand/inventory-optimize';
+    final requestData = {
       'sellerId': sellerId,
       'budget': budget,
-    });
+    };
     
-    return response.data as Map<String, dynamic>;
+    _log('POST', endpoint, data: requestData);
+    
+    try {
+      final response = await _dio.post(endpoint, data: requestData);
+      _log('POST', endpoint, response: response.data);
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      _log('POST', endpoint, error: e);
+      rethrow;
+    }
   }
 
   /// Get customer profile insights (for sellers)
   Future<Map<String, dynamic>> getCustomerProfile(String customerId) async {
-    final response = await _dio.get('/ai/seller/customer/profile/$customerId');
-    return response.data as Map<String, dynamic>;
+    final endpoint = '/ai/seller/customer/profile/$customerId';
+    _log('GET', endpoint);
+    
+    try {
+      final response = await _dio.get(endpoint);
+      _log('GET', endpoint, response: response.data);
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      _log('GET', endpoint, error: e);
+      rethrow;
+    }
   }
 }
 
