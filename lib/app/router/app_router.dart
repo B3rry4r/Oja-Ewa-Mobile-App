@@ -20,6 +20,7 @@ import '../../features/account/subfeatures/edit_profile/presentation/edit_profil
 import '../../features/account/subfeatures/your_address/presentation/add_edit_address.dart';
 import '../../features/account/subfeatures/connect/connect.dart';
 import '../../features/account/subfeatures/faq/faq.dart';
+import '../../features/account/subfeatures/support/pdf_viewer_screen.dart';
 import '../../features/account/subfeatures/notifications/presentation/notifications_settings.dart';
 import '../../features/account/subfeatures/password/presentation/password.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/business_category.dart';
@@ -88,6 +89,9 @@ abstract class AppRoutes {
   static const changePassword = '/change-password';
   static const notificationsSettings = '/notifications-settings';
   static const faq = '/faq';
+  static const faqLegacy = '/faq-legacy';
+  static const privacyPolicy = '/privacy-policy';
+  static const termsOfService = '/terms-of-service';
   static const connectToUs = '/connect-to-us';
 
   // Business onboarding
@@ -258,7 +262,34 @@ abstract class AppRouter {
       case AppRoutes.faq:
         return MaterialPageRoute<void>(
           settings: settings,
+          builder: (_) => const PdfViewerScreen(
+            title: 'FAQ',
+            assetPath: 'assets/docs/faq.pdf',
+          ),
+        );
+
+      case AppRoutes.faqLegacy:
+        return MaterialPageRoute<void>(
+          settings: settings,
           builder: (_) => const FaqsScreen(),
+        );
+
+      case AppRoutes.privacyPolicy:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const PdfViewerScreen(
+            title: 'Privacy Policy',
+            assetPath: 'assets/docs/privacy_policy.pdf',
+          ),
+        );
+
+      case AppRoutes.termsOfService:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const PdfViewerScreen(
+            title: 'Terms of Service',
+            assetPath: 'assets/docs/terms_of_agreement.pdf',
+          ),
         );
 
       case AppRoutes.connectToUs:

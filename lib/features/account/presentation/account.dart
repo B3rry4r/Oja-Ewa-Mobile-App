@@ -440,12 +440,12 @@ class AccountScreen extends ConsumerWidget {
         _buildMenuItem(
           iconAsset: AppIcons.privacyPolicy,
           label: 'Privacy Policy',
-          onTap: () {},
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.privacyPolicy),
         ),
         _buildMenuItem(
           iconAsset: AppIcons.termsOfService,
           label: 'Terms of Service',
-          onTap: () {},
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.termsOfService),
         ),
         _buildMenuItem(
           iconAsset: AppIcons.faq,
