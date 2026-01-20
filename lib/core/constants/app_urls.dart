@@ -19,14 +19,14 @@ class AppUrls {
     if (_laravelOverride.isNotEmpty) return _laravelOverride;
 
     // Defaults (from docs):
-    // - https://ojaewa-pro-api-production.up.railway.app
+    // - https://ojaewa-pro-api-production.up.railway.app/api
     switch (AppEnv.current) {
       case AppEnvironment.dev:
-        return 'https://ojaewa-pro-api-production.up.railway.app';
+        return 'https://ojaewa-pro-api-production.up.railway.app/api';
       case AppEnvironment.staging:
-        return 'https://ojaewa-pro-api-production.up.railway.app';
+        return 'https://ojaewa-pro-api-production.up.railway.app/api';
       case AppEnvironment.prod:
-        return 'https://ojaewa-pro-api-production.up.railway.app';
+        return 'https://ojaewa-pro-api-production.up.railway.app/api';
     }
   }
 
