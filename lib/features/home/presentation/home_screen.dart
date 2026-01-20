@@ -550,10 +550,10 @@ class HomeScreen extends ConsumerWidget {
                 child: Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 20,
                     fontFamily: 'Campton',
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF241508),
                   ),
                 ),
               ),
