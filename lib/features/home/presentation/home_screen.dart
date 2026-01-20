@@ -529,8 +529,8 @@ class HomeScreen extends ConsumerWidget {
           children: [
             Image.asset(iconAsset, fit: BoxFit.cover),
             Positioned(
-              top: 0,
-              left: 0,
+              bottom: 0,
+              right: 0,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 decoration: BoxDecoration(
@@ -543,7 +543,6 @@ class HomeScreen extends ConsumerWidget {
                     ],
                   ),
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(8),
                     bottomRight: Radius.circular(8),
                   ),
                 ),
