@@ -7,6 +7,8 @@ import 'theme/app_theme.dart';
 import '../core/deep_links/deep_link_handler.dart';
 import '../core/network/network_providers.dart';
 import '../core/widgets/offline_screen.dart';
+import '../core/auth/auth_providers.dart';
+import '../core/subscriptions/subscription_controller.dart';
 
 /// Global navigator key for deep link navigation
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -42,6 +44,12 @@ class _AppState extends ConsumerState<App> {
           builder: (context, ref, _) {
             final isOnline = ref.watch(isOnlineProvider);
             final content = AppBootstrap(child: child ?? const SizedBox.shrink());
+
+            ref.listen<String?>(accessTokenProvider, (prev, next) {
+              if (next != null && next.isNotEmpty) {
+                ref.read(subscriptionControllerProvider.notifier).refreshStatus();
+              }
+            });
 
             if (isOnline) {
               return content;
