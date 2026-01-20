@@ -13,11 +13,18 @@ import '../../../app/router/app_router.dart';
 import '../subfeatures/product/product_listing.dart';
 import '../subfeatures/orders/orders.dart';
 
-class ShopDashboardScreen extends ConsumerWidget {
+class ShopDashboardScreen extends ConsumerStatefulWidget {
   const ShopDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ShopDashboardScreen> createState() => _ShopDashboardScreenState();
+}
+
+class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
+  bool _isAnalyticsLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
     final sellerStatus = ref.watch(sellerStatusProvider);
     final processingOrders = ref.watch(sellerOrdersProvider('processing'));
     final allOrders = ref.watch(sellerOrdersProvider(null));
@@ -283,15 +290,27 @@ class ShopDashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildAiAnalyticsButton(BuildContext context, WidgetRef ref, String? userId) {
+    final isLoading = _isAnalyticsLoading;
     return InkWell(
-      onTap: () async {
-        if (userId != null && userId.isNotEmpty) {
-          await ref.read(sellerAnalyticsControllerProvider.notifier).initialize(userId);
-        }
-        if (context.mounted) {
-          Navigator.of(context).pushNamed(AppRoutes.sellerAnalytics);
-        }
-      },
+      onTap: isLoading
+          ? null
+          : () async {
+              setState(() => _isAnalyticsLoading = true);
+              try {
+                if (userId != null && userId.isNotEmpty) {
+                  await ref
+                      .read(sellerAnalyticsControllerProvider.notifier)
+                      .initialize(userId);
+                }
+                if (context.mounted) {
+                  Navigator.of(context).pushNamed(AppRoutes.sellerAnalytics);
+                }
+              } finally {
+                if (mounted) {
+                  setState(() => _isAnalyticsLoading = false);
+                }
+              }
+            },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         width: double.infinity,
@@ -351,11 +370,20 @@ class ShopDashboardScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white70,
-              size: 16,
-            ),
+            isLoading
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : const Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white70,
+                    size: 16,
+                  ),
           ],
         ),
       ),
