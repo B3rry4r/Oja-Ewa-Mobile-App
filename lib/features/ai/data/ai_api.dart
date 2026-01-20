@@ -15,17 +15,26 @@ class AiApi {
   final Dio _dio;
 
   /// Log helper for AI API calls
-  void _log(String method, String endpoint, {dynamic data, dynamic response, dynamic error}) {
+  void _log(String method, String endpoint, {dynamic data, dynamic response, int? statusCode, dynamic error}) {
     final timestamp = DateTime.now().toIso8601String();
+    final fullUrl = '${_dio.options.baseUrl}$endpoint';
     debugPrint('═══════════════════════════════════════════════════════════');
     debugPrint('🤖 [AI API] $timestamp');
-    debugPrint('📍 $method $endpoint');
-    debugPrint('🌐 Base URL: ${_dio.options.baseUrl}');
+    debugPrint('📍 $method $fullUrl');
     if (data != null) {
       debugPrint('📤 Request: $data');
     }
+    if (statusCode != null) {
+      debugPrint('📊 Status: $statusCode');
+    }
     if (response != null) {
-      debugPrint('📥 Response: $response');
+      // Truncate response if it's too long (e.g., HTML error pages)
+      final responseStr = response.toString();
+      if (responseStr.length > 500) {
+        debugPrint('📥 Response (truncated): ${responseStr.substring(0, 500)}...');
+      } else {
+        debugPrint('📥 Response: $responseStr');
+      }
     }
     if (error != null) {
       debugPrint('❌ Error: $error');
@@ -72,9 +81,9 @@ class AiApi {
     
     try {
       final response = await _dio.post(endpoint, data: requestData);
-      final data = response.data as Map<String, dynamic>;
+      _log('POST', endpoint, response: response.data, statusCode: response.statusCode);
       
-      _log('POST', endpoint, response: data);
+      final data = _parseJsonResponse(response.data);
       
       return AiChatMessage(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -86,6 +95,9 @@ class AiApi {
             ?.map((p) => AiSuggestedProduct.fromJson(p as Map<String, dynamic>))
             .toList(),
       );
+    } on DioException catch (e) {
+      _log('POST', endpoint, error: e.message, statusCode: e.response?.statusCode);
+      rethrow;
     } catch (e) {
       _log('POST', endpoint, error: e);
       rethrow;
@@ -100,14 +112,16 @@ class AiApi {
     
     try {
       final response = await _dio.get(endpoint);
-      final data = response.data as Map<String, dynamic>;
+      _log('GET', endpoint, response: response.data, statusCode: response.statusCode);
       
-      _log('GET', endpoint, response: data);
-      
+      final data = _parseJsonResponse(response.data);
       final history = data['history'] as List<dynamic>? ?? [];
       return history
           .map((m) => AiChatMessage.fromJson(m as Map<String, dynamic>))
           .toList();
+    } on DioException catch (e) {
+      _log('GET', endpoint, error: e.message, statusCode: e.response?.statusCode);
+      rethrow;
     } catch (e) {
       _log('GET', endpoint, error: e);
       rethrow;
@@ -224,9 +238,21 @@ class AiApi {
         queryParameters: queryParams.isEmpty ? null : queryParams,
       );
       
-      _log('GET', endpoint, response: response.data);
+      _log('GET', endpoint, response: response.data, statusCode: response.statusCode);
       
       final data = response.data;
+      
+      // Check for HTML response first
+      if (data is String) {
+        if (data.contains('<!DOCTYPE') || data.contains('<html')) {
+          throw Exception(
+            'AI API returned HTML instead of JSON. '
+            'The endpoint may not exist or the server is misconfigured. '
+            'URL: ${_dio.options.baseUrl}$endpoint'
+          );
+        }
+      }
+      
       // Handle both direct list response and wrapped response
       List<dynamic> recommendations;
       if (data is List) {
@@ -238,8 +264,11 @@ class AiApi {
       }
       
       return recommendations
-          .map((r) => PersonalizedRecommendation.fromJson(r as Map<String, dynamic>))
+          .map((r) => PersonalizedRecommendation.fromJson(r))
           .toList();
+    } on DioException catch (e) {
+      _log('GET', endpoint, error: e.message, statusCode: e.response?.statusCode);
+      rethrow;
     } catch (e) {
       _log('GET', endpoint, error: e);
       rethrow;
@@ -253,10 +282,11 @@ class AiApi {
     
     try {
       final response = await _dio.get(endpoint);
-      _log('GET', endpoint, response: response.data);
-      return StyleDnaProfile.fromJson(response.data as Map<String, dynamic>);
+      _log('GET', endpoint, response: response.data, statusCode: response.statusCode);
+      final data = _parseJsonResponse(response.data);
+      return StyleDnaProfile.fromJson(data);
     } on DioException catch (e) {
-      _log('GET', endpoint, error: e);
+      _log('GET', endpoint, error: e.message, statusCode: e.response?.statusCode);
       if (e.response?.statusCode == 404) return null;
       rethrow;
     }
