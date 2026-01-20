@@ -5,27 +5,25 @@ import 'ai_api.dart';
 
 /// AI Repository
 /// 
-/// Provides a clean interface for AI features with error handling
-/// and data transformation.
+/// Provides a clean interface for the 4 boss-priority AI features:
+/// 1. Cultural Context AI Chat
+/// 2. Style Quiz & Personalized Recommendations  
+/// 3. Smart Product Descriptions
+/// 4. Seller Analytics (Trends & Inventory)
 class AiRepository {
   AiRepository(this._api);
 
   final AiApi _api;
 
   // ============================================================
-  // CULTURAL CONTEXT AI (Chat)
+  // FEATURE 1: CULTURAL CONTEXT AI CHAT
   // ============================================================
 
   Future<AiChatMessage> sendMessage({
     required String message,
-    String? userId,
-    String? context,
+    Map<String, dynamic>? context,
   }) async {
-    return _api.sendChatMessage(
-      message: message,
-      userId: userId,
-      context: context,
-    );
+    return _api.sendChatMessage(message: message, context: context);
   }
 
   Future<List<AiChatMessage>> getChatHistory(String userId) async {
@@ -33,44 +31,12 @@ class AiRepository {
   }
 
   // ============================================================
-  // SMART PRODUCT DESCRIPTIONS
-  // ============================================================
-
-  Future<AiProductDescription> generateDescription({
-    required String name,
-    required String style,
-    required String tribe,
-    required String gender,
-    required double price,
-    String? materials,
-    String? occasion,
-    List<String>? colors,
-  }) async {
-    return _api.generateProductDescription(
-      name: name,
-      style: style,
-      tribe: tribe,
-      gender: gender,
-      price: price,
-      materials: materials,
-      occasion: occasion,
-      colors: colors,
-    );
-  }
-
-  Future<List<AiProductDescription>> generateBatchDescriptions(
-    List<ProductDescriptionRequest> products,
-  ) async {
-    return _api.generateBatchDescriptions(products);
-  }
-
-  // ============================================================
-  // PERSONALIZATION (Style DNA & Recommendations)
+  // FEATURE 2: STYLE QUIZ & PERSONALIZED RECOMMENDATIONS
   // ============================================================
 
   Future<StyleDnaProfile> submitStyleQuiz({
     required String userId,
-    required List<StyleQuizAnswer> answers,
+    required Map<String, dynamic> answers,
   }) async {
     return _api.submitStyleQuiz(userId: userId, answers: answers);
   }
@@ -91,16 +57,36 @@ class AiRepository {
     return _api.getStyleProfile(userId);
   }
 
-  Future<TrendData> getPersonalTrends(String userId) async {
-    return _api.getPersonalTrends(userId);
+  // ============================================================
+  // FEATURE 3: SMART PRODUCT DESCRIPTIONS
+  // ============================================================
+
+  Future<AiProductDescription> generateDescription({
+    required String name,
+    required String category,
+    String? fabric,
+    String? style,
+    String? occasion,
+  }) async {
+    return _api.generateProductDescription(
+      name: name,
+      category: category,
+      fabric: fabric,
+      style: style,
+      occasion: occasion,
+    );
   }
 
   // ============================================================
-  // INVENTORY & TREND PREDICTION (Seller Analytics)
+  // FEATURE 4: SELLER ANALYTICS (Trends & Inventory)
   // ============================================================
 
   Future<TrendData> getCategoryTrends(String category) async {
     return _api.getCategoryTrends(category);
+  }
+
+  Future<SellerPerformance> getSellerPerformance(String sellerId) async {
+    return _api.getSellerPerformance(sellerId);
   }
 
   Future<List<InventoryForecast>> getInventoryForecast({
@@ -113,29 +99,6 @@ class AiRepository {
       category: category,
       daysAhead: daysAhead,
     );
-  }
-
-  Future<SellerPerformance> getSellerPerformance(String sellerId) async {
-    return _api.getSellerPerformance(sellerId);
-  }
-
-  Future<DemandPrediction> getColorTrendPrediction(String category) async {
-    return _api.getColorTrendPrediction(category);
-  }
-
-  Future<DemandPrediction> getSizeDemandPrediction(String category) async {
-    return _api.getSizeDemandPrediction(category);
-  }
-
-  Future<Map<String, dynamic>> getInventoryOptimization({
-    required String sellerId,
-    required double budget,
-  }) async {
-    return _api.getInventoryOptimization(sellerId: sellerId, budget: budget);
-  }
-
-  Future<Map<String, dynamic>> getCustomerProfile(String customerId) async {
-    return _api.getCustomerProfile(customerId);
   }
 }
 

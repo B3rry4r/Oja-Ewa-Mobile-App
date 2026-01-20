@@ -167,11 +167,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                       AiDescriptionGenerator(
                         nameController: _nameController,
                         descriptionController: _descriptionController,
+                        category: _categoryName,
+                        fabric: _selectedFabricType,
                         style: _selectedStyle,
-                        tribe: _selectedTribe,
-                        gender: 'unisex', // Default since gender is now category-based
-                        price: double.tryParse(_priceController.text),
-                        materials: _selectedFabricType,
                       ),
                       const SizedBox(height: 16),
                     ],

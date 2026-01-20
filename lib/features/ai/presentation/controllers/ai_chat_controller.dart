@@ -77,7 +77,6 @@ class AiChatController extends AsyncNotifier<AiChatState> {
       final repository = ref.read(aiRepositoryProvider);
       final response = await repository.sendMessage(
         message: message,
-        userId: _userId,
       );
 
       final updatedMessages = state.value?.messages ?? [];

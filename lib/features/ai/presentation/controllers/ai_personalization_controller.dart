@@ -16,14 +16,14 @@ class StyleQuizState {
   });
 
   final int currentStep;
-  final Map<String, String> answers;
+  final Map<String, dynamic> answers;
   final bool isSubmitting;
   final StyleDnaProfile? profile;
   final String? error;
 
   StyleQuizState copyWith({
     int? currentStep,
-    Map<String, String>? answers,
+    Map<String, dynamic>? answers,
     bool? isSubmitting,
     StyleDnaProfile? profile,
     String? error,
@@ -45,10 +45,10 @@ class StyleQuizController extends AsyncNotifier<StyleQuizState> {
     return const StyleQuizState();
   }
 
-  /// Answer a question
-  void answerQuestion(String questionId, String answer) {
+  /// Answer a question - stores in the format the API expects
+  void answerQuestion(String questionId, dynamic answer) {
     final currentState = state.value ?? const StyleQuizState();
-    final newAnswers = Map<String, String>.from(currentState.answers);
+    final newAnswers = Map<String, dynamic>.from(currentState.answers);
     newAnswers[questionId] = answer;
     state = AsyncData(currentState.copyWith(answers: newAnswers));
   }
@@ -68,19 +68,20 @@ class StyleQuizController extends AsyncNotifier<StyleQuizState> {
   }
 
   /// Submit the quiz
+  /// POST /ai/buyer/style-quiz with { answers: { preferredStyle, favoriteColors[], ... } }
   Future<StyleDnaProfile?> submitQuiz(String userId) async {
     final currentState = state.value ?? const StyleQuizState();
     state = AsyncData(currentState.copyWith(isSubmitting: true, error: null));
 
     try {
       final repository = ref.read(aiRepositoryProvider);
-      final answers = currentState.answers.entries
-          .map((e) => StyleQuizAnswer(questionId: e.key, answer: e.value))
-          .toList();
-
+      
+      // Convert our answers to the API format
+      final apiAnswers = _convertToApiFormat(currentState.answers);
+      
       final profile = await repository.submitStyleQuiz(
         userId: userId,
-        answers: answers,
+        answers: apiAnswers,
       );
 
       state = AsyncData(currentState.copyWith(isSubmitting: false, profile: profile));
@@ -88,10 +89,38 @@ class StyleQuizController extends AsyncNotifier<StyleQuizState> {
     } catch (e) {
       state = AsyncData(currentState.copyWith(
         isSubmitting: false,
-        error: 'Failed to submit quiz: ${e.toString()}',
+        error: 'Failed to submit quiz. Please try again.',
       ));
       return null;
     }
+  }
+
+  /// Convert quiz answers to the API expected format
+  Map<String, dynamic> _convertToApiFormat(Map<String, dynamic> answers) {
+    return {
+      'preferredStyle': answers['style_preference'] ?? 'modern',
+      'favoriteColors': _toList(answers['color_preference']),
+      'occasions': _toList(answers['occasion_focus']),
+      'budgetRange': _mapBudget(answers['budget_range']),
+      'culturalPreference': _toList(answers['tribe_interest']),
+      'fitPreference': answers['fashion_goal'] ?? 'comfortable',
+      'patternPreference': answers['fabric_preference'] ?? 'mixed',
+    };
+  }
+
+  List<String> _toList(dynamic value) {
+    if (value is List) return value.cast<String>();
+    if (value is String) return [value];
+    return [];
+  }
+
+  String _mapBudget(dynamic value) {
+    if (value == null) return 'mid-range';
+    final str = value.toString().toLowerCase();
+    if (str.contains('under') || str.contains('20,000')) return 'budget';
+    if (str.contains('200,000') || str.contains('above')) return 'luxury';
+    if (str.contains('100,000')) return 'premium';
+    return 'mid-range';
   }
 
   /// Reset the quiz
@@ -121,49 +150,27 @@ final personalizedRecommendationsProvider =
   },
 );
 
-/// Provider for personal trends
-final personalTrendsProvider = FutureProvider.family<TrendData, String>(
-  (ref, userId) async {
-    final repository = ref.watch(aiRepositoryProvider);
-    return repository.getPersonalTrends(userId);
-  },
-);
-
-/// Style Quiz Questions
+/// Style Quiz Questions - matching what the API expects
 class StyleQuizQuestion {
   const StyleQuizQuestion({
     required this.id,
     required this.question,
     required this.options,
-    this.imageOptions,
     this.allowMultiple = false,
   });
 
   final String id;
   final String question;
   final List<String> options;
-  final List<String>? imageOptions;
   final bool allowMultiple;
 }
 
-/// Default style quiz questions
+/// Style quiz questions that map to API format
 final styleQuizQuestions = [
   const StyleQuizQuestion(
     id: 'style_preference',
     question: 'What style resonates with you most?',
     options: ['Traditional', 'Modern', 'Fusion', 'Minimalist', 'Bold & Vibrant'],
-  ),
-  const StyleQuizQuestion(
-    id: 'tribe_interest',
-    question: 'Which cultural styles interest you?',
-    options: ['Yoruba', 'Igbo', 'Hausa', 'Edo', 'All Nigerian Cultures'],
-    allowMultiple: true,
-  ),
-  const StyleQuizQuestion(
-    id: 'occasion_focus',
-    question: 'What occasions do you usually dress for?',
-    options: ['Everyday Casual', 'Work/Office', 'Weddings & Events', 'Religious Gatherings', 'All Occasions'],
-    allowMultiple: true,
   ),
   const StyleQuizQuestion(
     id: 'color_preference',
@@ -172,15 +179,26 @@ final styleQuizQuestions = [
     allowMultiple: true,
   ),
   const StyleQuizQuestion(
-    id: 'fabric_preference',
-    question: 'What fabrics do you prefer?',
-    options: ['Ankara/African Print', 'Aso-Oke', 'Lace', 'Cotton', 'Silk & Satin'],
+    id: 'occasion_focus',
+    question: 'What occasions do you usually dress for?',
+    options: ['Casual', 'Work', 'Traditional Events', 'Parties', 'All Occasions'],
     allowMultiple: true,
   ),
   const StyleQuizQuestion(
+    id: 'tribe_interest',
+    question: 'Which cultural styles interest you?',
+    options: ['Yoruba', 'Igbo', 'Hausa', 'Edo', 'Modern African'],
+    allowMultiple: true,
+  ),
+  const StyleQuizQuestion(
+    id: 'fabric_preference',
+    question: 'What patterns do you prefer?',
+    options: ['Bold Prints', 'Subtle Patterns', 'Solid Colors', 'Mixed', 'Traditional Motifs'],
+  ),
+  const StyleQuizQuestion(
     id: 'fashion_goal',
-    question: 'What\'s your fashion goal?',
-    options: ['Express My Heritage', 'Stand Out', 'Comfort First', 'Professional Look', 'Sustainable Fashion'],
+    question: 'How do you like your clothes to fit?',
+    options: ['Fitted', 'Relaxed', 'Oversized', 'Tailored', 'Comfortable'],
   ),
   const StyleQuizQuestion(
     id: 'budget_range',

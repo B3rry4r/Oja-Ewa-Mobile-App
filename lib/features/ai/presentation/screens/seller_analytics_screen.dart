@@ -263,10 +263,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
             _buildTrendCard('Trending Colors', state.trends!.trendingColors, Icons.palette),
           if (state.trends!.trendingTribes.isNotEmpty)
             _buildTrendCard('Popular Cultures', state.trends!.trendingTribes, Icons.public),
-          if (state.colorPredictions != null)
-            _buildPredictionCard('Color Forecast', state.colorPredictions!),
-          if (state.sizePredictions != null)
-            _buildPredictionCard('Size Demand', state.sizePredictions!),
           const SizedBox(height: 24),
         ],
       ),

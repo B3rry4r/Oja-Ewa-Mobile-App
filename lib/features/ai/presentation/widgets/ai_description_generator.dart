@@ -12,24 +12,18 @@ class AiDescriptionGenerator extends ConsumerStatefulWidget {
     super.key,
     required this.nameController,
     required this.descriptionController,
-    required this.style,
-    required this.tribe,
-    required this.gender,
-    required this.price,
-    this.materials,
+    required this.category,
+    this.fabric,
+    this.style,
     this.occasion,
-    this.colors,
   });
 
   final TextEditingController nameController;
   final TextEditingController descriptionController;
+  final String? category;
+  final String? fabric;
   final String? style;
-  final String? tribe;
-  final String gender;
-  final double? price;
-  final String? materials;
   final String? occasion;
-  final List<String>? colors;
 
   @override
   ConsumerState<AiDescriptionGenerator> createState() =>
@@ -42,17 +36,15 @@ class _AiDescriptionGeneratorState
 
   bool get _canGenerate {
     return widget.nameController.text.isNotEmpty &&
-        widget.style != null &&
-        widget.tribe != null &&
-        widget.price != null &&
-        widget.price! > 0;
+        widget.category != null &&
+        widget.category!.isNotEmpty;
   }
 
   Future<void> _generateDescription() async {
     if (!_canGenerate) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please fill in product name, style, tribe, and price first'),
+          content: Text('Please enter product name and category first'),
           backgroundColor: Color(0xFFE57373),
         ),
       );
@@ -63,13 +55,10 @@ class _AiDescriptionGeneratorState
         .read(aiDescriptionControllerProvider.notifier)
         .generateDescription(
           name: widget.nameController.text,
-          style: widget.style!,
-          tribe: widget.tribe!,
-          gender: widget.gender,
-          price: widget.price!,
-          materials: widget.materials,
+          category: widget.category!,
+          fabric: widget.fabric,
+          style: widget.style,
           occasion: widget.occasion,
-          colors: widget.colors,
         );
 
     if (description != null && mounted) {
@@ -166,21 +155,21 @@ class _AiDescriptionGeneratorState
                   ),
                   const SizedBox(height: 8),
                   _buildStatusItem(
+                    'Category',
+                    widget.category != null && widget.category!.isNotEmpty,
+                    widget.category ?? 'Required',
+                  ),
+                  const SizedBox(height: 8),
+                  _buildStatusItem(
                     'Style',
-                    widget.style != null,
-                    widget.style ?? 'Required',
+                    widget.style != null && widget.style!.isNotEmpty,
+                    widget.style ?? 'Optional',
                   ),
                   const SizedBox(height: 8),
                   _buildStatusItem(
-                    'Tribe/Culture',
-                    widget.tribe != null,
-                    widget.tribe ?? 'Required',
-                  ),
-                  const SizedBox(height: 8),
-                  _buildStatusItem(
-                    'Price',
-                    widget.price != null && widget.price! > 0,
-                    widget.price != null ? '₦${widget.price!.toStringAsFixed(0)}' : 'Required',
+                    'Fabric',
+                    widget.fabric != null && widget.fabric!.isNotEmpty,
+                    widget.fabric ?? 'Optional',
                   ),
                   const SizedBox(height: 16),
 

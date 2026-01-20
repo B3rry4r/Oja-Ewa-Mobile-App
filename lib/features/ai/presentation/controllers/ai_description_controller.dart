@@ -38,15 +38,13 @@ class AiDescriptionController extends AsyncNotifier<AiDescriptionState> {
   }
 
   /// Generate AI description for a product
+  /// Uses POST /ai/seller/products/generate-description
   Future<AiProductDescription?> generateDescription({
     required String name,
-    required String style,
-    required String tribe,
-    required String gender,
-    required double price,
-    String? materials,
+    required String category,
+    String? fabric,
+    String? style,
     String? occasion,
-    List<String>? colors,
   }) async {
     state = AsyncData(state.value!.copyWith(isLoading: true, error: null));
 
@@ -54,13 +52,10 @@ class AiDescriptionController extends AsyncNotifier<AiDescriptionState> {
       final repository = ref.read(aiRepositoryProvider);
       final description = await repository.generateDescription(
         name: name,
+        category: category,
+        fabric: fabric,
         style: style,
-        tribe: tribe,
-        gender: gender,
-        price: price,
-        materials: materials,
         occasion: occasion,
-        colors: colors,
       );
 
       state = AsyncData(state.value!.copyWith(isLoading: false, description: description));
@@ -68,7 +63,7 @@ class AiDescriptionController extends AsyncNotifier<AiDescriptionState> {
     } catch (e) {
       state = AsyncData(state.value!.copyWith(
         isLoading: false,
-        error: 'Failed to generate description: ${e.toString()}',
+        error: 'Failed to generate description. Please try again.',
       ));
       return null;
     }
@@ -84,12 +79,3 @@ class AiDescriptionController extends AsyncNotifier<AiDescriptionState> {
 final aiDescriptionControllerProvider =
     AsyncNotifierProvider<AiDescriptionController, AiDescriptionState>(
         AiDescriptionController.new);
-
-/// Provider for batch description generation
-final batchDescriptionProvider = FutureProvider.family<
-    List<AiProductDescription>, List<ProductDescriptionRequest>>(
-  (ref, products) async {
-    final repository = ref.watch(aiRepositoryProvider);
-    return repository.generateBatchDescriptions(products);
-  },
-);
