@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/audio/audio_controller.dart';
 import '../../core/audio/audio_controls.dart';
+import '../../core/auth/auth_providers.dart';
+import '../router/app_router.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
 import '../../features/wishlist/presentation/wishlist.dart';
@@ -33,13 +35,16 @@ class _AppShellState extends ConsumerState<AppShell> {
 
   @override
   Widget build(BuildContext context) {
+    final token = ref.watch(accessTokenProvider);
+    final isLoggedIn = token != null && token.isNotEmpty;
+
     return Scaffold(
       extendBody: true,
       backgroundColor: Colors.transparent,
-      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: AppBottomNavBar.height + 16),
-        child: const AudioControlsButton(),
+        child: _buildFloatingButtons(context, isLoggedIn),
       ),
       body: IndexedStack(
         index: _index,
@@ -57,6 +62,34 @@ class _AppShellState extends ConsumerState<AppShell> {
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
       ),
+    );
+  }
+
+  Widget _buildFloatingButtons(BuildContext context, bool isLoggedIn) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        const AudioControlsButton(),
+        if (isLoggedIn) ...[
+          const SizedBox(height: 10),
+          FloatingActionButton.extended(
+            heroTag: 'ai-chat-fab',
+            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.aiChat),
+            backgroundColor: const Color(0xFF603814),
+            foregroundColor: Colors.white,
+            icon: const Icon(Icons.auto_awesome, size: 24),
+            label: const Text(
+              'Ask AI',
+              style: TextStyle(
+                fontSize: 14,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

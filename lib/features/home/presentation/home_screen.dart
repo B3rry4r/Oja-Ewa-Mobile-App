@@ -20,11 +20,6 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: AppBottomNavBar.height + 20),
-        child: _buildAiChatFab(context, ref),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
         bottom: false,
         child: Container(
@@ -634,25 +629,4 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  /// Floating Action Button for AI Cultural Assistant
-  Widget _buildAiChatFab(BuildContext context, WidgetRef ref) {
-    final token = ref.watch(accessTokenProvider);
-    final isLoggedIn = token != null && token.isNotEmpty;
-    if (!isLoggedIn) return const SizedBox.shrink();
-    return FloatingActionButton.extended(
-      onPressed: () => Navigator.of(context).pushNamed(AppRoutes.aiChat),
-      backgroundColor: const Color(0xFF603814),
-      foregroundColor: Colors.white,
-      icon: const Icon(Icons.auto_awesome, size: 24),
-      label: const Text(
-        'Ask AI',
-        style: TextStyle(
-          fontSize: 14,
-          fontFamily: 'Campton',
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      elevation: 4,
-    );
-  }
 }
