@@ -166,11 +166,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     if (_requiresExtendedFields) ...[
                       AiDescriptionGenerator(
                         nameController: _nameController,
+                        priceController: _priceController,
                         descriptionController: _descriptionController,
                         style: _selectedStyle,
                         tribe: _selectedTribe,
                         gender: 'unisex',
-                        price: double.tryParse(_priceController.text),
                         materials: _selectedFabricType,
                         occasion: null,
                       ),

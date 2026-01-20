@@ -11,21 +11,21 @@ class AiDescriptionGenerator extends ConsumerStatefulWidget {
   const AiDescriptionGenerator({
     super.key,
     required this.nameController,
+    required this.priceController,
     required this.descriptionController,
     required this.style,
     required this.tribe,
     required this.gender,
-    required this.price,
     this.materials,
     this.occasion,
   });
 
   final TextEditingController nameController;
+  final TextEditingController priceController;
   final TextEditingController descriptionController;
   final String? style;
   final String? tribe;
   final String gender;
-  final double? price;
   final String? materials;
   final String? occasion;
 
@@ -38,12 +38,34 @@ class _AiDescriptionGeneratorState
     extends ConsumerState<AiDescriptionGenerator> {
   bool _isExpanded = false;
 
+  double? get _priceValue {
+    final value = double.tryParse(widget.priceController.text);
+    return value != null && value > 0 ? value : null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.nameController.addListener(_handleInputChange);
+    widget.priceController.addListener(_handleInputChange);
+  }
+
+  @override
+  void dispose() {
+    widget.nameController.removeListener(_handleInputChange);
+    widget.priceController.removeListener(_handleInputChange);
+    super.dispose();
+  }
+
+  void _handleInputChange() {
+    if (mounted) setState(() {});
+  }
+
   bool get _canGenerate {
     return widget.nameController.text.isNotEmpty &&
         widget.style != null &&
         widget.tribe != null &&
-        widget.price != null &&
-        widget.price! > 0;
+        _priceValue != null;
   }
 
   Future<void> _generateDescription() async {
@@ -64,7 +86,7 @@ class _AiDescriptionGeneratorState
           style: widget.style!,
           tribe: widget.tribe!,
           gender: widget.gender,
-          price: widget.price!,
+          price: _priceValue!,
           materials: widget.materials,
           occasion: widget.occasion,
         );
@@ -176,8 +198,8 @@ class _AiDescriptionGeneratorState
                   const SizedBox(height: 8),
                   _buildStatusItem(
                     'Price',
-                    widget.price != null && widget.price! > 0,
-                    widget.price != null ? '₦${widget.price!.toStringAsFixed(0)}' : 'Required',
+                    _priceValue != null,
+                    _priceValue != null ? '₦${_priceValue!.toStringAsFixed(0)}' : 'Required',
                   ),
                   const SizedBox(height: 8),
                   _buildStatusItem(
