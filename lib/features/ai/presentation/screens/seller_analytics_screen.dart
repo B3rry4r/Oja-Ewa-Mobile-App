@@ -22,6 +22,13 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
   late TabController _tabController;
   bool _isInitialized = false;
 
+  // App consistent colors
+  static const _backgroundColor = Color(0xFFFFFBF5);
+  static const _cardColor = Color(0xFFF5E0CE);
+  static const _primaryColor = Color(0xFFFDAF40);
+  static const _textDark = Color(0xFF241508);
+  static const _textSecondary = Color(0xFF777F84);
+
   @override
   void initState() {
     super.initState();
@@ -50,54 +57,64 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
     final state = stateAsync.value ?? const SellerAnalyticsState();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFBF5),
+      backgroundColor: _backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
             AppHeader(
-              backgroundColor: const Color(0xFFFFFBF5),
-              iconColor: const Color(0xFF241508),
+              backgroundColor: _backgroundColor,
+              iconColor: _textDark,
               title: const Text(
                 'AI Analytics',
                 style: TextStyle(
                   fontSize: 22,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
+                  color: _textDark,
                 ),
               ),
               showActions: false,
             ),
 
-            // Category Selector
+            // Category Pills
             _buildCategorySelector(state),
+            const SizedBox(height: 16),
 
-            // Tab Bar
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: TabBar(
-                controller: _tabController,
-                labelColor: const Color(0xFFFDAF40),
-                unselectedLabelColor: const Color(0xFF777F84),
-                indicatorSize: TabBarIndicatorSize.tab,
-                indicator: BoxDecoration(
-                  color: const Color(0xFFFDAF40).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+            // Tab Bar - matching app style
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                height: 44,
+                decoration: BoxDecoration(
+                  color: _cardColor,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                labelStyle: const TextStyle(
-                  fontSize: 13,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w600,
+                child: TabBar(
+                  controller: _tabController,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: _textSecondary,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  dividerColor: Colors.transparent,
+                  indicator: BoxDecoration(
+                    color: _primaryColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  labelStyle: const TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w600,
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w400,
+                  ),
+                  tabs: const [
+                    Tab(text: 'Trends'),
+                    Tab(text: 'Inventory'),
+                    Tab(text: 'Performance'),
+                  ],
                 ),
-                tabs: const [
-                  Tab(text: 'Trends'),
-                  Tab(text: 'Inventory'),
-                  Tab(text: 'Performance'),
-                ],
               ),
             ),
             const SizedBox(height: 16),
@@ -107,17 +124,19 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               child: state.isLoading
                   ? const Center(
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFDAF40)),
+                        valueColor: AlwaysStoppedAnimation<Color>(_primaryColor),
                       ),
                     )
-                  : TabBarView(
-                      controller: _tabController,
-                      children: [
-                        _buildTrendsTab(state),
-                        _buildInventoryTab(state),
-                        _buildPerformanceTab(state),
-                      ],
-                    ),
+                  : state.error != null
+                      ? _buildErrorState(state.error!)
+                      : TabBarView(
+                          controller: _tabController,
+                          children: [
+                            _buildTrendsTab(state),
+                            _buildInventoryTab(state),
+                            _buildPerformanceTab(state),
+                          ],
+                        ),
             ),
           ],
         ),
@@ -128,26 +147,36 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
   Widget _buildCategorySelector(SellerAnalyticsState state) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: analyticsCategories.map((cat) {
           final (value, label) = cat;
           final isSelected = state.selectedCategory == value;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: Text(label),
-              selected: isSelected,
-              onSelected: (_) => ref
+            child: InkWell(
+              onTap: () => ref
                   .read(sellerAnalyticsControllerProvider.notifier)
                   .selectCategory(value),
-              backgroundColor: Colors.white,
-              selectedColor: const Color(0xFFFDAF40),
-              labelStyle: TextStyle(
-                fontSize: 13,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w500,
-                color: isSelected ? Colors.white : const Color(0xFF777F84),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected ? _primaryColor : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected ? _primaryColor : const Color(0xFFCCCCCC),
+                  ),
+                ),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Campton',
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                    color: isSelected ? Colors.white : _textSecondary,
+                  ),
+                ),
               ),
             ),
           );
@@ -156,9 +185,71 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
     );
   }
 
+  Widget _buildErrorState(String error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: _cardColor,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.cloud_off, size: 40, color: _textSecondary),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Unable to load analytics',
+              style: TextStyle(
+                fontSize: 18,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w600,
+                color: _textDark,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Please check your connection and try again',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                fontFamily: 'Campton',
+                color: _textSecondary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            InkWell(
+              onTap: () => ref.read(sellerAnalyticsControllerProvider.notifier).loadAllData(),
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: _primaryColor),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'Retry',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w600,
+                    color: _primaryColor,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildTrendsTab(SellerAnalyticsState state) {
     if (state.trends == null) {
-      return _buildEmptyState('No trend data available');
+      return _buildEmptyState('No trend data available', Icons.trending_up);
     }
 
     return SingleChildScrollView(
@@ -166,15 +257,14 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTrendSection('Trending Styles', state.trends!.trendingStyles, Icons.style),
-          const SizedBox(height: 20),
-          _buildTrendSection('Trending Colors', state.trends!.trendingColors, Icons.palette),
-          const SizedBox(height: 20),
-          _buildTrendSection('Popular Cultures', state.trends!.trendingTribes, Icons.public),
-          const SizedBox(height: 20),
+          if (state.trends!.trendingStyles.isNotEmpty)
+            _buildTrendCard('Trending Styles', state.trends!.trendingStyles, Icons.style),
+          if (state.trends!.trendingColors.isNotEmpty)
+            _buildTrendCard('Trending Colors', state.trends!.trendingColors, Icons.palette),
+          if (state.trends!.trendingTribes.isNotEmpty)
+            _buildTrendCard('Popular Cultures', state.trends!.trendingTribes, Icons.public),
           if (state.colorPredictions != null)
             _buildPredictionCard('Color Forecast', state.colorPredictions!),
-          const SizedBox(height: 20),
           if (state.sizePredictions != null)
             _buildPredictionCard('Size Demand', state.sizePredictions!),
           const SizedBox(height: 24),
@@ -183,28 +273,20 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
     );
   }
 
-  Widget _buildTrendSection(String title, List<TrendItem> items, IconData icon) {
-    if (items.isEmpty) return const SizedBox.shrink();
-
+  Widget _buildTrendCard(String title, List<TrendItem> items, IconData icon) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: _cardColor,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 20, color: const Color(0xFFFDAF40)),
+              Icon(icon, size: 18, color: _primaryColor),
               const SizedBox(width: 8),
               Text(
                 title,
@@ -212,7 +294,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   fontSize: 16,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
+                  color: _textDark,
                 ),
               ),
             ],
@@ -229,33 +311,27 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
   }
 
   Widget _buildTrendItem(int rank, TrendItem item) {
-    final growthColor = (item.growth ?? 0) >= 0
-        ? const Color(0xFF4CAF50)
-        : const Color(0xFFE57373);
-
+    final isPositive = (item.growth ?? 0) >= 0;
+    
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
           Container(
-            width: 28,
-            height: 28,
+            width: 24,
+            height: 24,
             decoration: BoxDecoration(
-              color: rank <= 3
-                  ? const Color(0xFFFDAF40).withOpacity(0.2)
-                  : const Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(8),
+              color: rank <= 3 ? _primaryColor : Colors.white,
+              borderRadius: BorderRadius.circular(6),
             ),
             child: Center(
               child: Text(
-                '#$rank',
+                '$rank',
                 style: TextStyle(
                   fontSize: 12,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: rank <= 3
-                      ? const Color(0xFFFDAF40)
-                      : const Color(0xFF777F84),
+                  color: rank <= 3 ? Colors.white : _textSecondary,
                 ),
               ),
             ),
@@ -267,37 +343,30 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               style: const TextStyle(
                 fontSize: 14,
                 fontFamily: 'Campton',
-                color: Color(0xFF241508),
+                color: _textDark,
               ),
             ),
           ),
           if (item.growth != null)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: growthColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    item.growth! >= 0 ? Icons.trending_up : Icons.trending_down,
-                    size: 14,
-                    color: growthColor,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isPositive ? Icons.arrow_upward : Icons.arrow_downward,
+                  size: 14,
+                  color: isPositive ? const Color(0xFF4CAF50) : const Color(0xFFE57373),
+                ),
+                const SizedBox(width: 2),
+                Text(
+                  '${item.growth!.abs().toStringAsFixed(0)}%',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w500,
+                    color: isPositive ? const Color(0xFF4CAF50) : const Color(0xFFE57373),
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${item.growth!.abs().toStringAsFixed(1)}%',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w500,
-                      color: growthColor,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
         ],
       ),
@@ -306,41 +375,46 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
 
   Widget _buildPredictionCard(String title, DemandPrediction prediction) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: _cardColor,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Icon(Icons.insights, size: 20, color: Color(0xFFFDAF40)),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
-                ),
+              Row(
+                children: [
+                  const Icon(Icons.insights, size: 18, color: _primaryColor),
+                  const SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w600,
+                      color: _textDark,
+                    ),
+                  ),
+                ],
               ),
-              const Spacer(),
-              Text(
-                prediction.period,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontFamily: 'Campton',
-                  color: Color(0xFF777F84),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  prediction.period,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontFamily: 'Campton',
+                    color: _textSecondary,
+                  ),
                 ),
               ),
             ],
@@ -348,27 +422,32 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
           const SizedBox(height: 16),
           ...prediction.predictions.take(5).map((p) => _buildPredictionItem(p)),
           if (prediction.insights != null && prediction.insights!.isNotEmpty) ...[
-            const Divider(height: 24),
-            ...prediction.insights!.take(2).map((insight) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.lightbulb_outline, size: 16, color: Color(0xFFFDAF40)),
+                  const Icon(Icons.lightbulb_outline, size: 16, color: _primaryColor),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      insight,
-                      style: TextStyle(
+                      prediction.insights!.first,
+                      style: const TextStyle(
                         fontSize: 12,
                         fontFamily: 'Campton',
-                        color: const Color(0xFF241508).withOpacity(0.7),
+                        color: _textDark,
+                        height: 1.4,
                       ),
                     ),
                   ),
                 ],
               ),
-            )),
+            ),
           ],
         ],
       ),
@@ -378,39 +457,39 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
   Widget _buildPredictionItem(DemandPredictionItem item) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              item.item,
-              style: const TextStyle(
-                fontSize: 13,
-                fontFamily: 'Campton',
-                color: Color(0xFF241508),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                item.item,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontFamily: 'Campton',
+                  color: _textDark,
+                ),
               ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: item.confidence,
-                backgroundColor: const Color(0xFFEEEEEE),
-                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFDAF40)),
-                minHeight: 8,
+              Text(
+                '${(item.confidence * 100).toInt()}%',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w600,
+                  color: _primaryColor,
+                ),
               ),
-            ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Text(
-            '${(item.confidence * 100).toInt()}%',
-            style: const TextStyle(
-              fontSize: 12,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF777F84),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: item.confidence,
+              backgroundColor: Colors.white,
+              valueColor: const AlwaysStoppedAnimation<Color>(_primaryColor),
+              minHeight: 6,
             ),
           ),
         ],
@@ -420,7 +499,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
 
   Widget _buildInventoryTab(SellerAnalyticsState state) {
     if (state.forecasts == null || state.forecasts!.isEmpty) {
-      return _buildEmptyState('No inventory forecasts available');
+      return _buildEmptyState('No inventory forecasts available', Icons.inventory_2);
     }
 
     return ListView.builder(
@@ -439,18 +518,11 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: _cardColor,
+        borderRadius: BorderRadius.circular(8),
         border: needsRestock
-            ? Border.all(color: const Color(0xFFE57373).withOpacity(0.5))
+            ? Border.all(color: const Color(0xFFE57373), width: 1)
             : null,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -464,7 +536,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                     fontSize: 14,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF241508),
+                    color: _textDark,
                   ),
                 ),
               ),
@@ -472,17 +544,24 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE57373).withOpacity(0.1),
+                    color: const Color(0xFFE57373).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
-                    'Restock Needed',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFFE57373),
-                    ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.warning_amber, size: 12, color: Color(0xFFE57373)),
+                      SizedBox(width: 4),
+                      Text(
+                        'Restock',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontFamily: 'Campton',
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFE57373),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
             ],
@@ -490,10 +569,10 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
           const SizedBox(height: 16),
           Row(
             children: [
-              _buildStockIndicator('Current', forecast.currentStock, const Color(0xFF777F84)),
-              const SizedBox(width: 16),
-              _buildStockIndicator('Predicted', forecast.predictedDemand, const Color(0xFFFDAF40)),
-              const SizedBox(width: 16),
+              _buildStockIndicator('Current', forecast.currentStock, _textSecondary),
+              Container(width: 1, height: 32, color: Colors.white),
+              _buildStockIndicator('Predicted', forecast.predictedDemand, _primaryColor),
+              Container(width: 1, height: 32, color: Colors.white),
               _buildStockIndicator('Recommended', forecast.recommendedStock, const Color(0xFF4CAF50)),
             ],
           ),
@@ -506,7 +585,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   style: TextStyle(
                     fontSize: 12,
                     fontFamily: 'Campton',
-                    color: Color(0xFF777F84),
+                    color: _textSecondary,
                   ),
                 ),
                 Text(
@@ -515,7 +594,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                     fontSize: 12,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFFFDAF40),
+                    color: _primaryColor,
                   ),
                 ),
               ],
@@ -533,18 +612,19 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
           Text(
             value.toString(),
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 18,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: color,
             ),
           ),
+          const SizedBox(height: 2),
           Text(
             label,
             style: const TextStyle(
-              fontSize: 11,
+              fontSize: 10,
               fontFamily: 'Campton',
-              color: Color(0xFF777F84),
+              color: _textSecondary,
             ),
           ),
         ],
@@ -554,7 +634,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
 
   Widget _buildPerformanceTab(SellerAnalyticsState state) {
     if (state.performance == null) {
-      return _buildEmptyState('No performance data available');
+      return _buildEmptyState('No performance data available', Icons.bar_chart);
     }
 
     final perf = state.performance!;
@@ -563,89 +643,76 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          // Stats Cards
+          // Stats Cards - matching shop dashboard style
           Row(
             children: [
-              Expanded(child: _buildStatCard('Total Sales', '₦${_formatNumber(perf.totalSales)}', Icons.payments)),
+              _buildStatCard('Total Sales', '₦${_formatNumber(perf.totalSales)}'),
               const SizedBox(width: 12),
-              Expanded(child: _buildStatCard('Rating', perf.averageRating.toStringAsFixed(1), Icons.star)),
+              _buildStatCard('Rating', '${perf.averageRating.toStringAsFixed(1)} ★'),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
-          // Market Comparison
+          // Market Position
           if (perf.marketComparison != null)
-            _buildMarketComparisonCard(perf.marketComparison!),
-          const SizedBox(height: 20),
+            _buildMarketPositionCard(perf.marketComparison!),
 
           // Top Products
           if (perf.topProducts.isNotEmpty)
             _buildTopProductsCard(perf.topProducts),
-          const SizedBox(height: 20),
 
-          // Suggestions
+          // AI Suggestions
           if (perf.suggestions != null && perf.suggestions!.isNotEmpty)
             _buildSuggestionsCard(perf.suggestions!),
+
           const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 24, color: const Color(0xFFFDAF40)),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 22,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
+  Widget _buildStatCard(String label, String value) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: _cardColor,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: 'Campton',
+                color: _textSecondary,
+              ),
             ),
-          ),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontFamily: 'Campton',
-              color: Color(0xFF777F84),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 18,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w600,
+                color: _textDark,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildMarketComparisonCard(MarketComparison comparison) {
+  Widget _buildMarketPositionCard(MarketComparison comparison) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: _cardColor,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -656,7 +723,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
+              color: _textDark,
             ),
           ),
           const SizedBox(height: 16),
@@ -668,7 +735,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                     Text(
                       'Top ${comparison.percentile.toInt()}%',
                       style: const TextStyle(
-                        fontSize: 28,
+                        fontSize: 24,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF4CAF50),
@@ -679,13 +746,13 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                       style: TextStyle(
                         fontSize: 12,
                         fontFamily: 'Campton',
-                        color: Color(0xFF777F84),
+                        color: _textSecondary,
                       ),
                     ),
                   ],
                 ),
               ),
-              Container(width: 1, height: 50, color: const Color(0xFFEEEEEE)),
+              Container(width: 1, height: 40, color: Colors.white),
               Expanded(
                 child: Column(
                   children: [
@@ -695,7 +762,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                         fontSize: 16,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFFFDAF40),
+                        color: _primaryColor,
                       ),
                     ),
                     const Text(
@@ -703,7 +770,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                       style: TextStyle(
                         fontSize: 12,
                         fontFamily: 'Campton',
-                        color: Color(0xFF777F84),
+                        color: _textSecondary,
                       ),
                     ),
                   ],
@@ -718,17 +785,11 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
 
   Widget _buildTopProductsCard(List<TopProduct> products) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: _cardColor,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -739,7 +800,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
+              color: _textDark,
             ),
           ),
           const SizedBox(height: 16),
@@ -754,7 +815,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFDAF40).withOpacity(0.2),
+                      color: _primaryColor,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Center(
@@ -764,7 +825,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                           fontSize: 12,
                           fontFamily: 'Campton',
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFFFDAF40),
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -776,7 +837,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                       style: const TextStyle(
                         fontSize: 14,
                         fontFamily: 'Campton',
-                        color: Color(0xFF241508),
+                        color: _textDark,
                       ),
                     ),
                   ),
@@ -785,7 +846,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                     style: const TextStyle(
                       fontSize: 12,
                       fontFamily: 'Campton',
-                      color: Color(0xFF777F84),
+                      color: _textSecondary,
                     ),
                   ),
                 ],
@@ -799,25 +860,19 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
 
   Widget _buildSuggestionsCard(List<String> suggestions) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFFFDAF40).withOpacity(0.1),
-            const Color(0xFFFFCC80).withOpacity(0.1),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFFDAF40).withOpacity(0.3)),
+        color: _primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _primaryColor.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Row(
             children: [
-              Icon(Icons.lightbulb, size: 20, color: Color(0xFFFDAF40)),
+              Icon(Icons.lightbulb, size: 18, color: _primaryColor),
               SizedBox(width: 8),
               Text(
                 'AI Suggestions',
@@ -825,25 +880,25 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   fontSize: 16,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
+                  color: _textDark,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          ...suggestions.map((suggestion) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+          const SizedBox(height: 12),
+          ...suggestions.take(3).map((suggestion) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('•  ', style: TextStyle(color: Color(0xFFFDAF40), fontWeight: FontWeight.bold)),
+                const Text('•  ', style: TextStyle(color: _primaryColor, fontWeight: FontWeight.bold)),
                 Expanded(
                   child: Text(
                     suggestion,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontFamily: 'Campton',
-                      color: Color(0xFF241508),
+                      color: _textDark,
                       height: 1.4,
                     ),
                   ),
@@ -856,23 +911,26 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
     );
   }
 
-  Widget _buildEmptyState(String message) {
+  Widget _buildEmptyState(String message, IconData icon) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.analytics_outlined,
-            size: 64,
-            color: const Color(0xFF241508).withOpacity(0.2),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: _cardColor,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 40, color: _textSecondary),
           ),
           const SizedBox(height: 16),
           Text(
             message,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
-              color: const Color(0xFF241508).withOpacity(0.5),
+              color: _textSecondary,
             ),
           ),
         ],

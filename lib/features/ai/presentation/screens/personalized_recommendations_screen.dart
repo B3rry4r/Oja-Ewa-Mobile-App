@@ -23,6 +23,13 @@ class _PersonalizedRecommendationsScreenState
     extends ConsumerState<PersonalizedRecommendationsScreen> {
   String? _selectedCategory;
 
+  // App consistent colors
+  static const _backgroundColor = Color(0xFFFFFBF5);
+  static const _cardColor = Color(0xFFF5E0CE);
+  static const _primaryColor = Color(0xFFFDAF40);
+  static const _textDark = Color(0xFF241508);
+  static const _textSecondary = Color(0xFF777F84);
+
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProfileProvider).value;
@@ -32,20 +39,20 @@ class _PersonalizedRecommendationsScreenState
     final recommendationsAsync = ref.watch(personalizedRecommendationsProvider(userId));
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFBF5),
+      backgroundColor: _backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
             AppHeader(
-              backgroundColor: const Color(0xFFFFFBF5),
-              iconColor: const Color(0xFF241508),
+              backgroundColor: _backgroundColor,
+              iconColor: _textDark,
               title: const Text(
                 'For You',
                 style: TextStyle(
                   fontSize: 22,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
+                  color: _textDark,
                 ),
               ),
               showActions: false,
@@ -53,7 +60,7 @@ class _PersonalizedRecommendationsScreenState
 
             Expanded(
               child: RefreshIndicator(
-                color: const Color(0xFFFDAF40),
+                color: _primaryColor,
                 onRefresh: () async {
                   ref.invalidate(personalizedRecommendationsProvider(userId));
                   ref.invalidate(styleProfileProvider(userId));
@@ -72,7 +79,7 @@ class _PersonalizedRecommendationsScreenState
                             : _buildNoProfile(),
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
 
                       // Category Filters
                       _buildCategoryFilters(),
@@ -84,7 +91,7 @@ class _PersonalizedRecommendationsScreenState
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: recommendationsAsync.when(
                           loading: () => _buildRecommendationsLoading(),
-                          error: (e, st) => _buildRecommendationsError(e),
+                          error: (e, st) => _buildRecommendationsError(),
                           data: (recommendations) {
                             final filtered = _selectedCategory == null
                                 ? recommendations
@@ -118,19 +125,12 @@ class _PersonalizedRecommendationsScreenState
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: _cardColor,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: const Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFDAF40)),
+          valueColor: AlwaysStoppedAnimation<Color>(_primaryColor),
         ),
       ),
     );
@@ -139,21 +139,10 @@ class _PersonalizedRecommendationsScreenState
   Widget _buildProfileCard(StyleDnaProfile profile) {
     return Container(
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFFDAF40), Color(0xFFFFCC80)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFFDAF40).withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: _primaryColor,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,15 +150,15 @@ class _PersonalizedRecommendationsScreenState
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
                   Icons.auto_awesome,
                   color: Colors.white,
-                  size: 24,
+                  size: 20,
                 ),
               ),
               const SizedBox(width: 12),
@@ -177,20 +166,27 @@ class _PersonalizedRecommendationsScreenState
                 child: Text(
                   'Your Style DNA',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.edit, color: Colors.white, size: 20),
-                onPressed: () => Navigator.of(context).pushNamed(AppRoutes.styleDnaQuiz),
+              InkWell(
+                onTap: () => Navigator.of(context).pushNamed(AppRoutes.styleDnaQuiz),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Icon(Icons.edit, color: Colors.white, size: 16),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             profile.styleProfile,
             style: TextStyle(
@@ -201,16 +197,16 @@ class _PersonalizedRecommendationsScreenState
             ),
           ),
           if (profile.preferredStyles != null && profile.preferredStyles!.isNotEmpty) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: profile.preferredStyles!.take(4).map((style) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     style,
@@ -218,7 +214,6 @@ class _PersonalizedRecommendationsScreenState
                       fontSize: 12,
                       fontFamily: 'Campton',
                       color: Colors.white,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 );
@@ -233,66 +228,72 @@ class _PersonalizedRecommendationsScreenState
   Widget _buildNoProfile() {
     return Container(
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFEEEEEE)),
+        color: _cardColor,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
-              color: const Color(0xFFFDAF40).withOpacity(0.1),
+              color: _primaryColor.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.psychology_outlined,
-              size: 30,
-              color: Color(0xFFFDAF40),
+              size: 28,
+              color: _primaryColor,
             ),
           ),
           const SizedBox(height: 16),
           const Text(
             'Discover Your Style DNA',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
+              color: _textDark,
             ),
           ),
           const SizedBox(height: 8),
-          Text(
+          const Text(
             'Take a quick quiz to get personalized fashion recommendations based on your unique style.',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontFamily: 'Campton',
-              color: const Color(0xFF241508).withOpacity(0.6),
+              color: _textSecondary,
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 20),
-          ElevatedButton.icon(
-            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.styleDnaQuiz),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFDAF40),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
+          const SizedBox(height: 16),
+          InkWell(
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.styleDnaQuiz),
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              decoration: BoxDecoration(
+                color: _primaryColor,
                 borderRadius: BorderRadius.circular(8),
               ),
-            ),
-            icon: const Icon(Icons.play_arrow, size: 20),
-            label: const Text(
-              'Take Style Quiz',
-              style: TextStyle(
-                fontSize: 14,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w600,
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.play_arrow, size: 18, color: Colors.white),
+                  SizedBox(width: 8),
+                  Text(
+                    'Take Style Quiz',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -309,41 +310,41 @@ class _PersonalizedRecommendationsScreenState
       ('afro_beauty_products', 'Beauty'),
     ];
 
-    return SizedBox(
-      height: 40,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final (value, label) = categories[index];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: categories.map((cat) {
+          final (value, label) = cat;
           final isSelected = _selectedCategory == value;
 
           return Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text(label),
-              selected: isSelected,
-              onSelected: (_) => setState(() => _selectedCategory = value),
-              backgroundColor: Colors.white,
-              selectedColor: const Color(0xFFFDAF40).withOpacity(0.2),
-              checkmarkColor: const Color(0xFFFDAF40),
-              labelStyle: TextStyle(
-                fontSize: 13,
-                fontFamily: 'Campton',
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                color: isSelected ? const Color(0xFFFDAF40) : const Color(0xFF777F84),
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(
-                  color: isSelected ? const Color(0xFFFDAF40) : const Color(0xFFEEEEEE),
+            child: InkWell(
+              onTap: () => setState(() => _selectedCategory = value),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected ? _primaryColor : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected ? _primaryColor : const Color(0xFFCCCCCC),
+                  ),
+                ),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Campton',
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                    color: isSelected ? Colors.white : _textSecondary,
+                  ),
                 ),
               ),
-              showCheckmark: false,
             ),
           );
-        },
+        }).toList(),
       ),
     );
   }
@@ -362,12 +363,12 @@ class _PersonalizedRecommendationsScreenState
       itemBuilder: (context, index) {
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            color: _cardColor,
+            borderRadius: BorderRadius.circular(8),
           ),
           child: const Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFDAF40)),
+              valueColor: AlwaysStoppedAnimation<Color>(_primaryColor),
             ),
           ),
         );
@@ -375,7 +376,7 @@ class _PersonalizedRecommendationsScreenState
     );
   }
 
-  Widget _buildRecommendationsError(Object error) {
+  Widget _buildRecommendationsError() {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -384,45 +385,53 @@ class _PersonalizedRecommendationsScreenState
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFE57373).withOpacity(0.1),
+                color: _cardColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.cloud_off, size: 48, color: Color(0xFFE57373)),
+              child: const Icon(Icons.cloud_off, size: 40, color: _textSecondary),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             const Text(
               'Unable to load recommendations',
               style: TextStyle(
                 fontSize: 16,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF241508),
+                color: _textDark,
               ),
             ),
             const SizedBox(height: 8),
-            Text(
+            const Text(
               'Please check your connection and try again',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
                 fontFamily: 'Campton',
-                color: const Color(0xFF241508).withOpacity(0.6),
+                color: _textSecondary,
               ),
             ),
             const SizedBox(height: 20),
-            OutlinedButton.icon(
-              onPressed: () {
+            InkWell(
+              onTap: () {
                 final user = ref.read(userProfileProvider).value;
                 final userId = user?.id.toString() ?? '';
                 ref.invalidate(personalizedRecommendationsProvider(userId));
               },
-              icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Retry'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFFFDAF40),
-                side: const BorderSide(color: Color(0xFFFDAF40)),
-                shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: _primaryColor),
                   borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'Retry',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w600,
+                    color: _primaryColor,
+                  ),
                 ),
               ),
             ),
@@ -438,10 +447,13 @@ class _PersonalizedRecommendationsScreenState
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            Icon(
-              Icons.search_off,
-              size: 48,
-              color: const Color(0xFF241508).withOpacity(0.3),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: _cardColor,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.search_off, size: 40, color: _textSecondary),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -450,17 +462,17 @@ class _PersonalizedRecommendationsScreenState
                 fontSize: 16,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF241508),
+                color: _textDark,
               ),
             ),
             const SizedBox(height: 8),
-            Text(
+            const Text(
               'Complete your style quiz to get personalized recommendations.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
                 fontFamily: 'Campton',
-                color: const Color(0xFF241508).withOpacity(0.6),
+                color: _textSecondary,
               ),
             ),
           ],
@@ -487,19 +499,13 @@ class _PersonalizedRecommendationsScreenState
   }
 
   Widget _buildRecommendationCard(PersonalizedRecommendation recommendation) {
-    return GestureDetector(
+    return InkWell(
       onTap: () => Navigator.of(context).pushNamed('/product/${recommendation.id}'),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 5,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          color: _cardColor,
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -510,35 +516,50 @@ class _PersonalizedRecommendationsScreenState
               child: Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                    child: recommendation.imageUrl != null
-                        ? Image.network(
-                            recommendation.imageUrl!,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.image_outlined, color: Color(0xFFCCCCCC))),
-                          )
-                        : const Center(child: Icon(Icons.image_outlined, color: Color(0xFFCCCCCC))),
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                    child: Container(
+                      width: double.infinity,
+                      color: Colors.white,
+                      child: recommendation.imageUrl != null
+                          ? Image.network(
+                              recommendation.imageUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Center(
+                                child: Icon(
+                                  Icons.image_outlined,
+                                  color: Color(0xFFCCCCCC),
+                                  size: 32,
+                                ),
+                              ),
+                            )
+                          : const Center(
+                              child: Icon(
+                                Icons.image_outlined,
+                                color: Color(0xFFCCCCCC),
+                                size: 32,
+                              ),
+                            ),
+                    ),
                   ),
                   // Match Score Badge
                   Positioned(
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
                         color: const Color(0xFF4CAF50),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.auto_awesome, size: 12, color: Colors.white),
-                          const SizedBox(width: 4),
+                          const Icon(Icons.auto_awesome, size: 10, color: Colors.white),
+                          const SizedBox(width: 3),
                           Text(
                             '${(recommendation.matchScore * 100).toInt()}%',
                             style: const TextStyle(
-                              fontSize: 11,
+                              fontSize: 10,
                               fontFamily: 'Campton',
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
@@ -566,7 +587,7 @@ class _PersonalizedRecommendationsScreenState
                         fontSize: 13,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF241508),
+                        color: _textDark,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -575,10 +596,10 @@ class _PersonalizedRecommendationsScreenState
                     if (recommendation.reason != null) ...[
                       Text(
                         recommendation.reason!,
-                        style: TextStyle(
-                          fontSize: 11,
+                        style: const TextStyle(
+                          fontSize: 10,
                           fontFamily: 'Campton',
-                          color: const Color(0xFF241508).withOpacity(0.6),
+                          color: _textSecondary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -591,7 +612,7 @@ class _PersonalizedRecommendationsScreenState
                         fontSize: 14,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFFFDAF40),
+                        color: _primaryColor,
                       ),
                     ),
                   ],

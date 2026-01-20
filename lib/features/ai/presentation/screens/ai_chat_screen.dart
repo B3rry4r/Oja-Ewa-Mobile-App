@@ -23,6 +23,13 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
   final _scrollController = ScrollController();
   bool _isInitialized = false;
 
+  // App consistent colors
+  static const _backgroundColor = Color(0xFFFFFBF5);
+  static const _cardColor = Color(0xFFF5E0CE);
+  static const _primaryColor = Color(0xFFFDAF40);
+  static const _textDark = Color(0xFF241508);
+  static const _textSecondary = Color(0xFF777F84);
+
   @override
   void initState() {
     super.initState();
@@ -80,22 +87,23 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFBF5),
+      backgroundColor: _backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
             AppHeader(
-              backgroundColor: const Color(0xFFFFFBF5),
-              iconColor: const Color(0xFF241508),
+              backgroundColor: _backgroundColor,
+              iconColor: _textDark,
               title: const Text(
                 'Cultural AI Assistant',
                 style: TextStyle(
                   fontSize: 22,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
+                  color: _textDark,
                 ),
               ),
+              showActions: false,
             ),
 
             // Chat Messages
@@ -108,23 +116,23 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
             // Error message
             if (chatState.error != null)
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFEBEE),
+                  color: _cardColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline, color: Color(0xFFE57373), size: 20),
+                    const Icon(Icons.info_outline, color: _primaryColor, size: 18),
                     const SizedBox(width: 8),
-                    Expanded(
+                    const Expanded(
                       child: Text(
-                        chatState.error ?? '',
-                        style: const TextStyle(
+                        'Unable to get response. Please try again.',
+                        style: TextStyle(
                           fontSize: 12,
                           fontFamily: 'Campton',
-                          color: Color(0xFFE57373),
+                          color: _textDark,
                         ),
                       ),
                     ),
@@ -145,47 +153,47 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
           
           // AI Icon
           Container(
-            width: 80,
-            height: 80,
+            width: 72,
+            height: 72,
             decoration: BoxDecoration(
-              color: const Color(0xFFFDAF40).withOpacity(0.2),
+              color: _cardColor,
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.psychology,
-              size: 40,
-              color: Color(0xFFFDAF40),
+              size: 36,
+              color: _primaryColor,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           const Text(
             'Welcome to Your Cultural\nFashion Assistant',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 22,
+              fontSize: 20,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
+              color: _textDark,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
-          Text(
+          const Text(
             'I\'m here to help you discover Nigerian fashion, understand cultural significance, and find the perfect outfit for any occasion.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
               fontFamily: 'Campton',
-              color: const Color(0xFF241508).withOpacity(0.7),
+              color: _textSecondary,
               height: 1.5,
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 28),
 
           // Suggested Questions
           const Align(
@@ -196,7 +204,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 fontSize: 14,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF777F84),
+                color: _textDark,
               ),
             ),
           ),
@@ -217,21 +225,20 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
         ref.read(aiChatControllerProvider.notifier).sendSuggestion(suggestion);
         _scrollToBottom();
       },
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFEEEEEE)),
+          color: _cardColor,
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           children: [
             const Icon(
               Icons.chat_bubble_outline,
-              size: 18,
-              color: Color(0xFFFDAF40),
+              size: 16,
+              color: _primaryColor,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -240,14 +247,14 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 style: const TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
-                  color: Color(0xFF241508),
+                  color: _textDark,
                 ),
               ),
             ),
             const Icon(
               Icons.arrow_forward_ios,
-              size: 14,
-              color: Color(0xFFCCCCCC),
+              size: 12,
+              color: _textSecondary,
             ),
           ],
         ),
@@ -284,13 +291,13 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: const Color(0xFFFDAF40).withOpacity(0.2),
+                color: _cardColor,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.psychology,
                 size: 18,
-                color: Color(0xFFFDAF40),
+                color: _primaryColor,
               ),
             ),
             const SizedBox(width: 8),
@@ -301,29 +308,22 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                   isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isUser ? const Color(0xFFFDAF40) : Colors.white,
+                    color: isUser ? _primaryColor : _cardColor,
                     borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(16),
-                      topRight: const Radius.circular(16),
-                      bottomLeft: Radius.circular(isUser ? 16 : 4),
-                      bottomRight: Radius.circular(isUser ? 4 : 16),
+                      topLeft: const Radius.circular(12),
+                      topRight: const Radius.circular(12),
+                      bottomLeft: Radius.circular(isUser ? 12 : 4),
+                      bottomRight: Radius.circular(isUser ? 4 : 12),
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 5,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
                   ),
                   child: Text(
                     message.content,
                     style: TextStyle(
                       fontSize: 14,
                       fontFamily: 'Campton',
-                      color: isUser ? Colors.white : const Color(0xFF241508),
+                      color: isUser ? Colors.white : _textDark,
                       height: 1.4,
                     ),
                   ),
@@ -348,10 +348,10 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFDAF40).withOpacity(0.1),
+                            color: _primaryColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: const Color(0xFFFDAF40).withOpacity(0.3),
+                              color: _primaryColor.withOpacity(0.3),
                             ),
                           ),
                           child: Text(
@@ -359,7 +359,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                             style: const TextStyle(
                               fontSize: 12,
                               fontFamily: 'Campton',
-                              color: Color(0xFFFDAF40),
+                              color: _primaryColor,
                             ),
                           ),
                         ),
@@ -372,7 +372,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 if (!isUser && message.products != null && message.products!.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   SizedBox(
-                    height: 120,
+                    height: 100,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: message.products!.length,
@@ -392,7 +392,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
               width: 32,
               height: 32,
               decoration: const BoxDecoration(
-                color: Color(0xFF241508),
+                color: _textDark,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -409,37 +409,43 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
 
   Widget _buildProductCard(AiSuggestedProduct product) {
     return Container(
-      width: 140,
+      width: 120,
       margin: const EdgeInsets.only(right: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFEEEEEE)),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Image placeholder
-          Container(
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              image: product.imageUrl != null
-                  ? DecorationImage(
-                      image: NetworkImage(product.imageUrl!),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
+          Expanded(
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+              child: Container(
+                width: double.infinity,
+                color: _cardColor,
+                child: product.imageUrl != null
+                    ? Image.network(
+                        product.imageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const Center(
+                          child: Icon(
+                            Icons.shopping_bag_outlined,
+                            color: _textSecondary,
+                            size: 24,
+                          ),
+                        ),
+                      )
+                    : const Center(
+                        child: Icon(
+                          Icons.shopping_bag_outlined,
+                          color: _textSecondary,
+                          size: 24,
+                        ),
+                      ),
+              ),
             ),
-            child: product.imageUrl == null
-                ? const Center(
-                    child: Icon(
-                      Icons.shopping_bag_outlined,
-                      color: Color(0xFFCCCCCC),
-                    ),
-                  )
-                : null,
           ),
           Padding(
             padding: const EdgeInsets.all(8),
@@ -449,10 +455,10 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 Text(
                   product.name,
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 11,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF241508),
+                    color: _textDark,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -461,10 +467,10 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 Text(
                   '₦${product.price.toStringAsFixed(0)}',
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 11,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFFFDAF40),
+                    color: _primaryColor,
                   ),
                 ),
               ],
@@ -484,28 +490,21 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: const Color(0xFFFDAF40).withOpacity(0.2),
+              color: _cardColor,
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.psychology,
               size: 18,
-              color: Color(0xFFFDAF40),
+              color: _primaryColor,
             ),
           ),
           const SizedBox(width: 8),
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              color: _cardColor,
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -533,8 +532,8 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
           height: 8,
           decoration: BoxDecoration(
             color: Color.lerp(
-              const Color(0xFFCCCCCC),
-              const Color(0xFFFDAF40),
+              _textSecondary,
+              _primaryColor,
               value,
             ),
             shape: BoxShape.circle,
@@ -548,7 +547,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _backgroundColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -560,47 +559,53 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
       child: Row(
         children: [
           Expanded(
-            child: TextField(
-              controller: _messageController,
-              enabled: !isLoading,
-              textInputAction: TextInputAction.send,
-              onSubmitted: (_) => _sendMessage(),
-              decoration: InputDecoration(
-                hintText: 'Ask about Nigerian fashion...',
-                hintStyle: const TextStyle(
+            child: Container(
+              decoration: BoxDecoration(
+                color: _cardColor,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: TextField(
+                controller: _messageController,
+                enabled: !isLoading,
+                textInputAction: TextInputAction.send,
+                onSubmitted: (_) => _sendMessage(),
+                decoration: const InputDecoration(
+                  hintText: 'Ask about Nigerian fashion...',
+                  hintStyle: TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Campton',
+                    color: _textSecondary,
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  border: InputBorder.none,
+                ),
+                style: const TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
-                  color: Color(0xFFAAAAAA),
+                  color: _textDark,
                 ),
-                filled: true,
-                fillColor: const Color(0xFFF5F5F5),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              style: const TextStyle(
-                fontSize: 14,
-                fontFamily: 'Campton',
-                color: Color(0xFF241508),
               ),
             ),
           ),
           const SizedBox(width: 8),
-          Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFFFDAF40),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              onPressed: isLoading ? null : _sendMessage,
-              icon: const Icon(Icons.send_rounded),
-              color: Colors.white,
-              iconSize: 20,
+          InkWell(
+            onTap: isLoading ? null : _sendMessage,
+            borderRadius: BorderRadius.circular(24),
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                color: _primaryColor,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.send_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
           ),
         ],

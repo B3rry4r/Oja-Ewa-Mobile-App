@@ -20,6 +20,13 @@ class StyleDnaQuizScreen extends ConsumerStatefulWidget {
 class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
   final _pageController = PageController();
 
+  // App consistent colors
+  static const _backgroundColor = Color(0xFFFFFBF5);
+  static const _cardColor = Color(0xFFF5E0CE);
+  static const _primaryColor = Color(0xFFFDAF40);
+  static const _textDark = Color(0xFF241508);
+  static const _textSecondary = Color(0xFF777F84);
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -54,87 +61,96 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50).withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.check_circle,
-                size: 50,
-                color: Color(0xFF4CAF50),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Style Profile Created!',
-              style: TextStyle(
-                fontSize: 20,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF241508),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              state.profile?.styleProfile ?? 'Your personalized style profile is ready.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                fontFamily: 'Campton',
-                color: const Color(0xFF241508).withOpacity(0.7),
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pushReplacementNamed(AppRoutes.personalizedRecommendations);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFDAF40),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: _backgroundColor,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4CAF50).withOpacity(0.1),
+                  shape: BoxShape.circle,
                 ),
-                child: const Text(
-                  'See My Recommendations',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontFamily: 'Campton',
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: const Icon(
+                  Icons.check_circle,
+                  size: 40,
+                  color: Color(0xFF4CAF50),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-              child: const Text(
-                'Back to Home',
+              const SizedBox(height: 20),
+              const Text(
+                'Style Profile Created!',
                 style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w600,
+                  color: _textDark,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                state.profile?.styleProfile ?? 'Your personalized style profile is ready.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
-                  color: Color(0xFF777F84),
+                  color: _textSecondary,
+                  height: 1.4,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pushReplacementNamed(AppRoutes.personalizedRecommendations);
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      color: _primaryColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'See My Recommendations',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Campton',
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    'Back to Home',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Campton',
+                      color: _textSecondary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -148,22 +164,23 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
     final totalSteps = styleQuizQuestions.length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFBF5),
+      backgroundColor: _backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
             AppHeader(
-              backgroundColor: const Color(0xFFFFFBF5),
-              iconColor: const Color(0xFF241508),
+              backgroundColor: _backgroundColor,
+              iconColor: _textDark,
               title: const Text(
                 'Discover Your Style',
                 style: TextStyle(
                   fontSize: 22,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
+                  color: _textDark,
                 ),
               ),
+              showActions: false,
             ),
 
             // Progress Indicator
@@ -180,7 +197,7 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                           fontSize: 12,
                           fontFamily: 'Campton',
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF777F84),
+                          color: _textSecondary,
                         ),
                       ),
                       Text(
@@ -189,7 +206,7 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                           fontSize: 12,
                           fontFamily: 'Campton',
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFFFDAF40),
+                          color: _primaryColor,
                         ),
                       ),
                     ],
@@ -199,8 +216,8 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: (currentStep + 1) / totalSteps,
-                      backgroundColor: const Color(0xFFEEEEEE),
-                      valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFDAF40)),
+                      backgroundColor: _cardColor,
+                      valueColor: const AlwaysStoppedAnimation<Color>(_primaryColor),
                       minHeight: 6,
                     ),
                   ),
@@ -216,7 +233,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: totalSteps,
                 onPageChanged: (index) {
-                  // Update state when page changes
                   if (index != currentStep) {
                     if (index > currentStep) {
                       ref.read(styleQuizControllerProvider.notifier).nextStep();
@@ -226,54 +242,75 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                   }
                 },
                 itemBuilder: (context, index) {
-                  return _buildQuestionPage(styleQuizQuestions[index], stateAsync.value ?? const StyleQuizState());
+                  return _buildQuestionPage(
+                    styleQuizQuestions[index], 
+                    stateAsync.value ?? const StyleQuizState(),
+                  );
                 },
               ),
             ),
 
             // Navigation Buttons
-            Padding(
+            Container(
               padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: _backgroundColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
               child: Row(
                 children: [
                   if (currentStep > 0)
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
+                      child: InkWell(
+                        onTap: () {
                           ref.read(styleQuizControllerProvider.notifier).previousStep();
                           _goToPage(currentStep - 1);
                         },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF241508),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          side: const BorderSide(color: Color(0xFFCCCCCC)),
-                          shape: RoundedRectangleBorder(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFFCCCCCC)),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                        ),
-                        child: const Text(
-                          'Previous',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'Campton',
-                            fontWeight: FontWeight.w600,
+                          child: const Text(
+                            'Previous',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Campton',
+                              fontWeight: FontWeight.w600,
+                              color: _textDark,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   if (currentStep > 0) const SizedBox(width: 12),
                   Expanded(
-                    flex: currentStep == 0 ? 1 : 1,
-                    child: ElevatedButton(
-                      onPressed: state.isSubmitting
+                    child: InkWell(
+                      onTap: state.isSubmitting
                           ? null
                           : () {
                               final question = styleQuizQuestions[currentStep];
                               if (state.answers[question.id] == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Please select an option'),
-                                    backgroundColor: Color(0xFFE57373),
+                                  SnackBar(
+                                    content: const Text(
+                                      'Please select an option',
+                                      style: TextStyle(fontFamily: 'Campton'),
+                                    ),
+                                    backgroundColor: _primaryColor,
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
                                 );
                                 return;
@@ -286,32 +323,35 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                                 _submitQuiz();
                               }
                             },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFDAF40),
-                        foregroundColor: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
+                        decoration: BoxDecoration(
+                          color: state.isSubmitting 
+                              ? const Color(0xFFCCCCCC) 
+                              : _primaryColor,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        disabledBackgroundColor: const Color(0xFFCCCCCC),
+                        child: state.isSubmitting
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            : Text(
+                                currentStep < totalSteps - 1 ? 'Next' : 'Complete',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontFamily: 'Campton',
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
-                      child: state.isSubmitting
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : Text(
-                              currentStep < totalSteps - 1 ? 'Next' : 'Complete',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontFamily: 'Campton',
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
                     ),
                   ),
                 ],
@@ -334,21 +374,21 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
           Text(
             question.question,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 22,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
+              color: _textDark,
               height: 1.3,
             ),
           ),
           const SizedBox(height: 8),
           if (question.allowMultiple)
-            Text(
+            const Text(
               'Select all that apply',
               style: TextStyle(
                 fontSize: 14,
                 fontFamily: 'Campton',
-                color: const Color(0xFF241508).withOpacity(0.6),
+                color: _textSecondary,
               ),
             ),
           const SizedBox(height: 24),
@@ -364,16 +404,16 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                   ref.read(styleQuizControllerProvider.notifier)
                       .answerQuestion(question.id, option);
                 },
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(8),
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFFFDAF40).withOpacity(0.1) : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    color: isSelected ? _primaryColor.withOpacity(0.1) : _cardColor,
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: isSelected ? const Color(0xFFFDAF40) : const Color(0xFFEEEEEE),
-                      width: isSelected ? 2 : 1,
+                      color: isSelected ? _primaryColor : Colors.transparent,
+                      width: 2,
                     ),
                   ),
                   child: Row(
@@ -383,16 +423,16 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                         height: 24,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isSelected ? const Color(0xFFFDAF40) : Colors.transparent,
+                          color: isSelected ? _primaryColor : Colors.white,
                           border: Border.all(
-                            color: isSelected ? const Color(0xFFFDAF40) : const Color(0xFFCCCCCC),
+                            color: isSelected ? _primaryColor : const Color(0xFFCCCCCC),
                             width: 2,
                           ),
                         ),
                         child: isSelected
                             ? const Icon(
                                 Icons.check,
-                                size: 16,
+                                size: 14,
                                 color: Colors.white,
                               )
                             : null,
@@ -405,7 +445,7 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                             fontSize: 16,
                             fontFamily: 'Campton',
                             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                            color: const Color(0xFF241508),
+                            color: _textDark,
                           ),
                         ),
                       ),
