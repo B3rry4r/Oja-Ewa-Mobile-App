@@ -524,7 +524,42 @@ class HomeScreen extends ConsumerWidget {
           color: color,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Image.asset(iconAsset, fit: BoxFit.cover),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(iconAsset, fit: BoxFit.cover),
+            Positioned(
+              top: 0,
+              left: 0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomLeft,
+                    colors: [
+                      const Color(0xFFFDAF40).withOpacity(0.85),
+                      const Color(0xFFFDAF40).withOpacity(0.0),
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    bottomRight: Radius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
