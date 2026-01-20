@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/widgets/app_header.dart';
+import '../../../../core/resources/app_assets.dart';
 import '../../../account/presentation/controllers/profile_controller.dart';
 import '../../domain/ai_models.dart';
 import '../controllers/ai_chat_controller.dart';
@@ -271,7 +272,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
         if (index == state.messages.length && state.isLoading) {
           return _buildTypingIndicator();
         }
-        return _buildMessageBubble(state.messages[index]);
+        final message = state.messages[index];
+        if (message.content.trim().isEmpty) {
+          return const SizedBox.shrink();
+        }
+        return _buildMessageBubble(message);
       },
     );
   }
@@ -494,52 +499,45 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.psychology,
+              Icons.auto_awesome,
               size: 18,
               color: _primaryColor,
             ),
           ),
           const SizedBox(width: 8),
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: _cardColor,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildTypingDot(0),
-                const SizedBox(width: 4),
-                _buildTypingDot(1),
-                const SizedBox(width: 4),
-                _buildTypingDot(2),
-              ],
+            child: SizedBox(
+              width: 32,
+              height: 32,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  const SizedBox(
+                    width: 32,
+                    height: 32,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(_primaryColor),
+                    ),
+                  ),
+                  Image.asset(
+                    AppImages.logoOutline,
+                    width: 18,
+                    height: 18,
+                    fit: BoxFit.contain,
+                    color: _textSecondary,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildTypingDot(int index) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: 1),
-      duration: Duration(milliseconds: 600 + (index * 200)),
-      builder: (context, value, child) {
-        return Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: Color.lerp(
-              _textSecondary,
-              _primaryColor,
-              value,
-            ),
-            shape: BoxShape.circle,
-          ),
-        );
-      },
     );
   }
 
