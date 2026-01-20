@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../app/widgets/app_header.dart';
 import '../../../../core/resources/app_assets.dart';
@@ -299,10 +300,13 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 color: _cardColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.psychology,
-                size: 18,
-                color: _primaryColor,
+              child: Center(
+                child: SvgPicture.asset(
+                  AppImages.appLogoAlt,
+                  width: 18,
+                  height: 18,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -525,12 +529,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                       valueColor: AlwaysStoppedAnimation<Color>(_primaryColor),
                     ),
                   ),
-                  Image.asset(
-                    AppImages.logoOutline,
+                  SvgPicture.asset(
+                    AppImages.appLogoAlt,
                     width: 18,
                     height: 18,
                     fit: BoxFit.contain,
-                    color: _textSecondary,
                   ),
                 ],
               ),
@@ -558,9 +561,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
         children: [
           Expanded(
             child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: _cardColor,
-                borderRadius: BorderRadius.circular(24),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFDEDEDE)),
               ),
               child: TextField(
                 controller: _messageController,
@@ -568,20 +573,16 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => _sendMessage(),
                 decoration: const InputDecoration(
+                  border: InputBorder.none,
                   hintText: 'Ask about Nigerian fashion...',
                   hintStyle: TextStyle(
                     fontSize: 14,
                     fontFamily: 'Campton',
-                    color: _textSecondary,
+                    color: Color(0xFFCCCCCC),
                   ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  border: InputBorder.none,
                 ),
                 style: const TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontFamily: 'Campton',
                   color: _textDark,
                 ),
