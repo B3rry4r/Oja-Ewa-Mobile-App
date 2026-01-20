@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -35,6 +36,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
   Widget build(BuildContext context) {
     // Do not change layout; only populate data.
     final detailsAsync = ref.watch(productDetailsProvider(widget.productId));
+    final accessToken = ref.watch(accessTokenProvider);
+    final isLoggedIn = accessToken != null && accessToken.isNotEmpty;
 
     if (detailsAsync.isLoading) {
       return const Scaffold(
@@ -288,8 +291,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                         },
                       ),
 
-                      // Ask AI about this product
-                      _buildAskAiButton(details?.name ?? 'this item'),
+                      if (isLoggedIn) ...[
+                        // Ask AI about this product
+                        _buildAskAiButton(details?.name ?? 'this item'),
+                      ],
 
                       _buildExpandableSection(
                         'Return Policy',
@@ -314,20 +319,21 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                         ),
                       ),
 
-                      _buildExpandableSection(
-                        'About Seller',
-                        Icons.add,
-                        onTap: () {
-                          final sellerId = details?.sellerProfileId;
-                          if (sellerId == null || sellerId == 0) return;
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  SellerProfileScreen(sellerId: sellerId),
-                            ),
-                          );
-                        },
-                      ),
+                      if (isLoggedIn)
+                        _buildExpandableSection(
+                          'About Seller',
+                          Icons.add,
+                          onTap: () {
+                            final sellerId = details?.sellerProfileId;
+                            if (sellerId == null || sellerId == 0) return;
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    SellerProfileScreen(sellerId: sellerId),
+                              ),
+                            );
+                          },
+                        ),
 
                       const SizedBox(height: 28),
 

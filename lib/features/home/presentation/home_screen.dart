@@ -22,7 +22,7 @@ class HomeScreen extends ConsumerWidget {
       backgroundColor: const Color(0xFFFFF8F1),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: AppBottomNavBar.height + 8),
-        child: _buildAiChatFab(context),
+        child: _buildAiChatFab(context, ref),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
@@ -547,6 +547,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   borderRadius: const BorderRadius.only(
                     bottomRight: Radius.circular(8),
+                    topLeft: Radius.circular(8),
                   ),
                 ),
                 child: Text(
@@ -651,7 +652,10 @@ class HomeScreen extends ConsumerWidget {
   }
 
   /// Floating Action Button for AI Cultural Assistant
-  Widget _buildAiChatFab(BuildContext context) {
+  Widget _buildAiChatFab(BuildContext context, WidgetRef ref) {
+    final token = ref.watch(accessTokenProvider);
+    final isLoggedIn = token != null && token.isNotEmpty;
+    if (!isLoggedIn) return const SizedBox.shrink();
     return FloatingActionButton.extended(
       onPressed: () => Navigator.of(context).pushNamed(AppRoutes.aiChat),
       backgroundColor: const Color(0xFF603814),
