@@ -333,13 +333,28 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: state.isSubmitting
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
+                            ? const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    height: 18,
+                                    width: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Submitting...',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontFamily: 'Campton',
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                               )
                             : Text(
                                 currentStep < totalSteps - 1 ? 'Next' : 'Complete',

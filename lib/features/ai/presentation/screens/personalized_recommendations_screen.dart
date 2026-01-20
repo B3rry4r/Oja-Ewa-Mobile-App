@@ -37,6 +37,8 @@ class _PersonalizedRecommendationsScreenState
 
     final profileAsync = ref.watch(styleProfileProvider(userId));
     final recommendationsAsync = ref.watch(personalizedRecommendationsProvider(userId));
+    final profile = profileAsync.asData?.value;
+    final hasProfile = profile != null;
 
     return Scaffold(
       backgroundColor: _backgroundColor,
@@ -89,23 +91,25 @@ class _PersonalizedRecommendationsScreenState
                       // Recommendations
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: recommendationsAsync.when(
-                          loading: () => _buildRecommendationsLoading(),
-                          error: (e, st) => _buildRecommendationsError(),
-                          data: (recommendations) {
-                            final filtered = _selectedCategory == null
-                                ? recommendations
-                                : recommendations
-                                    .where((r) => r.category == _selectedCategory)
-                                    .toList();
-                            
-                            if (filtered.isEmpty) {
-                              return _buildEmptyRecommendations();
-                            }
-                            
-                            return _buildRecommendationsGrid(filtered);
-                          },
-                        ),
+                        child: hasProfile
+                            ? recommendationsAsync.when(
+                                loading: () => _buildRecommendationsLoading(),
+                                error: (e, st) => _buildRecommendationsError(),
+                                data: (recommendations) {
+                                  final filtered = _selectedCategory == null
+                                      ? recommendations
+                                      : recommendations
+                                          .where((r) => r.category == _selectedCategory)
+                                          .toList();
+                                  
+                                  if (filtered.isEmpty) {
+                                    return _buildEmptyRecommendations();
+                                  }
+                                  
+                                  return _buildRecommendationsGrid(filtered);
+                                },
+                              )
+                            : _buildNoProfileRecommendations(),
                       ),
 
                       const SizedBox(height: 24),
@@ -345,6 +349,70 @@ class _PersonalizedRecommendationsScreenState
             ),
           );
         }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildNoProfileRecommendations() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _cardColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(Icons.auto_awesome, color: _primaryColor, size: 24),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Take the Style Quiz to unlock recommendations',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w600,
+              color: _textDark,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'We need your style profile before we can personalize your feed.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontFamily: 'Campton',
+              color: _textSecondary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          InkWell(
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.styleDnaQuiz),
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              decoration: BoxDecoration(
+                color: _primaryColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Text(
+                'Take Style Quiz',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

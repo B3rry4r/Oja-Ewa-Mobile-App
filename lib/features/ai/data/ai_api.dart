@@ -132,7 +132,9 @@ class AiApi {
 
   /// Get chat history for a user
   /// GET /ai/buyer/chat/history/{userId}
-  /// Response: { success, history: [{ id, role, content, timestamp }] }
+  /// Response formats:
+  /// 1) { history: [{ id, role, content, timestamp }] }
+  /// 2) { history: [{ id, userMessage, assistantResponse, timestamp }] }
   Future<List<AiChatMessage>> getChatHistory(String userId) async {
     final endpoint = '/ai/buyer/chat/history/$userId';
     
@@ -145,16 +147,43 @@ class AiApi {
       final data = _parseJsonResponse(response.data);
       final history = data['history'] as List<dynamic>? ?? [];
       
-      // API returns: { id, role: "user"|"assistant", content, timestamp }
-      return history.map((item) {
-        if (item is! Map<String, dynamic>) return null;
-        return AiChatMessage(
-          id: item['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
-          content: item['content']?.toString() ?? '',
-          isUser: item['role'] == 'user',
-          timestamp: _parseDateTime(item['timestamp']),
-        );
-      }).whereType<AiChatMessage>().toList();
+      final messages = <AiChatMessage>[];
+      for (final item in history) {
+        if (item is! Map<String, dynamic>) continue;
+
+        // Format 1: role/content
+        if (item.containsKey('role') && item.containsKey('content')) {
+          messages.add(AiChatMessage(
+            id: item['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
+            content: item['content']?.toString() ?? '',
+            isUser: item['role'] == 'user',
+            timestamp: _parseDateTime(item['timestamp']),
+          ));
+          continue;
+        }
+
+        // Format 2: userMessage + assistantResponse
+        if (item['userMessage'] != null || item['assistantResponse'] != null) {
+          final timestamp = _parseDateTime(item['timestamp']);
+          if (item['userMessage'] != null) {
+            messages.add(AiChatMessage(
+              id: '${item['id'] ?? DateTime.now().millisecondsSinceEpoch}_user',
+              content: item['userMessage']?.toString() ?? '',
+              isUser: true,
+              timestamp: timestamp,
+            ));
+          }
+          if (item['assistantResponse'] != null) {
+            messages.add(AiChatMessage(
+              id: '${item['id'] ?? DateTime.now().millisecondsSinceEpoch}_assistant',
+              content: item['assistantResponse']?.toString() ?? '',
+              isUser: false,
+              timestamp: timestamp,
+            ));
+          }
+        }
+      }
+      return messages;
     } on DioException catch (e) {
       _log('GET', endpoint, error: e.message, statusCode: e.response?.statusCode);
       if (e.response?.statusCode == 404) return [];

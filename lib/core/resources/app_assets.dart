@@ -42,7 +42,7 @@ abstract class AppIcons {
 
 abstract class AppImages {
   // assets/icons/*.png
-  static const String onboarding = 'assets/icons/LP3.png';
+  static const String onboarding = 'assets/icons/lpi.jpg';
   static const String logoOutline = 'assets/icons/logo_outline.png';
 
   // assets/app_icon/*
