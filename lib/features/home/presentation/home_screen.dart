@@ -21,7 +21,7 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: AppBottomNavBar.height + 8),
+        padding: const EdgeInsets.only(bottom: AppBottomNavBar.height + 20),
         child: _buildAiChatFab(context, ref),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -643,7 +643,7 @@ class HomeScreen extends ConsumerWidget {
       onPressed: () => Navigator.of(context).pushNamed(AppRoutes.aiChat),
       backgroundColor: const Color(0xFF603814),
       foregroundColor: Colors.white,
-      icon: const Icon(Icons.psychology, size: 24),
+      icon: const Icon(Icons.auto_awesome, size: 24),
       label: const Text(
         'Ask AI',
         style: TextStyle(
