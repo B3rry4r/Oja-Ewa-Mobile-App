@@ -57,13 +57,11 @@ class UserSubscription {
 class SubscriptionStatusResponse {
   const SubscriptionStatusResponse({
     required this.hasSubscription,
-    required this.features,
     this.subscription,
   });
 
   final bool hasSubscription;
   final UserSubscription? subscription;
-  final SubscriptionFeatureSet features;
 
   factory SubscriptionStatusResponse.fromJson(Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>? ?? json;
@@ -72,9 +70,6 @@ class SubscriptionStatusResponse {
       subscription: data['subscription'] != null
           ? UserSubscription.fromJson(data['subscription'] as Map<String, dynamic>)
           : null,
-      features: SubscriptionFeatureSet.fromJson(
-        data['features'] as Map<String, dynamic>? ?? {},
-      ),
     );
   }
 

@@ -22,25 +22,6 @@ class SubscriptionRepository {
     return _api.getSubscriptionStatus();
   }
 
-  /// Get available subscription plans
-  Future<SubscriptionPlansResponse> getPlans() async {
-    return _api.getPlans();
-  }
-
-  /// Restore purchases
-  Future<VerifyPurchaseResponse> restorePurchases(RestorePurchasesRequest request) async {
-    return _api.restorePurchases(request);
-  }
-
-  /// Get subscription history
-  Future<List<SubscriptionHistoryItem>> getHistory({int page = 1}) async {
-    return _api.getHistory(page: page);
-  }
-
-  /// Get cancellation info
-  Future<CancelInfoResponse> getCancelInfo() async {
-    return _api.getCancelInfo();
-  }
 }
 
 /// Provider for Subscription Repository

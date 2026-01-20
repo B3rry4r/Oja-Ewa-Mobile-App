@@ -28,41 +28,6 @@ class SubscriptionApi {
     return SubscriptionStatusResponse.fromJson(response.data as Map<String, dynamic>);
   }
 
-  /// Get available subscription plans
-  Future<SubscriptionPlansResponse> getPlans() async {
-    final response = await _dio.get('/subscriptions/plans');
-    return SubscriptionPlansResponse.fromJson(response.data as Map<String, dynamic>);
-  }
-
-  /// Restore purchases
-  Future<VerifyPurchaseResponse> restorePurchases(RestorePurchasesRequest request) async {
-    final response = await _dio.post(
-      '/subscriptions/restore',
-      data: request.toJson(),
-    );
-    return VerifyPurchaseResponse.fromJson(response.data as Map<String, dynamic>);
-  }
-
-  /// Get subscription history
-  Future<List<SubscriptionHistoryItem>> getHistory({int page = 1, int perPage = 20}) async {
-    final response = await _dio.get(
-      '/subscriptions/history',
-      queryParameters: {'page': page, 'per_page': perPage},
-    );
-    
-    final data = response.data as Map<String, dynamic>;
-    final history = data['data']?['history'] as List<dynamic>? ?? [];
-    
-    return history
-        .map((item) => SubscriptionHistoryItem.fromJson(item as Map<String, dynamic>))
-        .toList();
-  }
-
-  /// Get cancellation info
-  Future<CancelInfoResponse> getCancelInfo() async {
-    final response = await _dio.get('/subscriptions/cancel-info');
-    return CancelInfoResponse.fromJson(response.data as Map<String, dynamic>);
-  }
 }
 
 /// Provider for Subscription API

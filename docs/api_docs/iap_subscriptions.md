@@ -1,19 +1,19 @@
-# Ojaewa IAP & Subscriptions - Backend API Specification
+# Ojaewa IAP Subscriptions API (Laravel)
 
-> **Version:** 1.0  
-> **Last Updated:** January 2026  
-> **Purpose:** Backend API endpoints required for In-App Purchase (IAP) subscription management
+Base URL: `https://api.ojaewa.com/api`
+
+Authentication: Bearer token (Sanctum)
 
 ---
 
-## Overview
+---
 
-This document specifies the backend API endpoints required to support yearly subscriptions for Sellers and Business Profiles in the Ojaewa app. Subscriptions are processed through Apple App Store and Google Play Store, with the backend responsible for:
+## Notes
 
-1. **Verification** - Validating purchase receipts with Apple/Google
-2. **Storage** - Storing subscription details and status
-3. **Access Control** - Determining feature access based on subscription status
-4. **Webhook Handling** - Processing subscription lifecycle events (renewals, cancellations, etc.)
+- Only `ojaewa_pro` is supported
+- `POST /subscriptions/verify` only stores purchase data (no verification yet)
+- Verification with Apple/Google will be added later
+- If `transaction_id + platform` already exists, subscription is updated
 
 ---
 
@@ -130,145 +130,91 @@ CREATE TABLE subscription_history (
 
 ---
 
-## API Endpoints (Only Required Endpoints)
+## API Endpoints
 
-### Base URL
-```
-https://api.ojaewa.com/api/v1
-```
-
-### Authentication
-All endpoints require Bearer token authentication:
-```
-Authorization: Bearer {sanctum_token}
-```
-
----
-
-### 1. Verify & Store Purchase (Required)
+### 1) Store Subscription (No Verification Yet)
 
 **Endpoint:** `POST /subscriptions/verify`
 
-Called by the app after a successful purchase to verify with Apple/Google and store the subscription.
+This endpoint only stores the purchase data. Receipt verification will be added later.
 
-**Request:**
+**Request Body**
 ```json
 {
-    "platform": "ios",                     // "ios" | "android"
-    "product_id": "ojaewa_pro",            // Single product ID
-    "transaction_id": "1000000123456789",  // Store transaction ID
-    "receipt_data": "MIIbngYJKoZIhvc...", // iOS: Base64 receipt | Android: purchase token
-    "environment": "production"            // "sandbox" | "production"
+  "platform": "ios",
+  "product_id": "ojaewa_pro",
+  "transaction_id": "1000000123456789",
+  "receipt_data": "MIIbngYJKoZIhvc...",
+  "environment": "sandbox"
 }
 ```
 
-**Response (Success - 200):**
+**Response (200)**
 ```json
 {
-    "success": true,
-    "message": "Subscription verified and activated",
-    "data": {
-        "subscription": {
-            "id": 123,
-            "product_id": "ojaewa_pro",
-            "tier": "ojaewa_pro",
-            "status": "active",
-            "starts_at": "2026-01-18T00:00:00Z",
-            "expires_at": "2027-01-18T00:00:00Z",
-            "is_auto_renewing": true,
-            "platform": "ios"
-        },
-        "features": {
-            "unlimited_products": true,
-            "ai_descriptions": true,
-            "ai_analytics": true,
-            "trend_predictions": true,
-            "inventory_forecasting": true,
-            "customer_insights": true,
-            "verified_badge": true,
-            "priority_support": true,
-            "featured_placement": true
-        }
+  "success": true,
+  "message": "Subscription verified and activated",
+  "data": {
+    "subscription": {
+      "id": 4,
+      "product_id": "ojaewa_pro",
+      "tier": "ojaewa_pro",
+      "status": "active",
+      "starts_at": "2026-01-20T17:57:54.000000Z",
+      "expires_at": "2027-01-20T17:57:54.000000Z",
+      "is_auto_renewing": true,
+      "platform": "ios"
     }
+  }
 }
 ```
 
 ---
 
-### 2. Get Current Subscription Status (Required)
+### 2) Get Subscription Status
 
 **Endpoint:** `GET /subscriptions/status`
 
-Returns the current user's subscription status and entitled features.
-
-**Response (Active Subscription):**
+**Response (No Subscription)**
 ```json
 {
-    "success": true,
-    "data": {
-        "has_subscription": true,
-        "subscription": {
-            "id": 123,
-            "product_id": "ojaewa_pro",
-            "tier": "ojaewa_pro",
-            "tier_name": "Ojaewa Pro",
-            "status": "active",
-            "platform": "ios",
-            "starts_at": "2026-01-18T00:00:00Z",
-            "expires_at": "2027-01-18T00:00:00Z",
-            "days_remaining": 365,
-            "is_auto_renewing": true,
-            "will_renew": true
-        },
-        "features": {
-            "unlimited_products": true,
-            "ai_descriptions": true,
-            "ai_analytics": true,
-            "trend_predictions": true,
-            "inventory_forecasting": true,
-            "customer_insights": true,
-            "verified_badge": true,
-            "priority_support": true,
-            "featured_placement": true,
-            "max_products": -1
-        }
-    }
+  "success": true,
+  "data": {
+    "has_subscription": false,
+    "subscription": null
+  }
 }
 ```
 
-**Response (No Subscription):**
+**Response (Active Subscription)**
 ```json
 {
-    "success": true,
-    "data": {
-        "has_subscription": false,
-        "subscription": null,
-        "features": {
-            "unlimited_products": false,
-            "ai_descriptions": false,
-            "ai_analytics": false,
-            "trend_predictions": false,
-            "inventory_forecasting": false,
-            "customer_insights": false,
-            "verified_badge": false,
-            "priority_support": false,
-            "featured_placement": false,
-            "max_products": 10
-        }
+  "success": true,
+  "data": {
+    "has_subscription": true,
+    "subscription": {
+      "id": 4,
+      "product_id": "ojaewa_pro",
+      "tier": "ojaewa_pro",
+      "status": "active",
+      "platform": "ios",
+      "starts_at": "2026-01-20T17:57:54.000000Z",
+      "expires_at": "2027-01-20T17:57:54.000000Z",
+      "days_remaining": 364,
+      "is_auto_renewing": true,
+      "will_renew": true
     }
+  }
 }
 ```
 
 ---
 
-## Endpoints NOT Required (Removed)
-- Subscription plans
-- Restore purchases
-- History
-- Cancel info
-- Webhooks
+## Notes
 
-Only `verify` and `status` are required per current scope.
+- Only `ojaewa_pro` is currently supported
+- Verification with Apple/Google will be added later
+- If `transaction_id + platform` already exists, subscription is updated
 
 
 ## Receipt Verification
