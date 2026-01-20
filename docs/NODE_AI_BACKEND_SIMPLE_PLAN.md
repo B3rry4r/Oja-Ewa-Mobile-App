@@ -4,7 +4,7 @@
 
 **Two completely separate backends:**
 - **Laravel Backend:** `https://ojaewa-laravel.railway.app` (Your existing API - DON'T TOUCH)
-- **Node.js AI Backend:** `https://ojaewa-ai.railway.app` (New service you're building)
+- **Node.js AI Backend:** `https://ojaewa-ai-production.up.railway.app` (New service you're building)
 
 **Authentication:** Same JWT token validates on BOTH backends (shared secret key)
 
@@ -1313,13 +1313,13 @@ async function getCachedRecommendations(userId) {
 // Option 1: Frontend calls both APIs
 const [laravelData, aiData] = await Promise.all([
   fetch('https://ojaewa-laravel.railway.app/api/products'),
-  fetch('https://ojaewa-ai.railway.app/ai/recommendations/123', {
+  fetch('https://ojaewa-ai-production.up.railway.app/ai/recommendations/123', {
     headers: { 'Authorization': `Bearer ${token}` }
   })
 ]);
 
 // Option 2: AI service calls Laravel internally
-const aiData = await fetch('https://ojaewa-ai.railway.app/ai/recommendations/123', {
+const aiData = await fetch('https://ojaewa-ai-production.up.railway.app/ai/recommendations/123', {
   headers: { 'Authorization': `Bearer ${token}` }
 });
 // Node.js handles calling Laravel inside

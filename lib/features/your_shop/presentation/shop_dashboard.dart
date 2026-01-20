@@ -51,6 +51,9 @@ class ShopDashboardScreen extends ConsumerWidget {
                 allOrders.maybeWhen(data: (o) => o.length, orElse: () => 0),
                 0,
               ),
+              const SizedBox(height: 16),
+              // AI Analytics Button
+              _buildAiAnalyticsButton(context),
               const SizedBox(height: 32),
               const Text(
                 "Orders in Process",
@@ -272,6 +275,79 @@ class ShopDashboardScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAiAnalyticsButton(BuildContext context) {
+    return InkWell(
+      onTap: () => Navigator.of(context).pushNamed(AppRoutes.sellerAnalytics),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFFDAF40), Color(0xFFFFCC80)],
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFFDAF40).withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.insights,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'AI Analytics',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'Smart inventory & trend predictions',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'Campton',
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white70,
+              size: 16,
+            ),
+          ],
+        ),
       ),
     );
   }

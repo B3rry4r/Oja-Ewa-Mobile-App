@@ -9,6 +9,7 @@ import 'package:ojaewa/features/categories/presentation/widgets/category_tree_pi
 import 'package:ojaewa/core/widgets/selection_bottom_sheet.dart';
 import 'package:ojaewa/features/categories/domain/category_catalog.dart';
 import 'package:ojaewa/features/your_shop/presentation/controllers/seller_product_controller.dart';
+import 'package:ojaewa/features/ai/presentation/widgets/ai_description_generator.dart';
 
 /// Fetch form options from categories endpoint
 final _productFiltersProvider = Provider<CategoryFormOptions>((ref) {
@@ -158,6 +159,18 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     // Gender removed (Men/Women are now category groups)
                     if (_requiresExtendedFields) ...[
                       _buildFilterDropdowns(formOptions),
+                      const SizedBox(height: 16),
+                    ],
+
+                    // AI Description Generator
+                    if (_requiresExtendedFields) ...[
+                      AiDescriptionGenerator(
+                        nameController: _nameController,
+                        descriptionController: _descriptionController,
+                        category: _categoryName,
+                        fabric: _selectedFabricType,
+                        style: _selectedStyle,
+                      ),
                       const SizedBox(height: 16),
                     ],
 
