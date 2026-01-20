@@ -553,7 +553,7 @@ class HomeScreen extends ConsumerWidget {
                     fontSize: 20,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF241508),
+                    color: Colors.white,
                   ),
                 ),
               ),
