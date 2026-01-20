@@ -26,11 +26,11 @@ class OnboardingScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 60), // Spacing from image to title
+                    const SizedBox(height: 20), // Spacing from image to title
                     // Main Headline
                     _buildHeadline(),
 
-                    const SizedBox(height: 90), // Spacing from title to buttons
+                    const SizedBox(height: 20), // Spacing from title to buttons
                     // Action Buttons
                     _buildActionButtons(context),
 
@@ -117,7 +117,7 @@ class OnboardingScreen extends StatelessWidget {
     return Text(
       'The Pan-African\nBeauty Market',
       style: TextStyle(
-        fontSize: 48,
+        fontSize: 38,
         fontWeight: FontWeight.w600,
         fontFamily: 'Campton',
         color: const Color(0xFF1E2021), // #1e2021
