@@ -16,7 +16,7 @@ class SubscriptionApi {
   /// Called after successful IAP purchase from App Store / Play Store
   Future<VerifyPurchaseResponse> verifyPurchase(VerifyPurchaseRequest request) async {
     final response = await _dio.post(
-      '/subscriptions/verify',
+      '/api/subscriptions/verify',
       data: request.toJson(),
     );
     return VerifyPurchaseResponse.fromJson(response.data as Map<String, dynamic>);
@@ -24,7 +24,7 @@ class SubscriptionApi {
 
   /// Get current subscription status
   Future<SubscriptionStatusResponse> getSubscriptionStatus() async {
-    final response = await _dio.get('/subscriptions/status');
+    final response = await _dio.get('/api/subscriptions/status');
     return SubscriptionStatusResponse.fromJson(response.data as Map<String, dynamic>);
   }
 
