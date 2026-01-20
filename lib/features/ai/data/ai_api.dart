@@ -463,7 +463,7 @@ class AiApi {
       
       final data = _parseJsonResponse(response.data);
       final forecast = data['forecast'] as Map<String, dynamic>? ?? {};
-      final restock = forecast['restock'] as List<dynamic>? ?? [];
+      final restock = forecast['restockPriorities'] as List<dynamic>? ?? [];
       
       return restock.map((item) {
         if (item is! Map<String, dynamic>) {
@@ -475,7 +475,7 @@ class AiApi {
         return InventoryForecast(
           productId: item['product']?.toString() ?? '',
           productName: item['product']?.toString() ?? '',
-          currentStock: 0,
+          currentStock: (item['currentStock'] as num?)?.toInt() ?? 0,
           predictedDemand: (item['quantity'] as num?)?.toInt() ?? 0,
           recommendedStock: (item['quantity'] as num?)?.toInt() ?? 0,
           confidence: item['urgency'] == 'high' ? 0.9 : 0.6,

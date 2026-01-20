@@ -11,7 +11,6 @@ class SellerAnalyticsState {
     this.isLoading = false,
     this.trends,
     this.forecasts,
-    this.performance,
     this.error,
     this.selectedCategory = 'textiles',
   });
@@ -19,7 +18,6 @@ class SellerAnalyticsState {
   final bool isLoading;
   final TrendData? trends;
   final List<InventoryForecast>? forecasts;
-  final SellerPerformance? performance;
   final String? error;
   final String selectedCategory;
 
@@ -27,7 +25,6 @@ class SellerAnalyticsState {
     bool? isLoading,
     TrendData? trends,
     List<InventoryForecast>? forecasts,
-    SellerPerformance? performance,
     String? error,
     String? selectedCategory,
   }) {
@@ -35,7 +32,6 @@ class SellerAnalyticsState {
       isLoading: isLoading ?? this.isLoading,
       trends: trends ?? this.trends,
       forecasts: forecasts ?? this.forecasts,
-      performance: performance ?? this.performance,
       error: error,
       selectedCategory: selectedCategory ?? this.selectedCategory,
     );
@@ -67,18 +63,16 @@ class SellerAnalyticsController extends AsyncNotifier<SellerAnalyticsState> {
     try {
       final repository = ref.read(aiRepositoryProvider);
 
-      // Load trends + inventory + performance in parallel
+      // Load trends + inventory in parallel
       final results = await Future.wait([
         repository.getCategoryTrends(currentState.selectedCategory),
         repository.getInventoryForecast(sellerId: _sellerId!),
-        repository.getSellerPerformance(_sellerId!),
       ]);
 
       state = AsyncData(currentState.copyWith(
         isLoading: false,
         trends: results[0] as TrendData,
         forecasts: results[1] as List<InventoryForecast>,
-        performance: results[2] as SellerPerformance,
       ));
     } catch (e) {
       state = AsyncData(currentState.copyWith(

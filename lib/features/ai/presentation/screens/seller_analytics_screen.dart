@@ -32,7 +32,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _initialize());
   }
 
@@ -112,7 +112,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   tabs: const [
                     Tab(text: 'Trends'),
                     Tab(text: 'Inventory'),
-                    Tab(text: 'Performance'),
                   ],
                 ),
               ),
@@ -134,7 +133,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                           children: [
                             _buildTrendsTab(state),
                             _buildInventoryTab(state),
-                            _buildPerformanceTab(state),
                           ],
                         ),
             ),
@@ -623,45 +621,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               color: _textSecondary,
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPerformanceTab(SellerAnalyticsState state) {
-    if (state.performance == null) {
-      return _buildEmptyState('No performance data available', Icons.bar_chart);
-    }
-
-    final perf = state.performance!;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          // Stats Cards - matching shop dashboard style
-          Row(
-            children: [
-              _buildStatCard('Total Sales', '₦${_formatNumber(perf.totalSales)}'),
-              const SizedBox(width: 12),
-              _buildStatCard('Rating', '${perf.averageRating.toStringAsFixed(1)} ★'),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Market Position
-          if (perf.marketComparison != null)
-            _buildMarketPositionCard(perf.marketComparison!),
-
-          // Top Products
-          if (perf.topProducts.isNotEmpty)
-            _buildTopProductsCard(perf.topProducts),
-
-          // AI Suggestions
-          if (perf.suggestions != null && perf.suggestions!.isNotEmpty)
-            _buildSuggestionsCard(perf.suggestions!),
-
-          const SizedBox(height: 24),
         ],
       ),
     );
