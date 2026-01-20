@@ -538,8 +538,8 @@ class HomeScreen extends ConsumerWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomLeft,
                     colors: [
-                      const Color(0xFFFDAF40).withOpacity(0.85),
-                      const Color(0xFFFDAF40).withOpacity(0.0),
+                      const Color(0xFF241508).withOpacity(0.85),
+                      const Color(0xFF241508).withOpacity(0.0),
                     ],
                   ),
                   borderRadius: const BorderRadius.only(
