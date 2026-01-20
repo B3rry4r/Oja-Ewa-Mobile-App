@@ -55,7 +55,7 @@ class MusicScreen extends ConsumerWidget {
 
         return CategoryScreen(
           categoryTitle: 'Art Market',
-          categoryDescription: 'African music and entertainment.',
+          categoryDescription: 'Explore African art and creative works.',
           sections: sections,
           onItemTap: (section, item) {
             final parent = findParentByTitle(section.title);
@@ -69,7 +69,7 @@ class MusicScreen extends ConsumerWidget {
                   type: 'art',
                   slug: slug,
                   pageTitle: item == 'View All' ? section.title : item,
-                  breadcrumb: 'Art • ${section.title}',
+                  breadcrumb: 'Art Market • ${section.title}',
                   showBusinessTypeFilter: false,
                 ),
               ),

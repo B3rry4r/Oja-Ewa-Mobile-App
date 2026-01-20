@@ -474,7 +474,7 @@ class HomeScreen extends ConsumerWidget {
         // Brands
         _buildCategoryItem(
           context: context,
-          title: 'Shoes & Bags',
+          title: 'Footwear/Bags',
           color: const Color(0xFFA15E22),
           iconAsset: AppIcons.brands,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.brands),
@@ -482,7 +482,7 @@ class HomeScreen extends ConsumerWidget {
         // Music
         _buildCategoryItem(
           context: context,
-          title: 'Art',
+          title: 'Art Market',
           color: const Color(0xFFEBC29D),
           iconAsset: AppIcons.music,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.music),
@@ -490,7 +490,7 @@ class HomeScreen extends ConsumerWidget {
         // Schools
         _buildCategoryItem(
           context: context,
-          title: 'Schools',
+          title: 'Education',
           color: const Color(0xFFFECF8C),
           iconAsset: AppIcons.schools,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.schools),
@@ -529,34 +529,17 @@ class HomeScreen extends ConsumerWidget {
           children: [
             Image.asset(iconAsset, fit: BoxFit.cover),
             Positioned(
-              bottom: 0,
+              bottom: 8,
+              left: 0,
               right: 0,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomLeft,
-                    colors: [
-                      const Color(0xFF603814).withOpacity(0.0),
-                      const Color(0xFF603814).withOpacity(0.85),
-                    ],
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    bottomRight: Radius.circular(8),
-                    topLeft: Radius.circular(8),
-                  ),
-                ),
+              child: Center(
                 child: Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 16,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: Color(0xFF241508),
                   ),
                 ),
               ),

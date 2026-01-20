@@ -9,6 +9,6 @@ class SchoolsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ComingSoonScreen(title: 'Schools');
+    return const ComingSoonScreen(title: 'Education');
   }
 }
