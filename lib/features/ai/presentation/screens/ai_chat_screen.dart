@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../app/widgets/app_header.dart';
+import '../../../../core/resources/app_assets.dart';
 import '../../../account/presentation/controllers/profile_controller.dart';
 import '../../domain/ai_models.dart';
 import '../controllers/ai_chat_controller.dart';
@@ -271,7 +273,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
         if (index == state.messages.length && state.isLoading) {
           return _buildTypingIndicator();
         }
-        return _buildMessageBubble(state.messages[index]);
+        final message = state.messages[index];
+        if (message.content.trim().isEmpty) {
+          return const SizedBox.shrink();
+        }
+        return _buildMessageBubble(message);
       },
     );
   }
@@ -294,10 +300,13 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 color: _cardColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.psychology,
-                size: 18,
-                color: _primaryColor,
+              child: Center(
+                child: SvgPicture.asset(
+                  AppImages.appLogoAlt,
+                  width: 18,
+                  height: 18,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -494,52 +503,44 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.psychology,
+              Icons.auto_awesome,
               size: 18,
               color: _primaryColor,
             ),
           ),
           const SizedBox(width: 8),
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: _cardColor,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildTypingDot(0),
-                const SizedBox(width: 4),
-                _buildTypingDot(1),
-                const SizedBox(width: 4),
-                _buildTypingDot(2),
-              ],
+            child: SizedBox(
+              width: 32,
+              height: 32,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  const SizedBox(
+                    width: 32,
+                    height: 32,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(_primaryColor),
+                    ),
+                  ),
+                  SvgPicture.asset(
+                    AppImages.appLogoAlt,
+                    width: 18,
+                    height: 18,
+                    fit: BoxFit.contain,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildTypingDot(int index) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: 1),
-      duration: Duration(milliseconds: 600 + (index * 200)),
-      builder: (context, value, child) {
-        return Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: Color.lerp(
-              _textSecondary,
-              _primaryColor,
-              value,
-            ),
-            shape: BoxShape.circle,
-          ),
-        );
-      },
     );
   }
 
@@ -560,9 +561,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
         children: [
           Expanded(
             child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: _cardColor,
-                borderRadius: BorderRadius.circular(24),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFDEDEDE)),
               ),
               child: TextField(
                 controller: _messageController,
@@ -570,20 +573,16 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => _sendMessage(),
                 decoration: const InputDecoration(
+                  border: InputBorder.none,
                   hintText: 'Ask about Nigerian fashion...',
                   hintStyle: TextStyle(
                     fontSize: 14,
                     fontFamily: 'Campton',
-                    color: _textSecondary,
+                    color: Color(0xFFCCCCCC),
                   ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  border: InputBorder.none,
                 ),
                 style: const TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontFamily: 'Campton',
                   color: _textDark,
                 ),

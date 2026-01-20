@@ -63,16 +63,20 @@ class AiRepository {
 
   Future<AiProductDescription> generateDescription({
     required String name,
-    required String category,
-    String? fabric,
-    String? style,
+    required String style,
+    required String tribe,
+    required String gender,
+    required double price,
+    String? materials,
     String? occasion,
   }) async {
     return _api.generateProductDescription(
       name: name,
-      category: category,
-      fabric: fabric,
       style: style,
+      tribe: tribe,
+      gender: gender,
+      price: price,
+      materials: materials,
       occasion: occasion,
     );
   }

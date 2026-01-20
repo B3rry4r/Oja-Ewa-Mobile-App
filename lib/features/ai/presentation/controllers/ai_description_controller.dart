@@ -41,9 +41,11 @@ class AiDescriptionController extends AsyncNotifier<AiDescriptionState> {
   /// Uses POST /ai/seller/products/generate-description
   Future<AiProductDescription?> generateDescription({
     required String name,
-    required String category,
-    String? fabric,
-    String? style,
+    required String style,
+    required String tribe,
+    required String gender,
+    required double price,
+    String? materials,
     String? occasion,
   }) async {
     state = AsyncData(state.value!.copyWith(isLoading: true, error: null));
@@ -52,9 +54,11 @@ class AiDescriptionController extends AsyncNotifier<AiDescriptionState> {
       final repository = ref.read(aiRepositoryProvider);
       final description = await repository.generateDescription(
         name: name,
-        category: category,
-        fabric: fabric,
         style: style,
+        tribe: tribe,
+        gender: gender,
+        price: price,
+        materials: materials,
         occasion: occasion,
       );
 

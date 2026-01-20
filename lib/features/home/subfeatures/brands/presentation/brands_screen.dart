@@ -5,7 +5,7 @@ import 'package:ojaewa/features/categories/presentation/controllers/category_con
 import 'package:ojaewa/features/categories/presentation/screens/category_screen.dart';
 import 'package:ojaewa/features/product/presentation/screens/product_listing_screen.dart';
 
-/// Shoes & Bags screen - displays products (not businesses).
+/// Footwear/Bags screen - displays products (not businesses).
 /// Category type: shoes_bags → Returns Products
 class BrandsScreen extends ConsumerWidget {
   const BrandsScreen({super.key});
@@ -55,8 +55,8 @@ class BrandsScreen extends ConsumerWidget {
         }
 
         return CategoryScreen(
-          categoryTitle: 'Shoes & Bags',
-          categoryDescription: 'Discover premium African brands.',
+          categoryTitle: 'Footwear/Bags',
+          categoryDescription: 'Discover premium African footwear and bags.',
           sections: sections,
           onItemTap: (section, item) {
             final parent = findParentByTitle(section.title);
@@ -72,7 +72,7 @@ class BrandsScreen extends ConsumerWidget {
                   type: 'shoes_bags',
                   slug: slug,
                   pageTitle: item == 'View All' ? section.title : item,
-                  breadcrumb: 'Shoes & Bags • ${section.title}',
+                  breadcrumb: 'Footwear/Bags • ${section.title}',
                   showBusinessTypeFilter: false,
                   // No onProductTap - uses default product detail navigation
                 ),

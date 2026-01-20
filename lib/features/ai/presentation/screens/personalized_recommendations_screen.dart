@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/router/app_router.dart';
 import '../../../../app/widgets/app_header.dart';
 import '../../../../core/ui/price_formatter.dart';
+import '../../../../core/widgets/product_card.dart';
 import '../../../account/presentation/controllers/profile_controller.dart';
+import '../../../product/domain/product.dart';
 import '../../domain/ai_models.dart';
 import '../controllers/ai_personalization_controller.dart';
 
@@ -555,7 +557,7 @@ class _PersonalizedRecommendationsScreenState
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.65,
+        childAspectRatio: 0.62,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
@@ -567,129 +569,24 @@ class _PersonalizedRecommendationsScreenState
   }
 
   Widget _buildRecommendationCard(PersonalizedRecommendation recommendation) {
-    return InkWell(
-      onTap: () => Navigator.of(context).pushNamed('/product/${recommendation.id}'),
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        decoration: BoxDecoration(
-          color: _cardColor,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image
-            Expanded(
-              flex: 3,
-              child: Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                    child: Container(
-                      width: double.infinity,
-                      color: Colors.white,
-                      child: recommendation.imageUrl != null
-                          ? Image.network(
-                              recommendation.imageUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Center(
-                                child: Icon(
-                                  Icons.image_outlined,
-                                  color: Color(0xFFCCCCCC),
-                                  size: 32,
-                                ),
-                              ),
-                            )
-                          : const Center(
-                              child: Icon(
-                                Icons.image_outlined,
-                                color: Color(0xFFCCCCCC),
-                                size: 32,
-                              ),
-                            ),
-                    ),
-                  ),
-                  // Match Score Badge
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF4CAF50),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.auto_awesome, size: 10, color: Colors.white),
-                          const SizedBox(width: 3),
-                          Text(
-                            '${(recommendation.matchScore * 100).toInt()}%',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontFamily: 'Campton',
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    final product = _mapRecommendationToProduct(recommendation);
 
-            // Details
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      recommendation.name,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontFamily: 'Campton',
-                        fontWeight: FontWeight.w500,
-                        color: _textDark,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const Spacer(),
-                    if (recommendation.reason != null) ...[
-                      Text(
-                        recommendation.reason!,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontFamily: 'Campton',
-                          color: _textSecondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                    ],
-                    Text(
-                      formatPrice(recommendation.price),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontFamily: 'Campton',
-                        fontWeight: FontWeight.w600,
-                        color: _primaryColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return ProductCard(
+      product: product,
+      onTap: () => Navigator.of(context).pushNamed('/product/${recommendation.id}'),
+      onFavoriteTap: () {},
+    );
+  }
+
+  Product _mapRecommendationToProduct(PersonalizedRecommendation recommendation) {
+    return Product(
+      id: recommendation.id,
+      title: recommendation.name,
+      priceLabel: formatPrice(recommendation.price),
+      rating: recommendation.matchScore * 5,
+      reviewCount: 0,
+      imageUrl: recommendation.imageUrl,
+      imageColor: 0xFFF5E0CE,
     );
   }
 }

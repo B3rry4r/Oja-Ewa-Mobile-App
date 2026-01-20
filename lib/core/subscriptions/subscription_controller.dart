@@ -12,25 +12,21 @@ class SubscriptionState {
   const SubscriptionState({
     this.isLoading = false,
     this.status,
-    this.plans,
     this.error,
   });
 
   final bool isLoading;
   final SubscriptionStatusResponse? status;
-  final SubscriptionPlansResponse? plans;
   final String? error;
 
   SubscriptionState copyWith({
     bool? isLoading,
     SubscriptionStatusResponse? status,
-    SubscriptionPlansResponse? plans,
     String? error,
   }) {
     return SubscriptionState(
       isLoading: isLoading ?? this.isLoading,
       status: status ?? this.status,
-      plans: plans ?? this.plans,
       error: error,
     );
   }
@@ -40,7 +36,7 @@ class SubscriptionState {
 
   /// Current features
   SubscriptionFeatureSet get features => 
-      status?.features ?? SubscriptionFeatures.forTier(SubscriptionTier.free);
+      SubscriptionFeatures.forTier(status?.tier ?? SubscriptionTier.free);
 
   /// Whether user has an active subscription
   bool get hasActiveSubscription => status?.hasSubscription ?? false;
@@ -84,27 +80,6 @@ class SubscriptionController extends AsyncNotifier<SubscriptionState> {
     }
   }
 
-  /// Load available subscription plans
-  Future<void> loadPlans() async {
-    final currentState = state.value ?? const SubscriptionState();
-    
-    // Don't reload if already have plans
-    if (currentState.plans != null) return;
-
-    state = AsyncData(currentState.copyWith(isLoading: true, error: null));
-
-    try {
-      final repository = ref.read(subscriptionRepositoryProvider);
-      final plans = await repository.getPlans();
-      state = AsyncData(currentState.copyWith(isLoading: false, plans: plans));
-    } catch (e) {
-      state = AsyncData(currentState.copyWith(
-        isLoading: false,
-        error: 'Failed to load subscription plans',
-      ));
-    }
-  }
-
   /// Verify a purchase with the backend
   Future<VerifyPurchaseResponse?> verifyPurchase({
     required String productId,
@@ -142,39 +117,6 @@ class SubscriptionController extends AsyncNotifier<SubscriptionState> {
       state = AsyncData(currentState.copyWith(
         isLoading: false,
         error: 'Failed to verify purchase: ${e.toString()}',
-      ));
-      return null;
-    }
-  }
-
-  /// Restore purchases
-  Future<VerifyPurchaseResponse?> restorePurchases({
-    String? receiptData,
-    List<String>? purchaseTokens,
-  }) async {
-    final currentState = state.value ?? const SubscriptionState();
-    state = AsyncData(currentState.copyWith(isLoading: true, error: null));
-
-    try {
-      final repository = ref.read(subscriptionRepositoryProvider);
-      final response = await repository.restorePurchases(
-        RestorePurchasesRequest(
-          platform: Platform.isIOS ? 'ios' : 'android',
-          receiptData: receiptData,
-          purchaseTokens: purchaseTokens,
-        ),
-      );
-
-      if (response.success) {
-        await refreshStatus();
-      }
-
-      state = AsyncData(currentState.copyWith(isLoading: false));
-      return response;
-    } catch (e) {
-      state = AsyncData(currentState.copyWith(
-        isLoading: false,
-        error: 'Failed to restore purchases: ${e.toString()}',
       ));
       return null;
     }
@@ -244,20 +186,3 @@ final canAccessFeatureProvider = Provider.family<bool, String>((ref, feature) {
   }
 });
 
-/// Subscription plans
-final subscriptionPlansProvider = FutureProvider<SubscriptionPlansResponse>((ref) async {
-  final repository = ref.watch(subscriptionRepositoryProvider);
-  return repository.getPlans();
-});
-
-/// Subscription history
-final subscriptionHistoryProvider = FutureProvider<List<SubscriptionHistoryItem>>((ref) async {
-  final repository = ref.watch(subscriptionRepositoryProvider);
-  return repository.getHistory();
-});
-
-/// Cancellation info
-final cancelInfoProvider = FutureProvider<CancelInfoResponse>((ref) async {
-  final repository = ref.watch(subscriptionRepositoryProvider);
-  return repository.getCancelInfo();
-});

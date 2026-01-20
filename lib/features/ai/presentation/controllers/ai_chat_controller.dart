@@ -32,8 +32,6 @@ class AiChatState {
 
 /// Controller for Cultural Context AI Chat
 class AiChatController extends AsyncNotifier<AiChatState> {
-  String? _userId;
-
   @override
   FutureOr<AiChatState> build() {
     return const AiChatState();
@@ -41,7 +39,6 @@ class AiChatController extends AsyncNotifier<AiChatState> {
 
   /// Initialize chat with user ID and load history
   Future<void> initialize(String userId) async {
-    _userId = userId;
     state = AsyncData(state.value!.copyWith(isLoading: true, error: null));
 
     try {
@@ -79,10 +76,11 @@ class AiChatController extends AsyncNotifier<AiChatState> {
         message: message,
       );
 
-      final updatedMessages = state.value?.messages ?? [];
-      state = AsyncData(state.value!.copyWith(
-        messages: [...updatedMessages, response],
+      final updatedMessages = [...currentMessages, userMessage, response];
+      state = AsyncData(AiChatState(
+        messages: updatedMessages,
         isLoading: false,
+        error: null,
       ));
     } catch (e) {
       state = AsyncData(state.value!.copyWith(

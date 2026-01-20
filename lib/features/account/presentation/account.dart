@@ -14,6 +14,9 @@ import 'package:ojaewa/features/auth/presentation/controllers/auth_controller.da
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_status_controller.dart';
 import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
+import 'package:ojaewa/core/subscriptions/subscription_constants.dart';
+import 'package:ojaewa/core/subscriptions/subscription_controller.dart';
+import 'package:ojaewa/core/subscriptions/iap_service.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -185,6 +188,10 @@ class AccountScreen extends ConsumerWidget {
                         _buildSettingsList(context),
 
                         if (isLoggedIn) ...[
+                          // Subscription status
+                          const SizedBox(height: 16),
+                          _buildSubscriptionStatusCard(ref),
+
                           // AI Features section
                           const SizedBox(height: 24),
                           _buildSectionHeader('AI Features'),
@@ -405,6 +412,82 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildSubscriptionStatusCard(WidgetRef ref) {
+    final subscriptionState = ref.watch(subscriptionControllerProvider).value;
+    final subscription = subscriptionState?.subscription;
+    final hasPro = subscription != null && subscription.status.isActive;
+    final expiresText = subscription?.expiresAt != null
+        ? 'Expires on ${subscription!.expiresAt.toLocal().toString().split(' ').first}'
+        : 'Subscribe to unlock seller AI tools';
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5E0CE),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: hasPro ? const Color(0xFF4CAF50) : const Color(0xFFCCCCCC),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              hasPro ? Icons.verified : Icons.lock_outline,
+              color: Colors.white,
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  hasPro ? 'Ojaewa Pro Active' : 'Ojaewa Pro Inactive',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF241508),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  hasPro ? expiresText : 'Subscribe to sell and publish your business profile',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'Campton',
+                    color: Color(0xFF777F84),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (!hasPro)
+            TextButton(
+              onPressed: () async {
+                await ref.read(iapServiceProvider).purchaseSubscription(
+                      SubscriptionProducts.ojaewaProYearly,
+                    );
+              },
+              child: const Text(
+                'Subscribe',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFFFDAF40),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildBusinessList(BuildContext context, WidgetRef ref) {
     final isSellerApproved = ref.watch(isSellerApprovedProvider);
     final hasApprovedBusiness = ref.watch(hasApprovedBusinessProvider);
@@ -440,12 +523,12 @@ class AccountScreen extends ConsumerWidget {
         _buildMenuItem(
           iconAsset: AppIcons.privacyPolicy,
           label: 'Privacy Policy',
-          onTap: () {},
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.privacyPolicy),
         ),
         _buildMenuItem(
           iconAsset: AppIcons.termsOfService,
           label: 'Terms of Service',
-          onTap: () {},
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.termsOfService),
         ),
         _buildMenuItem(
           iconAsset: AppIcons.faq,

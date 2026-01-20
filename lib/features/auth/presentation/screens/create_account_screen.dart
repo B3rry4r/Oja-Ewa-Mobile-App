@@ -663,13 +663,18 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                     height: 1.4,
                   ),
                 ),
-                TextSpan(
-                  text: 'terms of service',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Campton',
-                    color: const Color(0xFFFDAF40), // #fdaf40
+                WidgetSpan(
+                  child: InkWell(
+                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.termsOfService),
+                    child: const Text(
+                      'terms of service',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Campton',
+                        color: Color(0xFFFDAF40), // #fdaf40
+                      ),
+                    ),
                   ),
                 ),
               ],

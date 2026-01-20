@@ -1,30 +1,29 @@
-# Ojaewa IAP & Subscriptions - Backend API Specification
+# Ojaewa IAP Subscriptions API (Laravel)
 
-> **Version:** 1.0  
-> **Last Updated:** January 2026  
-> **Purpose:** Backend API endpoints required for In-App Purchase (IAP) subscription management
+Base URL: `https://api.ojaewa.com/api`
+
+Authentication: Bearer token (Sanctum)
 
 ---
 
-## Overview
+---
 
-This document specifies the backend API endpoints required to support yearly subscriptions for Sellers and Business Profiles in the Ojaewa app. Subscriptions are processed through Apple App Store and Google Play Store, with the backend responsible for:
+## Notes
 
-1. **Verification** - Validating purchase receipts with Apple/Google
-2. **Storage** - Storing subscription details and status
-3. **Access Control** - Determining feature access based on subscription status
-4. **Webhook Handling** - Processing subscription lifecycle events (renewals, cancellations, etc.)
+- Only `ojaewa_pro` is supported
+- `POST /subscriptions/verify` only stores purchase data (no verification yet)
+- Verification with Apple/Google will be added later
+- If `transaction_id + platform` already exists, subscription is updated
 
 ---
 
 ## Subscription Products
 
-### Product IDs (Use these exactly in App Store Connect & Google Play Console)
+### Product ID (Use this exactly in App Store Connect & Google Play Console)
 
 | Product ID | Platform | Type | Duration | Description |
 |------------|----------|------|----------|-------------|
-| `ojaewa_seller_pro_yearly` | Both | Auto-Renewable | 1 Year | Seller Pro subscription |
-| `ojaewa_business_premium_yearly` | Both | Auto-Renewable | 1 Year | Business Premium subscription |
+| `ojaewa_pro` | Both | Auto-Renewable | 1 Year | Ojaewa Pro subscription |
 
 ### Subscription Tiers
 
@@ -34,21 +33,16 @@ This document specifies the backend API endpoints required to support yearly sub
 - No AI features
 - Standard support
 
-#### 2. Seller Pro (₦49,999/year) - `ojaewa_seller_pro_yearly`
+#### 2. Ojaewa Pro (Yearly) - `ojaewa_pro`
 - Unlimited product listings
 - AI Product Descriptions
-- Basic Analytics
-- Priority support
-- Verified seller badge
-
-#### 3. Business Premium (₦99,999/year) - `ojaewa_business_premium_yearly`
-- Everything in Seller Pro
-- Full AI Analytics Dashboard
+- AI Analytics Dashboard
 - Trend Predictions
 - Inventory Forecasting
 - Customer Insights
 - Featured placement
-- Premium support
+- Priority support
+- Verified seller badge
 
 ---
 
@@ -62,8 +56,8 @@ CREATE TABLE subscriptions (
     user_id BIGINT UNSIGNED NOT NULL,
     
     -- Subscription Details
-    product_id VARCHAR(100) NOT NULL,           -- e.g., 'ojaewa_seller_pro_yearly'
-    tier VARCHAR(50) NOT NULL,                   -- 'seller_pro' | 'business_premium'
+    product_id VARCHAR(100) NOT NULL,           -- e.g., 'ojaewa_pro'
+    tier VARCHAR(50) NOT NULL,                   -- 'ojaewa_pro' | 'free'
     platform VARCHAR(20) NOT NULL,               -- 'ios' | 'android'
     
     -- Store Transaction Info
@@ -138,415 +132,90 @@ CREATE TABLE subscription_history (
 
 ## API Endpoints
 
-### Base URL
-```
-https://api.ojaewa.com/api/v1
-```
-
-### Authentication
-All endpoints require Bearer token authentication:
-```
-Authorization: Bearer {sanctum_token}
-```
-
----
-
-### 1. Verify & Store Purchase
+### 1) Store Subscription (No Verification Yet)
 
 **Endpoint:** `POST /subscriptions/verify`
 
-Called by the app after a successful purchase to verify with Apple/Google and store the subscription.
+This endpoint only stores the purchase data. Receipt verification will be added later.
 
-**Request:**
+**Request Body**
 ```json
 {
-    "platform": "ios",                              // "ios" | "android"
-    "product_id": "ojaewa_seller_pro_yearly",       // Product ID
-    "transaction_id": "1000000123456789",           // Store transaction ID
-    "receipt_data": "MIIbngYJKoZIhvc...",          // iOS: Base64 receipt | Android: purchase token
-    "environment": "production"                     // "sandbox" | "production"
+  "platform": "ios",
+  "product_id": "ojaewa_pro",
+  "transaction_id": "1000000123456789",
+  "receipt_data": "MIIbngYJKoZIhvc...",
+  "environment": "sandbox"
 }
 ```
 
-**Response (Success - 200):**
+**Response (200)**
 ```json
 {
-    "success": true,
-    "message": "Subscription verified and activated",
-    "data": {
-        "subscription": {
-            "id": 123,
-            "product_id": "ojaewa_seller_pro_yearly",
-            "tier": "seller_pro",
-            "status": "active",
-            "starts_at": "2026-01-18T00:00:00Z",
-            "expires_at": "2027-01-18T00:00:00Z",
-            "is_auto_renewing": true,
-            "platform": "ios"
-        },
-        "features": {
-            "unlimited_products": true,
-            "ai_descriptions": true,
-            "ai_analytics": false,
-            "trend_predictions": false,
-            "inventory_forecasting": false,
-            "verified_badge": true,
-            "priority_support": true
-        }
+  "success": true,
+  "message": "Subscription verified and activated",
+  "data": {
+    "subscription": {
+      "id": 4,
+      "product_id": "ojaewa_pro",
+      "tier": "ojaewa_pro",
+      "status": "active",
+      "starts_at": "2026-01-20T17:57:54.000000Z",
+      "expires_at": "2027-01-20T17:57:54.000000Z",
+      "is_auto_renewing": true,
+      "platform": "ios"
     }
-}
-```
-
-**Response (Invalid Receipt - 400):**
-```json
-{
-    "success": false,
-    "message": "Invalid receipt",
-    "error": {
-        "code": "INVALID_RECEIPT",
-        "details": "Receipt verification failed with store"
-    }
-}
-```
-
-**Response (Already Processed - 409):**
-```json
-{
-    "success": false,
-    "message": "Transaction already processed",
-    "error": {
-        "code": "DUPLICATE_TRANSACTION",
-        "details": "This transaction has already been verified"
-    }
+  }
 }
 ```
 
 ---
 
-### 2. Get Current Subscription Status
+### 2) Get Subscription Status
 
 **Endpoint:** `GET /subscriptions/status`
 
-Returns the current user's subscription status and entitled features.
-
-**Response (Active Subscription):**
+**Response (No Subscription)**
 ```json
 {
-    "success": true,
-    "data": {
-        "has_subscription": true,
-        "subscription": {
-            "id": 123,
-            "product_id": "ojaewa_seller_pro_yearly",
-            "tier": "seller_pro",
-            "tier_name": "Seller Pro",
-            "status": "active",
-            "platform": "ios",
-            "starts_at": "2026-01-18T00:00:00Z",
-            "expires_at": "2027-01-18T00:00:00Z",
-            "days_remaining": 365,
-            "is_auto_renewing": true,
-            "will_renew": true
-        },
-        "features": {
-            "unlimited_products": true,
-            "ai_descriptions": true,
-            "ai_analytics": false,
-            "trend_predictions": false,
-            "inventory_forecasting": false,
-            "customer_insights": false,
-            "verified_badge": true,
-            "priority_support": true,
-            "featured_placement": false,
-            "max_products": -1
-        }
-    }
+  "success": true,
+  "data": {
+    "has_subscription": false,
+    "subscription": null
+  }
 }
 ```
 
-**Response (No Subscription):**
+**Response (Active Subscription)**
 ```json
 {
-    "success": true,
-    "data": {
-        "has_subscription": false,
-        "subscription": null,
-        "features": {
-            "unlimited_products": false,
-            "ai_descriptions": false,
-            "ai_analytics": false,
-            "trend_predictions": false,
-            "inventory_forecasting": false,
-            "customer_insights": false,
-            "verified_badge": false,
-            "priority_support": false,
-            "featured_placement": false,
-            "max_products": 10
-        }
+  "success": true,
+  "data": {
+    "has_subscription": true,
+    "subscription": {
+      "id": 4,
+      "product_id": "ojaewa_pro",
+      "tier": "ojaewa_pro",
+      "status": "active",
+      "platform": "ios",
+      "starts_at": "2026-01-20T17:57:54.000000Z",
+      "expires_at": "2027-01-20T17:57:54.000000Z",
+      "days_remaining": 364,
+      "is_auto_renewing": true,
+      "will_renew": true
     }
-}
-```
-
-**Response (Expired):**
-```json
-{
-    "success": true,
-    "data": {
-        "has_subscription": false,
-        "subscription": {
-            "id": 123,
-            "product_id": "ojaewa_seller_pro_yearly",
-            "tier": "seller_pro",
-            "status": "expired",
-            "expires_at": "2026-01-15T00:00:00Z",
-            "days_since_expiry": 3,
-            "can_restore": true
-        },
-        "features": {
-            // Free tier features
-        }
-    }
+  }
 }
 ```
 
 ---
 
-### 3. Get Subscription Plans
+## Notes
 
-**Endpoint:** `GET /subscriptions/plans`
+- Only `ojaewa_pro` is currently supported
+- Verification with Apple/Google will be added later
+- If `transaction_id + platform` already exists, subscription is updated
 
-Returns available subscription plans with pricing (for display in app).
-
-**Response:**
-```json
-{
-    "success": true,
-    "data": {
-        "plans": [
-            {
-                "product_id": "ojaewa_seller_pro_yearly",
-                "name": "Seller Pro",
-                "description": "Unlock powerful selling tools and AI features",
-                "tier": "seller_pro",
-                "duration": "yearly",
-                "price": {
-                    "amount": 49999,
-                    "currency": "NGN",
-                    "formatted": "₦49,999/year"
-                },
-                "features": [
-                    "Unlimited product listings",
-                    "AI Product Descriptions",
-                    "Basic Analytics",
-                    "Verified Seller Badge",
-                    "Priority Support"
-                ],
-                "popular": true
-            },
-            {
-                "product_id": "ojaewa_business_premium_yearly",
-                "name": "Business Premium",
-                "description": "Full suite of AI-powered business tools",
-                "tier": "business_premium",
-                "duration": "yearly",
-                "price": {
-                    "amount": 99999,
-                    "currency": "NGN",
-                    "formatted": "₦99,999/year"
-                },
-                "features": [
-                    "Everything in Seller Pro",
-                    "Full AI Analytics Dashboard",
-                    "Trend Predictions",
-                    "Inventory Forecasting",
-                    "Customer Insights",
-                    "Featured Placement",
-                    "Premium Support"
-                ],
-                "popular": false
-            }
-        ],
-        "free_tier": {
-            "name": "Free",
-            "features": [
-                "Up to 10 product listings",
-                "Basic seller tools",
-                "Standard support"
-            ]
-        }
-    }
-}
-```
-
----
-
-### 4. Restore Purchases
-
-**Endpoint:** `POST /subscriptions/restore`
-
-Called when user taps "Restore Purchases" - verifies and restores any active subscriptions.
-
-**Request:**
-```json
-{
-    "platform": "ios",
-    "receipt_data": "MIIbngYJKoZIhvc...",   // iOS: Full receipt | Android: Not needed (use Play Billing API)
-    "purchase_tokens": [                      // Android only: List of purchase tokens to verify
-        "token1...",
-        "token2..."
-    ]
-}
-```
-
-**Response (Restored):**
-```json
-{
-    "success": true,
-    "message": "Subscription restored successfully",
-    "data": {
-        "restored": true,
-        "subscription": {
-            // Same as verify response
-        }
-    }
-}
-```
-
-**Response (Nothing to Restore):**
-```json
-{
-    "success": true,
-    "message": "No active subscriptions found",
-    "data": {
-        "restored": false,
-        "subscription": null
-    }
-}
-```
-
----
-
-### 5. Get Subscription History
-
-**Endpoint:** `GET /subscriptions/history`
-
-Returns the user's subscription history.
-
-**Response:**
-```json
-{
-    "success": true,
-    "data": {
-        "history": [
-            {
-                "id": 1,
-                "event_type": "purchased",
-                "product_id": "ojaewa_seller_pro_yearly",
-                "tier": "seller_pro",
-                "created_at": "2026-01-18T10:30:00Z"
-            },
-            {
-                "id": 2,
-                "event_type": "renewed",
-                "product_id": "ojaewa_seller_pro_yearly",
-                "tier": "seller_pro",
-                "created_at": "2027-01-18T10:30:00Z"
-            }
-        ],
-        "pagination": {
-            "current_page": 1,
-            "per_page": 20,
-            "total": 2
-        }
-    }
-}
-```
-
----
-
-### 6. Cancel Subscription Info
-
-**Endpoint:** `GET /subscriptions/cancel-info`
-
-Returns information about cancelling (subscriptions are cancelled through App Store/Play Store).
-
-**Response:**
-```json
-{
-    "success": true,
-    "data": {
-        "cancellation_url": {
-            "ios": "https://apps.apple.com/account/subscriptions",
-            "android": "https://play.google.com/store/account/subscriptions"
-        },
-        "current_subscription": {
-            "expires_at": "2027-01-18T00:00:00Z",
-            "will_lose_access_on": "2027-01-18T00:00:00Z"
-        },
-        "message": "You can cancel anytime. You'll keep access until your current period ends."
-    }
-}
-```
-
----
-
-## Webhook Endpoints
-
-### Apple App Store Server Notifications (V2)
-
-**Endpoint:** `POST /webhooks/apple/subscriptions`
-
-**Headers:**
-```
-Content-Type: application/json
-```
-
-**Notification Types to Handle:**
-- `SUBSCRIBED` - New subscription
-- `DID_RENEW` - Successful renewal
-- `DID_FAIL_TO_RENEW` - Renewal failed
-- `DID_CHANGE_RENEWAL_STATUS` - Auto-renew toggled
-- `EXPIRED` - Subscription expired
-- `GRACE_PERIOD_EXPIRED` - Grace period ended
-- `REFUND` - Purchase refunded
-- `REVOKE` - Family sharing revoked
-
-**Implementation Notes:**
-1. Verify the `signedPayload` using Apple's certificates
-2. Decode the JWS to get the notification data
-3. Update subscription status accordingly
-4. Log to `subscription_history`
-
----
-
-### Google Play Real-time Developer Notifications
-
-**Endpoint:** `POST /webhooks/google/subscriptions`
-
-**Setup:** Configure Pub/Sub topic in Google Play Console
-
-**Notification Types:**
-- `SUBSCRIPTION_PURCHASED` (1)
-- `SUBSCRIPTION_RENEWED` (2)
-- `SUBSCRIPTION_RECOVERED` (3) - From account hold
-- `SUBSCRIPTION_CANCELED` (4)
-- `SUBSCRIPTION_ON_HOLD` (5)
-- `SUBSCRIPTION_IN_GRACE_PERIOD` (6)
-- `SUBSCRIPTION_RESTARTED` (7)
-- `SUBSCRIPTION_PRICE_CHANGE_CONFIRMED` (8)
-- `SUBSCRIPTION_DEFERRED` (9)
-- `SUBSCRIPTION_PAUSED` (10)
-- `SUBSCRIPTION_PAUSE_SCHEDULE_CHANGED` (11)
-- `SUBSCRIPTION_REVOKED` (12)
-- `SUBSCRIPTION_EXPIRED` (13)
-
-**Implementation Notes:**
-1. Verify the Pub/Sub message authenticity
-2. Decode the `data` field (base64)
-3. Use Google Play Developer API to get full subscription details
-4. Update subscription status accordingly
-
----
 
 ## Receipt Verification
 
@@ -586,20 +255,8 @@ class SubscriptionFeatures
             'priority_support' => false,
             'featured_placement' => false,
         ],
-        'seller_pro' => [
+        'ojaewa_pro' => [
             'max_products' => -1, // unlimited
-            'unlimited_products' => true,
-            'ai_descriptions' => true,
-            'ai_analytics' => false,
-            'trend_predictions' => false,
-            'inventory_forecasting' => false,
-            'customer_insights' => false,
-            'verified_badge' => true,
-            'priority_support' => true,
-            'featured_placement' => false,
-        ],
-        'business_premium' => [
-            'max_products' => -1,
             'unlimited_products' => true,
             'ai_descriptions' => true,
             'ai_analytics' => true,

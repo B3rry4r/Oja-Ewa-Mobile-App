@@ -8,26 +8,20 @@
 class SubscriptionProducts {
   SubscriptionProducts._();
 
-  /// Seller Pro - Yearly subscription
-  /// Price: ₦49,999/year
-  static const String sellerProYearly = 'ojaewa_seller_pro_yearly';
-
-  /// Business Premium - Yearly subscription
-  /// Price: ₦99,999/year
-  static const String businessPremiumYearly = 'ojaewa_business_premium_yearly';
+  /// Ojaewa Pro - Yearly subscription
+  /// Price: Set in App Store/Play Console
+  static const String ojaewaProYearly = 'ojaewa_pro';
 
   /// All available product IDs
   static const List<String> allProducts = [
-    sellerProYearly,
-    businessPremiumYearly,
+    ojaewaProYearly,
   ];
 }
 
 /// Subscription Tiers
 enum SubscriptionTier {
   free('free', 'Free'),
-  sellerPro('seller_pro', 'Seller Pro'),
-  businessPremium('business_premium', 'Business Premium');
+  ojaewaPro('ojaewa_pro', 'Ojaewa Pro');
 
   const SubscriptionTier(this.id, this.displayName);
 
@@ -43,10 +37,8 @@ enum SubscriptionTier {
 
   static SubscriptionTier fromProductId(String? productId) {
     switch (productId) {
-      case SubscriptionProducts.sellerProYearly:
-        return SubscriptionTier.sellerPro;
-      case SubscriptionProducts.businessPremiumYearly:
-        return SubscriptionTier.businessPremium;
+      case SubscriptionProducts.ojaewaProYearly:
+        return SubscriptionTier.ojaewaPro;
       default:
         return SubscriptionTier.free;
     }
@@ -54,8 +46,7 @@ enum SubscriptionTier {
 
   bool get isFree => this == SubscriptionTier.free;
   bool get isPaid => this != SubscriptionTier.free;
-  bool get isSellerPro => this == SubscriptionTier.sellerPro;
-  bool get isBusinessPremium => this == SubscriptionTier.businessPremium;
+  bool get isOjaewaPro => this == SubscriptionTier.ojaewaPro;
 }
 
 /// Subscription Status
@@ -100,22 +91,9 @@ class SubscriptionFeatures {
           prioritySupport: false,
           featuredPlacement: false,
         );
-      case SubscriptionTier.sellerPro:
+      case SubscriptionTier.ojaewaPro:
         return const SubscriptionFeatureSet(
           maxProducts: -1, // unlimited
-          unlimitedProducts: true,
-          aiDescriptions: true,
-          aiAnalytics: false,
-          trendPredictions: false,
-          inventoryForecasting: false,
-          customerInsights: false,
-          verifiedBadge: true,
-          prioritySupport: true,
-          featuredPlacement: false,
-        );
-      case SubscriptionTier.businessPremium:
-        return const SubscriptionFeatureSet(
-          maxProducts: -1,
           unlimitedProducts: true,
           aiDescriptions: true,
           aiAnalytics: true,

@@ -166,10 +166,13 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     if (_requiresExtendedFields) ...[
                       AiDescriptionGenerator(
                         nameController: _nameController,
+                        priceController: _priceController,
                         descriptionController: _descriptionController,
-                        category: _categoryName,
-                        fabric: _selectedFabricType,
                         style: _selectedStyle,
+                        tribe: _selectedTribe,
+                        gender: 'unisex',
+                        materials: _selectedFabricType,
+                        occasion: null,
                       ),
                       const SizedBox(height: 16),
                     ],

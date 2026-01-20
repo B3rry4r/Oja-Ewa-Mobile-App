@@ -316,24 +316,26 @@ class AiApi {
   // ============================================================
 
   /// Generate AI product description
-  /// POST /ai/seller/products/generate-description
-  /// Request: { name, category, attributes: { fabric, style, occasion } }
+  /// POST /ai/seller/product/description
+  /// Request: { name, style, tribe, gender, price, materials, occasion }
   Future<AiProductDescription> generateProductDescription({
     required String name,
-    required String category,
-    String? fabric,
-    String? style,
+    required String style,
+    required String tribe,
+    required String gender,
+    required double price,
+    String? materials,
     String? occasion,
   }) async {
-    const endpoint = '/ai/seller/products/generate-description';
+    const endpoint = '/ai/seller/product/description';
     final requestData = {
       'name': name,
-      'category': category,
-      'attributes': {
-        if (fabric != null) 'fabric': fabric,
-        if (style != null) 'style': style,
-        if (occasion != null) 'occasion': occasion,
-      },
+      'style': style,
+      'tribe': tribe,
+      'gender': gender,
+      'price': price,
+      if (materials != null) 'materials': materials,
+      if (occasion != null) 'occasion': occasion,
     };
     
     _log('POST', endpoint, data: requestData);
@@ -363,11 +365,10 @@ class AiApi {
   // FEATURE 4: SELLER ANALYTICS (Trends & Inventory)
   // ============================================================
 
-  /// Get upcoming trends for a category
-  /// GET /ai/buyer/trends/upcoming/{category}
-  /// Categories: textiles, shoes_bags, afro_beauty_products, art
+  /// Get seller category trends
+  /// GET /ai/seller/trends/:category
   Future<TrendData> getCategoryTrends(String category) async {
-    final endpoint = '/ai/buyer/trends/upcoming/$category';
+    final endpoint = '/ai/seller/trends/$category';
     
     _log('GET', endpoint);
     
@@ -376,22 +377,22 @@ class AiApi {
       _log('GET', endpoint, response: response.data, statusCode: response.statusCode);
       
       final data = _parseJsonResponse(response.data);
-      final trends = data['trends'] as List<dynamic>? ?? [];
+      final trends = data['trends'] as Map<String, dynamic>? ?? {};
+      final trendingStyles = trends['trendingStyles'] as List<dynamic>? ?? [];
       
       return TrendData(
-        category: data['category']?.toString() ?? category,
-        trendingStyles: trends.map((t) {
+        category: category,
+        trendingStyles: trendingStyles.map((t) {
           if (t is! Map<String, dynamic>) return const TrendItem(name: '', score: 0);
-          final popularity = t['popularity']?.toString() ?? '';
           return TrendItem(
-            name: t['name']?.toString() ?? '',
-            score: popularity == 'rising' ? 0.9 : popularity == 'stable' ? 0.6 : 0.3,
-            growth: popularity == 'rising' ? 15.0 : popularity == 'stable' ? 0.0 : -10.0,
+            name: t['style']?.toString() ?? t['name']?.toString() ?? '',
+            score: _parseDouble(t['score']),
+            growth: t['growth']?.toString() == 'rising' ? 15.0 : null,
           );
         }).toList(),
         trendingColors: [],
         trendingTribes: [],
-        period: (data['seasonalFactors'] as List<dynamic>?)?.join(', '),
+        period: trends['seasonalInsights']?.toString(),
         confidence: null,
       );
     } on DioException catch (e) {
@@ -403,18 +404,15 @@ class AiApi {
     }
   }
 
-  /// Get sales analytics for a seller
-  /// GET /ai/seller/analytics/sales/{sellerId}?period=30days
+  /// Get seller performance comparison
+  /// GET /ai/seller/trends/seller/:sellerId
   Future<SellerPerformance> getSellerPerformance(String sellerId) async {
-    final endpoint = '/ai/seller/analytics/sales/$sellerId';
+    final endpoint = '/ai/seller/trends/seller/$sellerId';
     
-    _log('GET', endpoint, data: {'period': '30days'});
+    _log('GET', endpoint);
     
     try {
-      final response = await _dio.get(
-        endpoint,
-        queryParameters: {'period': '30days'},
-      );
+      final response = await _dio.get(endpoint);
       _log('GET', endpoint, response: response.data, statusCode: response.statusCode);
       
       final data = _parseJsonResponse(response.data);
@@ -433,8 +431,7 @@ class AiApi {
           );
         }).toList(),
         marketComparison: null,
-        suggestions: (data['insights'] as List<dynamic>?)?.cast<String>() ??
-            (data['suggestions'] as List<dynamic>?)?.cast<String>(),
+        suggestions: (data['suggestions'] as List<dynamic>?)?.cast<String>() ?? [],
       );
     } on DioException catch (e) {
       _log('GET', endpoint, error: e.message, statusCode: e.response?.statusCode);
@@ -445,50 +442,50 @@ class AiApi {
     }
   }
 
-  /// Get inventory insights for a seller
-  /// GET /ai/seller/analytics/inventory/{sellerId}
+  /// Get inventory forecast
+  /// POST /ai/seller/inventory/forecast
+  /// Request: { timeframe: "30days" }
   Future<List<InventoryForecast>> getInventoryForecast({
     required String sellerId,
     String? category,
     int? daysAhead,
   }) async {
-    final endpoint = '/ai/seller/analytics/inventory/$sellerId';
+    const endpoint = '/ai/seller/inventory/forecast';
+    final requestData = {
+      'timeframe': '30days',
+    };
     
-    _log('GET', endpoint);
+    _log('POST', endpoint, data: requestData);
     
     try {
-      final response = await _dio.get(endpoint);
-      _log('GET', endpoint, response: response.data, statusCode: response.statusCode);
+      final response = await _dio.post(endpoint, data: requestData);
+      _log('POST', endpoint, response: response.data, statusCode: response.statusCode);
       
       final data = _parseJsonResponse(response.data);
-      final items = data['items'] as List<dynamic>? ?? 
-                    data['inventory'] as List<dynamic>? ?? 
-                    data['forecasts'] as List<dynamic>? ?? [];
+      final forecast = data['forecast'] as Map<String, dynamic>? ?? {};
+      final restock = forecast['restock'] as List<dynamic>? ?? [];
       
-      return items.map((item) {
+      return restock.map((item) {
         if (item is! Map<String, dynamic>) {
           return const InventoryForecast(
-            productId: '', productName: '', currentStock: 0, 
+            productId: '', productName: '', currentStock: 0,
             predictedDemand: 0, recommendedStock: 0,
           );
         }
         return InventoryForecast(
-          productId: item['productId']?.toString() ?? item['product_id']?.toString() ?? '',
-          productName: item['productName']?.toString() ?? item['name']?.toString() ?? '',
-          currentStock: (item['currentStock'] as num?)?.toInt() ?? 
-                        (item['stock'] as num?)?.toInt() ?? 0,
-          predictedDemand: (item['predictedDemand'] as num?)?.toInt() ?? 
-                           (item['demand'] as num?)?.toInt() ?? 0,
-          recommendedStock: (item['recommendedStock'] as num?)?.toInt() ?? 
-                            (item['recommended'] as num?)?.toInt() ?? 0,
-          confidence: _parseDouble(item['confidence']),
+          productId: item['product']?.toString() ?? '',
+          productName: item['product']?.toString() ?? '',
+          currentStock: 0,
+          predictedDemand: (item['quantity'] as num?)?.toInt() ?? 0,
+          recommendedStock: (item['quantity'] as num?)?.toInt() ?? 0,
+          confidence: item['urgency'] == 'high' ? 0.9 : 0.6,
         );
       }).toList();
     } on DioException catch (e) {
-      _log('GET', endpoint, error: e.message, statusCode: e.response?.statusCode);
+      _log('POST', endpoint, error: e.message, statusCode: e.response?.statusCode);
       rethrow;
     } catch (e) {
-      _log('GET', endpoint, error: e);
+      _log('POST', endpoint, error: e);
       rethrow;
     }
   }

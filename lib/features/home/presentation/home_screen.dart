@@ -20,11 +20,6 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: AppBottomNavBar.height + 8),
-        child: _buildAiChatFab(context, ref),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
         bottom: false,
         child: Container(
@@ -474,7 +469,7 @@ class HomeScreen extends ConsumerWidget {
         // Brands
         _buildCategoryItem(
           context: context,
-          title: 'Shoes & Bags',
+          title: 'Footwear/Bags',
           color: const Color(0xFFA15E22),
           iconAsset: AppIcons.brands,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.brands),
@@ -482,7 +477,7 @@ class HomeScreen extends ConsumerWidget {
         // Music
         _buildCategoryItem(
           context: context,
-          title: 'Art',
+          title: 'Art Market',
           color: const Color(0xFFEBC29D),
           iconAsset: AppIcons.music,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.music),
@@ -490,7 +485,7 @@ class HomeScreen extends ConsumerWidget {
         // Schools
         _buildCategoryItem(
           context: context,
-          title: 'Schools',
+          title: 'Education',
           color: const Color(0xFFFECF8C),
           iconAsset: AppIcons.schools,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.schools),
@@ -529,34 +524,17 @@ class HomeScreen extends ConsumerWidget {
           children: [
             Image.asset(iconAsset, fit: BoxFit.cover),
             Positioned(
-              bottom: 0,
+              bottom: 8,
+              left: 0,
               right: 0,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomLeft,
-                    colors: [
-                      const Color(0xFF603814).withOpacity(0.0),
-                      const Color(0xFF603814).withOpacity(0.85),
-                    ],
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    bottomRight: Radius.circular(8),
-                    topLeft: Radius.circular(8),
-                  ),
-                ),
+              child: Center(
                 child: Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 16,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: Color(0xFF241508),
                   ),
                 ),
               ),
@@ -651,25 +629,4 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  /// Floating Action Button for AI Cultural Assistant
-  Widget _buildAiChatFab(BuildContext context, WidgetRef ref) {
-    final token = ref.watch(accessTokenProvider);
-    final isLoggedIn = token != null && token.isNotEmpty;
-    if (!isLoggedIn) return const SizedBox.shrink();
-    return FloatingActionButton.extended(
-      onPressed: () => Navigator.of(context).pushNamed(AppRoutes.aiChat),
-      backgroundColor: const Color(0xFF603814),
-      foregroundColor: Colors.white,
-      icon: const Icon(Icons.psychology, size: 24),
-      label: const Text(
-        'Ask AI',
-        style: TextStyle(
-          fontSize: 14,
-          fontFamily: 'Campton',
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      elevation: 4,
-    );
-  }
 }
