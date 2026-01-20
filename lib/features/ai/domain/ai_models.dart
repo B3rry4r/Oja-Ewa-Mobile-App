@@ -30,16 +30,60 @@ class AiChatMessage {
   factory AiChatMessage.fromJson(Map<String, dynamic> json) {
     return AiChatMessage(
       id: json['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
-      content: json['response'] as String? ?? json['message'] as String? ?? '',
-      isUser: json['isUser'] as bool? ?? false,
-      timestamp: json['timestamp'] != null 
-          ? DateTime.parse(json['timestamp'] as String) 
-          : DateTime.now(),
+      content: json['response']?.toString() ?? 
+               json['message']?.toString() ?? 
+               json['content']?.toString() ?? '',
+      isUser: json['isUser'] as bool? ?? json['is_user'] as bool? ?? false,
+      timestamp: _parseDateTime(json['timestamp'] ?? json['created_at']),
       suggestions: (json['suggestions'] as List<dynamic>?)?.cast<String>(),
       products: (json['products'] as List<dynamic>?)
           ?.map((p) => AiSuggestedProduct.fromJson(p as Map<String, dynamic>))
           .toList(),
     );
+  }
+
+  static DateTime _parseDateTime(dynamic value) {
+    if (value == null) return DateTime.now();
+    if (value is DateTime) return value;
+    try {
+      return DateTime.parse(value.toString());
+    } catch (_) {
+      return DateTime.now();
+    }
+  }
+
+  /// Parse history item that contains both userMessage and assistantResponse
+  /// Returns a list of 2 messages: [userMessage, assistantResponse]
+  static List<AiChatMessage> fromHistoryItem(Map<String, dynamic> json) {
+    final messages = <AiChatMessage>[];
+    final id = json['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
+    final timestamp = _parseDateTime(json['timestamp'] ?? json['created_at']);
+
+    // User message
+    if (json['userMessage'] != null || json['user_message'] != null) {
+      messages.add(AiChatMessage(
+        id: '${id}_user',
+        content: json['userMessage']?.toString() ?? json['user_message']?.toString() ?? '',
+        isUser: true,
+        timestamp: timestamp,
+      ));
+    }
+
+    // Assistant response
+    if (json['assistantResponse'] != null || json['assistant_response'] != null) {
+      messages.add(AiChatMessage(
+        id: '${id}_assistant',
+        content: json['assistantResponse']?.toString() ?? json['assistant_response']?.toString() ?? '',
+        isUser: false,
+        timestamp: timestamp,
+        suggestions: (json['suggestions'] as List<dynamic>?)?.cast<String>(),
+        products: (json['products'] as List<dynamic>?)
+            ?.map((p) => AiSuggestedProduct.fromJson(p as Map<String, dynamic>))
+            .toList(),
+      ));
+    }
+
+    return messages;
   }
 
   Map<String, dynamic> toJson() => {

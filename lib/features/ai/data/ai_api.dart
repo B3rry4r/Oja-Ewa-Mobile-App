@@ -116,9 +116,16 @@ class AiApi {
       
       final data = _parseJsonResponse(response.data);
       final history = data['history'] as List<dynamic>? ?? [];
-      return history
-          .map((m) => AiChatMessage.fromJson(m as Map<String, dynamic>))
-          .toList();
+      
+      // Each history item contains userMessage + assistantResponse
+      // We need to expand them into individual messages
+      final messages = <AiChatMessage>[];
+      for (final item in history) {
+        if (item is Map<String, dynamic>) {
+          messages.addAll(AiChatMessage.fromHistoryItem(item));
+        }
+      }
+      return messages;
     } on DioException catch (e) {
       _log('GET', endpoint, error: e.message, statusCode: e.response?.statusCode);
       rethrow;
