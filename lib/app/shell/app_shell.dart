@@ -43,7 +43,8 @@ class _AppShellState extends ConsumerState<AppShell> {
       backgroundColor: Colors.transparent,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: AppBottomNavBar.height + 16),
+        padding: const EdgeInsets.only(bottom: 10),
+        // padding: const EdgeInsets.only(bottom: AppBottomNavBar.height + 16),
         child: _buildFloatingButtons(context, isLoggedIn),
       ),
       body: IndexedStack(
