@@ -439,7 +439,7 @@ class HomeScreen extends ConsumerWidget {
       style: TextStyle(
         fontSize: 32,
         fontWeight: FontWeight.w700,
-        color: Color(0xFF241508),
+        color: Color(0xFF603814),
         height: 1.2,
         letterSpacing: -0.5,
       ),
@@ -532,14 +532,17 @@ class HomeScreen extends ConsumerWidget {
               bottom: 0,
               right: 0,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomLeft,
                     colors: [
-                      const Color(0xFF241508).withOpacity(0.85),
-                      const Color(0xFF241508).withOpacity(0.0),
+                      const Color(0xFF603814).withOpacity(0.0),
+                      const Color(0xFF603814).withOpacity(0.85),
                     ],
                   ),
                   borderRadius: const BorderRadius.only(
@@ -574,7 +577,9 @@ class HomeScreen extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: InkWell(
-        onTap: () => Navigator.of(context).pushNamed(AppRoutes.personalizedRecommendations),
+        onTap: () => Navigator.of(
+          context,
+        ).pushNamed(AppRoutes.personalizedRecommendations),
         borderRadius: BorderRadius.circular(16),
         child: Container(
           padding: const EdgeInsets.all(16),
@@ -649,7 +654,7 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildAiChatFab(BuildContext context) {
     return FloatingActionButton.extended(
       onPressed: () => Navigator.of(context).pushNamed(AppRoutes.aiChat),
-      backgroundColor: const Color(0xFFFDAF40),
+      backgroundColor: const Color(0xFF603814),
       foregroundColor: Colors.white,
       icon: const Icon(Icons.psychology, size: 24),
       label: const Text(
