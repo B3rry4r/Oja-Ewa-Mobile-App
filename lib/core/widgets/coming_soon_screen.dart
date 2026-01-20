@@ -39,7 +39,7 @@ class ComingSoonScreen extends StatelessWidget {
                   children: [
                     // Ojá-Ẹwà Logo
                     Image.asset(
-                      AppImages.logoOutline,
+                      AppImages.comingSoon,
                       width: 120,
                       height: 120,
                     ),
