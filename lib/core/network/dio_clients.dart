@@ -18,14 +18,14 @@ class DioClients {
 }
 
 final dioClientsProvider = Provider<DioClients>((ref) {
-  Dio build(String baseUrl) {
+  Dio build(String baseUrl, {Duration? connectTimeout, Duration? receiveTimeout}) {
     final options = BaseOptions(
       baseUrl: baseUrl,
-      connectTimeout: NetworkConstants.connectTimeout,
+      connectTimeout: connectTimeout ?? NetworkConstants.connectTimeout,
       // Web warning: sendTimeout is only meaningful when sending a request body.
       // Leaving this unset avoids noisy logs on web.
       // sendTimeout: NetworkConstants.sendTimeout,
-      receiveTimeout: NetworkConstants.receiveTimeout,
+      receiveTimeout: receiveTimeout ?? NetworkConstants.receiveTimeout,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -46,7 +46,11 @@ final dioClientsProvider = Provider<DioClients>((ref) {
 
   return DioClients(
     laravel: build(AppUrls.laravelBaseUrl),
-    ai: build(AppUrls.aiBaseUrl),
+    ai: build(
+      AppUrls.aiBaseUrl,
+      connectTimeout: const Duration(seconds: 60),
+      receiveTimeout: const Duration(seconds: 60),
+    ),
   );
 });
 

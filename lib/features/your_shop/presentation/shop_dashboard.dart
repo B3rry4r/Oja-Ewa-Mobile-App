@@ -6,6 +6,8 @@ import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/domain/seller_status.dart';
 import 'package:ojaewa/features/your_shop/presentation/controllers/seller_orders_controller.dart';
+import 'package:ojaewa/features/account/presentation/controllers/profile_controller.dart';
+import 'package:ojaewa/features/ai/presentation/controllers/ai_analytics_controller.dart';
 
 import '../../../app/router/app_router.dart';
 import '../subfeatures/product/product_listing.dart';
@@ -19,6 +21,7 @@ class ShopDashboardScreen extends ConsumerWidget {
     final sellerStatus = ref.watch(sellerStatusProvider);
     final processingOrders = ref.watch(sellerOrdersProvider('processing'));
     final allOrders = ref.watch(sellerOrdersProvider(null));
+    final userId = ref.watch(userProfileProvider).value?.id.toString();
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Main Brand Background
@@ -53,7 +56,7 @@ class ShopDashboardScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               // AI Analytics Button
-              _buildAiAnalyticsButton(context),
+              _buildAiAnalyticsButton(context, ref, userId),
               const SizedBox(height: 32),
               const Text(
                 "Orders in Process",
@@ -279,9 +282,16 @@ class ShopDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAiAnalyticsButton(BuildContext context) {
+  Widget _buildAiAnalyticsButton(BuildContext context, WidgetRef ref, String? userId) {
     return InkWell(
-      onTap: () => Navigator.of(context).pushNamed(AppRoutes.sellerAnalytics),
+      onTap: () async {
+        if (userId != null && userId.isNotEmpty) {
+          await ref.read(sellerAnalyticsControllerProvider.notifier).initialize(userId);
+        }
+        if (context.mounted) {
+          Navigator.of(context).pushNamed(AppRoutes.sellerAnalytics);
+        }
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         width: double.infinity,
