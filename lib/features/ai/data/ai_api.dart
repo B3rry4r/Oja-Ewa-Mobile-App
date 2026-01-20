@@ -316,24 +316,26 @@ class AiApi {
   // ============================================================
 
   /// Generate AI product description
-  /// POST /ai/seller/products/generate-description
-  /// Request: { name, category, attributes: { fabric, style, occasion } }
+  /// POST /ai/seller/product/description
+  /// Request: { name, style, tribe, gender, price, materials, occasion }
   Future<AiProductDescription> generateProductDescription({
     required String name,
-    required String category,
-    String? fabric,
-    String? style,
+    required String style,
+    required String tribe,
+    required String gender,
+    required double price,
+    String? materials,
     String? occasion,
   }) async {
-    const endpoint = '/ai/seller/products/generate-description';
+    const endpoint = '/ai/seller/product/description';
     final requestData = {
       'name': name,
-      'category': category,
-      'attributes': {
-        if (fabric != null) 'fabric': fabric,
-        if (style != null) 'style': style,
-        if (occasion != null) 'occasion': occasion,
-      },
+      'style': style,
+      'tribe': tribe,
+      'gender': gender,
+      'price': price,
+      if (materials != null) 'materials': materials,
+      if (occasion != null) 'occasion': occasion,
     };
     
     _log('POST', endpoint, data: requestData);

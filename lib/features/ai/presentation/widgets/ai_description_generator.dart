@@ -12,17 +12,21 @@ class AiDescriptionGenerator extends ConsumerStatefulWidget {
     super.key,
     required this.nameController,
     required this.descriptionController,
-    required this.category,
-    this.fabric,
-    this.style,
+    required this.style,
+    required this.tribe,
+    required this.gender,
+    required this.price,
+    this.materials,
     this.occasion,
   });
 
   final TextEditingController nameController;
   final TextEditingController descriptionController;
-  final String? category;
-  final String? fabric;
   final String? style;
+  final String? tribe;
+  final String gender;
+  final double? price;
+  final String? materials;
   final String? occasion;
 
   @override
@@ -36,15 +40,17 @@ class _AiDescriptionGeneratorState
 
   bool get _canGenerate {
     return widget.nameController.text.isNotEmpty &&
-        widget.category != null &&
-        widget.category!.isNotEmpty;
+        widget.style != null &&
+        widget.tribe != null &&
+        widget.price != null &&
+        widget.price! > 0;
   }
 
   Future<void> _generateDescription() async {
     if (!_canGenerate) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter product name and category first'),
+          content: Text('Please fill in name, style, tribe, and price first'),
           backgroundColor: Color(0xFFE57373),
         ),
       );
@@ -55,9 +61,11 @@ class _AiDescriptionGeneratorState
         .read(aiDescriptionControllerProvider.notifier)
         .generateDescription(
           name: widget.nameController.text,
-          category: widget.category!,
-          fabric: widget.fabric,
-          style: widget.style,
+          style: widget.style!,
+          tribe: widget.tribe!,
+          gender: widget.gender,
+          price: widget.price!,
+          materials: widget.materials,
           occasion: widget.occasion,
         );
 
@@ -155,21 +163,27 @@ class _AiDescriptionGeneratorState
                   ),
                   const SizedBox(height: 8),
                   _buildStatusItem(
-                    'Category',
-                    widget.category != null && widget.category!.isNotEmpty,
-                    widget.category ?? 'Required',
-                  ),
-                  const SizedBox(height: 8),
-                  _buildStatusItem(
                     'Style',
                     widget.style != null && widget.style!.isNotEmpty,
-                    widget.style ?? 'Optional',
+                    widget.style ?? 'Required',
                   ),
                   const SizedBox(height: 8),
                   _buildStatusItem(
-                    'Fabric',
-                    widget.fabric != null && widget.fabric!.isNotEmpty,
-                    widget.fabric ?? 'Optional',
+                    'Tribe/Culture',
+                    widget.tribe != null && widget.tribe!.isNotEmpty,
+                    widget.tribe ?? 'Required',
+                  ),
+                  const SizedBox(height: 8),
+                  _buildStatusItem(
+                    'Price',
+                    widget.price != null && widget.price! > 0,
+                    widget.price != null ? '₦${widget.price!.toStringAsFixed(0)}' : 'Required',
+                  ),
+                  const SizedBox(height: 8),
+                  _buildStatusItem(
+                    'Materials',
+                    widget.materials != null && widget.materials!.isNotEmpty,
+                    widget.materials ?? 'Optional',
                   ),
                   const SizedBox(height: 16),
 
