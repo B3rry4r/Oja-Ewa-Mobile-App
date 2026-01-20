@@ -20,6 +20,7 @@ class AiApi {
     debugPrint('═══════════════════════════════════════════════════════════');
     debugPrint('🤖 [AI API] $timestamp');
     debugPrint('📍 $method $endpoint');
+    debugPrint('🌐 Base URL: ${_dio.options.baseUrl}');
     if (data != null) {
       debugPrint('📤 Request: $data');
     }
@@ -30,6 +31,24 @@ class AiApi {
       debugPrint('❌ Error: $error');
     }
     debugPrint('═══════════════════════════════════════════════════════════');
+  }
+
+  /// Safely parse JSON response, throwing clear error if HTML is returned
+  Map<String, dynamic> _parseJsonResponse(dynamic responseData) {
+    if (responseData is String) {
+      if (responseData.contains('<!DOCTYPE') || responseData.contains('<html')) {
+        throw Exception(
+          'AI API returned HTML instead of JSON. '
+          'Please check the AI_BASE_URL configuration. '
+          'Current URL: ${_dio.options.baseUrl}'
+        );
+      }
+      throw Exception('AI API returned unexpected string response: ${responseData.substring(0, 100)}...');
+    }
+    if (responseData is! Map<String, dynamic>) {
+      throw Exception('AI API returned unexpected response type: ${responseData.runtimeType}');
+    }
+    return responseData;
   }
 
   // ============================================================

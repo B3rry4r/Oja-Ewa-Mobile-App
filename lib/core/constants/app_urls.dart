@@ -34,14 +34,14 @@ class AppUrls {
     if (_aiOverride.isNotEmpty) return _aiOverride;
 
     // Defaults (from docs):
-    // - ojaewa-ai-production.up.railway.app
+    // - https://ojaewa-ai-production.up.railway.app
     switch (AppEnv.current) {
       case AppEnvironment.dev:
-        return 'ojaewa-ai-production.up.railway.app';
+        return 'https://ojaewa-ai-production.up.railway.app';
       case AppEnvironment.staging:
-        return 'ojaewa-ai-production.up.railway.app';
+        return 'https://ojaewa-ai-production.up.railway.app';
       case AppEnvironment.prod:
-        return 'ojaewa-ai-production.up.railway.app';
+        return 'https://ojaewa-ai-production.up.railway.app';
     }
   }
 }
