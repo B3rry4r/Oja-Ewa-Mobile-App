@@ -163,7 +163,7 @@ class BusinessOnboardingScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Subscribe to Ojaewa Pro to register a business profile and access AI tools.',
+            'Subscribe to Ojaewa Pro to publish your business profile and sell on the platform. AI tools are included.',
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Campton',

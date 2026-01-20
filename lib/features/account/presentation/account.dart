@@ -456,7 +456,7 @@ class AccountScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  hasPro ? expiresText : 'Subscribe to unlock seller AI tools',
+                  hasPro ? expiresText : 'Subscribe to sell and publish your business profile',
                   style: const TextStyle(
                     fontSize: 12,
                     fontFamily: 'Campton',

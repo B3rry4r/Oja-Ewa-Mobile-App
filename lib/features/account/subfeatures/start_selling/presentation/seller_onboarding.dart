@@ -131,7 +131,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Subscribe to Ojaewa Pro to register as a seller and access AI tools.',
+            'Subscribe to Ojaewa Pro to sell on the platform and publish your seller profile. AI tools are included.',
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Campton',
