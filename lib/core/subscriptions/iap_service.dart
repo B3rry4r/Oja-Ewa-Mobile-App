@@ -105,15 +105,25 @@ class IapService {
       return false;
     }
 
+    // Set loading state immediately when purchase starts
+    _ref.read(subscriptionControllerProvider.notifier).setLoading(true);
+
     final purchaseParam = PurchaseParam(productDetails: product);
 
     try {
       // For subscriptions, use buyNonConsumable
       final success = await _iap.buyNonConsumable(purchaseParam: purchaseParam);
       debugPrint('IAP: Purchase initiated: $success');
+      
+      // If purchase initiation failed, clear loading state
+      if (!success) {
+        _ref.read(subscriptionControllerProvider.notifier).setLoading(false);
+      }
       return success;
     } catch (e) {
       debugPrint('IAP: Purchase error: $e');
+      // Clear loading state on error
+      _ref.read(subscriptionControllerProvider.notifier).setLoading(false, error: e.toString());
       return false;
     }
   }
@@ -206,7 +216,8 @@ class IapService {
 
   void _onPurchasePending(PurchaseDetails purchase) {
     debugPrint('IAP: Purchase pending for ${purchase.productID}');
-    // The UI should show a loading state - handled by subscription controller
+    // Set loading state to show spinner on subscribe buttons
+    _ref.read(subscriptionControllerProvider.notifier).setLoading(true);
   }
 
   void _onPurchaseSuccess(PurchaseDetails purchase, VerifyPurchaseResponse response) {
@@ -217,12 +228,14 @@ class IapService {
 
   void _onPurchaseError(PurchaseDetails purchase) {
     debugPrint('IAP: Purchase error for ${purchase.productID}: ${purchase.error}');
-    // Error is handled by subscription controller
+    // Clear loading state and show error
+    _ref.read(subscriptionControllerProvider.notifier).setLoading(false, error: purchase.error?.message);
   }
 
   void _onPurchaseCanceled(PurchaseDetails purchase) {
     debugPrint('IAP: Purchase canceled for ${purchase.productID}');
-    // User canceled - no action needed
+    // Clear loading state - user canceled
+    _ref.read(subscriptionControllerProvider.notifier).setLoading(false);
   }
 
   void _onVerificationFailed(PurchaseDetails purchase, VerifyPurchaseResponse? response) {

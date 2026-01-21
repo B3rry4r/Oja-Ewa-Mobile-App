@@ -61,7 +61,7 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
+      builder: (dialogContext) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         backgroundColor: _backgroundColor,
         child: Padding(
@@ -108,8 +108,11 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                 width: double.infinity,
                 child: InkWell(
                   onTap: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushReplacementNamed(AppRoutes.personalizedRecommendations);
+                    // Close dialog first
+                    Navigator.of(dialogContext).pop();
+                    // Pop the quiz screen and replace with recommendations
+                    // Using popAndPushNamed to avoid double-back issue
+                    Navigator.of(context).popAndPushNamed(AppRoutes.personalizedRecommendations);
                   },
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
@@ -134,7 +137,8 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
               const SizedBox(height: 12),
               InkWell(
                 onTap: () {
-                  Navigator.of(context).pop();
+                  // Close dialog first, then pop the quiz screen
+                  Navigator.of(dialogContext).pop();
                   Navigator.of(context).pop();
                 },
                 child: const Padding(

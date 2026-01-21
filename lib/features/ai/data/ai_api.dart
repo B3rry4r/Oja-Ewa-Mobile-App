@@ -445,6 +445,7 @@ class AiApi {
   /// Get inventory forecast
   /// POST /ai/seller/inventory/forecast
   /// Request: { timeframe: "30days" }
+  /// Response: { success, sellerId, forecast: { expectedDemand, recommendation, restockPriorities[] }, source }
   Future<List<InventoryForecast>> getInventoryForecast({
     required String sellerId,
     String? category,
@@ -464,6 +465,29 @@ class AiApi {
       final data = _parseJsonResponse(response.data);
       final forecast = data['forecast'] as Map<String, dynamic>? ?? {};
       final restock = forecast['restockPriorities'] as List<dynamic>? ?? [];
+      
+      // If restockPriorities is empty but we have forecast data, create a summary item
+      // This handles the case where API returns: { expectedDemand: "medium", recommendation: "...", restockPriorities: [] }
+      if (restock.isEmpty) {
+        final expectedDemand = forecast['expectedDemand']?.toString() ?? '';
+        final recommendation = forecast['recommendation']?.toString() ?? '';
+        
+        // If we have any forecast info, show it as a summary
+        if (expectedDemand.isNotEmpty || recommendation.isNotEmpty) {
+          return [
+            InventoryForecast(
+              productId: 'summary',
+              productName: 'Inventory Summary',
+              currentStock: 0,
+              predictedDemand: expectedDemand == 'high' ? 100 : (expectedDemand == 'medium' ? 50 : 25),
+              recommendedStock: expectedDemand == 'high' ? 100 : (expectedDemand == 'medium' ? 50 : 25),
+              confidence: 0.7,
+              recommendation: recommendation.isNotEmpty ? recommendation : 'Expected demand: $expectedDemand',
+            ),
+          ];
+        }
+        return [];
+      }
       
       return restock.map((item) {
         if (item is! Map<String, dynamic>) {
