@@ -46,7 +46,7 @@ class HomeScreen extends ConsumerWidget {
                       // For You - AI Personalized Section
                       _buildForYouSection(context, ref),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 12),
 
                       // Hero Title
                       Padding(
@@ -54,7 +54,7 @@ class HomeScreen extends ConsumerWidget {
                         child: _buildHeroTitle(),
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
 
                       // Category Grid Section with light background
                       Container(
@@ -67,7 +67,7 @@ class HomeScreen extends ConsumerWidget {
                           ),
                         ),
                         padding: const EdgeInsets.only(
-                          top: 24,
+                          top: 12,
                           left: 16,
                           right: 16,
                           bottom: 32,
@@ -432,11 +432,11 @@ class HomeScreen extends ConsumerWidget {
     return const Text(
       'Find What Speaks\nTo Your Soul',
       style: TextStyle(
-        fontSize: 32,
-        fontWeight: FontWeight.w700,
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
         color: Color(0xFF603814),
         height: 1.2,
-        letterSpacing: -0.5,
+        letterSpacing: -0.3,
       ),
     );
   }
@@ -446,9 +446,9 @@ class HomeScreen extends ConsumerWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      mainAxisSpacing: 8,
-      crossAxisSpacing: 8,
-      childAspectRatio: 168 / 186,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      childAspectRatio: 1.1,
       children: [
         // Market
         _buildCategoryItem(
@@ -513,34 +513,31 @@ class HomeScreen extends ConsumerWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
-      child: Container(
-        clipBehavior: Clip.hardEdge,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(iconAsset, fit: BoxFit.cover),
-            Positioned(
-              bottom: 8,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Campton',
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF241508),
-                  ),
-                ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Expanded(
+            child: Container(
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(8),
               ),
+              child: Image.asset(iconAsset, fit: BoxFit.cover),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w400,
+              color: Colors.black,
+            ),
+          ),
+        ],
       ),
     );
   }
