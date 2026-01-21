@@ -41,7 +41,7 @@ class AudioController extends Notifier<bool> {
     
     try {
       // Use MP3 format for better cross-platform compatibility
-      await _player.setSource(AssetSource('ojaewa.mp3'));
+      await _player.setSource(AssetSource('ojaewa2.mp3'));
       _sourceSet = true;
       debugPrint('AudioPlayer: Source set successfully');
       await play();
