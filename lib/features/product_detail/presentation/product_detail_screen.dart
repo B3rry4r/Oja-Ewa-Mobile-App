@@ -28,7 +28,6 @@ class ProductDetailsScreen extends ConsumerStatefulWidget {
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
   String selectedSize = 'S';
-  String selectedProcessing = 'Normal';
   int quantity = 1;
   int currentImageIndex = 0;
 
@@ -265,7 +264,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
                       const SizedBox(height: 12),
 
-                      _buildProcessingOptions(unitPriceLabel),
+                      _buildProcessingInfo(unitPriceLabel),
 
                       const SizedBox(height: 24),
 
@@ -477,118 +476,60 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     );
   }
 
-  Widget _buildProcessingOptions(String priceLabel) {
-    final days = ref
+  Widget _buildProcessingInfo(String priceLabel) {
+    final details = ref
         .read(productDetailsProvider(widget.productId))
-        .maybeWhen(data: (d) => d.processingDays, orElse: () => null);
-    final duration = days == null ? '' : '$days days';
+        .maybeWhen(data: (d) => d, orElse: () => null);
+    
+    final days = details?.processingDays;
+    final type = details?.processingTimeType ?? 'normal';
+    final duration = days == null ? 'Contact seller' : '$days days';
+    final typeLabel = type == 'quick_quick' ? 'Quick Quick' : 'Normal';
 
-    return Row(
-      children: [
-        Expanded(
-          child: _buildProcessingCard(
-            'Normal',
-            duration,
-            priceLabel,
-            isSelected: selectedProcessing == 'Normal',
-            onTap: () => setState(() => selectedProcessing = 'Normal'),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _buildProcessingCard(
-            'Quick Quick',
-            duration,
-            priceLabel,
-            isSelected: selectedProcessing == 'Quick Quick',
-            onTap: () => setState(() => selectedProcessing = 'Quick Quick'),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildProcessingCard(
-    String title,
-    String duration,
-    String price, {
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected
-                ? const Color(0xFF603814)
-                : const Color(0xFFDEDEDE),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF603814)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF1E2021),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      duration,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF777F84),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      price,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF0F1011),
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFF603814)
-                          : const Color(0xFF777F84),
-                    ),
+                Text(
+                  typeLabel,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1E2021),
                   ),
-                  child: isSelected
-                      ? const Icon(
-                          Icons.circle,
-                          size: 14,
-                          color: Color(0xFF603814),
-                        )
-                      : null,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  duration,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF777F84),
+                  ),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          Text(
+            priceLabel,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF0F1011),
+            ),
+          ),
+        ],
       ),
     );
   }
+
 
   Widget _buildExpandableSection(
     String title,
@@ -950,11 +891,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
               Expanded(
                 child: GestureDetector(
                   onTap: () async {
-                    final processingTimeType =
-                        selectedProcessing.toLowerCase().contains('quick') ||
-                            selectedProcessing.toLowerCase().contains('express')
-                        ? 'express'
-                        : 'normal';
+                    // Use the processing time type from the product details
+                    final details = ref.read(productDetailsProvider(widget.productId)).value;
+                    final processingTimeType = details?.processingTimeType ?? 'normal';
 
                     try {
                       await ref

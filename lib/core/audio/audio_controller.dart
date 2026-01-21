@@ -40,14 +40,8 @@ class AudioController extends Notifier<bool> {
     _initialized = true;
     
     try {
-      // For mobile platforms, we need to set the source differently
-      if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
-        // On mobile, use AssetSource with just the filename (assets/ prefix is automatic)
-        await _player.setSource(AssetSource('ojaewa.mpeg'));
-      } else {
-        // On web, AssetSource works directly
-        await _player.setSource(AssetSource('ojaewa.mpeg'));
-      }
+      // Use MP3 format for better cross-platform compatibility
+      await _player.setSource(AssetSource('ojaewa.mp3'));
       _sourceSet = true;
       debugPrint('AudioPlayer: Source set successfully');
       await play();
