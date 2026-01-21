@@ -63,9 +63,11 @@ class AiChatController extends AsyncNotifier<AiChatState> {
       timestamp: DateTime.now(),
     );
 
-    final currentMessages = state.value?.messages ?? [];
-    state = AsyncData(state.value!.copyWith(
-      messages: [...currentMessages, userMessage],
+    final currentMessages = List<AiChatMessage>.from(state.value?.messages ?? []);
+    final messagesWithUser = [...currentMessages, userMessage];
+    
+    state = AsyncData(AiChatState(
+      messages: messagesWithUser,
       isLoading: true,
       error: null,
     ));
@@ -76,14 +78,17 @@ class AiChatController extends AsyncNotifier<AiChatState> {
         message: message,
       );
 
-      final updatedMessages = [...currentMessages, userMessage, response];
+      // Create a completely new state with the AI response added
+      final messagesWithResponse = [...messagesWithUser, response];
       state = AsyncData(AiChatState(
-        messages: updatedMessages,
+        messages: messagesWithResponse,
         isLoading: false,
         error: null,
       ));
     } catch (e) {
-      state = AsyncData(state.value!.copyWith(
+      // Keep the user message but show error
+      state = AsyncData(AiChatState(
+        messages: messagesWithUser,
         isLoading: false,
         error: 'Failed to get response: ${e.toString()}',
       ));

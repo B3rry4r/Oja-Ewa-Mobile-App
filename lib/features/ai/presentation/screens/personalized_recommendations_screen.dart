@@ -277,7 +277,16 @@ class _PersonalizedRecommendationsScreenState
           ),
           const SizedBox(height: 16),
           InkWell(
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.styleDnaQuiz),
+            onTap: () async {
+              await Navigator.of(context).pushNamed(AppRoutes.styleDnaQuiz);
+              // After returning from quiz, refresh the providers to show new data
+              if (mounted) {
+                final user = ref.read(userProfileProvider).value;
+                final userId = user?.id.toString() ?? '';
+                ref.invalidate(styleProfileProvider(userId));
+                ref.invalidate(personalizedRecommendationsProvider(userId));
+              }
+            },
             borderRadius: BorderRadius.circular(8),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -356,67 +365,9 @@ class _PersonalizedRecommendationsScreenState
   }
 
   Widget _buildNoProfileRecommendations() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: _cardColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.auto_awesome, color: _primaryColor, size: 24),
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            'Take the Style Quiz to unlock recommendations',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w600,
-              color: _textDark,
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'We need your style profile before we can personalize your feed.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              fontFamily: 'Campton',
-              color: _textSecondary,
-            ),
-          ),
-          const SizedBox(height: 12),
-          InkWell(
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.styleDnaQuiz),
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-              decoration: BoxDecoration(
-                color: _primaryColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                'Take Style Quiz',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    // This widget is now redundant since _buildNoProfile handles the no-profile state
+    // Return an empty container - the profile section already shows the quiz prompt
+    return const SizedBox.shrink();
   }
 
   Widget _buildRecommendationsLoading() {

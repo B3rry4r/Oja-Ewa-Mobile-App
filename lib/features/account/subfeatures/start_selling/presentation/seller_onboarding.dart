@@ -111,6 +111,9 @@ class SellerOnboardingScreen extends ConsumerWidget {
   }
 
   Widget _buildSubscriptionGate(BuildContext context, WidgetRef ref) {
+    final subscriptionState = ref.watch(subscriptionControllerProvider);
+    final isLoading = subscriptionState.value?.isLoading ?? false;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -158,7 +161,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
               ),
               const SizedBox(width: 12),
               ElevatedButton(
-                onPressed: () async {
+                onPressed: isLoading ? null : () async {
                   await ref.read(iapServiceProvider).purchaseSubscription(
                         SubscriptionProducts.ojaewaProYearly,
                       );
@@ -166,8 +169,18 @@ class SellerOnboardingScreen extends ConsumerWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFDAF40),
                   foregroundColor: Colors.white,
+                  disabledBackgroundColor: const Color(0xFFCCCCCC),
                 ),
-                child: const Text('Subscribe'),
+                child: isLoading 
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Text('Subscribe'),
               ),
             ],
           ),

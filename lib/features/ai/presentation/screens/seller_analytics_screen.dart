@@ -507,6 +507,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
 
   Widget _buildInventoryCard(InventoryForecast forecast) {
     final needsRestock = forecast.predictedDemand > forecast.currentStock;
+    final isSummary = forecast.productId == 'summary';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -514,7 +515,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
       decoration: BoxDecoration(
         color: _cardColor,
         borderRadius: BorderRadius.circular(8),
-        border: needsRestock
+        border: needsRestock && !isSummary
             ? Border.all(color: const Color(0xFFE57373), width: 1)
             : null,
       ),
@@ -534,7 +535,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   ),
                 ),
               ),
-              if (needsRestock)
+              if (needsRestock && !isSummary)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
@@ -560,17 +561,63 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                 ),
             ],
           ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              _buildStockIndicator('Current', forecast.currentStock, _textSecondary),
-              Container(width: 1, height: 32, color: Colors.white),
-              _buildStockIndicator('Predicted', forecast.predictedDemand, _primaryColor),
-              Container(width: 1, height: 32, color: Colors.white),
-              _buildStockIndicator('Recommended', forecast.recommendedStock, const Color(0xFF4CAF50)),
-            ],
-          ),
-          if (forecast.confidence != null) ...[
+          // Show recommendation text for summary cards
+          if (isSummary && forecast.recommendation != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.lightbulb_outline, size: 16, color: _primaryColor),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      forecast.recommendation!,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontFamily: 'Campton',
+                        color: _textDark,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Icon(Icons.trending_up, size: 16, color: _primaryColor),
+                const SizedBox(width: 8),
+                Text(
+                  'Expected Demand: ${forecast.predictedDemand >= 100 ? "High" : forecast.predictedDemand >= 50 ? "Medium" : "Low"}',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w600,
+                    color: _textDark,
+                  ),
+                ),
+              ],
+            ),
+          ] else ...[
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                _buildStockIndicator('Current', forecast.currentStock, _textSecondary),
+                Container(width: 1, height: 32, color: Colors.white),
+                _buildStockIndicator('Predicted', forecast.predictedDemand, _primaryColor),
+                Container(width: 1, height: 32, color: Colors.white),
+                _buildStockIndicator('Recommended', forecast.recommendedStock, const Color(0xFF4CAF50)),
+              ],
+            ),
+          ],
+          if (forecast.confidence != null && !isSummary) ...[
             const SizedBox(height: 12),
             Row(
               children: [

@@ -129,6 +129,12 @@ class SubscriptionController extends AsyncNotifier<SubscriptionState> {
       state = AsyncData(currentState.copyWith(error: null));
     }
   }
+
+  /// Set loading state (called by IAP service during purchase flow)
+  void setLoading(bool isLoading, {String? error}) {
+    final currentState = state.value ?? const SubscriptionState();
+    state = AsyncData(currentState.copyWith(isLoading: isLoading, error: error));
+  }
 }
 
 /// Provider for Subscription Controller

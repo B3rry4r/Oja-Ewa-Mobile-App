@@ -408,6 +408,7 @@ class InventoryForecast {
     this.confidence,
     this.seasonalFactor,
     this.trendFactor,
+    this.recommendation,
   });
 
   final String productId;
@@ -418,6 +419,7 @@ class InventoryForecast {
   final double? confidence;
   final double? seasonalFactor;
   final double? trendFactor;
+  final String? recommendation;
 
   factory InventoryForecast.fromJson(Map<String, dynamic> json) {
     return InventoryForecast(
@@ -431,6 +433,7 @@ class InventoryForecast {
           (json['seasonal_factor'] as num?)?.toDouble(),
       trendFactor: (json['trendFactor'] as num?)?.toDouble() ?? 
           (json['trend_factor'] as num?)?.toDouble(),
+      recommendation: json['recommendation'] as String?,
     );
   }
 }
