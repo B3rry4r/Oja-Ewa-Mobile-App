@@ -37,7 +37,7 @@ class BusinessProfilePayload {
     this.spotify,
   });
 
-  /// enum: school|art|afro_beauty_services (per API validation)
+  /// enum: school|art (per API validation - afro_beauty_services removed)
   final String category;
 
   final int categoryId;

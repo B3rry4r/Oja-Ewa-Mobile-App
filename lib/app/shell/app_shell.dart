@@ -72,6 +72,22 @@ class _AppShellState extends ConsumerState<AppShell> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         const AudioControlsButton(),
+        const SizedBox(height: 10),
+        FloatingActionButton.extended(
+          heroTag: 'start-selling-fab',
+          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.sellerOnboarding),
+          backgroundColor: const Color(0xFFFDAF40),
+          foregroundColor: Colors.white,
+          icon: const Icon(Icons.storefront, size: 24),
+          label: const Text(
+            'Start Selling',
+            style: TextStyle(
+              fontSize: 14,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
         if (isLoggedIn) ...[
           const SizedBox(height: 10),
           FloatingActionButton.extended(

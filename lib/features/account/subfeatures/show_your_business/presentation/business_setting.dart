@@ -207,15 +207,6 @@ class BusinessSettingsScreen extends ConsumerWidget {
     final category = business.category.toLowerCase();
 
     switch (category) {
-      case 'beauty':
-      case 'afro_beauty_services':
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) =>
-                BusinessProfileBeautyScreen(businessId: business.id),
-          ),
-        );
-        break;
       case 'music':
         Navigator.of(context).push(
           MaterialPageRoute(

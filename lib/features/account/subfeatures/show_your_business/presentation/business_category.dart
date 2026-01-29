@@ -19,17 +19,11 @@ class BusinessCategoryScreen extends ConsumerStatefulWidget {
 
 class _BusinessCategoryScreenState extends ConsumerState<BusinessCategoryScreen> {
   // Local state to track selection
-  String selectedCategory = "Beauty";
+  String selectedCategory = "Schools";
 
   // Data mapping based on backend category types
-  // Business profiles now only use: afro_beauty_services, school
-  // Art has been moved to Products (not BusinessProfiles)
+  // Currently only Schools is enabled for business registration
   final List<Map<String, String>> categories = [
-    {
-      "name": "Beauty",
-      "desc": "Hair Care, Skin Care, Makeup Services, Spa, Salons",
-      "type": "afro_beauty_services",
-    },
     {
       "name": "Schools",
       "desc": "Fashion, Beauty, Catering, Music",
@@ -136,11 +130,8 @@ class _BusinessCategoryScreenState extends ConsumerState<BusinessCategoryScreen>
 
   List<CategoryNode> _rootsForLabel(Map<String, List<CategoryNode>> all, String label) {
     // Map UI labels to backend category types
-    // Business profiles now only use: afro_beauty_services, school
-    // Art has been moved to Products
+    // Currently only Schools is enabled
     switch (label) {
-      case 'Beauty':
-        return all['afro_beauty_services'] ?? const [];
       case 'Schools':
         return all['school'] ?? const [];
       default:

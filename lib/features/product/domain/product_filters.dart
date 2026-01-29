@@ -43,6 +43,7 @@ class ProductFilters {
   );
 
   /// Default filter values - no API call needed
+  /// Sort values match backend: price_asc, price_desc, newest, popular
   static const defaults = ProductFilters(
     genders: ['Men', 'Women', 'Unisex'],
     styles: ['Traditional', 'Western', 'Casual', 'Formal', 'Fabrics'],
@@ -51,10 +52,9 @@ class ProductFilters {
     priceRange: PriceRange(min: 0, max: 500000),
     sortOptions: [
       SortOption(value: 'newest', label: 'Newest'),
-      SortOption(value: 'price_low', label: 'Price: Low to High'),
-      SortOption(value: 'price_high', label: 'Price: High to Low'),
+      SortOption(value: 'price_asc', label: 'Price: Low to High'),
+      SortOption(value: 'price_desc', label: 'Price: High to Low'),
       SortOption(value: 'popular', label: 'Most Popular'),
-      SortOption(value: 'rating', label: 'Top Rated'),
     ],
   );
 }

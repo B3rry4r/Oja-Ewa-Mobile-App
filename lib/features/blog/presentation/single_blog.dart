@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
@@ -39,6 +41,15 @@ class BlogDetailScreen extends ConsumerWidget {
                     alignment: Alignment.centerRight,
                     child: IconButton(
                       onPressed: () async {
+                        // Check if user is logged in
+                        final token = ref.read(accessTokenProvider);
+                        if (token == null || token.isEmpty) {
+                          // Navigate to onboarding
+                          if (!context.mounted) return;
+                          Navigator.of(context).pushNamed(AppRoutes.onboarding);
+                          return;
+                        }
+
                         try {
                           if (isFav) {
                             await ref

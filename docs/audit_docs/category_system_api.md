@@ -14,15 +14,18 @@ The category system has been restructured with a clear mapping between landing b
 |------|-------|-----------|---------|
 | `textiles` | 3 levels | Group → Leaf | Products |
 | `shoes_bags` | 3 levels | Group → Leaf | Products |
-| `afro_beauty_products` | 2 levels | Leaf only | Products |
+| `afro_beauty_products` | 3 levels | Group → Leaf | Products |
+
+**Kids Categories Added:**
+- `textiles` now has `Kids` group with Female/Male leaf items
+- `shoes_bags` now has `Kids` group with Shoes + Bags leaf items
+- `afro_beauty_products` now has `Kids` group (Male/Female leaf items)
 
 ### Business Directories (Return BusinessProfiles)
 
 | Type | Depth | Structure | Returns |
 |------|-------|-----------|---------|
-| `art` | 2 levels | Leaf only | BusinessProfiles |
 | `school` | 2 levels | Leaf only | BusinessProfiles |
-| `afro_beauty_services` | 2 levels | Leaf only | BusinessProfiles |
 
 ### Initiatives (Return SustainabilityInitiatives)
 
@@ -30,11 +33,10 @@ The category system has been restructured with a clear mapping between landing b
 |------|-------|-----------|---------|
 | `sustainability` | 2 levels | Leaf only | SustainabilityInitiatives |
 
-### Afro Beauty - Two Tabs
+### Afro Beauty
 
-The Afro Beauty landing box has two tabs:
-- **Tab 1 (Products)**: Uses `afro_beauty_products` type
-- **Tab 2 (Services)**: Uses `afro_beauty_services` type
+The Afro Beauty landing box has a single products tree:
+- **Products**: Uses `afro_beauty_products` type (Kids/Women/Men groups)
 
 ---
 
