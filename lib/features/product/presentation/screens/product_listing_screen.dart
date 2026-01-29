@@ -552,7 +552,6 @@ extension ListingKindMapper on _ListingKind {
       case 'shoes_bags':
       case 'afro_beauty_products':
         return _ListingKind.product;
-      case 'afro_beauty_services':
       case 'school':
       case 'art_services':
         return _ListingKind.business;

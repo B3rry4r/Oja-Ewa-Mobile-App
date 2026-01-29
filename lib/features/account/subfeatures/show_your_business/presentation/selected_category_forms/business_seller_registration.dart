@@ -397,12 +397,10 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
           ..identityDocumentPath = _identityDocumentLocalPath;
 
         // Map UI category labels to form routes
-        // Business profiles now only use: afro_beauty_services (Beauty), school (Schools)
-        // Art has been moved to Products
+        // Currently only Schools is enabled for business registration
         final route = switch (selectedCategory) {
-          'Beauty' => AppRoutes.businessBeautyForm,
           'Schools' => AppRoutes.businessSchoolsForm,
-          _ => AppRoutes.businessBeautyForm,
+          _ => AppRoutes.businessSchoolsForm,
         };
 
         // If we came in via legacy string-only args, we may not have categoryId/subcategoryId.
@@ -413,13 +411,9 @@ class _BusinessSellerRegistrationScreenState extends ConsumerState<BusinessSelle
           final all = catalog.categories;
 
           // Map UI category labels to backend category types
-          // Business profiles now only use: afro_beauty_services, school
-          // Art has been moved to Products
+          // Currently only Schools is enabled
           List<CategoryNode> roots;
           switch (selectedCategory) {
-            case 'Beauty':
-              roots = all['afro_beauty_services'] ?? const [];
-              break;
             case 'Schools':
               roots = all['school'] ?? const [];
               break;

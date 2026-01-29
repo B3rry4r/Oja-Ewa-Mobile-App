@@ -83,6 +83,21 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.of(context).pushNamed(AppRoutes.sellerOnboarding),
+        backgroundColor: const Color(0xFFFDAF40),
+        foregroundColor: Colors.white,
+        elevation: 4,
+        icon: const Icon(Icons.storefront),
+        label: const Text(
+          'Start Selling',
+          style: TextStyle(
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
+        ),
+      ),
     );
   }
 

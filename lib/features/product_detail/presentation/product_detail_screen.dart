@@ -290,11 +290,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                         },
                       ),
 
-                      if (isLoggedIn) ...[
-                        // Ask AI about this product
-                        _buildAskAiButton(details?.name ?? 'this item'),
-                      ],
-
                       _buildExpandableSection(
                         'Return Policy',
                         Icons.add,
@@ -558,80 +553,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
             ),
             Icon(icon, size: 20),
           ],
-        ),
-      ),
-    );
-  }
-
-  /// Ask AI about this product button
-  Widget _buildAskAiButton(String productName) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 12),
-      child: InkWell(
-        onTap: () => Navigator.of(context).pushNamed(AppRoutes.aiChat),
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                const Color(0xFFFDAF40).withOpacity(0.15),
-                const Color(0xFFFDAF40).withOpacity(0.05),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: const Color(0xFFFDAF40).withOpacity(0.3),
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFDAF40),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.psychology,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Ask AI about this item',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontFamily: 'Campton',
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF241508),
-                      ),
-                    ),
-                    Text(
-                      'Get styling tips, cultural context & more',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontFamily: 'Campton',
-                        color: const Color(0xFF241508).withOpacity(0.6),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: Color(0xFFFDAF40),
-              ),
-            ],
-          ),
         ),
       ),
     );

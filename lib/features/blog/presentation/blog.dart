@@ -313,6 +313,15 @@ class _BlogPostCard extends ConsumerWidget {
           ),
           IconButton(
             onPressed: () async {
+              // Check if user is logged in
+              final token = ref.read(accessTokenProvider);
+              if (token == null || token.isEmpty) {
+                // Navigate to onboarding
+                if (!context.mounted) return;
+                Navigator.of(context).pushNamed(AppRoutes.onboarding);
+                return;
+              }
+
               try {
                 if (isFav) {
                   await ref.read(blogFavoritesActionsProvider.notifier).remove(post.id);

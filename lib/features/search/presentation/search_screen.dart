@@ -23,12 +23,15 @@ num? _parseNum(dynamic v) {
 }
 
 /// Category types available for search filtering
+// Product search types (per category system):
+// - textiles
+// - shoes_bags
+// - afro_beauty_products
 const _categoryTypes = [
   {'key': 'all', 'label': 'All'},
   {'key': 'textiles', 'label': 'Textiles'},
   {'key': 'afro_beauty_products', 'label': 'Afro Beauty'},
   {'key': 'shoes_bags', 'label': 'Shoes & Bags'},
-  {'key': 'art', 'label': 'Art'},
 ];
 
 class SearchScreen extends ConsumerStatefulWidget {
