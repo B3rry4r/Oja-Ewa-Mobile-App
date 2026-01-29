@@ -41,13 +41,8 @@ class MarketScreen extends ConsumerWidget {
         
         final items = <String>['View All'];
         for (final child in node.children) {
-          if (child.children.isNotEmpty) {
-            // Child has its own children - mark it as expandable with ▶
-            items.add('▶ ${child.name}');
-          } else {
-            // Child is a leaf
-            items.add(child.name);
-          }
+          // All children will be tappable - we'll determine behavior in the handler
+          items.add(child.name);
         }
         
         sections.add(CategorySection(
@@ -64,7 +59,7 @@ class MarketScreen extends ConsumerWidget {
 
   void _handleItemTap(BuildContext context, List<CategoryNode> rootCats, CategorySection section, String item) {
     final cleanTitle = section.title.trim();
-    final cleanItem = item.replaceAll('▶ ', '').trim();
+    final cleanItem = item.trim();
     
     // Find the node by traversing the tree
     CategoryNode? findNode(List<CategoryNode> nodes, String name) {
@@ -79,120 +74,131 @@ class MarketScreen extends ConsumerWidget {
     final parentNode = findNode(rootCats, cleanTitle);
     if (parentNode == null) return;
     
-    // Check if item starts with ▶ (indicates nested category)
-    if (item.startsWith('▶')) {
-      // User tapped a nested category (e.g., ▶ Female under Kids)
-      // Show a sub-picker or navigate to that nested category's listing
-      final nestedNode = findNode(parentNode.children, cleanItem);
-      if (nestedNode == null) return;
-      
-      // For now, show bottom sheet with the nested category's children
-      if (nestedNode.children.isNotEmpty) {
-        _showNestedPicker(context, nestedNode, cleanTitle);
-      } else {
-        // Navigate to products for this nested node
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => ProductListingScreen(
-              type: 'textiles',
-              slug: nestedNode.slug,
-              pageTitle: cleanItem,
-              breadcrumb: 'Textiles • $cleanTitle • $cleanItem',
-              showBusinessTypeFilter: false,
-            ),
+    if (item == 'View All') {
+      // Navigate to parent category
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ProductListingScreen(
+            type: 'textiles',
+            slug: parentNode.slug,
+            pageTitle: cleanTitle,
+            breadcrumb: 'Textiles • $cleanTitle',
+            showBusinessTypeFilter: false,
           ),
-        );
-      }
+        ),
+      );
       return;
     }
     
-    CategoryNode? targetNode;
-    if (item == 'View All') {
-      targetNode = parentNode;
-    } else {
-      // Find child by name
-      targetNode = findNode(parentNode.children, cleanItem);
+    // Find the tapped child node
+    final childNode = findNode(parentNode.children, cleanItem);
+    if (childNode == null) {
+      debugPrint('❌ Child node not found for: $cleanItem');
+      return;
     }
     
-    if (targetNode == null) return;
+    debugPrint('✅ Found child node: ${childNode.name}, has ${childNode.children.length} children');
     
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ProductListingScreen(
-          type: 'textiles',
-          slug: targetNode!.slug,
-          pageTitle: item == 'View All' ? cleanTitle : cleanItem,
-          breadcrumb: 'Textiles • $cleanTitle',
-          showBusinessTypeFilter: false,
+    // Check if this child has its own children (nested category)
+    if (childNode.children.isNotEmpty) {
+      debugPrint('📋 Showing nested picker for ${childNode.name} with ${childNode.children.length} items');
+      // Show modal picker for nested selection
+      _showNestedPicker(context, childNode, cleanTitle);
+    } else {
+      debugPrint('🎯 Navigating to leaf node: ${childNode.name}');
+      // Leaf node - navigate to product listing
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ProductListingScreen(
+            type: 'textiles',
+            slug: childNode.slug,
+            pageTitle: cleanItem,
+            breadcrumb: 'Textiles • $cleanTitle',
+            showBusinessTypeFilter: false,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   void _showNestedPicker(BuildContext context, CategoryNode node, String parentTitle) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: const Color(0xFFFFF8F1),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  node.name,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Campton',
-                    color: Color(0xFF241508),
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.3,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (context, scrollController) {
+            return SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      node.name,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Campton',
+                        color: Color(0xFF241508),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                ...node.children.map((child) {
-                  return Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => ProductListingScreen(
-                              type: 'textiles',
-                              slug: child.slug,
-                              pageTitle: child.name,
-                              breadcrumb: 'Textiles • $parentTitle • ${node.name}',
-                              showBusinessTypeFilter: false,
+                  const Divider(height: 1),
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      itemCount: node.children.length,
+                      itemBuilder: (context, index) {
+                        final child = node.children[index];
+                        return Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => ProductListingScreen(
+                                    type: 'textiles',
+                                    slug: child.slug,
+                                    pageTitle: child.name,
+                                    breadcrumb: 'Textiles • $parentTitle • ${node.name}',
+                                    showBusinessTypeFilter: false,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                              decoration: const BoxDecoration(
+                                border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE))),
+                              ),
+                              child: Text(
+                                child.name,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Campton',
+                                  color: Color(0xFF1E2021),
+                                ),
+                              ),
                             ),
                           ),
                         );
                       },
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                        decoration: const BoxDecoration(
-                          border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE))),
-                        ),
-                        child: Text(
-                          child.name,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Campton',
-                            color: Color(0xFF1E2021),
-                          ),
-                        ),
-                      ),
                     ),
-                  );
-                }).toList(),
-              ],
-            ),
-          ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
@@ -200,7 +206,9 @@ class MarketScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final categoriesAsync = ref.watch(categoriesByTypeProvider('textiles'));
+    // Use allCategoriesProvider to get the full nested tree, not categoriesByTypeProvider
+    final allCategoriesAsync = ref.watch(allCategoriesProvider);
+    final categoriesAsync = allCategoriesAsync.whenData((catalog) => catalog.categories['textiles'] ?? []);
 
     return categoriesAsync.when(
       loading: () => const Scaffold(
