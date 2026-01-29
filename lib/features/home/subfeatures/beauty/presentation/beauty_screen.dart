@@ -14,9 +14,9 @@ class BeautyScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final productsAsync = ref.watch(
-      categoriesByTypeProvider('afro_beauty_products'),
-    );
+    // Use allCategoriesProvider to get the full nested tree
+    final allCategoriesAsync = ref.watch(allCategoriesProvider);
+    final productsAsync = allCategoriesAsync.whenData((catalog) => catalog.categories['afro_beauty_products'] ?? []);
 
     // Check async state
     final isLoading = productsAsync.isLoading;

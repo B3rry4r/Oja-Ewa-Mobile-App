@@ -33,67 +33,76 @@ class InfoBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFF8F1),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Drag handle
-            Center(
-              child: Container(
-                margin: const EdgeInsets.only(top: 12),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.3,
+      maxChildSize: 0.9,
+      builder: (context, scrollController) {
+        return Container(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            color: Color(0xFFFFF8F1),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
             ),
-
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 20, 16, 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontFamily: 'Campton',
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF301C0A),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Drag handle
+                Center(
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 12),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  HeaderIconButton(
-                    asset: AppIcons.back,
-                    iconColor: const Color(0xFF301C0A),
-                    onTap: () => Navigator.of(context).pop(),
+                ),
+
+                // Header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 20, 16, 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontFamily: 'Campton',
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF301C0A),
+                        ),
+                      ),
+                      HeaderIconButton(
+                        asset: AppIcons.back,
+                        iconColor: const Color(0xFF301C0A),
+                        onTap: () => Navigator.of(context).pop(),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
 
-            const Divider(color: Color(0xFFDEDEDE), thickness: 0.5),
+                const Divider(color: Color(0xFFDEDEDE), thickness: 0.5),
 
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-              child: SingleChildScrollView(child: content),
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+                    child: content,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

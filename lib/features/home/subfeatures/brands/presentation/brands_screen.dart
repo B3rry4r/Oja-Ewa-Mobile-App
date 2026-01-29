@@ -29,11 +29,7 @@ class BrandsScreen extends ConsumerWidget {
       } else {
         final items = <String>['View All'];
         for (final child in node.children) {
-          if (child.children.isNotEmpty) {
-            items.add('▶ ${child.name}');
-          } else {
-            items.add(child.name);
-          }
+          items.add(child.name);
         }
         
         sections.add(CategorySection(
@@ -50,7 +46,7 @@ class BrandsScreen extends ConsumerWidget {
 
   void _handleItemTap(BuildContext context, List<CategoryNode> rootCats, CategorySection section, String item) {
     final cleanTitle = section.title.trim();
-    final cleanItem = item.replaceAll('▶ ', '').trim();
+    final cleanItem = item.trim();
     
     CategoryNode? findNode(List<CategoryNode> nodes, String name) {
       for (final node in nodes) {
@@ -64,127 +60,132 @@ class BrandsScreen extends ConsumerWidget {
     final parentNode = findNode(rootCats, cleanTitle);
     if (parentNode == null) return;
     
-    if (item.startsWith('▶')) {
-      final nestedNode = findNode(parentNode.children, cleanItem);
-      if (nestedNode == null) return;
-      
-      if (nestedNode.children.isNotEmpty) {
-        _showNestedPicker(context, nestedNode, cleanTitle);
-      } else {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => ProductListingScreen(
-              type: 'shoes_bags',
-              slug: nestedNode.slug,
-              pageTitle: cleanItem,
-              breadcrumb: 'Footwear/Bags • $cleanTitle • $cleanItem',
-              showBusinessTypeFilter: false,
-            ),
+    if (item == 'View All') {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ProductListingScreen(
+            type: 'shoes_bags',
+            slug: parentNode.slug,
+            pageTitle: cleanTitle,
+            breadcrumb: 'Footwear/Bags • $cleanTitle',
+            showBusinessTypeFilter: false,
           ),
-        );
-      }
+        ),
+      );
       return;
     }
     
-    CategoryNode? targetNode;
-    if (item == 'View All') {
-      targetNode = parentNode;
+    final childNode = findNode(parentNode.children, cleanItem);
+    if (childNode == null) return;
+    
+    if (childNode.children.isNotEmpty) {
+      _showNestedPicker(context, childNode, cleanTitle);
     } else {
-      targetNode = findNode(parentNode.children, cleanItem);
-    }
-    
-    if (targetNode == null) return;
-    
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ProductListingScreen(
-          type: 'shoes_bags',
-          slug: targetNode!.slug,
-          pageTitle: item == 'View All' ? cleanTitle : cleanItem,
-          breadcrumb: 'Footwear/Bags • $cleanTitle',
-          showBusinessTypeFilter: false,
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ProductListingScreen(
+            type: 'shoes_bags',
+            slug: childNode.slug,
+            pageTitle: cleanItem,
+            breadcrumb: 'Footwear/Bags • $cleanTitle',
+            showBusinessTypeFilter: false,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   void _showNestedPicker(BuildContext context, CategoryNode node, String parentTitle) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: const Color(0xFFFFF8F1),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  node.name,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Campton',
-                    color: Color(0xFF241508),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ...node.children.map((child) {
-                  return Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        
-                        // If child has further children (Shoes/Bags), show another picker
-                        if (child.children.isNotEmpty) {
-                          _showNestedPicker(context, child, '$parentTitle • ${node.name}');
-                        } else {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => ProductListingScreen(
-                                type: 'shoes_bags',
-                                slug: child.slug,
-                                pageTitle: child.name,
-                                breadcrumb: 'Footwear/Bags • $parentTitle • ${node.name}',
-                                showBusinessTypeFilter: false,
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                        decoration: const BoxDecoration(
-                          border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE))),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              child.name,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'Campton',
-                                color: Color(0xFF1E2021),
-                              ),
-                            ),
-                            if (child.children.isNotEmpty)
-                              const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF777F84)),
-                          ],
-                        ),
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.3,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (context, scrollController) {
+            return SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      node.name,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Campton',
+                        color: Color(0xFF241508),
                       ),
                     ),
-                  );
-                }).toList(),
-              ],
-            ),
-          ),
+                  ),
+                  const Divider(height: 1),
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      itemCount: node.children.length,
+                      itemBuilder: (context, index) {
+                        final child = node.children[index];
+                        return Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              
+                              // If child has further children (Shoes/Bags), show another picker
+                              if (child.children.isNotEmpty) {
+                                _showNestedPicker(context, child, '$parentTitle • ${node.name}');
+                              } else {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => ProductListingScreen(
+                                      type: 'shoes_bags',
+                                      slug: child.slug,
+                                      pageTitle: child.name,
+                                      breadcrumb: 'Footwear/Bags • $parentTitle • ${node.name}',
+                                      showBusinessTypeFilter: false,
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                              decoration: const BoxDecoration(
+                                border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE))),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    child.name,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'Campton',
+                                      color: Color(0xFF1E2021),
+                                    ),
+                                  ),
+                                  if (child.children.isNotEmpty)
+                                    const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF777F84)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
@@ -192,7 +193,9 @@ class BrandsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final categoriesAsync = ref.watch(categoriesByTypeProvider('shoes_bags'));
+    // Use allCategoriesProvider to get the full nested tree
+    final allCategoriesAsync = ref.watch(allCategoriesProvider);
+    final categoriesAsync = allCategoriesAsync.whenData((catalog) => catalog.categories['shoes_bags'] ?? []);
 
     return categoriesAsync.when(
       loading: () => const Scaffold(
