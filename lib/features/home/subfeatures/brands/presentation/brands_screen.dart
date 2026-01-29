@@ -99,10 +99,7 @@ class BrandsScreen extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFFFFF8F1),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (context) {
         return DraggableScrollableSheet(
           initialChildSize: 0.6,
@@ -110,79 +107,102 @@ class BrandsScreen extends ConsumerWidget {
           maxChildSize: 0.9,
           expand: false,
           builder: (context, scrollController) {
-            return SafeArea(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Text(
-                      node.name,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Campton',
-                        color: Color(0xFF241508),
+            return Container(
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFF8F1),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    // Drag handle
+                    Center(
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 12),
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                     ),
-                  ),
-                  const Divider(height: 1),
-                  Expanded(
-                    child: ListView.builder(
-                      controller: scrollController,
-                      itemCount: node.children.length,
-                      itemBuilder: (context, index) {
-                        final child = node.children[index];
-                        return Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              
-                              // If child has further children (Shoes/Bags), show another picker
-                              if (child.children.isNotEmpty) {
-                                _showNestedPicker(context, child, '$parentTitle • ${node.name}');
-                              } else {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => ProductListingScreen(
-                                      type: 'shoes_bags',
-                                      slug: child.slug,
-                                      pageTitle: child.name,
-                                      breadcrumb: 'Footwear/Bags • $parentTitle • ${node.name}',
-                                      showBusinessTypeFilter: false,
+                    // Title
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                      child: Text(
+                        node.name,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Campton',
+                          color: Color(0xFF241508),
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1, color: Color(0xFFDEDEDE)),
+                    Expanded(
+                      child: ListView.builder(
+                        controller: scrollController,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        itemCount: node.children.length,
+                        itemBuilder: (context, index) {
+                          final child = node.children[index];
+                          final hasChildren = child.children.isNotEmpty;
+                          
+                          return Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                
+                                if (hasChildren) {
+                                  _showNestedPicker(context, child, '$parentTitle • ${node.name}');
+                                } else {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => ProductListingScreen(
+                                        type: 'shoes_bags',
+                                        slug: child.slug,
+                                        pageTitle: child.name,
+                                        breadcrumb: 'Footwear/Bags • $parentTitle • ${node.name}',
+                                        showBusinessTypeFilter: false,
+                                      ),
                                     ),
+                                  );
+                                }
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(color: Color(0xFFDEDEDE), width: 1),
                                   ),
-                                );
-                              }
-                            },
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                              decoration: const BoxDecoration(
-                                border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE))),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    child.name,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontFamily: 'Campton',
-                                      color: Color(0xFF1E2021),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      child.name,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: 'Campton',
+                                        color: Color(0xFF1E2021),
+                                      ),
                                     ),
-                                  ),
-                                  if (child.children.isNotEmpty)
-                                    const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF777F84)),
-                                ],
+                                    if (hasChildren)
+                                      const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF777F84)),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
@@ -193,9 +213,8 @@ class BrandsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Use allCategoriesProvider to get the full nested tree
-    final allCategoriesAsync = ref.watch(allCategoriesProvider);
-    final categoriesAsync = allCategoriesAsync.whenData((catalog) => catalog.categories['shoes_bags'] ?? []);
+    // Use categoriesByTypeProvider - backend now returns full nested tree
+    final categoriesAsync = ref.watch(categoriesByTypeProvider('shoes_bags'));
 
     return categoriesAsync.when(
       loading: () => const Scaffold(
