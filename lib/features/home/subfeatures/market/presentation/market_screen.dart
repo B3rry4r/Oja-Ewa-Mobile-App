@@ -191,14 +191,13 @@ class MarketScreen extends ConsumerWidget {
                                   ),
                                 );
                               },
-                              borderRadius: BorderRadius.circular(8),
                               child: Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                                margin: const EdgeInsets.only(bottom: 8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
+                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(color: Color(0xFFDEDEDE), width: 1),
+                                  ),
                                 ),
                                 child: Text(
                                   child.name,
