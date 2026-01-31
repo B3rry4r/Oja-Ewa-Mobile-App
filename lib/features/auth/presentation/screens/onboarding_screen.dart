@@ -1,5 +1,6 @@
 // onboarding_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 
 import 'package:ojaewa/core/resources/app_assets.dart';
 
@@ -30,11 +31,15 @@ class OnboardingScreen extends StatelessWidget {
                     // Main Headline
                     _buildHeadline(),
 
-                    const SizedBox(height: 20), // Spacing from title to buttons
+                    const SizedBox(height: 16), // Spacing from title to buttons
                     // Action Buttons
                     _buildActionButtons(context),
 
-                    const SizedBox(height: 32), // Bottom spacing
+                    const SizedBox(height: 16), // Spacing before terms
+                    // Terms and Privacy
+                    _buildTermsAndPrivacy(context),
+
+                    const SizedBox(height: 24), // Bottom spacing
                   ],
                 ),
               ),
@@ -49,7 +54,7 @@ class OnboardingScreen extends StatelessWidget {
     return Stack(
       alignment: Alignment.topCenter,
       children: [
-        // Hero Image
+        // Hero Image - reduced height to fit on one screen
         ClipRRect(
           borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(25),
@@ -58,7 +63,7 @@ class OnboardingScreen extends StatelessWidget {
           child: Image.asset(
             AppImages.onboarding,
             width: double.infinity,
-            // height: 499,
+            height: 300,
             fit: BoxFit.cover,
           ),
         ),
@@ -114,14 +119,14 @@ class OnboardingScreen extends StatelessWidget {
   // }
 
   Widget _buildHeadline() {
-    return Text(
+    return const Text(
       'The Pan-African\nBeauty Market',
       style: TextStyle(
-        fontSize: 38,
+        fontSize: 24,
         fontWeight: FontWeight.w600,
         fontFamily: 'Campton',
-        color: const Color(0xFF1E2021), // #1e2021
-        height: 1.1, // Better line height for readability
+        color: Color(0xFF1E2021),
+        height: 1.2,
       ),
     );
   }
@@ -246,6 +251,48 @@ class OnboardingScreen extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildTermsAndPrivacy(BuildContext context) {
+    return Center(
+      child: RichText(
+        textAlign: TextAlign.center,
+        text: TextSpan(
+          style: const TextStyle(
+            fontSize: 12,
+            fontFamily: 'Campton',
+            color: Color(0xFF777F84),
+            height: 1.4,
+          ),
+          children: [
+            const TextSpan(text: "By continuing you agree to Oja-ewa's\n"),
+            TextSpan(
+              text: 'Terms of Service',
+              style: const TextStyle(
+                color: Color(0xFFFDAF40),
+                decoration: TextDecoration.underline,
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  Navigator.of(context).pushNamed(AppRoutes.termsOfService);
+                },
+            ),
+            const TextSpan(text: ' and '),
+            TextSpan(
+              text: 'Privacy Policy',
+              style: const TextStyle(
+                color: Color(0xFFFDAF40),
+                decoration: TextDecoration.underline,
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  Navigator.of(context).pushNamed(AppRoutes.privacyPolicy);
+                },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
