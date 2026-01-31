@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/core/widgets/seller_badge.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/domain/seller_status.dart';
 import 'package:ojaewa/features/your_shop/presentation/controllers/seller_orders_controller.dart';
@@ -84,15 +85,40 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
   }
 
   Widget _buildShopHeader(BuildContext context, SellerStatus? sellerStatus) {
+    final businessName = sellerStatus?.businessName ?? '';
+    final badge = sellerStatus?.badge;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'Your Shop',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1E2021),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (businessName.isNotEmpty) ...[
+                Text(
+                  businessName,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1E2021),
+                    fontFamily: 'Campton',
+                  ),
+                ),
+                if (badge != null) ...[
+                  const SizedBox(height: 6),
+                  SellerBadge(badge: badge),
+                ],
+              ] else
+                const Text(
+                  'Your Shop',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1E2021),
+                  ),
+                ),
+            ],
           ),
         ),
         InkWell(

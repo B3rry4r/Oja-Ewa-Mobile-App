@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
+import 'package:ojaewa/core/widgets/seller_badge.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
 import 'package:ojaewa/features/sellers/presentation/controllers/public_seller_controller.dart';
 import 'package:ojaewa/features/sellers/presentation/controllers/public_seller_products_controller.dart';
@@ -81,7 +82,11 @@ class SellerProfileScreen extends ConsumerWidget {
                                         color: Color(0xFF241508),
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: 6),
+                                    if (seller.badge != null) ...[
+                                      SellerBadge(badge: seller.badge),
+                                      const SizedBox(height: 6),
+                                    ],
                                     if (location.isNotEmpty)
                                       Text(
                                         location,
@@ -133,26 +138,80 @@ class SellerProfileScreen extends ConsumerWidget {
 
                           const SizedBox(height: 24),
 
-                          // Existing UI sections (contact/social) filled where available
+                          // Contact info sections - only show if data exists
                           if ((seller.businessEmail ?? '').trim().isNotEmpty) ...[
-                            const Text('Email', style: TextStyle(fontWeight: FontWeight.w600)),
+                            const Text(
+                              'Email',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                fontFamily: 'Campton',
+                                color: Color(0xFF241508),
+                              ),
+                            ),
                             const SizedBox(height: 6),
-                            Text(seller.businessEmail!),
+                            Text(
+                              seller.businessEmail!,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontFamily: 'Campton',
+                                color: Color(0xFF1E2021),
+                              ),
+                            ),
                             const SizedBox(height: 16),
                           ],
 
                           if ((seller.businessPhoneNumber ?? '').trim().isNotEmpty) ...[
-                            const Text('Phone', style: TextStyle(fontWeight: FontWeight.w600)),
+                            const Text(
+                              'Phone',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                fontFamily: 'Campton',
+                                color: Color(0xFF241508),
+                              ),
+                            ),
                             const SizedBox(height: 6),
-                            Text(seller.businessPhoneNumber!),
+                            Text(
+                              seller.businessPhoneNumber!,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontFamily: 'Campton',
+                                color: Color(0xFF1E2021),
+                              ),
+                            ),
                             const SizedBox(height: 16),
                           ],
 
                           if ((seller.instagram ?? '').trim().isNotEmpty || (seller.facebook ?? '').trim().isNotEmpty) ...[
-                            const Text('Socials', style: TextStyle(fontWeight: FontWeight.w600)),
+                            const Text(
+                              'Socials',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                fontFamily: 'Campton',
+                                color: Color(0xFF241508),
+                              ),
+                            ),
                             const SizedBox(height: 6),
-                            if ((seller.instagram ?? '').trim().isNotEmpty) Text('Instagram: ${seller.instagram}'),
-                            if ((seller.facebook ?? '').trim().isNotEmpty) Text('Facebook: ${seller.facebook}'),
+                            if ((seller.instagram ?? '').trim().isNotEmpty)
+                              Text(
+                                'Instagram: ${seller.instagram}',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontFamily: 'Campton',
+                                  color: Color(0xFF1E2021),
+                                ),
+                              ),
+                            if ((seller.facebook ?? '').trim().isNotEmpty)
+                              Text(
+                                'Facebook: ${seller.facebook}',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontFamily: 'Campton',
+                                  color: Color(0xFF1E2021),
+                                ),
+                              ),
                             const SizedBox(height: 16),
                           ],
 

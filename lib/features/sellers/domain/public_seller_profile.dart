@@ -16,6 +16,7 @@ class PublicSellerProfile {
     required this.sellingSince,
     required this.avgRating,
     required this.totalReviews,
+    this.badge,
   });
 
   final int id;
@@ -31,6 +32,7 @@ class PublicSellerProfile {
   final DateTime? sellingSince;
   final num? avgRating;
   final int? totalReviews;
+  final String? badge;
 
   static PublicSellerProfile fromJson(Map<String, dynamic> json) {
     num? parseNum(dynamic v) {
@@ -53,6 +55,7 @@ class PublicSellerProfile {
       sellingSince: DateTime.tryParse((json['selling_since'] as String?) ?? ''),
       avgRating: parseNum(json['avg_rating']),
       totalReviews: (parseNum(json['total_reviews']))?.toInt(),
+      badge: json['badge'] as String?,
     );
   }
 }

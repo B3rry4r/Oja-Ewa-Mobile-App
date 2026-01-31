@@ -8,6 +8,7 @@ import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/widgets/info_bottom_sheet.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
+import 'package:ojaewa/core/widgets/seller_badge.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
 import 'package:ojaewa/features/product/presentation/controllers/product_details_controller.dart';
@@ -197,12 +198,20 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
                       const SizedBox(height: 8),
 
-                      Text(
-                        sellerName.isEmpty ? '' : 'by $sellerName',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF595F63),
-                        ),
+                      Row(
+                        children: [
+                          Text(
+                            sellerName.isEmpty ? '' : 'by $sellerName',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF595F63),
+                            ),
+                          ),
+                          if (details?.sellerBadge != null) ...[
+                            const SizedBox(width: 8),
+                            SellerBadge(badge: details?.sellerBadge),
+                          ],
+                        ],
                       ),
 
                       const SizedBox(height: 24),

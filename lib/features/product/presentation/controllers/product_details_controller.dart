@@ -14,6 +14,7 @@ class ProductDetails {
     required this.avgRating,
     required this.sellerProfileId,
     required this.sellerBusinessName,
+    this.sellerBadge,
     required this.size,
     required this.processingTimeType,
     required this.processingDays,
@@ -28,6 +29,7 @@ class ProductDetails {
   final num? avgRating;
   final int? sellerProfileId;
   final String? sellerBusinessName;
+  final String? sellerBadge;
   final String? size;
   final String? processingTimeType;
   final int? processingDays;
@@ -52,6 +54,7 @@ class ProductDetails {
       avgRating: parseNum(json['avg_rating']),
       sellerProfileId: seller is Map<String, dynamic> ? (seller['id'] as num?)?.toInt() : (json['seller_profile_id'] as num?)?.toInt(),
       sellerBusinessName: seller is Map<String, dynamic> ? seller['business_name'] as String? : null,
+      sellerBadge: seller is Map<String, dynamic> ? seller['badge'] as String? : null,
       size: json['size'] as String?,
       processingTimeType: json['processing_time_type'] as String?,
       processingDays: (parseNum(json['processing_days']))?.toInt(),

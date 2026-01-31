@@ -177,12 +177,18 @@ class WriteReviewScreen extends StatelessWidget {
                 if (isEmailField) const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Campton',
+                      color: Color(0xFF241508),
+                      fontWeight: FontWeight.w400,
+                    ),
                     decoration: InputDecoration(
                       hintText: hintText,
-                      hintStyle: TextStyle(
+                      hintStyle: const TextStyle(
                         fontSize: 16,
                         fontFamily: 'Campton',
-                        color: const Color(0xFFCCCCCC),
+                        color: Color(0xFFCCCCCC),
                       ),
                       border: InputBorder.none,
                     ),
