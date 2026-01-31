@@ -20,27 +20,45 @@ class SellerOnboardingScreen extends ConsumerWidget {
     final subscription = subscriptionAsync.value?.subscription;
     final hasPro = subscription != null && subscription.status.isActive;
 
-    // If seller profile exists, route based on status
-    sellerStatusAsync.whenOrNull(
+    // If seller profile exists, redirect to appropriate screen
+    return sellerStatusAsync.when(
+      loading: () => const Scaffold(
+        backgroundColor: Color(0xFFFFF8F1),
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (_, __) => _buildOnboardingContent(context, ref, hasPro),
       data: (status) {
-        if (status == null) return;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!context.mounted) return;
-          if (status.isApprovedAndActive) {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              AppRoutes.yourShopDashboard,
-              (r) => false,
-            );
-          } else {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              AppRoutes.sellerApprovalStatus,
-              (r) => false,
-            );
-          }
-        });
+        // If seller status exists (pending, approved, or rejected), redirect
+        if (status != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!context.mounted) return;
+            if (status.isApprovedAndActive) {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRoutes.yourShopDashboard,
+                (r) => false,
+              );
+            } else {
+              // Pending or rejected - show approval status screen
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRoutes.sellerApprovalStatus,
+                (r) => false,
+              );
+            }
+          });
+          // Show loading while redirecting
+          return const Scaffold(
+            backgroundColor: Color(0xFFFFF8F1),
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        
+        // No seller profile yet - show onboarding
+        return _buildOnboardingContent(context, ref, hasPro);
       },
     );
+  }
 
+  Widget _buildOnboardingContent(BuildContext context, WidgetRef ref, bool hasPro) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
@@ -85,7 +103,12 @@ class SellerOnboardingScreen extends ConsumerWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 24),
+
+                    // Quality Standards Banner
+                    _buildQualityStandardsBanner(),
+
+                    const SizedBox(height: 32),
 
                     // "How it works" section
                     _buildHowItWorksSection(),
@@ -106,6 +129,64 @@ class SellerOnboardingScreen extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildQualityStandardsBanner() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF8F1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDAF40).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.verified_user,
+                  color: Color(0xFFFDAF40),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Our Quality Promise',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Campton',
+                    color: Color(0xFF241508),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'At Ojá-Ẹwà your trust is our foundation. Every product on Ojá-Ẹwà must pass our verification for authenticity and craftsmanship.\n\n'
+            'We guarantee: If a newly registered brand/product fails our review and does not meet our published Quality Standards, its registration fee will be fully refunded.\n\n'
+            'We invest in your success by ensuring only excellence reaches our marketplace.\n\n'
+            'Based on who you be, we ensure what you sell is worthy.\n\n'
+            'The Ojá-Ẹwà Team',
+            style: TextStyle(
+              fontSize: 13,
+              fontFamily: 'Campton',
+              color: Color(0xFF1E2021),
+              height: 1.5,
+            ),
+          ),
+        ],
       ),
     );
   }

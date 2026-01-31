@@ -77,6 +77,12 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
 
                   const Spacer(flex: 3),
 
+                  // Quality Standards Section (only show before submission)
+                  if (!_isSubmitted) ...[
+                    _buildQualityStandards(),
+                    const SizedBox(height: 24),
+                  ],
+
                   // --- Primary Action Button ---
                   _isSubmitted
                       ? _buildDoneButton(context)
@@ -239,6 +245,64 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildQualityStandards() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF8F1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDAF40).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.verified_user,
+                  color: Color(0xFFFDAF40),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Our Quality Promise',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Campton',
+                    color: Color(0xFF241508),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'At Ojá-Ẹwà your trust is our foundation. Every product on Ojá-Ẹwà must pass our verification for authenticity and craftsmanship.\n\n'
+            'We guarantee: If a newly registered brand/product fails our review and does not meet our published Quality Standards, its registration fee will be fully refunded.\n\n'
+            'We invest in your success by ensuring only excellence reaches our marketplace.\n\n'
+            'Based on who you be, we ensure what you sell is worthy.\n\n'
+            'The Ojá-Ẹwà Team',
+            style: TextStyle(
+              fontSize: 13,
+              fontFamily: 'Campton',
+              color: Color(0xFF1E2021),
+              height: 1.5,
+            ),
+          ),
+        ],
       ),
     );
   }
