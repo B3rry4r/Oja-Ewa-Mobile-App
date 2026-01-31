@@ -12,7 +12,7 @@ abstract class AppIcons {
   static const String beauty = 'assets/icons/beauty_i.png';
   static const String brands = 'assets/icons/shoes_i.png';
   static const String market = 'assets/icons/textiles_i.png';
-  static const String music = 'assets/icons/art_i.png';
+  static const String music = 'assets/icons/art.png';
   static const String sustainability = 'assets/icons/sustain_i.png';
   static const String schools = 'assets/icons/schools_i.png';
   static const String connectToUs = 'assets/icons/connect_to_us.svg';
