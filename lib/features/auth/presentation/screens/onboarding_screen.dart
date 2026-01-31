@@ -266,7 +266,7 @@ class OnboardingScreen extends StatelessWidget {
             height: 1.4,
           ),
           children: [
-            const TextSpan(text: "By continuing you agree to Oja-ewa's\n"),
+            const TextSpan(text: "By continuing you agree to ojà-ewà's\n"),
             TextSpan(
               text: 'Terms of Service',
               style: const TextStyle(
