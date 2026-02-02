@@ -9,11 +9,26 @@ import 'package:ojaewa/features/cart/domain/cart.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
 
 /// Renamed/moved Shopping Bag screen. UI is unchanged.
-class CartScreen extends ConsumerWidget {
+class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends ConsumerState<CartScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(cartProvider);
+      ref.read(optimisticCartProvider.notifier).requestSync();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ref = this.ref;
     // Watch the optimistic cart state instead of raw cartProvider
     final cart = ref.watch(optimisticCartProvider);
     final isInitialLoading = ref.watch(cartProvider).isLoading && cart == null;
