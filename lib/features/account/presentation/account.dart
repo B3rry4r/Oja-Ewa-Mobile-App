@@ -515,11 +515,11 @@ class AccountScreen extends ConsumerWidget {
   Widget _buildSupportList(BuildContext context, WidgetRef ref, {required bool isLoggedIn}) {
     return Column(
       children: [
-        // _buildMenuItem(
-        //   iconAsset: AppIcons.emailUs,
-        //   label: 'Email Us',
-        //   onTap: () {},
-        // ),
+        _buildMenuItem(
+          iconAsset: AppIcons.emailUs,
+          label: 'Email Us',
+          onTap: () {},
+        ),
         _buildMenuItem(
           iconAsset: AppIcons.privacyPolicy,
           label: 'Privacy Policy',
