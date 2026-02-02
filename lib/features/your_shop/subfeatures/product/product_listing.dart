@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
-import 'package:ojaewa/core/resources/app_assets.dart';
-import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/sort_sheet.dart';
 import 'package:ojaewa/features/your_shop/data/seller_product_repository.dart';
 import '../add_edit_product/add_edit_product.dart';
 import '../add_edit_product/seller_category_selection.dart';
@@ -26,7 +23,6 @@ class ProductListingsScreen extends ConsumerStatefulWidget {
 }
 
 class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
-  String _searchQuery = '';
   String _selectedStatus = 'Approved';
 
   @override
@@ -158,46 +154,6 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
     );
   }
 
-  Widget _buildSortButton(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        showModalBottomSheet<String>(
-          context: context,
-          backgroundColor: Colors.transparent,
-          barrierColor: Colors.black.withValues(alpha: 0.7),
-          isScrollControlled: true,
-          builder: (_) => const SortOverlay(),
-        );
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFCCCCCC)),
-        ),
-        child: Row(
-          children: [
-            SvgPicture.asset(
-              AppIcons.sort,
-              width: 16,
-              height: 16,
-              colorFilter: const ColorFilter.mode(
-                Color(0xFF241508),
-                BlendMode.srcIn,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Text(
-              "Sort",
-              style: TextStyle(fontSize: 14, color: Color(0xFF241508)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildTab(String label, {bool isActive = false}) {
     return InkWell(
       onTap: () => setState(() => _selectedStatus = label),
@@ -221,16 +177,9 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
   }
 
   List<ShopProduct> _applyFilters(List<ShopProduct> products) {
-    final query = _searchQuery.toLowerCase();
-    final filteredByStatus = _selectedStatus == 'All'
+    return _selectedStatus == 'All'
         ? products
         : products.where((p) => p.status.toLowerCase() == _selectedStatus.toLowerCase()).toList();
-
-    if (query.isEmpty) return filteredByStatus;
-
-    return filteredByStatus
-        .where((p) => p.name.toLowerCase().contains(query))
-        .toList();
   }
 
   Widget _buildProductTable(BuildContext context, List<ShopProduct> products) {
