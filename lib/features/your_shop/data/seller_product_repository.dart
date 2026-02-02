@@ -12,6 +12,15 @@ class SellerProductRepository {
   SellerProductRepository(this._api);
   final ProductApi _api;
 
+  /// Get all products for the authenticated seller
+  /// Endpoint: GET /api/products (auth required)
+  Future<List<Map<String, dynamic>>> getMyProducts({
+    int page = 1,
+    int perPage = 10,
+  }) async {
+    return _api.getSellerProducts(page: page, perPage: perPage);
+  }
+
   /// Create a new product.
   /// 
   /// Fields style, tribe, sizes, fabric_type are required for textiles & shoes_bags

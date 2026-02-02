@@ -1,22 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/widgets/app_header.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/sort_sheet.dart';
+import 'package:ojaewa/features/your_shop/data/seller_product_repository.dart';
 import '../add_edit_product/add_edit_product.dart';
 import '../add_edit_product/seller_category_selection.dart';
 import 'domain/shop_product.dart';
 
 import '../../../../core/widgets/confirmation_modal.dart';
 
-class ProductListingsScreen extends StatelessWidget {
+final sellerProductsProvider = FutureProvider<List<ShopProduct>>((ref) async {
+  final repo = ref.read(sellerProductRepositoryProvider);
+  final productsJson = await repo.getMyProducts(perPage: 100);
+  return productsJson.map(ShopProduct.fromJson).toList();
+});
+
+class ProductListingsScreen extends ConsumerStatefulWidget {
   const ProductListingsScreen({super.key});
 
   @override
+  ConsumerState<ProductListingsScreen> createState() => _ProductListingsScreenState();
+}
+
+class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
+  String _searchQuery = '';
+  String _selectedStatus = 'Approved';
+
+  @override
   Widget build(BuildContext context) {
-    // TODO: Replace with seller products API once available
-    const products = <ShopProduct>[];
+    final productsAsync = ref.watch(sellerProductsProvider);
+
+    return productsAsync.when(
+      loading: () => Scaffold(
+        backgroundColor: const Color(0xFFFFF8F1),
+        body: SafeArea(
+          child: Column(
+            children: [
+              const AppHeader(
+                backgroundColor: Color(0xFFFFF8F1),
+                iconColor: Color(0xFF241508),
+              ),
+              const Expanded(child: Center(child: CircularProgressIndicator())),
+            ],
+          ),
+        ),
+      ),
+      error: (error, _) => _buildErrorState(context, error),
+      data: (products) => _buildContent(context, products),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, List<ShopProduct> products) {
+    final filteredProducts = _applyFilters(products);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
@@ -46,7 +84,7 @@ class ProductListingsScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "${products.length} Products",
+                          "${filteredProducts.length} Products",
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -56,12 +94,10 @@ class ProductListingsScreen extends StatelessWidget {
                         _buildAddProductButton(context),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    _buildSearchBar(),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 12),
                     _buildFilterTabs(context),
                     const SizedBox(height: 24),
-                    _buildProductTable(context, products),
+                    _buildProductTable(context, filteredProducts),
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -105,38 +141,18 @@ class ProductListingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-      ),
-      child: Row(
-        children: const [
-          Icon(Icons.search, color: Color(0xFF777F84), size: 20),
-          SizedBox(width: 12),
-          Text(
-            "search Ojá-Ẹwà",
-            style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 16),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildFilterTabs(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildSortButton(context),
+          _buildTab("Approved", isActive: _selectedStatus == 'Approved'),
           const SizedBox(width: 8),
-          _buildTab("Approved", isActive: true),
+          _buildTab("Rejected", isActive: _selectedStatus == 'Rejected'),
           const SizedBox(width: 8),
-          _buildTab("Rejected"),
+          _buildTab("Pending", isActive: _selectedStatus == 'Pending'),
           const SizedBox(width: 8),
-          _buildTab("Pending"),
+          _buildTab("All", isActive: _selectedStatus == 'All'),
         ],
       ),
     );
@@ -183,21 +199,38 @@ class ProductListingsScreen extends StatelessWidget {
   }
 
   Widget _buildTab(String label, {bool isActive = false}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: isActive ? const Color(0xFFA15E22) : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-        border: isActive ? null : Border.all(color: const Color(0xFFCCCCCC)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: isActive ? Colors.white : const Color(0xFF301C0A),
-          fontSize: 14,
+    return InkWell(
+      onTap: () => setState(() => _selectedStatus = label),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isActive ? const Color(0xFFA15E22) : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: isActive ? null : Border.all(color: const Color(0xFFCCCCCC)),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isActive ? Colors.white : const Color(0xFF301C0A),
+            fontSize: 14,
+          ),
         ),
       ),
     );
+  }
+
+  List<ShopProduct> _applyFilters(List<ShopProduct> products) {
+    final query = _searchQuery.toLowerCase();
+    final filteredByStatus = _selectedStatus == 'All'
+        ? products
+        : products.where((p) => p.status.toLowerCase() == _selectedStatus.toLowerCase()).toList();
+
+    if (query.isEmpty) return filteredByStatus;
+
+    return filteredByStatus
+        .where((p) => p.name.toLowerCase().contains(query))
+        .toList();
   }
 
   Widget _buildProductTable(BuildContext context, List<ShopProduct> products) {
@@ -357,6 +390,44 @@ class ProductListingsScreen extends StatelessWidget {
             style: const TextStyle(fontSize: 12, color: Color(0xFF3C4042)),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, Object error) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFFFF8F1),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const AppHeader(
+              backgroundColor: Color(0xFFFFF8F1),
+              iconColor: Color(0xFF241508),
+            ),
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Failed to load products',
+                        style: TextStyle(fontSize: 16, color: Color(0xFF777F84)),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        error.toString(),
+                        style: const TextStyle(fontSize: 12, color: Color(0xFFCCCCCC)),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

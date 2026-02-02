@@ -297,6 +297,7 @@ class CartActionsController extends AsyncNotifier<void> {
           .read(cartRepositoryProvider)
           .updateItemQuantity(cartItemId: cartItemId, quantity: quantity);
       ref.invalidate(cartProvider);
+      ref.read(optimisticCartProvider.notifier).requestSync();
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -314,6 +315,7 @@ class CartActionsController extends AsyncNotifier<void> {
           .read(cartRepositoryProvider)
           .updateItemSize(cartItemId: cartItemId, selectedSize: selectedSize);
       ref.invalidate(cartProvider);
+      ref.read(optimisticCartProvider.notifier).requestSync();
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -326,6 +328,7 @@ class CartActionsController extends AsyncNotifier<void> {
     try {
       await ref.read(cartRepositoryProvider).removeItem(cartItemId: cartItemId);
       ref.invalidate(cartProvider);
+      ref.read(optimisticCartProvider.notifier).requestSync();
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);

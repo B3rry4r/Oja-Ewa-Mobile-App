@@ -243,6 +243,30 @@ class _CartRow extends ConsumerWidget {
                     ),
                   ),
                 ],
+                // Processing time
+                if (cartItem.processingTimeLabel != null) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.schedule,
+                        size: 14,
+                        color: Color(0xFF777F84),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        cartItem.processingTimeLabel!,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontFamily: 'Campton',
+                          color: Color(0xFF777F84),
+                          height: 1.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -11,40 +11,31 @@ class OnboardingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Using Material scaffold for proper safe area handling
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // #fff8f1
+      backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Hero Section
-              _buildHeroSection(),
-
-              // Content Section with proper spacing
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20), // Spacing from image to title
-                    // Main Headline
-                    _buildHeadline(),
-
-                    const SizedBox(height: 16), // Spacing from title to buttons
-                    // Action Buttons
-                    _buildActionButtons(context),
-
-                    const SizedBox(height: 16), // Spacing before terms
-                    // Terms and Privacy
-                    _buildTermsAndPrivacy(context),
-
-                    const SizedBox(height: 24), // Bottom spacing
-                  ],
-                ),
+        child: Column(
+          children: [
+            // Hero image - expands to fill available space
+            Expanded(
+              child: _buildHeroSection(),
+            ),
+            // Bottom content - fixed at bottom, no scrolling
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildHeadline(),
+                  const SizedBox(height: 16),
+                  _buildActionButtons(context),
+                  const SizedBox(height: 16),
+                  _buildTermsAndPrivacy(context),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -54,7 +45,7 @@ class OnboardingScreen extends StatelessWidget {
     return Stack(
       alignment: Alignment.topCenter,
       children: [
-        // Hero Image - reduced height to fit on one screen
+        // Hero Image - expands to fill available space
         ClipRRect(
           borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(25),
@@ -63,7 +54,7 @@ class OnboardingScreen extends StatelessWidget {
           child: Image.asset(
             AppImages.onboarding,
             width: double.infinity,
-            height: 300,
+            height: double.infinity,
             fit: BoxFit.cover,
           ),
         ),

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../core/network/dio_error_mapper.dart';
 
@@ -6,6 +7,42 @@ class ProductApi {
   ProductApi(this._dio);
 
   final Dio _dio;
+
+  /// Get seller's own products (authenticated seller only)
+  /// GET /api/products
+  Future<List<Map<String, dynamic>>> getSellerProducts({
+    int page = 1,
+    int perPage = 10,
+  }) async {
+    try {
+      final res = await _dio.get(
+        '/api/products',
+        queryParameters: {
+          'page': page,
+          'per_page': perPage,
+        },
+      );
+      
+      final data = res.data;
+      if (data is! Map<String, dynamic>) {
+        return [];
+      }
+      
+      // Response shape: { status: "success", data: { data: [...products], current_page, per_page, total } }
+      final innerData = data['data'];
+      if (innerData is Map<String, dynamic>) {
+        final products = innerData['data'];
+        if (products is List) {
+          return products.whereType<Map<String, dynamic>>().toList();
+        }
+      }
+      
+      return [];
+    } catch (e) {
+      debugPrint('ProductApi: getSellerProducts error: $e');
+      rethrow;
+    }
+  }
 
   Future<Map<String, dynamic>> getProductDetails(int id) async {
     try {

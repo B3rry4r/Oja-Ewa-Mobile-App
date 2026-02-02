@@ -11,6 +11,7 @@ import '../../features/wishlist/presentation/wishlist.dart';
 import '../../features/blog/presentation/blog.dart';
 import '../../features/account/presentation/account.dart';
 import '../widgets/app_bottom_nav_bar.dart';
+import '../../features/categories/presentation/controllers/category_controller.dart';
 
 /// App-level shell that owns the bottom navigation.
 ///
@@ -30,6 +31,8 @@ class _AppShellState extends ConsumerState<AppShell> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(audioControllerProvider.notifier).initialize();
+      // Prefetch categories for smoother UX
+      ref.read(allCategoriesProvider);
     });
   }
 

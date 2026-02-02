@@ -56,6 +56,7 @@ class CartItem {
     required this.selectedSize,
     required this.processingTimeType,
     required this.product,
+    this.processingTimeLabel,
   });
 
   final int id;
@@ -67,6 +68,7 @@ class CartItem {
   /// New cart variant fields
   final String selectedSize;
   final String processingTimeType; // normal|express
+  final String? processingTimeLabel; // e.g., "Standard (10 days)"
 
   final CartProductSnapshot product;
 
@@ -77,6 +79,11 @@ class CartItem {
       return null;
     }
 
+    final processingTime = json['processing_time'];
+    final processingTimeLabel = processingTime is Map<String, dynamic> 
+        ? processingTime['label'] as String? 
+        : null;
+
     return CartItem(
       id: (parseNum(json['id']))?.toInt() ?? 0,
       productId: (parseNum(json['product_id']))?.toInt() ?? 0,
@@ -85,6 +92,7 @@ class CartItem {
       subtotal: parseNum(json['subtotal']),
       selectedSize: (json['selected_size'] as String?) ?? '',
       processingTimeType: (json['processing_time_type'] as String?) ?? 'normal',
+      processingTimeLabel: processingTimeLabel,
       product: CartProductSnapshot.fromJson((json['product'] as Map?)?.cast<String, dynamic>() ?? const {}),
     );
   }

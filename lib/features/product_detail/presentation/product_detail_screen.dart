@@ -198,21 +198,31 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
                       const SizedBox(height: 8),
 
-                      Row(
-                        children: [
-                          Text(
-                            sellerName.isEmpty ? '' : 'by $sellerName',
+                      if (sellerName.isNotEmpty)
+                        RichText(
+                          text: TextSpan(
                             style: const TextStyle(
                               fontSize: 12,
+                              fontFamily: 'Campton',
                               color: Color(0xFF595F63),
                             ),
+                            children: [
+                              const TextSpan(text: 'by '),
+                              TextSpan(
+                                text: sellerName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF1E2021),
+                                ),
+                              ),
+                            ],
                           ),
-                          if (details?.sellerBadge != null) ...[
-                            const SizedBox(width: 8),
-                            SellerBadge(badge: details?.sellerBadge),
-                          ],
-                        ],
-                      ),
+                        ),
+
+                      if (details?.sellerBadge != null) ...[
+                        const SizedBox(height: 6),
+                        SellerBadge(badge: details?.sellerBadge),
+                      ],
 
                       const SizedBox(height: 24),
 

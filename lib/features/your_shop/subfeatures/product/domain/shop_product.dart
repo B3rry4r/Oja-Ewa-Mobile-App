@@ -29,4 +29,25 @@ class ShopProduct {
   final String normalPrice;
   final String quickDays;
   final String quickPrice;
+
+  factory ShopProduct.fromJson(Map<String, dynamic> json) {
+    final sizesRaw = json['sizes'];
+    final sizes = sizesRaw is List ? sizesRaw.map((e) => e.toString()).toList() : <String>[];
+    final status = (json['status'] as String?) ?? (json['approval_status'] as String?) ?? 'Pending';
+
+    return ShopProduct(
+      id: (json['id'] ?? '').toString(),
+      name: (json['name'] as String?) ?? '',
+      status: status.isEmpty ? 'Pending' : status,
+      gender: (json['gender'] as String?) ?? '',
+      style: (json['style'] as String?) ?? '',
+      tribe: (json['tribe'] as String?) ?? '',
+      description: (json['description'] as String?) ?? '',
+      sizes: sizes,
+      normalDays: (json['processing_days'] ?? '').toString(),
+      normalPrice: (json['price'] ?? '').toString(),
+      quickDays: '',
+      quickPrice: '',
+    );
+  }
 }

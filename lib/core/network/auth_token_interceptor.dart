@@ -24,6 +24,7 @@ class AuthTokenInterceptor extends Interceptor {
   static const _publicPrefixes = <String>[
     '/api/products/public/',
     '/api/products/browse',
+    '/api/products/search',
     '/api/categories',
     '/api/blogs',
     '/api/adverts',
@@ -37,6 +38,8 @@ class AuthTokenInterceptor extends Interceptor {
     '/api/login',
     '/api/register',
     '/api/oauth/google',
+    '/api/password/forgot',
+    '/api/password/reset',
   ];
 
   bool _isPublicPath(String path) {

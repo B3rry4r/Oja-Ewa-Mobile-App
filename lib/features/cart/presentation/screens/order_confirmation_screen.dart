@@ -162,7 +162,7 @@ class _OrderConfirmationScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Address',
+          'Shipping Address',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
