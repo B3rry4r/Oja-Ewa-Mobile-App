@@ -305,11 +305,11 @@ class AccountScreen extends ConsumerWidget {
           label: 'Your Addresses',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.addresses),
         ),
-        _buildMenuItem(
-          iconAsset: AppIcons.notification,
-          label: 'Notifications',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.notificationsSettings),
-        ),
+        // _buildMenuItem(
+        //   iconAsset: AppIcons.notification,
+        //   label: 'Notifications',
+        //   onTap: () => Navigator.of(context).pushNamed(AppRoutes.notificationsSettings),
+        // ),
         _buildMenuItem(
           iconAsset: AppIcons.password,
           label: 'Password',
@@ -515,11 +515,11 @@ class AccountScreen extends ConsumerWidget {
   Widget _buildSupportList(BuildContext context, WidgetRef ref, {required bool isLoggedIn}) {
     return Column(
       children: [
-        _buildMenuItem(
-          iconAsset: AppIcons.emailUs,
-          label: 'Email Us',
-          onTap: () {},
-        ),
+        // _buildMenuItem(
+        //   iconAsset: AppIcons.emailUs,
+        //   label: 'Email Us',
+        //   onTap: () {},
+        // ),
         _buildMenuItem(
           iconAsset: AppIcons.privacyPolicy,
           label: 'Privacy Policy',

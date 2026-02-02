@@ -33,16 +33,10 @@ class SellerOnboardingScreen extends ConsumerWidget {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!context.mounted) return;
             if (status.isApprovedAndActive) {
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                AppRoutes.yourShopDashboard,
-                (r) => false,
-              );
+              Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
             } else {
               // Pending or rejected - show approval status screen
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                AppRoutes.sellerApprovalStatus,
-                (r) => false,
-              );
+              Navigator.of(context).pushNamed(AppRoutes.sellerApprovalStatus);
             }
           });
           // Show loading while redirecting
