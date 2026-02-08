@@ -13,6 +13,7 @@ import 'package:ojaewa/core/errors/app_exception.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
 import 'package:ojaewa/core/location/location_picker_sheets.dart';
+import 'set_referral_code_screen.dart';
 
 class CreateAccountScreen extends ConsumerStatefulWidget {
   const CreateAccountScreen({super.key});
@@ -102,7 +103,9 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       if (!mounted) return;
       
       // Show referral code sheet for new Google users
-      // They can optionally add a referral code after signing up
+      await SetReferralCodeSheet.show(context);
+      
+      if (!mounted) return;
       Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
     } on AppException catch (e) {
       // User cancelled - don't show error

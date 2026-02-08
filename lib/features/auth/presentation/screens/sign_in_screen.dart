@@ -12,6 +12,7 @@ import 'package:ojaewa/core/auth/google_sign_in_providers.dart';
 import 'package:ojaewa/core/errors/app_exception.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
+import 'set_referral_code_screen.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
@@ -484,6 +485,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             try {
               final idToken = await google.signInAndGetIdToken();
               await authFlow.googleSignIn(idToken: idToken);
+              if (!mounted) return;
+              
+              // Show referral code sheet for Google users
+              await SetReferralCodeSheet.show(context);
+              
               if (!mounted) return;
               Navigator.of(
                 context,
