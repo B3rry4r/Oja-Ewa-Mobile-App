@@ -23,12 +23,14 @@ class AuthRepositoryImpl implements AuthRepository {
     required String lastname,
     required String email,
     required String password,
+    String? referralCode,
   }) async {
     final token = await api.register(
       firstname: firstname,
       lastname: lastname,
       email: email,
       password: password,
+      referralCode: referralCode,
     );
     await authController.setAccessToken(token);
   }
@@ -67,9 +69,20 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> googleSignIn({required String idToken}) async {
-    final token = await api.googleSignIn(idToken: idToken);
+  Future<void> googleSignIn({
+    required String idToken,
+    String? referralCode,
+  }) async {
+    final token = await api.googleSignIn(
+      idToken: idToken,
+      referralCode: referralCode,
+    );
     await authController.setAccessToken(token);
+  }
+
+  @override
+  Future<void> setReferralCode({required String referralCode}) async {
+    await api.setReferralCode(referralCode: referralCode);
   }
 }
 

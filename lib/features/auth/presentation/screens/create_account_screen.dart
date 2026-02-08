@@ -29,6 +29,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _referralCodeController = TextEditingController();
 
   bool _obscurePassword = true;
   bool _agreeToTerms = false;
@@ -51,6 +52,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
     _emailController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
+    _referralCodeController.dispose();
     super.dispose();
   }
 
@@ -67,6 +69,8 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
     }
 
     try {
+      final referralCode = _referralCodeController.text.trim();
+      
       await ref
           .read(authFlowControllerProvider.notifier)
           .register(
@@ -74,6 +78,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             lastname: _lastNameController.text.trim(),
             email: _emailController.text.trim(),
             password: _passwordController.text,
+            referralCode: referralCode.isNotEmpty ? referralCode : null,
           );
 
       if (!mounted) return;
@@ -95,9 +100,10 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       final idToken = await google.signInAndGetIdToken();
       await authFlow.googleSignIn(idToken: idToken);
       if (!mounted) return;
-      Navigator.of(
-        context,
-      ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+      
+      // Show referral code sheet for new Google users
+      // They can optionally add a referral code after signing up
+      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
     } on AppException catch (e) {
       // User cancelled - don't show error
       if (e.message.contains('cancelled')) return;
@@ -220,6 +226,11 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                 color: const Color(0xFF777F84), // #777f84
               ),
             ),
+
+            const SizedBox(height: 20),
+
+            // Referral Code Input (Optional)
+            _buildReferralCodeInput(),
 
             const SizedBox(height: 20),
 
@@ -791,6 +802,64 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildReferralCodeInput() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Referral Code (Optional)',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            fontFamily: 'Campton',
+            color: const Color(0xFF777F84), // #777f84
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 49,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: const Color(0xFFCCCCCC), // #cccccc
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.card_giftcard_outlined,
+                  size: 20,
+                  color: Color(0xFFCCCCCC),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: TextField(
+                    controller: _referralCodeController,
+                    textCapitalization: TextCapitalization.characters,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      fontFamily: 'Campton',
+                      color: const Color(0xFF1E2021),
+                    ),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Enter referral code',
+                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

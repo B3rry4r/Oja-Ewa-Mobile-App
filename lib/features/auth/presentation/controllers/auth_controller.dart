@@ -43,6 +43,7 @@ class AuthFlowController extends AsyncNotifier<void> {
     required String lastname,
     required String email,
     required String password,
+    String? referralCode,
   }) async {
     state = const AsyncLoading();
     try {
@@ -51,6 +52,7 @@ class AuthFlowController extends AsyncNotifier<void> {
             lastname: lastname,
             email: email,
             password: password,
+            referralCode: referralCode,
           );
       state = const AsyncData(null);
     } catch (e, st) {
@@ -91,10 +93,29 @@ class AuthFlowController extends AsyncNotifier<void> {
     }
   }
 
-  Future<void> googleSignIn({required String idToken}) async {
+  Future<void> googleSignIn({
+    required String idToken,
+    String? referralCode,
+  }) async {
     state = const AsyncLoading();
     try {
-      await ref.read(authRepositoryProvider).googleSignIn(idToken: idToken);
+      await ref.read(authRepositoryProvider).googleSignIn(
+        idToken: idToken,
+        referralCode: referralCode,
+      );
+      state = const AsyncData(null);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
+  }
+
+  Future<void> setReferralCode({required String referralCode}) async {
+    state = const AsyncLoading();
+    try {
+      await ref.read(authRepositoryProvider).setReferralCode(
+        referralCode: referralCode,
+      );
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);

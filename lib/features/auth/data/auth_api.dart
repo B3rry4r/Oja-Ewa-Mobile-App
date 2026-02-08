@@ -37,16 +37,24 @@ class AuthApi {
     required String lastname,
     required String email,
     required String password,
+    String? referralCode,
   }) async {
     try {
+      final data = {
+        'firstname': firstname,
+        'lastname': lastname,
+        'email': email,
+        'password': password,
+      };
+      
+      // Add referral_code if provided
+      if (referralCode != null && referralCode.isNotEmpty) {
+        data['referral_code'] = referralCode;
+      }
+
       final res = await _dio.post(
         '/api/register',
-        data: {
-          'firstname': firstname,
-          'lastname': lastname,
-          'email': email,
-          'password': password,
-        },
+        data: data,
       );
 
       final token = _extractToken(res.data);
@@ -100,13 +108,23 @@ class AuthApi {
     }
   }
 
-  Future<String> googleSignIn({required String idToken}) async {
+  Future<String> googleSignIn({
+    required String idToken,
+    String? referralCode,
+  }) async {
     try {
+      final data = {
+        'idToken': idToken,
+      };
+      
+      // Add referral_code if provided
+      if (referralCode != null && referralCode.isNotEmpty) {
+        data['referral_code'] = referralCode;
+      }
+
       final res = await _dio.post(
         '/api/oauth/google',
-        data: {
-          'token': idToken,
-        },
+        data: data,
       );
 
       final token = _extractToken(res.data);
@@ -114,6 +132,20 @@ class AuthApi {
         throw const FormatException('Token missing in response');
       }
       return token;
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  /// Apply referral code after OAuth sign-up (authenticated endpoint)
+  Future<void> setReferralCode({required String referralCode}) async {
+    try {
+      await _dio.post(
+        '/api/set-referral-code',
+        data: {
+          'referral_code': referralCode,
+        },
+      );
     } catch (e) {
       throw mapDioError(e);
     }

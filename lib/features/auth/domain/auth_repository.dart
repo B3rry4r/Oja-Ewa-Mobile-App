@@ -6,6 +6,7 @@ abstract interface class AuthRepository {
     required String lastname,
     required String email,
     required String password,
+    String? referralCode,
   });
 
   Future<void> logout();
@@ -22,5 +23,11 @@ abstract interface class AuthRepository {
   /// Backend supports `POST /api/auth/google`.
   ///
   /// Note: the app still needs to obtain `idToken` (Google sign-in SDK).
-  Future<void> googleSignIn({required String idToken});
+  Future<void> googleSignIn({
+    required String idToken,
+    String? referralCode,
+  });
+
+  /// Apply referral code after OAuth sign-up (authenticated endpoint)
+  Future<void> setReferralCode({required String referralCode});
 }

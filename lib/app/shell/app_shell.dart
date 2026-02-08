@@ -97,7 +97,7 @@ class _AppShellState extends ConsumerState<AppShell> {
         const SizedBox(height: 10),
         FloatingActionButton.extended(
           heroTag: 'start-selling-fab',
-          onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed(AppRoutes.sellerOnboarding),
+          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.sellerOnboarding),
           backgroundColor: const Color(0xFFFDAF40),
           foregroundColor: Colors.white,
           icon: const Icon(Icons.storefront, size: 24),
