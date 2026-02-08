@@ -1,0 +1,42 @@
+═══════════════════════════════════════════════════════════════
+            GITHUB SECRETS - QUICK REFERENCE
+═══════════════════════════════════════════════════════════════
+
+🔗 WHERE TO ADD SECRETS:
+GitHub Repo → Settings → Secrets and variables → Actions
+
+═══════════════════════════════════════════════════════════════
+
+📋 4 SECRETS TO ADD:
+
+Secret Name: KEYSTORE_BASE64
+Value: Run this command to get it:
+       cat /tmp/keystore_base64.txt
+       OR
+       base64 android/app/upload-keystore.jks | tr -d '\n'
+
+Secret Name: KEYSTORE_PASSWORD
+Value: 08105340452
+
+Secret Name: KEY_PASSWORD
+Value: 08105340452
+
+Secret Name: KEY_ALIAS
+Value: upload
+
+═══════════════════════════════════════════════════════════════
+
+✅ AFTER ADDING SECRETS:
+
+1. Go to: Actions tab → Flutter Android CI
+2. Click: Run workflow
+3. Wait for build to complete
+4. Download from: Releases tab
+   - ojaewa-release.apk (install on phone)
+   - ojaewa-release.aab (upload to Play Store)
+
+═══════════════════════════════════════════════════════════════
+
+📖 For detailed instructions, see: GITHUB_SECRETS_SETUP.md
+
+═══════════════════════════════════════════════════════════════

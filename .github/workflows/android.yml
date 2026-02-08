@@ -1,0 +1,63 @@
+name: Flutter Android CI
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [ main, develop ]
+  # pull_request:
+  #   branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'master'
+        cache: true
+    
+    - name: Decode and setup keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+        echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+        echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+        echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+        echo "storeFile=upload-keystore.jks" >> android/key.properties
+        
+    - name: Get Flutter dependencies
+      run: flutter pub get
+      
+    - name: Build release APK
+      run: flutter build apk --release
+      
+    - name: Build release App Bundle (AAB)
+      run: flutter build appbundle --release
+      
+    - name: Upload release APK to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: build/app/outputs/flutter-apk/app-release.apk
+        asset_name: ojaewa-release.apk
+        tag: v1.0.${{ github.run_number }}
+        overwrite: true
+        body: "Android Release APK - Build #${{ github.run_number }}"
+        
+    - name: Upload release AAB to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: build/app/outputs/bundle/release/app-release.aab
+        asset_name: ojaewa-release.aab
+        tag: v1.0.${{ github.run_number }}
+        overwrite: true
+        body: "Android Release App Bundle (AAB) - Build #${{ github.run_number }}"
