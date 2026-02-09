@@ -267,7 +267,11 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
             flex: 3,
             child: Text(
               product.name,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF241508), // Dark text for readability
+              ),
             ),
           ),
           Expanded(
@@ -312,17 +316,7 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
                   context,
                   icon: Icons.delete_outline,
                   label: "Delete",
-                  onTap: () {
-                    ConfirmationModal.show(
-                      context,
-                      title: 'Delete product',
-                      message: 'Are you sure you want to delete this product?',
-                      confirmLabel: 'Delete',
-                      onConfirm: () {
-                        // TODO: delete later
-                      },
-                    );
-                  },
+                  onTap: () => _deleteProduct(context, product),
                 ),
               ],
             ),
@@ -351,6 +345,48 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
         ],
       ),
     );
+  }
+
+  void _deleteProduct(BuildContext context, ShopProduct product) {
+    ConfirmationModal.show(
+      context,
+      title: 'Delete product',
+      message: 'Are you sure you want to delete "${product.name}"? This action cannot be undone.',
+      confirmLabel: 'Delete',
+      onConfirm: () => _performDelete(context, product),
+    );
+  }
+
+  Future<void> _performDelete(BuildContext context, ShopProduct product) async {
+    try {
+      debugPrint('Deleting product: ${product.id} - ${product.name}');
+      
+      final repo = ref.read(sellerProductRepositoryProvider);
+      await repo.deleteProduct(int.parse(product.id));
+      
+      debugPrint('Product deleted successfully');
+      
+      // Refresh the product list
+      ref.invalidate(sellerProductsProvider);
+      
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Product deleted successfully'),
+          backgroundColor: Color(0xFF70B673),
+        ),
+      );
+    } catch (e) {
+      debugPrint('Error deleting product: $e');
+      
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to delete product: ${e.toString()}'),
+          backgroundColor: Color(0xFFC95353),
+        ),
+      );
+    }
   }
 
   Widget _buildErrorState(BuildContext context, Object error) {
