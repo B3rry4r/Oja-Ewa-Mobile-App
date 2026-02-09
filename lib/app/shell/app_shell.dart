@@ -12,6 +12,7 @@ import '../../features/blog/presentation/blog.dart';
 import '../../features/account/presentation/account.dart';
 import '../widgets/app_bottom_nav_bar.dart';
 import '../../features/categories/presentation/controllers/category_controller.dart';
+import '../../features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 
 /// App-level shell that owns the bottom navigation.
 ///
@@ -97,7 +98,7 @@ class _AppShellState extends ConsumerState<AppShell> {
         const SizedBox(height: 10),
         FloatingActionButton.extended(
           heroTag: 'start-selling-fab',
-          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.sellerOnboarding),
+          onPressed: () => _navigateToStartSelling(context, ref),
           backgroundColor: const Color(0xFFFDAF40),
           foregroundColor: Colors.white,
           icon: const Icon(Icons.storefront, size: 24),
@@ -112,6 +113,16 @@ class _AppShellState extends ConsumerState<AppShell> {
         ),
         
       ],
+    );
+  }
+
+  void _navigateToStartSelling(BuildContext context, WidgetRef ref) {
+    final isSellerApproved = ref.read(isSellerApprovedProvider);
+    
+    // Check seller status and navigate accordingly
+    // This mirrors the logic in account.dart to prevent navigation loops
+    Navigator.of(context).pushNamed(
+      isSellerApproved ? AppRoutes.yourShopDashboard : AppRoutes.sellerOnboarding,
     );
   }
 }

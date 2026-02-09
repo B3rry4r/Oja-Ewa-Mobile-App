@@ -115,19 +115,28 @@ platform :ios do
     
     # CRITICAL: Update pubspec.yaml build number BEFORE flutter build
     # Flutter build reads from pubspec.yaml and will override Xcode changes
-    Dir.chdir("..") do
-      pubspec_path = "pubspec.yaml"
+    # Navigate to project root (Fastfile is in ios/fastlane, need to go up 2 levels)
+    project_root = File.expand_path("../..", Dir.pwd)
+    pubspec_path = File.join(project_root, "pubspec.yaml")
+    
+    UI.message("Project root: #{project_root}")
+    UI.message("Pubspec path: #{pubspec_path}")
+    
+    if File.exist?(pubspec_path)
       pubspec_content = File.read(pubspec_path)
       
       # Replace the version line (e.g., version: 1.0.0+33 → version: 1.0.0+34)
       updated_content = pubspec_content.gsub(/^version:\s*(\d+\.\d+\.\d+)\+\d+/, "version: \\1+#{new_build_number}")
       File.write(pubspec_path, updated_content)
       
-      UI.success("Updated pubspec.yaml build number to: #{new_build_number}")
+      UI.success("✅ Updated pubspec.yaml build number to: #{new_build_number}")
       
       # Verify the change
       version_line = File.read(pubspec_path).match(/^version:\s*(.+)$/)
       UI.message("Current pubspec.yaml version: #{version_line[1]}")
+    else
+      UI.error("❌ pubspec.yaml not found at: #{pubspec_path}")
+      UI.important("Continuing with Xcode build number only...")
     end
     
     # Store for reference

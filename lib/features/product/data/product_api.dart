@@ -15,6 +15,8 @@ class ProductApi {
     int perPage = 10,
   }) async {
     try {
+      debugPrint('ProductApi: Fetching seller products (page=$page, perPage=$perPage)');
+      
       final res = await _dio.get(
         '/api/products',
         queryParameters: {
@@ -23,23 +25,50 @@ class ProductApi {
         },
       );
       
+      debugPrint('ProductApi: Response received - status: ${res.statusCode}');
+      
       final data = res.data;
       if (data is! Map<String, dynamic>) {
+        debugPrint('ProductApi: Unexpected response type: ${data.runtimeType}');
         return [];
       }
       
-      // Response shape: { status: "success", data: { data: [...products], current_page, per_page, total } }
-      final innerData = data['data'];
-      if (innerData is Map<String, dynamic>) {
-        final products = innerData['data'];
-        if (products is List) {
-          return products.whereType<Map<String, dynamic>>().toList();
+      debugPrint('ProductApi: Response keys: ${data.keys.toList()}');
+      
+      // Response shape can be one of two formats:
+      // Format 1: { status: "success", data: { data: [...products], ... } }
+      // Format 2: { data: [...products], current_page, per_page, total }
+      
+      // Try Format 2 first (paginated response with direct data array)
+      final directData = data['data'];
+      if (directData is List) {
+        debugPrint('ProductApi: Found products in data array (Format 2)');
+        final products = directData.whereType<Map<String, dynamic>>().toList();
+        debugPrint('ProductApi: Successfully parsed ${products.length} products');
+        return products;
+      }
+      
+      // Try Format 1 (nested data)
+      if (directData is Map<String, dynamic>) {
+        final nestedProducts = directData['data'];
+        if (nestedProducts is List) {
+          debugPrint('ProductApi: Found products in data.data array (Format 1)');
+          final products = nestedProducts.whereType<Map<String, dynamic>>().toList();
+          debugPrint('ProductApi: Successfully parsed ${products.length} products');
+          return products;
+        } else {
+          debugPrint('ProductApi: data.data is not a List: ${nestedProducts.runtimeType}');
         }
+      } else if (directData != null) {
+        debugPrint('ProductApi: data is not a List or Map: ${directData.runtimeType}');
+      } else {
+        debugPrint('ProductApi: data field is null');
       }
       
       return [];
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('ProductApi: getSellerProducts error: $e');
+      debugPrint('ProductApi: Stack trace: $st');
       rethrow;
     }
   }

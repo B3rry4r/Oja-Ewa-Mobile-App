@@ -13,6 +13,21 @@ import 'package:ojaewa/features/ai/presentation/controllers/ai_analytics_control
 import '../../../app/router/app_router.dart';
 import '../subfeatures/product/product_listing.dart';
 import '../subfeatures/orders/orders.dart';
+import '../../your_shop/data/seller_product_repository.dart';
+
+// Import seller products provider
+final sellerProductsProvider = FutureProvider.autoDispose<List<dynamic>>((ref) async {
+  final repo = ref.watch(sellerProductRepositoryProvider);
+  try {
+    final products = await repo.getMyProducts(perPage: 100);
+    debugPrint('ShopDashboard: Loaded ${products.length} products');
+    return products;
+  } catch (e, st) {
+    debugPrint('ShopDashboard: Error loading products: $e');
+    debugPrint('ShopDashboard: Stack trace: $st');
+    rethrow;
+  }
+});
 
 class ShopDashboardScreen extends ConsumerStatefulWidget {
   const ShopDashboardScreen({super.key});
@@ -30,6 +45,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
     final processingOrders = ref.watch(sellerOrdersProvider('processing'));
     final allOrders = ref.watch(sellerOrdersProvider(null));
     final userId = ref.watch(userProfileProvider).value?.id.toString();
+    final sellerProducts = ref.watch(sellerProductsProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1), // Main Brand Background
@@ -60,7 +76,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
               _buildStatsRow(
                 context,
                 allOrders.maybeWhen(data: (o) => o.length, orElse: () => 0),
-                0,
+                sellerProducts.maybeWhen(data: (p) => p.length, orElse: () => 0),
               ),
               const SizedBox(height: 16),
               // AI Analytics Button

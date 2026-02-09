@@ -31,14 +31,24 @@ class ShopProduct {
   final String quickPrice;
 
   factory ShopProduct.fromJson(Map<String, dynamic> json) {
-    final sizesRaw = json['sizes'];
-    final sizes = sizesRaw is List ? sizesRaw.map((e) => e.toString()).toList() : <String>[];
-    final status = (json['status'] as String?) ?? (json['approval_status'] as String?) ?? 'Pending';
+    // Handle both "sizes" (array) and "size" (single value) from API
+    final sizesRaw = json['sizes'] ?? json['size'];
+    final sizes = sizesRaw is List 
+        ? sizesRaw.map((e) => e.toString()).toList() 
+        : sizesRaw != null 
+            ? [sizesRaw.toString()] 
+            : <String>[];
+    
+    // Get status and capitalize first letter for filter matching
+    final rawStatus = (json['status'] as String?) ?? (json['approval_status'] as String?) ?? 'pending';
+    final status = rawStatus.isEmpty 
+        ? 'Pending' 
+        : rawStatus[0].toUpperCase() + rawStatus.substring(1).toLowerCase();
 
     return ShopProduct(
       id: (json['id'] ?? '').toString(),
       name: (json['name'] as String?) ?? '',
-      status: status.isEmpty ? 'Pending' : status,
+      status: status, // Now properly capitalized (approved → Approved)
       gender: (json['gender'] as String?) ?? '',
       style: (json['style'] as String?) ?? '',
       tribe: (json['tribe'] as String?) ?? '',

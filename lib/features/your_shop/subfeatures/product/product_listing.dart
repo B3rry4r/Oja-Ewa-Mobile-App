@@ -11,8 +11,18 @@ import '../../../../core/widgets/confirmation_modal.dart';
 
 final sellerProductsProvider = FutureProvider<List<ShopProduct>>((ref) async {
   final repo = ref.read(sellerProductRepositoryProvider);
-  final productsJson = await repo.getMyProducts(perPage: 100);
-  return productsJson.map(ShopProduct.fromJson).toList();
+  try {
+    debugPrint('ProductListingScreen: Fetching seller products...');
+    final productsJson = await repo.getMyProducts(perPage: 100);
+    debugPrint('ProductListingScreen: Received ${productsJson.length} products from API');
+    final products = productsJson.map(ShopProduct.fromJson).toList();
+    debugPrint('ProductListingScreen: Successfully parsed ${products.length} ShopProduct objects');
+    return products;
+  } catch (e, st) {
+    debugPrint('ProductListingScreen: Error fetching products: $e');
+    debugPrint('ProductListingScreen: Stack trace: $st');
+    rethrow;
+  }
 });
 
 class ProductListingsScreen extends ConsumerStatefulWidget {
