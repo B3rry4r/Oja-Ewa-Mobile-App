@@ -113,6 +113,23 @@ platform :ios do
       xcodeproj: "Runner.xcodeproj"
     )
     
+    # CRITICAL: Update pubspec.yaml build number BEFORE flutter build
+    # Flutter build reads from pubspec.yaml and will override Xcode changes
+    Dir.chdir("..") do
+      pubspec_path = "pubspec.yaml"
+      pubspec_content = File.read(pubspec_path)
+      
+      # Replace the version line (e.g., version: 1.0.0+33 → version: 1.0.0+34)
+      updated_content = pubspec_content.gsub(/^version:\s*(\d+\.\d+\.\d+)\+\d+/, "version: \\1+#{new_build_number}")
+      File.write(pubspec_path, updated_content)
+      
+      UI.success("Updated pubspec.yaml build number to: #{new_build_number}")
+      
+      # Verify the change
+      version_line = File.read(pubspec_path).match(/^version:\s*(.+)$/)
+      UI.message("Current pubspec.yaml version: #{version_line[1]}")
+    end
+    
     # Store for reference
     ENV["BUILD_NUMBER"] = new_build_number.to_s
 
@@ -120,7 +137,7 @@ platform :ios do
     # Flutter build (no codesign)
     # -----------------------------
     Dir.chdir("..") do
-      sh("flutter", "build", "ios", "--release", "--no-codesign")
+      sh("flutter", "build", "ios", "--release", "--no-codesign", "--build-number=#{new_build_number}")
     end    
 
     # -----------------------------

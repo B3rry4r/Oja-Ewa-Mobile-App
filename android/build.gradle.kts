@@ -1,6 +1,7 @@
 plugins {
     // Add the Google services Gradle plugin
-    id("com.google.gms.google-services") version "4.4.2" apply false
+    // Version managed by Flutter's Gradle plugin to avoid conflicts
+    id("com.google.gms.google-services") version "4.3.15" apply false
 }
 
 allprojects {
