@@ -19,14 +19,14 @@ class AppUrls {
     if (_laravelOverride.isNotEmpty) return _laravelOverride;
 
     // Defaults (from docs):
-    // - https://ojaewa-pro-api-production.up.railway.app
+    // - https://ojaewa-pro-api-production-2254.up.railway.app
     switch (AppEnv.current) {
       case AppEnvironment.dev:
-        return 'https://ojaewa-pro-api-production.up.railway.app';
+        return 'https://ojaewa-pro-api-production-2254.up.railway.app';
       case AppEnvironment.staging:
-        return 'https://ojaewa-pro-api-production.up.railway.app';
+        return 'https://ojaewa-pro-api-production-2254.up.railway.app';
       case AppEnvironment.prod:
-        return 'https://ojaewa-pro-api-production.up.railway.app';
+        return 'https://ojaewa-pro-api-production-2254.up.railway.app';
     }
   }
 
@@ -34,14 +34,14 @@ class AppUrls {
     if (_aiOverride.isNotEmpty) return _aiOverride;
 
     // Defaults (from docs):
-    // - https://ojaewa-ai-production.up.railway.app
+    // - https://ojaewa-ai-production-1bb8.up.railway.app
     switch (AppEnv.current) {
       case AppEnvironment.dev:
-        return 'https://ojaewa-ai-production.up.railway.app';
+        return 'https://ojaewa-ai-production-1bb8.up.railway.app';
       case AppEnvironment.staging:
-        return 'https://ojaewa-ai-production.up.railway.app';
+        return 'https://ojaewa-ai-production-1bb8.up.railway.app';
       case AppEnvironment.prod:
-        return 'https://ojaewa-ai-production.up.railway.app';
+        return 'https://ojaewa-ai-production-1bb8.up.railway.app';
     }
   }
 }

@@ -6,21 +6,28 @@ import '../../../core/network/dio_clients.dart';
 import '../domain/ai_models.dart';
 
 /// AI API Service
-/// 
+///
 /// Handles AI-related API calls for the 4 boss-priority features:
 /// 1. Smart Product Descriptions (Seller)
 /// 2. Cultural Context AI Chat (Buyer)
 /// 3. Style Quiz & Recommendations (Buyer)
 /// 4. Seller Analytics (Seller)
-/// 
-/// Base URL: https://ojaewa-ai-production.up.railway.app
+///
+/// Base URL: https://ojaewa-ai-production-1bb8.up.railway.app
 class AiApi {
   AiApi(this._dio);
 
   final Dio _dio;
 
   /// Log helper for AI API calls
-  void _log(String method, String endpoint, {dynamic data, dynamic response, int? statusCode, dynamic error}) {
+  void _log(
+    String method,
+    String endpoint, {
+    dynamic data,
+    dynamic response,
+    int? statusCode,
+    dynamic error,
+  }) {
     final timestamp = DateTime.now().toIso8601String();
     final fullUrl = '${_dio.options.baseUrl}$endpoint';
     debugPrint('═══════════════════════════════════════════════════════════');
@@ -35,7 +42,9 @@ class AiApi {
     if (response != null) {
       final responseStr = response.toString();
       if (responseStr.length > 500) {
-        debugPrint('📥 Response (truncated): ${responseStr.substring(0, 500)}...');
+        debugPrint(
+          '📥 Response (truncated): ${responseStr.substring(0, 500)}...',
+        );
       } else {
         debugPrint('📥 Response: $responseStr');
       }
@@ -49,13 +58,18 @@ class AiApi {
   /// Safely parse JSON response
   Map<String, dynamic> _parseJsonResponse(dynamic responseData) {
     if (responseData is String) {
-      if (responseData.contains('<!DOCTYPE') || responseData.contains('<html')) {
-        throw Exception('AI API returned HTML instead of JSON. Check AI_BASE_URL configuration.');
+      if (responseData.contains('<!DOCTYPE') ||
+          responseData.contains('<html')) {
+        throw Exception(
+          'AI API returned HTML instead of JSON. Check AI_BASE_URL configuration.',
+        );
       }
       throw Exception('AI API returned unexpected string response');
     }
     if (responseData is! Map<String, dynamic>) {
-      throw Exception('AI API returned unexpected response type: ${responseData.runtimeType}');
+      throw Exception(
+        'AI API returned unexpected response type: ${responseData.runtimeType}',
+      );
     }
     return responseData;
   }
@@ -91,18 +105,25 @@ class AiApi {
       'message': message,
       if (context != null) 'context': context,
     };
-    
+
     _log('POST', endpoint, data: requestData);
-    
+
     try {
       final response = await _dio.post(endpoint, data: requestData);
-      _log('POST', endpoint, response: response.data, statusCode: response.statusCode);
-      
+      _log(
+        'POST',
+        endpoint,
+        response: response.data,
+        statusCode: response.statusCode,
+      );
+
       final data = _parseJsonResponse(response.data);
-      
+
       // Response format: { success, response, suggestedProducts[], sessionId }
       return AiChatMessage(
-        id: data['sessionId']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        id:
+            data['sessionId']?.toString() ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
         content: data['response']?.toString() ?? '',
         isUser: false,
         timestamp: DateTime.now(),
@@ -122,7 +143,12 @@ class AiApi {
             .toList(),
       );
     } on DioException catch (e) {
-      _log('POST', endpoint, error: e.message, statusCode: e.response?.statusCode);
+      _log(
+        'POST',
+        endpoint,
+        error: e.message,
+        statusCode: e.response?.statusCode,
+      );
       rethrow;
     } catch (e) {
       _log('POST', endpoint, error: e);
@@ -137,28 +163,37 @@ class AiApi {
   /// 2) { history: [{ id, userMessage, assistantResponse, timestamp }] }
   Future<List<AiChatMessage>> getChatHistory(String userId) async {
     final endpoint = '/ai/buyer/chat/history/$userId';
-    
+
     _log('GET', endpoint);
-    
+
     try {
       final response = await _dio.get(endpoint);
-      _log('GET', endpoint, response: response.data, statusCode: response.statusCode);
-      
+      _log(
+        'GET',
+        endpoint,
+        response: response.data,
+        statusCode: response.statusCode,
+      );
+
       final data = _parseJsonResponse(response.data);
       final history = data['history'] as List<dynamic>? ?? [];
-      
+
       final messages = <AiChatMessage>[];
       for (final item in history) {
         if (item is! Map<String, dynamic>) continue;
 
         // Format 1: role/content
         if (item.containsKey('role') && item.containsKey('content')) {
-          messages.add(AiChatMessage(
-            id: item['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
-            content: item['content']?.toString() ?? '',
-            isUser: item['role'] == 'user',
-            timestamp: _parseDateTime(item['timestamp']),
-          ));
+          messages.add(
+            AiChatMessage(
+              id:
+                  item['id']?.toString() ??
+                  DateTime.now().millisecondsSinceEpoch.toString(),
+              content: item['content']?.toString() ?? '',
+              isUser: item['role'] == 'user',
+              timestamp: _parseDateTime(item['timestamp']),
+            ),
+          );
           continue;
         }
 
@@ -166,26 +201,35 @@ class AiApi {
         if (item['userMessage'] != null || item['assistantResponse'] != null) {
           final timestamp = _parseDateTime(item['timestamp']);
           if (item['userMessage'] != null) {
-            messages.add(AiChatMessage(
-              id: '${item['id'] ?? DateTime.now().millisecondsSinceEpoch}_user',
-              content: item['userMessage']?.toString() ?? '',
-              isUser: true,
-              timestamp: timestamp,
-            ));
+            messages.add(
+              AiChatMessage(
+                id: '${item['id'] ?? DateTime.now().millisecondsSinceEpoch}_user',
+                content: item['userMessage']?.toString() ?? '',
+                isUser: true,
+                timestamp: timestamp,
+              ),
+            );
           }
           if (item['assistantResponse'] != null) {
-            messages.add(AiChatMessage(
-              id: '${item['id'] ?? DateTime.now().millisecondsSinceEpoch}_assistant',
-              content: item['assistantResponse']?.toString() ?? '',
-              isUser: false,
-              timestamp: timestamp,
-            ));
+            messages.add(
+              AiChatMessage(
+                id: '${item['id'] ?? DateTime.now().millisecondsSinceEpoch}_assistant',
+                content: item['assistantResponse']?.toString() ?? '',
+                isUser: false,
+                timestamp: timestamp,
+              ),
+            );
           }
         }
       }
       return messages;
     } on DioException catch (e) {
-      _log('GET', endpoint, error: e.message, statusCode: e.response?.statusCode);
+      _log(
+        'GET',
+        endpoint,
+        error: e.message,
+        statusCode: e.response?.statusCode,
+      );
       if (e.response?.statusCode == 404) return [];
       rethrow;
     } catch (e) {
@@ -207,30 +251,43 @@ class AiApi {
   }) async {
     const endpoint = '/ai/buyer/style-quiz';
     final requestData = {'answers': answers};
-    
+
     _log('POST', endpoint, data: requestData);
-    
+
     try {
       final response = await _dio.post(endpoint, data: requestData);
-      _log('POST', endpoint, response: response.data, statusCode: response.statusCode);
-      
+      _log(
+        'POST',
+        endpoint,
+        response: response.data,
+        statusCode: response.statusCode,
+      );
+
       final data = _parseJsonResponse(response.data);
       final styleProfile = data['styleProfile'] as Map<String, dynamic>? ?? {};
-      
+
       return StyleDnaProfile(
         userId: userId,
-        styleProfile: styleProfile['summary']?.toString() ?? 'Style profile created',
+        styleProfile:
+            styleProfile['summary']?.toString() ?? 'Style profile created',
         colorSeason: null,
-        preferredStyles: styleProfile['stylePersonality'] != null 
-            ? [styleProfile['stylePersonality'].toString()] 
+        preferredStyles: styleProfile['stylePersonality'] != null
+            ? [styleProfile['stylePersonality'].toString()]
             : null,
-        preferredTribes: (styleProfile['culturalAffinity'] as List<dynamic>?)?.cast<String>(),
+        preferredTribes: (styleProfile['culturalAffinity'] as List<dynamic>?)
+            ?.cast<String>(),
         bodyType: styleProfile['fitPreference']?.toString(),
-        fashionGoals: (styleProfile['occasionFocus'] as List<dynamic>?)?.cast<String>(),
+        fashionGoals: (styleProfile['occasionFocus'] as List<dynamic>?)
+            ?.cast<String>(),
         updatedAt: DateTime.now(),
       );
     } on DioException catch (e) {
-      _log('POST', endpoint, error: e.message, statusCode: e.response?.statusCode);
+      _log(
+        'POST',
+        endpoint,
+        error: e.message,
+        statusCode: e.response?.statusCode,
+      );
       rethrow;
     } catch (e) {
       _log('POST', endpoint, error: e);
@@ -250,32 +307,43 @@ class AiApi {
     final queryParams = <String, dynamic>{};
     if (limit != null) queryParams['limit'] = limit;
     if (category != null) queryParams['category'] = category;
-    
+
     _log('GET', endpoint, data: queryParams.isNotEmpty ? queryParams : null);
-    
+
     try {
       final response = await _dio.get(
         endpoint,
         queryParameters: queryParams.isEmpty ? null : queryParams,
       );
-      
-      _log('GET', endpoint, response: response.data, statusCode: response.statusCode);
-      
+
+      _log(
+        'GET',
+        endpoint,
+        response: response.data,
+        statusCode: response.statusCode,
+      );
+
       final data = _parseJsonResponse(response.data);
       final recommendations = data['recommendations'] as List<dynamic>? ?? [];
-      
+
       return recommendations.map((item) {
         if (item is! Map<String, dynamic>) {
-          return const PersonalizedRecommendation(id: '', name: '', price: 0, matchScore: 0);
+          return const PersonalizedRecommendation(
+            id: '',
+            name: '',
+            price: 0,
+            matchScore: 0,
+          );
         }
-        
+
         final product = item['product'] as Map<String, dynamic>? ?? {};
-        
+
         return PersonalizedRecommendation(
           id: item['productId']?.toString() ?? product['id']?.toString() ?? '',
           name: product['name']?.toString() ?? '',
           price: _parseDouble(product['price']),
-          matchScore: _parseDouble(item['matchScore']) / 100, // Convert 0-100 to 0-1
+          matchScore:
+              _parseDouble(item['matchScore']) / 100, // Convert 0-100 to 0-1
           imageUrl: product['image']?.toString(),
           reason: item['reason']?.toString(),
           category: null,
@@ -284,7 +352,12 @@ class AiApi {
         );
       }).toList();
     } on DioException catch (e) {
-      _log('GET', endpoint, error: e.message, statusCode: e.response?.statusCode);
+      _log(
+        'GET',
+        endpoint,
+        error: e.message,
+        statusCode: e.response?.statusCode,
+      );
       rethrow;
     } catch (e) {
       _log('GET', endpoint, error: e);
@@ -298,7 +371,10 @@ class AiApi {
     // The API doesn't have a separate get-profile endpoint
     // We can try to get recommendations which includes profile info
     try {
-      final recommendations = await getRecommendations(userId: userId, limit: 1);
+      final recommendations = await getRecommendations(
+        userId: userId,
+        limit: 1,
+      );
       if (recommendations.isEmpty) return null;
       // If we got recommendations, user has a profile
       return StyleDnaProfile(
@@ -337,15 +413,20 @@ class AiApi {
       if (materials != null) 'materials': materials,
       if (occasion != null) 'occasion': occasion,
     };
-    
+
     _log('POST', endpoint, data: requestData);
-    
+
     try {
       final response = await _dio.post(endpoint, data: requestData);
-      _log('POST', endpoint, response: response.data, statusCode: response.statusCode);
-      
+      _log(
+        'POST',
+        endpoint,
+        response: response.data,
+        statusCode: response.statusCode,
+      );
+
       final data = _parseJsonResponse(response.data);
-      
+
       return AiProductDescription(
         description: data['description']?.toString() ?? '',
         title: data['seoTitle']?.toString(),
@@ -353,7 +434,12 @@ class AiApi {
         seoKeywords: (data['seoKeywords'] as List<dynamic>?)?.cast<String>(),
       );
     } on DioException catch (e) {
-      _log('POST', endpoint, error: e.message, statusCode: e.response?.statusCode);
+      _log(
+        'POST',
+        endpoint,
+        error: e.message,
+        statusCode: e.response?.statusCode,
+      );
       rethrow;
     } catch (e) {
       _log('POST', endpoint, error: e);
@@ -369,21 +455,27 @@ class AiApi {
   /// GET /ai/seller/trends/:category
   Future<TrendData> getCategoryTrends(String category) async {
     final endpoint = '/ai/seller/trends/$category';
-    
+
     _log('GET', endpoint);
-    
+
     try {
       final response = await _dio.get(endpoint);
-      _log('GET', endpoint, response: response.data, statusCode: response.statusCode);
-      
+      _log(
+        'GET',
+        endpoint,
+        response: response.data,
+        statusCode: response.statusCode,
+      );
+
       final data = _parseJsonResponse(response.data);
       final trends = data['trends'] as Map<String, dynamic>? ?? {};
       final trendingStyles = trends['trendingStyles'] as List<dynamic>? ?? [];
-      
+
       return TrendData(
         category: category,
         trendingStyles: trendingStyles.map((t) {
-          if (t is! Map<String, dynamic>) return const TrendItem(name: '', score: 0);
+          if (t is! Map<String, dynamic>)
+            return const TrendItem(name: '', score: 0);
           return TrendItem(
             name: t['style']?.toString() ?? t['name']?.toString() ?? '',
             score: _parseDouble(t['score']),
@@ -396,7 +488,12 @@ class AiApi {
         confidence: null,
       );
     } on DioException catch (e) {
-      _log('GET', endpoint, error: e.message, statusCode: e.response?.statusCode);
+      _log(
+        'GET',
+        endpoint,
+        error: e.message,
+        statusCode: e.response?.statusCode,
+      );
       rethrow;
     } catch (e) {
       _log('GET', endpoint, error: e);
@@ -408,21 +505,29 @@ class AiApi {
   /// GET /ai/seller/trends/seller/:sellerId
   Future<SellerPerformance> getSellerPerformance(String sellerId) async {
     final endpoint = '/ai/seller/trends/seller/$sellerId';
-    
+
     _log('GET', endpoint);
-    
+
     try {
       final response = await _dio.get(endpoint);
-      _log('GET', endpoint, response: response.data, statusCode: response.statusCode);
-      
+      _log(
+        'GET',
+        endpoint,
+        response: response.data,
+        statusCode: response.statusCode,
+      );
+
       final data = _parseJsonResponse(response.data);
-      
+
       return SellerPerformance(
         sellerId: sellerId,
         totalSales: _parseDouble(data['totalSales'] ?? data['total_sales']),
-        averageRating: _parseDouble(data['averageRating'] ?? data['average_rating']),
+        averageRating: _parseDouble(
+          data['averageRating'] ?? data['average_rating'],
+        ),
         topProducts: (data['topProducts'] as List<dynamic>? ?? []).map((p) {
-          if (p is! Map<String, dynamic>) return const TopProduct(id: '', name: '', sales: 0);
+          if (p is! Map<String, dynamic>)
+            return const TopProduct(id: '', name: '', sales: 0);
           return TopProduct(
             id: p['id']?.toString() ?? '',
             name: p['name']?.toString() ?? '',
@@ -431,10 +536,16 @@ class AiApi {
           );
         }).toList(),
         marketComparison: null,
-        suggestions: (data['suggestions'] as List<dynamic>?)?.cast<String>() ?? [],
+        suggestions:
+            (data['suggestions'] as List<dynamic>?)?.cast<String>() ?? [],
       );
     } on DioException catch (e) {
-      _log('GET', endpoint, error: e.message, statusCode: e.response?.statusCode);
+      _log(
+        'GET',
+        endpoint,
+        error: e.message,
+        statusCode: e.response?.statusCode,
+      );
       rethrow;
     } catch (e) {
       _log('GET', endpoint, error: e);
@@ -452,26 +563,29 @@ class AiApi {
     int? daysAhead,
   }) async {
     const endpoint = '/ai/seller/inventory/forecast';
-    final requestData = {
-      'timeframe': '30days',
-    };
-    
+    final requestData = {'timeframe': '30days'};
+
     _log('POST', endpoint, data: requestData);
-    
+
     try {
       final response = await _dio.post(endpoint, data: requestData);
-      _log('POST', endpoint, response: response.data, statusCode: response.statusCode);
-      
+      _log(
+        'POST',
+        endpoint,
+        response: response.data,
+        statusCode: response.statusCode,
+      );
+
       final data = _parseJsonResponse(response.data);
       final forecast = data['forecast'] as Map<String, dynamic>? ?? {};
       final restock = forecast['restockPriorities'] as List<dynamic>? ?? [];
-      
+
       // If restockPriorities is empty but we have forecast data, create a summary item
       // This handles the case where API returns: { expectedDemand: "medium", recommendation: "...", restockPriorities: [] }
       if (restock.isEmpty) {
         final expectedDemand = forecast['expectedDemand']?.toString() ?? '';
         final recommendation = forecast['recommendation']?.toString() ?? '';
-        
+
         // If we have any forecast info, show it as a summary
         if (expectedDemand.isNotEmpty || recommendation.isNotEmpty) {
           return [
@@ -479,21 +593,30 @@ class AiApi {
               productId: 'summary',
               productName: 'Inventory Summary',
               currentStock: 0,
-              predictedDemand: expectedDemand == 'high' ? 100 : (expectedDemand == 'medium' ? 50 : 25),
-              recommendedStock: expectedDemand == 'high' ? 100 : (expectedDemand == 'medium' ? 50 : 25),
+              predictedDemand: expectedDemand == 'high'
+                  ? 100
+                  : (expectedDemand == 'medium' ? 50 : 25),
+              recommendedStock: expectedDemand == 'high'
+                  ? 100
+                  : (expectedDemand == 'medium' ? 50 : 25),
               confidence: 0.7,
-              recommendation: recommendation.isNotEmpty ? recommendation : 'Expected demand: $expectedDemand',
+              recommendation: recommendation.isNotEmpty
+                  ? recommendation
+                  : 'Expected demand: $expectedDemand',
             ),
           ];
         }
         return [];
       }
-      
+
       return restock.map((item) {
         if (item is! Map<String, dynamic>) {
           return const InventoryForecast(
-            productId: '', productName: '', currentStock: 0,
-            predictedDemand: 0, recommendedStock: 0,
+            productId: '',
+            productName: '',
+            currentStock: 0,
+            predictedDemand: 0,
+            recommendedStock: 0,
           );
         }
         return InventoryForecast(
@@ -506,7 +629,12 @@ class AiApi {
         );
       }).toList();
     } on DioException catch (e) {
-      _log('POST', endpoint, error: e.message, statusCode: e.response?.statusCode);
+      _log(
+        'POST',
+        endpoint,
+        error: e.message,
+        statusCode: e.response?.statusCode,
+      );
       rethrow;
     } catch (e) {
       _log('POST', endpoint, error: e);

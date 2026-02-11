@@ -4,7 +4,7 @@ Source: `docs/NODE_AI_BACKEND_SIMPLE_PLAN.md`.
 
 The Node.js AI backend is a separate service:
 - Laravel: `https://ojaewa-laravel.railway.app` (existing)
-- AI service: `https://ojaewa-ai-production.up.railway.app` (new)
+- AI service: `https://ojaewa-ai-production-1bb8.up.railway.app` (new)
 
 Frontend should send the **same Bearer token** to both services.
 
@@ -236,7 +236,7 @@ UI changes:
 
 1. **Two HTTP clients**
    - Laravel `baseUrl = https://ojaewa-laravel.railway.app`
-   - AI `baseUrl = https://ojaewa-ai-production.up.railway.app`
+   - AI `baseUrl = https://ojaewa-ai-production-1bb8.up.railway.app`
 
 2. **Auth propagation**
    - Store the login token once.

@@ -104,7 +104,7 @@ debugPrint('ProductApi: Successfully parsed ${products.length} products');
 ## 🧪 API Testing Results
 
 **Test Account:** test@ojaewa.com / password123  
-**Base URL:** https://ojaewa-pro-api-production.up.railway.app
+**Base URL:** https://ojaewa-pro-api-production-2254.up.railway.app
 
 ### Test Results:
 ✅ **Login:** SUCCESS  
