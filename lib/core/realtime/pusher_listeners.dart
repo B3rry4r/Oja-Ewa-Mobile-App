@@ -1,13 +1,19 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/router/app_router.dart';
 import '../../features/cart/presentation/controllers/cart_controller.dart';
 import '../../features/orders/presentation/controllers/orders_controller.dart';
 import '../../features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import '../../features/account/presentation/controllers/profile_controller.dart';
 import '../auth/auth_providers.dart';
+import '../widgets/in_app_notification.dart';
 import 'pusher_service.dart';
+
+/// Global navigator key for showing notifications
+final GlobalKey<NavigatorState> pusherNavigatorKey = GlobalKey<NavigatorState>();
 
 /// Sets up Pusher real-time event listeners
 /// 
@@ -71,22 +77,41 @@ class PusherListeners {
     final channelName = 'private-user.$userId';
     await pusher.subscribeToChannel(channelName);
 
-    // Listen for order status updates - ACTUALLY INVALIDATES DATA
+    // Listen for order status updates - UPDATE STATE DIRECTLY
     pusher.bindEvent(channelName, 'order.status.updated', (data) {
       debugPrint('📦 Order status updated: $data');
       
-      // FORCE REFRESH - Invalidate orders provider to fetch new data
-      container.invalidate(ordersProvider);
-      
-      _handleOrderUpdate(data);
+      try {
+        final json = data is String ? jsonDecode(data) : data;
+        final orderId = json['order_id'];
+        final status = json['status'] as String?;
+        
+        // Invalidate to refresh - but also show notification
+        container.invalidate(ordersProvider);
+        
+        // Show in-app notification
+        _showOrderUpdateNotification(orderId, status ?? 'updated');
+      } catch (e) {
+        debugPrint('Error parsing order update: $e');
+      }
     });
 
-    // Listen for cart updates - ACTUALLY SYNCS ACROSS DEVICES
+    // Listen for cart updates - SYNC ACROSS DEVICES
     pusher.bindEvent(channelName, 'cart.updated', (data) {
       debugPrint('🛒 Cart updated: $data');
       
-      // FORCE REFRESH - Invalidate cart to fetch new data from server
-      container.invalidate(cartProvider);
+      try {
+        final json = data is String ? jsonDecode(data) : data;
+        final itemsCount = json['items_count'] as int?;
+        
+        // Invalidate to refresh cart
+        container.invalidate(cartProvider);
+        
+        // Show in-app notification
+        _showCartUpdateNotification(itemsCount ?? 0);
+      } catch (e) {
+        debugPrint('Error parsing cart update: $e');
+      }
     });
   }
 
@@ -107,16 +132,37 @@ class PusherListeners {
       container.invalidate(mySellerStatusProvider);
       container.invalidate(isSellerApprovedProvider);
       
-      _handleSellerApproval(data);
+      try {
+        final json = data is String ? jsonDecode(data) : data;
+        final status = json['status'] as String?;
+        final businessName = json['business_name'] as String?;
+        final rejectionReason = json['rejection_reason'] as String?;
+        
+        _showSellerApprovalNotification(status ?? '', businessName, rejectionReason);
+      } catch (e) {
+        debugPrint('Error parsing seller approval: $e');
+      }
     });
 
-    // Listen for PRODUCT approval status - REFRESHES PRODUCT LIST
+    // Listen for PRODUCT approval status
     pusher.bindEvent(channelName, 'product.approval.changed', (data) {
       debugPrint('✅ Product approval changed: $data');
       
-      // FORCE REFRESH - Seller should reload their products
-      // Note: Different screens use different providers, invalidate on demand
-      _handleProductApproval(data);
+      try {
+        final json = data is String ? jsonDecode(data) : data;
+        final productName = json['product_name'] as String?;
+        final status = json['status'] as String?;
+        final rejectionReason = json['rejection_reason'] as String?;
+        
+        // Show in-app notification
+        _showProductApprovalNotification(
+          productName ?? 'Your product',
+          status ?? '',
+          rejectionReason,
+        );
+      } catch (e) {
+        debugPrint('Error parsing product approval: $e');
+      }
     });
 
     // Subscribe to all seller orders channel - NEW ORDERS
@@ -125,10 +171,20 @@ class PusherListeners {
     pusher.bindEvent('private-seller.orders', 'order.new', (data) {
       debugPrint('🆕 NEW ORDER RECEIVED: $data');
       
-      // FORCE REFRESH - Shows new order immediately
-      container.invalidate(ordersProvider);
-      
-      _handleNewOrder(data);
+      try {
+        final json = data is String ? jsonDecode(data) : data;
+        final orderId = json['order_id'];
+        final total = json['total'];
+        final buyerName = json['buyer']?['name'] as String?;
+        
+        // Invalidate to refresh orders
+        container.invalidate(ordersProvider);
+        
+        // Show in-app notification
+        _showNewOrderNotification(orderId, total, buyerName ?? 'Customer');
+      } catch (e) {
+        debugPrint('Error parsing new order: $e');
+      }
     });
   }
 
@@ -138,68 +194,156 @@ class PusherListeners {
     
     pusher.bindEvent('blog-updates', 'blog.published', (data) {
       debugPrint('📝 New blog published: $data');
-      _handleNewBlog(data);
+      try {
+        final json = data is String ? jsonDecode(data) : data;
+        final title = json['title'] as String?;
+        _showBlogUpdateNotification(title ?? 'New blog post');
+      } catch (e) {
+        debugPrint('Error parsing blog: $e');
+      }
     });
   }
 
-  // Event handlers
-  static void _handleOrderUpdate(dynamic data) {
-    try {
-      final json = data is String ? jsonDecode(data) : data;
-      debugPrint('Order ${json['order_id']} status: ${json['status']}');
-      // TODO: Show in-app notification
-    } catch (e) {
-      debugPrint('Error parsing order update: $e');
+  // In-app notification show functions
+  static void _showOrderUpdateNotification(int orderId, String status) {
+    final context = pusherNavigatorKey.currentContext;
+    if (context == null) return;
+
+    String message = 'Order #$orderId is now $status';
+    IconData icon = Icons.local_shipping;
+    
+    if (status == 'completed') {
+      message = 'Order #$orderId has been delivered!';
+      icon = Icons.check_circle;
+    } else if (status == 'processing') {
+      message = 'Order #$orderId is being processed';
+      icon = Icons.hourglass_empty;
+    }
+
+    InAppNotification.show(
+      context,
+      title: 'Order Update',
+      message: message,
+      icon: icon,
+      backgroundColor: const Color(0xFF603814),
+      onTap: () {
+        Navigator.of(context).pushNamed(AppRoutes.orders);
+      },
+    );
+  }
+
+  static void _showCartUpdateNotification(int itemsCount) {
+    final context = pusherNavigatorKey.currentContext;
+    if (context == null) return;
+
+    InAppNotification.show(
+      context,
+      title: 'Cart Synced',
+      message: 'Your cart has been updated ($itemsCount items)',
+      icon: Icons.shopping_cart,
+      backgroundColor: const Color(0xFFFDAF40),
+      onTap: () {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      },
+    );
+  }
+
+  static void _showSellerApprovalNotification(
+    String status,
+    String? businessName,
+    String? rejectionReason,
+  ) {
+    final context = pusherNavigatorKey.currentContext;
+    if (context == null) return;
+
+    if (status == 'approved') {
+      InAppNotification.show(
+        context,
+        title: '🎉 Seller Account Approved!',
+        message: '$businessName is now live on Ojaewa!',
+        icon: Icons.celebration,
+        backgroundColor: const Color(0xFF28A745),
+        onTap: () {
+          Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
+        },
+      );
+    } else {
+      InAppNotification.show(
+        context,
+        title: 'Seller Application Update',
+        message: rejectionReason ?? 'Your application needs review',
+        icon: Icons.info,
+        backgroundColor: const Color(0xFFDC3545),
+        onTap: () {
+          Navigator.of(context).pushNamed(AppRoutes.sellerApprovalStatus);
+        },
+      );
     }
   }
 
-  static void _handleSellerApproval(dynamic data) {
-    try {
-      final json = data is String ? jsonDecode(data) : data;
-      final status = json['status'] as String?;
-      final businessName = json['business_name'] as String?;
-      
-      if (status == 'approved') {
-        debugPrint('🎉 SELLER APPROVED: $businessName - Shop unlocked!');
-        // TODO: Show success notification "Your shop is now live!"
-      } else if (status == 'rejected') {
-        final reason = json['rejection_reason'] as String?;
-        debugPrint('❌ SELLER REJECTED: $reason');
-        // TODO: Show rejection notification with reason
-      }
-    } catch (e) {
-      debugPrint('Error parsing seller approval: $e');
+  static void _showProductApprovalNotification(
+    String productName,
+    String status,
+    String? rejectionReason,
+  ) {
+    final context = pusherNavigatorKey.currentContext;
+    if (context == null) return;
+
+    if (status == 'approved') {
+      InAppNotification.show(
+        context,
+        title: '✅ Product Approved',
+        message: '$productName is now live!',
+        icon: Icons.check_circle,
+        backgroundColor: const Color(0xFF28A745),
+        onTap: () {
+          Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
+        },
+      );
+    } else {
+      InAppNotification.show(
+        context,
+        title: '❌ Product Rejected',
+        message: rejectionReason ?? '$productName needs changes',
+        icon: Icons.cancel,
+        backgroundColor: const Color(0xFFDC3545),
+        onTap: () {
+          Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
+        },
+      );
     }
   }
 
-  static void _handleProductApproval(dynamic data) {
-    try {
-      final json = data is String ? jsonDecode(data) : data;
-      debugPrint('Product ${json['product_id']} ${json['status']}');
-      // TODO: Show in-app notification
-    } catch (e) {
-      debugPrint('Error parsing product approval: $e');
-    }
+  static void _showNewOrderNotification(int orderId, dynamic total, String buyerName) {
+    final context = pusherNavigatorKey.currentContext;
+    if (context == null) return;
+
+    InAppNotification.show(
+      context,
+      title: '🛍️ New Order Received!',
+      message: 'Order #$orderId from $buyerName',
+      icon: Icons.notifications_active,
+      backgroundColor: const Color(0xFFFDAF40),
+      onTap: () {
+        Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
+      },
+    );
   }
 
-  static void _handleNewOrder(dynamic data) {
-    try {
-      final json = data is String ? jsonDecode(data) : data;
-      debugPrint('New order #${json['order_id']} received');
-      // TODO: Show notification, play sound
-    } catch (e) {
-      debugPrint('Error parsing new order: $e');
-    }
-  }
+  static void _showBlogUpdateNotification(String title) {
+    final context = pusherNavigatorKey.currentContext;
+    if (context == null) return;
 
-  static void _handleNewBlog(dynamic data) {
-    try {
-      final json = data is String ? jsonDecode(data) : data;
-      debugPrint('New blog: ${json['title']}');
-      // TODO: Show in-app notification
-    } catch (e) {
-      debugPrint('Error parsing blog update: $e');
-    }
+    InAppNotification.show(
+      context,
+      title: '📰 New Blog Post',
+      message: title,
+      icon: Icons.article,
+      backgroundColor: const Color(0xFF603814),
+      onTap: () {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      },
+    );
   }
 
   /// Unsubscribe from all user channels

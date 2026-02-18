@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/audio/audio_controller.dart';
 import '../../core/audio/audio_controls.dart';
 import '../../core/auth/auth_providers.dart';
-import '../../core/notifications/fcm_service.dart' hide fcmInitializedProvider;
+import '../../core/notifications/fcm_service.dart';
 import '../router/app_router.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
