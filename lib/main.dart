@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/app.dart';
 import 'core/auth/auth_controller.dart';
-import 'core/notifications/fcm_service.dart';
+// import 'core/notifications/fcm_service.dart';
 import 'core/realtime/pusher_service.dart';
 import 'core/realtime/pusher_listeners.dart';
-import 'features/notifications/data/notifications_repository_impl.dart';
+// import 'features/notifications/data/notifications_repository_impl.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
