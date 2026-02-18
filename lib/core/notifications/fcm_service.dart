@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../features/notifications/data/notifications_api.dart';
+import '../../features/notifications/data/notifications_repository_impl.dart';
 
 /// Background message handler (must be top-level function)
 @pragma('vm:entry-point')
@@ -14,11 +18,12 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 /// Firebase Cloud Messaging Service
 class FCMService {
-  FCMService() {
+  FCMService({NotificationsApi? notificationsApi}) : _notificationsApi = notificationsApi {
     _initialize();
   }
 
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  final NotificationsApi? _notificationsApi;
   String? _fcmToken;
 
   /// Get the current FCM token
@@ -46,11 +51,16 @@ class FCMService {
         _fcmToken = await _messaging.getToken();
         debugPrint('FCM Token: $_fcmToken');
 
+        // Send token to backend
+        if (_fcmToken != null) {
+          await _sendTokenToBackend(_fcmToken!);
+        }
+
         // Listen for token refresh
         _messaging.onTokenRefresh.listen((newToken) {
           _fcmToken = newToken;
           debugPrint('FCM Token refreshed: $newToken');
-          // TODO: Send token to backend
+          _sendTokenToBackend(newToken);
         });
 
         // Setup message handlers
@@ -120,6 +130,12 @@ class FCMService {
   /// Delete FCM token
   Future<void> deleteToken() async {
     try {
+      // Delete from backend first
+      if (_fcmToken != null && _notificationsApi != null) {
+        await _notificationsApi.deleteDeviceToken(token: _fcmToken!);
+      }
+      
+      // Then delete from Firebase
       await _messaging.deleteToken();
       _fcmToken = null;
       debugPrint('FCM token deleted');
@@ -127,11 +143,37 @@ class FCMService {
       debugPrint('Error deleting FCM token: $e');
     }
   }
+
+  /// Send token to backend
+  Future<void> _sendTokenToBackend(String token) async {
+    if (_notificationsApi == null) {
+      debugPrint('NotificationsApi not available, skipping token registration');
+      return;
+    }
+
+    try {
+      String deviceType = 'mobile';
+      if (Platform.isIOS) {
+        deviceType = 'ios';
+      } else if (Platform.isAndroid) {
+        deviceType = 'android';
+      }
+
+      await _notificationsApi.registerDeviceToken(
+        token: token,
+        deviceType: deviceType,
+      );
+      debugPrint('FCM token registered with backend: $deviceType');
+    } catch (e) {
+      debugPrint('Error sending FCM token to backend: $e');
+    }
+  }
 }
 
 /// Provider for FCM Service
 final fcmServiceProvider = Provider<FCMService>((ref) {
-  return FCMService();
+  final notificationsApi = ref.watch(notificationsApiProvider);
+  return FCMService(notificationsApi: notificationsApi);
 });
 
 /// Provider for FCM Token

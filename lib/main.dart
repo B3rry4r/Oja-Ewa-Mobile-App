@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app/app.dart';
 import 'core/auth/auth_controller.dart';
 import 'core/notifications/fcm_service.dart';
+import 'features/notifications/data/notifications_repository_impl.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -16,12 +17,13 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialize FCM for push notifications
-  FCMService();
-
   // Ensure auth token is loaded before any network calls.
   final container = ProviderContainer();
   await container.read(authControllerProvider.notifier).loadFromStorage();
+
+  // Initialize FCM for push notifications (after container is ready)
+  final notificationsApi = container.read(notificationsApiProvider);
+  FCMService(notificationsApi: notificationsApi);
 
   runApp(
     UncontrolledProviderScope(

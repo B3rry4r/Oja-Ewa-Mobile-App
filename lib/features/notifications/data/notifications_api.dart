@@ -81,6 +81,32 @@ class NotificationsApi {
       throw mapDioError(e);
     }
   }
+
+  /// Register FCM device token with backend
+  Future<void> registerDeviceToken({
+    required String token,
+    String? deviceType,
+  }) async {
+    try {
+      await _dio.post('/api/notifications/device-token', data: {
+        'token': token,
+        'device_type': deviceType ?? 'mobile', // mobile, ios, android
+      });
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  /// Delete FCM device token from backend
+  Future<void> deleteDeviceToken({required String token}) async {
+    try {
+      await _dio.delete('/api/notifications/device-token', data: {
+        'token': token,
+      });
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
 }
 
 List<AppNotification> _extractList(dynamic data) {
