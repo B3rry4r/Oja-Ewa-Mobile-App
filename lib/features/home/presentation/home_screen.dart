@@ -92,46 +92,12 @@ class HomeScreen extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Brand Logo
-          Row(
-            children: [
-              // Logo Mark
-              SvgPicture.asset(AppImages.appLogoAlt, width: 24, height: 24),
-              const SizedBox(width: 8),
-              // Brand Name
-              const Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    'oj',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(width: 1),
-                  Text(
-                    'à-ewà',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(width: 4),
-                  Text(
-                    '®',
-                    style: TextStyle(
-                      fontSize: 8,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+          // Brand Logo with text from logo2.svg
+          SvgPicture.asset(
+            AppImages.appLogoAlt,
+            width: 120, // Wider to accommodate logo + text
+            height: 28,
+            fit: BoxFit.contain,
           ),
 
           // Header Icons

@@ -309,11 +309,11 @@ class AccountScreen extends ConsumerWidget {
           label: 'Your Addresses',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.addresses),
         ),
-        // _buildMenuItem(
-        //   iconAsset: AppIcons.notification,
-        //   label: 'Notifications',
-        //   onTap: () => Navigator.of(context).pushNamed(AppRoutes.notificationsSettings),
-        // ),
+        _buildMenuItem(
+          iconAsset: AppIcons.notification,
+          label: 'Notifications',
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.notificationsSettings),
+        ),
         _buildMenuItem(
           iconAsset: AppIcons.password,
           label: 'Password',

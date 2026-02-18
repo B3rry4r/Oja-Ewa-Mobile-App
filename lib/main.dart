@@ -23,9 +23,7 @@ Future<void> main() async {
   final container = ProviderContainer();
   await container.read(authControllerProvider.notifier).loadFromStorage();
 
-  // Initialize FCM for push notifications (after container is ready)
-  final notificationsApi = container.read(notificationsApiProvider);
-  FCMService(notificationsApi: notificationsApi);
+  // FCM will be initialized in AppShell when user is authenticated
 
   // Initialize Pusher for real-time events
   final pusherService = PusherService();

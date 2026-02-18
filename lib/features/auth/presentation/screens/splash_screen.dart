@@ -59,48 +59,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             fit: BoxFit.contain,
           ),
         ),
-        // Foreground logo + text aligned like home screen
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(AppImages.appLogoAlt, width: 36, height: 36),
-            const SizedBox(width: 10),
-            const Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text(
-                  'oj',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black,
-                    fontFamily: 'Campton',
-                  ),
-                ),
-                SizedBox(width: 2),
-                Text(
-                  'à-ewà',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black,
-                    fontFamily: 'Campton',
-                  ),
-                ),
-                SizedBox(width: 4),
-                Text(
-                  '®',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black,
-                    fontFamily: 'Campton',
-                  ),
-                ),
-              ],
-            ),
-          ],
+        // Complete logo with text from logo2.svg (wider to accommodate text)
+        SvgPicture.asset(
+          AppImages.appLogoAlt,
+          width: 200, // Wider to show logo + text properly
+          height: 60,
+          fit: BoxFit.contain,
         ),
       ],
     );

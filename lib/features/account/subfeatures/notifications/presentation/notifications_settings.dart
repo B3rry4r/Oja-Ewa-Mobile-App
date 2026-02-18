@@ -1,4 +1,4 @@
-// notifications_screen.dart
+// notifications_settings_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -95,31 +95,33 @@ class NotificationsSettingsScreen extends ConsumerWidget {
 
     final p = prefs;
     final items = <_PrefItem>[
+      // Push Notifications toggle - controls FCM registration
       _PrefItem(
         title: 'Allow Push Notifications',
         value: p.allowPushNotifications,
         updater: (v) => p.copyWith(allowPushNotifications: v),
       ),
-      _PrefItem(
-        title: 'New Products',
-        value: p.newProducts,
-        updater: (v) => p.copyWith(newProducts: v),
-      ),
-      _PrefItem(
-        title: 'Discount and Sales',
-        value: p.discountAndSales,
-        updater: (v) => p.copyWith(discountAndSales: v),
-      ),
-      _PrefItem(
-        title: 'New Blog Posts',
-        value: p.newBlogPosts,
-        updater: (v) => p.copyWith(newBlogPosts: v),
-      ),
-      _PrefItem(
-        title: 'New Orders',
-        value: p.newOrders,
-        updater: (v) => p.copyWith(newOrders: v),
-      ),
+      // Other notification preferences (commented out per request)
+      // _PrefItem(
+      //   title: 'New Products',
+      //   value: p.newProducts,
+      //   updater: (v) => p.copyWith(newProducts: v),
+      // ),
+      // _PrefItem(
+      //   title: 'Discount and Sales',
+      //   value: p.discountAndSales,
+      //   updater: (v) => p.copyWith(discountAndSales: v),
+      // ),
+      // _PrefItem(
+      //   title: 'New Blog Posts',
+      //   value: p.newBlogPosts,
+      //   updater: (v) => p.copyWith(newBlogPosts: v),
+      // ),
+      // _PrefItem(
+      //   title: 'New Orders',
+      //   value: p.newOrders,
+      //   updater: (v) => p.copyWith(newOrders: v),
+      // ),
     ];
 
     return Padding(

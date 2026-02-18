@@ -18,21 +18,25 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 /// Firebase Cloud Messaging Service
 class FCMService {
-  FCMService({NotificationsApi? notificationsApi}) : _notificationsApi = notificationsApi {
-    _initialize();
-  }
+  FCMService({NotificationsApi? notificationsApi}) : _notificationsApi = notificationsApi;
 
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   final NotificationsApi? _notificationsApi;
   String? _fcmToken;
+  bool _initialized = false;
 
   /// Get the current FCM token
   String? get fcmToken => _fcmToken;
 
-  /// Initialize FCM
-  Future<void> _initialize() async {
+  /// Initialize FCM (call this after user is authenticated)
+  Future<void> requestPermissionAndInitialize() async {
+    if (_initialized) {
+      debugPrint('FCM already initialized');
+      return;
+    }
+
     try {
-      // Request permissions (iOS)
+      // Request permissions (iOS - Android auto-granted)
       final settings = await _messaging.requestPermission(
         alert: true,
         announcement: false,
@@ -68,6 +72,8 @@ class FCMService {
 
         // Register background handler
         FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+        
+        _initialized = true;
       } else {
         debugPrint('FCM Permission denied');
       }

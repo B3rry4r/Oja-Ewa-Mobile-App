@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/audio/audio_controller.dart';
 import '../../core/audio/audio_controls.dart';
 import '../../core/auth/auth_providers.dart';
+import '../../core/notifications/fcm_service.dart';
 import '../router/app_router.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
@@ -34,6 +35,12 @@ class _AppShellState extends ConsumerState<AppShell> {
       ref.read(audioControllerProvider.notifier).initialize();
       // Prefetch categories for smoother UX
       ref.read(allCategoriesProvider);
+      
+      // Request FCM permissions if user is logged in
+      final token = ref.read(accessTokenProvider);
+      if (token != null && token.isNotEmpty) {
+        ref.read(fcmServiceProvider).requestPermissionAndInitialize();
+      }
     });
   }
 
