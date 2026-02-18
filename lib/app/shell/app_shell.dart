@@ -45,6 +45,8 @@ class _AppShellState extends ConsumerState<AppShell> {
     ref.listen<String?>(accessTokenProvider, (prev, next) {
       if (next != null && next.isNotEmpty) {
         _initializeFCMIfNeeded();
+      } else if (prev != null && prev.isNotEmpty) {
+        ref.read(fcmServiceProvider).deleteToken();
       }
     });
   }
