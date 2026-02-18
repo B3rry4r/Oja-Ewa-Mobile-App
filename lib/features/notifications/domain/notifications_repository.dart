@@ -10,4 +10,7 @@ abstract interface class NotificationsRepository {
 
   Future<NotificationPreferences> getPreferences();
   Future<NotificationPreferences> updatePreferences(NotificationPreferences prefs);
+  
+  // Test notification
+  Future<void> sendTestNotification();
 }

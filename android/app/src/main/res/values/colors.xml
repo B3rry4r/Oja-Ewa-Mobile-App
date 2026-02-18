@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ojaewa brand color for notifications (golden/orange) -->
+    <color name="notification_color">#FDAF40</color>
+</resources>

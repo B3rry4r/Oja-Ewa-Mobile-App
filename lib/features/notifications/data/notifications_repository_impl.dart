@@ -31,6 +31,9 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
 
   @override
   Future<NotificationPreferences> updatePreferences(NotificationPreferences prefs) => _api.updatePreferences(prefs);
+
+  @override
+  Future<void> sendTestNotification() => _api.sendTestNotification();
 }
 
 final notificationsApiProvider = Provider<NotificationsApi>((ref) {

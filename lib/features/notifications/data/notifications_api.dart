@@ -107,6 +107,15 @@ class NotificationsApi {
       throw mapDioError(e);
     }
   }
+
+  /// Send test notification (for testing FCM)
+  Future<void> sendTestNotification() async {
+    try {
+      await _dio.post('/api/notifications/test');
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
 }
 
 List<AppNotification> _extractList(dynamic data) {

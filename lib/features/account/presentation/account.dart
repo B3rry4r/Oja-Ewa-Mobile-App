@@ -20,6 +20,7 @@ import 'package:ojaewa/core/subscriptions/subscription_constants.dart';
 import 'package:ojaewa/core/subscriptions/subscription_controller.dart';
 import 'package:ojaewa/core/subscriptions/iap_service.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/features/notifications/data/notifications_repository_impl.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -543,6 +544,11 @@ class AccountScreen extends ConsumerWidget {
           label: 'Connect to us',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.connectToUs),
         ),
+        
+        // Test notification button (only for test users)
+        if (_isTestUser(ref))
+          _buildTestNotificationButton(context, ref),
+        
         // Sign Out or Sign In based on auth state
         Container(
           height: 48,
@@ -639,6 +645,86 @@ class AccountScreen extends ConsumerWidget {
       if (context.mounted) {
         AppSnackbars.showError(context, 'Could not open email app');
       }
+    }
+  }
+
+  /// Check if current user is a test user
+  bool _isTestUser(WidgetRef ref) {
+    final profile = ref.watch(userProfileProvider).value;
+    final email = profile?.email ?? '';
+    // Show test button for these test emails
+    return email == 'test@user.com' || 
+           email == 'test@ojaewa.com' || 
+           email.startsWith('test+');
+  }
+
+  /// Build test notification button (only visible for test users)
+  Widget _buildTestNotificationButton(BuildContext context, WidgetRef ref) {
+    return Container(
+      height: 56,
+      margin: const EdgeInsets.only(bottom: 8, top: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFDAF40).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _sendTestNotification(context, ref),
+          borderRadius: BorderRadius.circular(8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.notifications_active,
+                color: Color(0xFFFDAF40),
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Send Test Notification',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFFFDAF40),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Send test notification via backend
+  Future<void> _sendTestNotification(BuildContext context, WidgetRef ref) async {
+    try {
+      // Show loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
+      );
+
+      // Call backend to send test notification
+      final notificationsApi = ref.read(notificationsRepositoryProvider);
+      await notificationsApi.sendTestNotification();
+
+      // Hide loading
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+
+      // Show success message
+      AppSnackbars.showSuccess(context, 'Test notification sent! Check your device.');
+    } catch (e) {
+      // Hide loading
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+
+      // Show error
+      AppSnackbars.showError(context, 'Failed to send test notification: $e');
     }
   }
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ojaewa logo for notification icon - Converted from app_logo_2.svg -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="177"
+    android:viewportHeight="262">
+    
+    <!-- Golden circle (top) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M88.0521,80.0651C110.161,80.0651 128.085,62.1419 128.085,40.0326C128.085,17.9232 110.161,0 88.0521,0C65.9427,0 48.0195,17.9232 48.0195,40.0326C48.0195,62.1419 65.9427,80.0651 88.0521,80.0651Z"/>
+    
+    <!-- Middle layer -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M176.128,85.875C176.128,134.511 136.692,173.947 88.056,173.947C39.4203,173.947 0,134.511 0,85.875H176.128Z"/>
+    
+    <!-- Bottom layer -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M176.128,173.943C176.128,222.579 136.692,261.999 88.056,261.999C39.4203,261.999 0,222.579 0,173.943H176.128Z"/>
+</vector>
