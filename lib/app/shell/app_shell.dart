@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 
 import '../../core/audio/audio_controller.dart';
 import '../../core/audio/audio_controls.dart';
@@ -37,21 +38,35 @@ class _AppShellState extends ConsumerState<AppShell> {
       // Prefetch categories for smoother UX
       ref.read(allCategoriesProvider);
       
-      // Request FCM permissions NOW (user is authenticated and in app shell)
+      // Request FCM permissions only after login.
       _initializeFCMIfNeeded();
+    });
+
+    ref.listen<String?>(accessTokenProvider, (prev, next) {
+      if (next != null && next.isNotEmpty) {
+        _initializeFCMIfNeeded();
+      }
     });
   }
 
   /// Initialize FCM for push notifications (only if user hasn't disabled it)
   Future<void> _initializeFCMIfNeeded() async {
     try {
+      final token = ref.read(accessTokenProvider);
+      if (token == null || token.isEmpty) {
+        return;
+      }
       // Check if user has push notifications enabled in settings
       final prefs = await SharedPreferences.getInstance();
       final pushEnabled = prefs.getBool('push_notifications_enabled') ?? true; // Default enabled
       
       if (pushEnabled) {
         final fcmService = ref.read(fcmServiceProvider);
-        await fcmService.requestPermissionAndInitialize();
+        if (Platform.isIOS) {
+          await fcmService.requestPermissionAndInitialize();
+        } else {
+          await fcmService.initializeWithoutPrompt();
+        }
       } else {
         debugPrint('⚠️ Push notifications disabled by user - skipping FCM init');
       }

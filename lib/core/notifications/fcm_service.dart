@@ -82,6 +82,34 @@ class FCMService {
     }
   }
 
+  /// Attempt to register token without prompting (Android auto-grants).
+  Future<void> initializeWithoutPrompt() async {
+    if (_initialized) {
+      return;
+    }
+
+    try {
+      final settings = await _messaging.getNotificationSettings();
+      final status = settings.authorizationStatus;
+      if (status == AuthorizationStatus.authorized ||
+          status == AuthorizationStatus.provisional) {
+        _fcmToken = await _messaging.getToken();
+        if (_fcmToken != null) {
+          await _sendTokenToBackend(_fcmToken!);
+        }
+        _messaging.onTokenRefresh.listen((newToken) {
+          _fcmToken = newToken;
+          _sendTokenToBackend(newToken);
+        });
+        _setupMessageHandlers();
+        FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+        _initialized = true;
+      }
+    } catch (e) {
+      debugPrint('FCM silent init error: $e');
+    }
+  }
+
   /// Setup foreground and background message handlers
   void _setupMessageHandlers() {
     // Foreground messages
@@ -144,6 +172,7 @@ class FCMService {
       // Then delete from Firebase
       await _messaging.deleteToken();
       _fcmToken = null;
+      _initialized = false;
       debugPrint('FCM token deleted');
     } catch (e) {
       debugPrint('Error deleting FCM token: $e');

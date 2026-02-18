@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../../app/router/app_router.dart';
 import '../../features/cart/presentation/controllers/cart_controller.dart';
@@ -14,6 +15,9 @@ import 'pusher_service.dart';
 
 /// Global navigator key for showing notifications
 final GlobalKey<NavigatorState> pusherNavigatorKey = GlobalKey<NavigatorState>();
+
+/// Tracks the current user id used for Pusher subscriptions
+final pusherUserIdProvider = StateProvider<int?>((ref) => null);
 
 /// Sets up Pusher real-time event listeners
 /// 
@@ -39,6 +43,7 @@ class PusherListeners {
         next.whenData((profile) {
           if (profile != null) {
             debugPrint('👤 User profile loaded, subscribing to channels for user ${profile.id}');
+            container.read(pusherUserIdProvider.notifier).state = profile.id;
             subscribeToUserChannel(pusher, profile.id, container);
             
             // Check if user is a seller and subscribe to seller channels

@@ -14,6 +14,7 @@ import '../../../wishlist/presentation/controllers/wishlist_controller.dart';
 import '../../../orders/presentation/controllers/orders_controller.dart';
 import '../../../search/presentation/controllers/search_suggestions_controller.dart';
 import '../../../blog/presentation/controllers/blog_favorites_controller.dart';
+import '../../../../core/notifications/fcm_service.dart';
 
 /// Presentation-layer controller for auth flows.
 ///
@@ -128,6 +129,7 @@ class AuthFlowController extends AsyncNotifier<void> {
 
     // Logout should never fail from the user's perspective.
     try {
+      await ref.read(fcmServiceProvider).deleteToken();
       await ref.read(authRepositoryProvider).logout();
     } catch (e, st) {
       // We swallow because local sign-out still completes.

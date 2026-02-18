@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app/app.dart';
 import 'core/auth/auth_controller.dart';
 // import 'core/notifications/fcm_service.dart';
-import 'core/realtime/pusher_service.dart';
 import 'core/realtime/pusher_listeners.dart';
+import 'core/realtime/pusher_providers.dart';
 // import 'features/notifications/data/notifications_repository_impl.dart';
 import 'firebase_options.dart';
 
@@ -26,7 +26,7 @@ Future<void> main() async {
   // FCM will be initialized in AppShell when user is authenticated
 
   // Initialize Pusher for real-time events
-  final pusherService = PusherService();
+  final pusherService = container.read(pusherServiceProvider);
   await pusherService.initialize();
   
   // Set up real-time event listeners
