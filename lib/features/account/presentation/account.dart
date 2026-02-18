@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
@@ -14,9 +15,11 @@ import 'package:ojaewa/features/auth/presentation/controllers/auth_controller.da
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_status_controller.dart';
 import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
+import 'package:ojaewa/features/account/subfeatures/connect/presentation/controllers/connect_controller.dart';
 import 'package:ojaewa/core/subscriptions/subscription_constants.dart';
 import 'package:ojaewa/core/subscriptions/subscription_controller.dart';
 import 'package:ojaewa/core/subscriptions/iap_service.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -518,7 +521,7 @@ class AccountScreen extends ConsumerWidget {
         _buildMenuItem(
           iconAsset: AppIcons.emailUs,
           label: 'Email Us',
-          onTap: () {},
+          onTap: () => _handleEmailUs(context, ref),
         ),
         _buildMenuItem(
           iconAsset: AppIcons.privacyPolicy,
@@ -617,5 +620,25 @@ class AccountScreen extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _handleEmailUs(BuildContext context, WidgetRef ref) async {
+    // Try to get email from connect info, fallback to default
+    String email = 'support@ojaewa.com';
+    try {
+      final connectInfo = await ref.read(connectInfoProvider.future);
+      email = connectInfo.email.isNotEmpty ? connectInfo.email : 'support@ojaewa.com';
+    } catch (_) {
+      // Use fallback email if API fails
+    }
+    
+    final uri = Uri(scheme: 'mailto', path: email);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      if (context.mounted) {
+        AppSnackbars.showError(context, 'Could not open email app');
+      }
+    }
   }
 }
