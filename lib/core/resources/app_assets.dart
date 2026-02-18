@@ -48,7 +48,7 @@ abstract class AppImages {
 
   // assets/app_icon/*
   static const String appLogo = 'assets/app_icon/app_logo.svg';
-  static const String appLogoAlt = 'assets/app_icon/logo2.svg';
+  static const String appLogoAlt = 'assets/app_icon/app_logo_2.svg';
   static const String appIconPng = 'assets/app_icon/icon.png';
   static const String appIconPng2 = 'assets/app_icon/icon2.png';
   static const String appBackground = 'assets/app_icon/background.png';

@@ -176,7 +176,7 @@ class FCMService {
   }
 }
 
-/// Provider for FCM Service
+/// Provider for FCM Service (lazy - only creates when accessed)
 final fcmServiceProvider = Provider<FCMService>((ref) {
   final notificationsApi = ref.watch(notificationsApiProvider);
   return FCMService(notificationsApi: notificationsApi);

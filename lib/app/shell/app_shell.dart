@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/audio/audio_controller.dart';
 import '../../core/audio/audio_controls.dart';
 import '../../core/auth/auth_providers.dart';
-import '../../core/notifications/fcm_service.dart';
+import '../../core/notifications/fcm_service.dart' hide fcmInitializedProvider;
 import '../router/app_router.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
@@ -39,9 +39,15 @@ class _AppShellState extends ConsumerState<AppShell> {
       // Request FCM permissions if user is logged in
       final token = ref.read(accessTokenProvider);
       if (token != null && token.isNotEmpty) {
-        ref.read(fcmServiceProvider).requestPermissionAndInitialize();
+        _initializeFCM();
       }
     });
+  }
+
+  /// Initialize FCM for push notifications
+  Future<void> _initializeFCM() async {
+    final fcmService = ref.read(fcmServiceProvider);
+    await fcmService.requestPermissionAndInitialize();
   }
 
   @override

@@ -1,19 +1,69 @@
 // notifications_settings_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
-import 'package:ojaewa/core/resources/app_assets.dart';
-import 'package:ojaewa/core/ui/snackbars.dart';
-import 'package:ojaewa/core/ui/ui_error_message.dart';
-import 'package:ojaewa/features/notifications/domain/notification_preferences.dart';
-import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
+import '../../../../../app/widgets/app_header.dart';
+import '../../../../../core/resources/app_assets.dart';
+import '../../../../../core/ui/snackbars.dart';
+import '../../../../../core/notifications/fcm_service.dart';
 
-class NotificationsSettingsScreen extends ConsumerWidget {
+class NotificationsSettingsScreen extends ConsumerStatefulWidget {
   const NotificationsSettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NotificationsSettingsScreen> createState() => _NotificationsSettingsScreenState();
+}
+
+class _NotificationsSettingsScreenState extends ConsumerState<NotificationsSettingsScreen> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPushNotificationState();
+  }
+
+  bool _pushEnabled = false;
+
+  Future<void> _loadPushNotificationState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final enabled = prefs.getBool('push_notifications_enabled') ?? false;
+    setState(() {
+      _pushEnabled = enabled;
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _savePushNotificationState(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('push_notifications_enabled', enabled);
+  }
+
+  Future<void> _handlePushToggle(bool newValue) async {
+    try {
+      if (newValue) {
+        // Enable push notifications - register with FCM
+        final fcmService = ref.read(fcmServiceProvider);
+        await fcmService.requestPermissionAndInitialize();
+        if (mounted) AppSnackbars.showSuccess(context, 'Push notifications enabled');
+      } else {
+        // Disable push notifications - delete FCM token
+        final fcmService = ref.read(fcmServiceProvider);
+        await fcmService.deleteToken();
+        if (mounted) AppSnackbars.showSuccess(context, 'Push notifications disabled');
+      }
+      
+      // Save state and update UI
+      await _savePushNotificationState(newValue);
+      setState(() => _pushEnabled = newValue);
+    } catch (e) {
+      if (mounted) AppSnackbars.showError(context, 'Failed to update notification settings');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
       body: SafeArea(
@@ -38,7 +88,10 @@ class NotificationsSettingsScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     const SizedBox(height: 24),
-                    _buildNotificationsList(context, ref),
+                    if (_isLoading)
+                      const Center(child: CircularProgressIndicator())
+                    else
+                      _buildNotificationsList(),
                     Align(
                       alignment: Alignment.centerRight,
                       child: Opacity(
@@ -61,86 +114,21 @@ class NotificationsSettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNotificationsList(BuildContext context, WidgetRef ref) {
-    // Use optimistic provider for immediate UI updates
-    final prefs = ref.watch(optimisticPreferencesProvider);
-    final isLoading =
-        ref.watch(notificationPreferencesProvider).isLoading && prefs == null;
-    final hasError =
-        ref.watch(notificationPreferencesProvider).hasError && prefs == null;
-
-    if (isLoading) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
-        child: Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation(Color(0xFFFDAF40)),
-          ),
-        ),
-      );
-    }
-
-    if (hasError) {
-      return Center(
-        child: ElevatedButton(
-          onPressed: () => ref.invalidate(notificationPreferencesProvider),
-          child: const Text('Retry'),
-        ),
-      );
-    }
-
-    if (prefs == null) {
-      return const Center(child: Text('Not logged in'));
-    }
-
-    final p = prefs;
-    final items = <_PrefItem>[
-      // Push Notifications toggle - controls FCM registration
-      _PrefItem(
-        title: 'Allow Push Notifications',
-        value: p.allowPushNotifications,
-        updater: (v) => p.copyWith(allowPushNotifications: v),
-      ),
-      // Other notification preferences (commented out per request)
-      // _PrefItem(
-      //   title: 'New Products',
-      //   value: p.newProducts,
-      //   updater: (v) => p.copyWith(newProducts: v),
-      // ),
-      // _PrefItem(
-      //   title: 'Discount and Sales',
-      //   value: p.discountAndSales,
-      //   updater: (v) => p.copyWith(discountAndSales: v),
-      // ),
-      // _PrefItem(
-      //   title: 'New Blog Posts',
-      //   value: p.newBlogPosts,
-      //   updater: (v) => p.copyWith(newBlogPosts: v),
-      // ),
-      // _PrefItem(
-      //   title: 'New Orders',
-      //   value: p.newOrders,
-      //   updater: (v) => p.copyWith(newOrders: v),
-      // ),
-    ];
-
+  Widget _buildNotificationsList() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
           const SizedBox(height: 16),
-          for (final item in items)
-            _buildPrefRow(context: context, ref: ref, item: item),
+          _buildPushToggle(),
         ],
       ),
     );
   }
 
-  Widget _buildPrefRow({
-    required BuildContext context,
-    required WidgetRef ref,
-    required _PrefItem item,
-  }) {
+  Widget _buildPushToggle() {
+    final enabled = _pushEnabled;
+    
     return Container(
       height: 54,
       margin: const EdgeInsets.only(bottom: 8),
@@ -149,9 +137,9 @@ class NotificationsSettingsScreen extends ConsumerWidget {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-            child: Text(
-              item.title,
-              style: const TextStyle(
+            child: const Text(
+              'Allow Push Notifications',
+              style: TextStyle(
                 fontSize: 16,
                 fontFamily: 'Campton',
                 color: Color(0xFF1E2021),
@@ -159,29 +147,20 @@ class NotificationsSettingsScreen extends ConsumerWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {
-              final updated = item.updater(!item.value);
-              ref
-                  .read(notificationsActionsProvider.notifier)
-                  .updatePreferences(updated)
-                  .catchError((e) {
-                    if (!context.mounted) return;
-                    AppSnackbars.showError(context, UiErrorMessage.from(e));
-                  });
-            },
+            onTap: () => _handlePushToggle(!enabled),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 48,
               height: 28,
               decoration: BoxDecoration(
-                color: item.value
+                color: enabled
                     ? const Color(0xFFA15E22)
                     : const Color(0xFFD9CFC5),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: AnimatedAlign(
                 duration: const Duration(milliseconds: 200),
-                alignment: item.value
+                alignment: enabled
                     ? Alignment.centerRight
                     : Alignment.centerLeft,
                 child: Padding(
@@ -190,7 +169,7 @@ class NotificationsSettingsScreen extends ConsumerWidget {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: item.value
+                      color: enabled
                           ? const Color(0xFFFDAF40)
                           : const Color(0xFFFFF8F1),
                       borderRadius: BorderRadius.circular(12),
@@ -211,12 +190,4 @@ class NotificationsSettingsScreen extends ConsumerWidget {
       ),
     );
   }
-}
-
-class _PrefItem {
-  _PrefItem({required this.title, required this.value, required this.updater});
-
-  final String title;
-  final bool value;
-  final NotificationPreferences Function(bool) updater;
 }
