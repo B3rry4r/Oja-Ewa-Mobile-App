@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
@@ -92,14 +91,12 @@ class HomeScreen extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Brand Logo with text from logo2.svg
-          SvgPicture.asset(
-            AppImages.appLogoAlt,
+          // Brand Logo with text (PNG for correct colors)
+          Image.asset(
+            'assets/app_icon/logo2.png',
             width: 120, // Wider to accommodate logo + text
             height: 28,
             fit: BoxFit.contain,
-            // Use original colors from SVG file (golden + brown)
-            colorFilter: null,
           ),
 
           // Header Icons
