@@ -8,9 +8,11 @@ import '../../features/home/subfeatures/schools/presentation/controllers/school_
 import '../../features/orders/presentation/controllers/orders_controller.dart';
 import '../ui/snackbars.dart';
 
-/// Handles deep links for the app, particularly Paystack payment callbacks.
+/// Handles deep links for the app, particularly payment callbacks (Paystack and MoMo).
 ///
-/// Expected callback URL format: ojaewa://payment/callback?reference=xxx&status=success
+/// Expected callback URL formats:
+/// - Paystack: ojaewa://payment/callback?reference=xxx&status=success
+/// - MoMo: ojaewa://payment/callback?status=success&reference=xxx&order_id=123&gateway=momo
 class DeepLinkHandler {
   DeepLinkHandler(this._ref);
 
@@ -67,15 +69,24 @@ class DeepLinkHandler {
   Future<void> _handlePaymentCallback(Uri uri) async {
     final reference = uri.queryParameters['reference'];
     final status = uri.queryParameters['status'];
-
-    if (reference == null || reference.isEmpty) {
-      _showError('Invalid payment callback: missing reference');
-      return;
-    }
+    final gateway = uri.queryParameters['gateway']; // 'momo' or 'paystack' or null
+    final orderIdStr = uri.queryParameters['order_id'];
 
     final context = _navigatorKey?.currentContext;
     if (context == null) {
       debugPrint('No context available for payment callback');
+      return;
+    }
+
+    // Handle MoMo callback (comes from backend redirect)
+    if (gateway == 'momo') {
+      _handleMoMoCallback(context, status, orderIdStr);
+      return;
+    }
+
+    // Handle Paystack callback (original flow)
+    if (reference == null || reference.isEmpty) {
+      _showError('Invalid payment callback: missing reference');
       return;
     }
 
@@ -89,9 +100,8 @@ class DeepLinkHandler {
           .verifyPayment(reference: reference);
 
       // Hide loading
-      if (context.mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
-      }
+      if (!context.mounted) return;
+      Navigator.of(context).pop(); // Close loading dialog
 
       if (result.status == 'success' || status == 'success') {
         _showPaymentSuccess(context, result.orderId);
@@ -103,10 +113,25 @@ class DeepLinkHandler {
       }
     } catch (e) {
       // Hide loading
-      if (context.mounted) {
-        Navigator.of(context).pop();
-        _showError('Failed to verify payment: $e');
-      }
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+      _showError('Failed to verify payment: $e');
+    }
+  }
+
+  void _handleMoMoCallback(BuildContext context, String? status, String? orderIdStr) {
+    // MoMo callback - payment already verified by backend
+    if (status == 'success') {
+      final orderId = orderIdStr != null ? int.tryParse(orderIdStr) : null;
+      _showPaymentSuccess(context, orderId);
+      // Invalidate orders to refresh
+      _ref.invalidate(orderActionsProvider);
+    } else if (status == 'failed') {
+      _showPaymentFailed(context, 'MoMo payment failed. Please try again.');
+    } else if (status == 'pending') {
+      _showPaymentPending(context);
+    } else {
+      _showError('Unknown MoMo payment status: $status');
     }
   }
 
@@ -134,9 +159,8 @@ class DeepLinkHandler {
       final result = await api.verifyPayment(reference: reference);
 
       // Hide loading
-      if (context.mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
-      }
+      if (!context.mounted) return;
+      Navigator.of(context).pop(); // Close loading dialog
 
       final data = result['data'] as Map<String, dynamic>?;
       final paymentStatus = data?['payment_status'] as String? ?? status;
@@ -151,10 +175,9 @@ class DeepLinkHandler {
       }
     } catch (e) {
       // Hide loading
-      if (context.mounted) {
-        Navigator.of(context).pop();
-        _showError('Failed to verify school payment: $e');
-      }
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+      _showError('Failed to verify school payment: $e');
     }
   }
 
@@ -531,6 +554,105 @@ class DeepLinkHandler {
                               color: const Color(
                                 0xFFFDAF40,
                               ).withValues(alpha: 0.4),
+                              blurRadius: 16,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'OK',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFFFFBF5),
+                              fontFamily: 'Campton',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showPaymentPending(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'PaymentPending',
+      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+      pageBuilder: (context, anim1, anim2) {
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                width: 342,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFBF5),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFF9800).withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.pending,
+                        color: Color(0xFFFF9800),
+                        size: 40,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Payment Pending',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF603814),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Your payment is still being processed. Please check your orders later.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF1E2021),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        width: double.infinity,
+                        height: 57,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFDAF40),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                             ),

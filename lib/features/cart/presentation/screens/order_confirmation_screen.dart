@@ -12,6 +12,9 @@ import 'package:ojaewa/features/cart/domain/cart.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
 import 'package:ojaewa/features/orders/presentation/controllers/orders_controller.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/checkout_controller.dart';
+import 'package:ojaewa/features/cart/presentation/widgets/payment_method_sheet.dart';
+import 'package:ojaewa/features/orders/data/orders_repository_impl.dart';
+import 'package:ojaewa/features/cart/presentation/screens/momo_payment_screen.dart';
 
 class OrderConfirmationScreen extends ConsumerStatefulWidget {
   const OrderConfirmationScreen({super.key, this.hasAddress = true});
@@ -112,10 +115,17 @@ class _OrderConfirmationScreenState
                         return;
                       }
 
+                      // Show payment method selection
+                      final paymentMethod = await PaymentMethodSheet.show(context);
+                      if (paymentMethod == null) return;
+                      
+                      if (!context.mounted) return;
+
                       try {
-                        final link = await ref
-                            .read(orderActionsProvider.notifier)
-                            .createOrderAndPaymentLink(
+                        // Create order first (common for both payment methods)
+                        final order = await ref
+                            .read(ordersRepositoryProvider)
+                            .createOrder(
                               items: items,
                               shippingName: selectedAddress.fullName,
                               shippingPhone: selectedAddress.phone,
@@ -125,20 +135,15 @@ class _OrderConfirmationScreenState
                               shippingCountry: selectedAddress.country,
                             );
 
-                        final uri = Uri.tryParse(link.paymentUrl);
-                        if (uri == null || link.paymentUrl.isEmpty) {
-                          if (context.mounted) {
-                            AppSnackbars.showError(
-                              context,
-                              'Failed to generate payment link',
-                            );
-                          }
-                          return;
+                        if (!context.mounted) return;
+
+                        if (paymentMethod == 'momo') {
+                          // MoMo payment flow
+                          await _handleMoMoPayment(context, ref, order.id, selectedAddress.phone);
+                        } else {
+                          // Paystack payment flow (original)
+                          await _handlePaystackPayment(context, ref, order.id);
                         }
-                        await launchUrl(
-                          uri,
-                          mode: LaunchMode.externalApplication,
-                        );
                       } catch (e) {
                         if (context.mounted) {
                           AppSnackbars.showError(
@@ -396,5 +401,74 @@ class _OrderConfirmationScreenState
         ),
       ),
     );
+  }
+
+  Future<void> _handlePaystackPayment(
+    BuildContext context,
+    WidgetRef ref,
+    int orderId,
+  ) async {
+    try {
+      final link = await ref
+          .read(ordersRepositoryProvider)
+          .createOrderPaymentLink(orderId: orderId);
+
+      final uri = Uri.tryParse(link.paymentUrl);
+      if (uri == null || link.paymentUrl.isEmpty) {
+        if (context.mounted) {
+          AppSnackbars.showError(
+            context,
+            'Failed to generate payment link',
+          );
+        }
+        return;
+      }
+      
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+    } catch (e) {
+      if (context.mounted) {
+        AppSnackbars.showError(
+          context,
+          'Failed to initialize Paystack payment: ${e.toString()}',
+        );
+      }
+    }
+  }
+
+  Future<void> _handleMoMoPayment(
+    BuildContext context,
+    WidgetRef ref,
+    int orderId,
+    String phone,
+  ) async {
+    try {
+      // Initialize MoMo payment
+      final response = await ref
+          .read(ordersRepositoryProvider)
+          .initializeMoMoPayment(orderId: orderId, phone: phone);
+
+      if (!context.mounted) return;
+
+      // Navigate to MoMo payment screen with polling
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => MoMoPaymentScreen(
+            referenceId: response.referenceId,
+            orderId: response.orderId,
+            phone: phone,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (context.mounted) {
+        AppSnackbars.showError(
+          context,
+          'Failed to initialize MoMo payment: ${e.toString()}',
+        );
+      }
+    }
   }
 }

@@ -1,20 +1,26 @@
-/// Subscription Constants
-/// 
-/// Product IDs and tier definitions for IAP subscriptions.
-/// These IDs must match exactly what's configured in App Store Connect
-/// and Google Play Console.
+// Subscription Constants
+// 
+// Product IDs and tier definitions for IAP subscriptions.
+// These IDs must match exactly what's configured in App Store Connect
+// and Google Play Console.
 
 /// Subscription Product IDs
 class SubscriptionProducts {
   SubscriptionProducts._();
 
-  /// Ojaewa Pro - Yearly subscription
+  /// Ojaewa Pro - Yearly subscription (Standard pricing)
   /// Price: Set in App Store/Play Console
   static const String ojaewaProYearly = 'ojaewa_pro';
+
+  /// Ojaewa Pro - Yearly subscription (MTN discount pricing)
+  /// Price: Discounted price set in App Store/Play Console for MTN users
+  /// This product ID should be configured with discounted pricing on both app stores
+  static const String ojaewaProYearlyMtn = 'ojaewa_pro_mtn';
 
   /// All available product IDs
   static const List<String> allProducts = [
     ojaewaProYearly,
+    ojaewaProYearlyMtn,
   ];
 }
 
@@ -38,6 +44,7 @@ enum SubscriptionTier {
   static SubscriptionTier fromProductId(String? productId) {
     switch (productId) {
       case SubscriptionProducts.ojaewaProYearly:
+      case SubscriptionProducts.ojaewaProYearlyMtn:
         return SubscriptionTier.ojaewaPro;
       default:
         return SubscriptionTier.free;
