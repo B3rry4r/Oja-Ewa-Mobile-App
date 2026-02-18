@@ -29,7 +29,7 @@ class AppEnv {
   // Pusher configuration
   static const String pusherKey = String.fromEnvironment(
     'PUSHER_KEY',
-    defaultValue: 'baf71c0a8ff3c3efb08b', // Replace with your actual Pusher key
+    defaultValue: 'baf71c0a8ff3c3efb08b',
   );
 
   static const String pusherCluster = String.fromEnvironment(
