@@ -303,18 +303,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
           ),
         ),
 
-        const SizedBox(height: 16),
 
-        // Step note
-        const Text(
-          '*Selling is strictly for fashion designers',
-          style: TextStyle(
-            fontSize: 12,
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF1E2021),
-          ),
-        ),
 
         const SizedBox(height: 40),
 
