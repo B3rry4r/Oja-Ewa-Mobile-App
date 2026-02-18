@@ -98,6 +98,8 @@ class HomeScreen extends ConsumerWidget {
             width: 120, // Wider to accommodate logo + text
             height: 28,
             fit: BoxFit.contain,
+            // Use original colors from SVG file (golden + brown)
+            colorFilter: null,
           ),
 
           // Header Icons

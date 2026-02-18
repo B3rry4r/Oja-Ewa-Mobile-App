@@ -65,6 +65,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           width: 200, // Wider to show logo + text properly
           height: 60,
           fit: BoxFit.contain,
+          // Use original colors from SVG file
+          colorFilter: null,
         ),
       ],
     );
