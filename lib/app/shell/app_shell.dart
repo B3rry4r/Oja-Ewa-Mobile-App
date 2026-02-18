@@ -36,11 +36,8 @@ class _AppShellState extends ConsumerState<AppShell> {
       // Prefetch categories for smoother UX
       ref.read(allCategoriesProvider);
       
-      // Request FCM permissions if user is logged in
-      final token = ref.read(accessTokenProvider);
-      if (token != null && token.isNotEmpty) {
-        _initializeFCM();
-      }
+      // FCM will be initialized only when user toggles it ON in notification settings
+      // DO NOT auto-initialize here
     });
   }
 

@@ -42,18 +42,26 @@ class PusherService {
         onDecryptionFailure: _onDecryptionFailure,
         onMemberAdded: _onMemberAdded,
         onMemberRemoved: _onMemberRemoved,
+        // Auth endpoint for private channels
+        authEndpoint: authEndpoint,
         onAuthorizer: (channelName, socketId, options) async {
-          // This will be called for private/presence channels
-          // Return headers for authorization
+          // This callback provides auth headers for the authEndpoint request
+          // Pusher SDK will automatically send socket_id and channel_name as POST params
           final token = AppEnv.accessToken;
           if (token == null || token.isEmpty) {
+            debugPrint('⚠️ No auth token available for Pusher authorization');
             return {};
           }
+          
+          debugPrint('🔐 Pusher authorizing channel: $channelName with socket_id: $socketId');
+          
+          // Return headers that will be sent with the POST request to authEndpoint
           return {
             'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
           };
         },
-        authEndpoint: authEndpoint,
       );
 
       await _pusher!.connect();
