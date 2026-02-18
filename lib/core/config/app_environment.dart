@@ -25,4 +25,25 @@ class AppEnv {
         return AppEnvironment.prod;
     }
   }
+
+  // Pusher configuration
+  static const String pusherKey = String.fromEnvironment(
+    'PUSHER_KEY',
+    defaultValue: 'baf71c0a8ff3c3efb08b', // Replace with your actual Pusher key
+  );
+
+  static const String pusherCluster = String.fromEnvironment(
+    'PUSHER_CLUSTER',
+    defaultValue: 'mt1',
+  );
+
+  static const String apiBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://ojaewa-pro-api-production-2254.up.railway.app',
+  );
+
+  static String get pusherAuthEndpoint => '$apiBaseUrl/broadcasting/auth';
+
+  // Access token storage for Pusher authorization
+  static String? accessToken;
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../config/app_environment.dart';
 import '../storage/storage_providers.dart';
 import 'auth_state.dart';
 
@@ -18,19 +19,23 @@ class AuthController extends Notifier<AuthState> {
   Future<void> loadFromStorage() async {
     final token = await ref.read(secureTokenStorageProvider).readAccessToken();
     if (token == null || token.isEmpty) {
+      AppEnv.accessToken = null;
       state = const AuthUnauthenticated();
     } else {
+      AppEnv.accessToken = token; // Set for Pusher authorization
       state = AuthAuthenticated(accessToken: token);
     }
   }
 
   Future<void> setAccessToken(String token) async {
     await ref.read(secureTokenStorageProvider).writeAccessToken(token);
+    AppEnv.accessToken = token; // Set for Pusher authorization
     state = AuthAuthenticated(accessToken: token);
   }
 
   Future<void> signOutLocal() async {
     await ref.read(secureTokenStorageProvider).deleteAccessToken();
+    AppEnv.accessToken = null; // Clear Pusher authorization
     state = const AuthUnauthenticated();
   }
 }

@@ -1,0 +1,172 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
+
+import '../config/app_environment.dart' show AppEnv;
+
+enum PusherConnectionState {
+  connecting,
+  connected,
+  disconnected,
+  error,
+}
+
+/// Pusher Channels service for real-time events
+class PusherService {
+  PusherService();
+
+  PusherChannelsFlutter? _pusher;
+  final Map<String, dynamic> _subscriptions = {};
+  
+  PusherConnectionState _connectionState = PusherConnectionState.disconnected;
+  PusherConnectionState get connectionState => _connectionState;
+
+  /// Initialize Pusher
+  Future<void> initialize() async {
+    try {
+      _pusher = PusherChannelsFlutter.getInstance();
+      
+      // Get Pusher config from environment
+      final pusherKey = AppEnv.pusherKey;
+      final pusherCluster = AppEnv.pusherCluster;
+      final authEndpoint = AppEnv.pusherAuthEndpoint;
+      
+      await _pusher!.init(
+        apiKey: pusherKey,
+        cluster: pusherCluster,
+        onConnectionStateChange: _onConnectionStateChange,
+        onError: _onError,
+        onSubscriptionSucceeded: _onSubscriptionSucceeded,
+        onEvent: _onEvent,
+        onSubscriptionError: _onSubscriptionError,
+        onDecryptionFailure: _onDecryptionFailure,
+        onMemberAdded: _onMemberAdded,
+        onMemberRemoved: _onMemberRemoved,
+        onAuthorizer: (channelName, socketId, options) async {
+          // This will be called for private/presence channels
+          // Return headers for authorization
+          final token = AppEnv.accessToken;
+          if (token == null || token.isEmpty) {
+            return {};
+          }
+          return {
+            'Authorization': 'Bearer $token',
+          };
+        },
+        authEndpoint: authEndpoint,
+      );
+
+      await _pusher!.connect();
+      debugPrint('✅ Pusher initialized successfully');
+    } catch (e) {
+      debugPrint('❌ Pusher initialization error: $e');
+      _connectionState = PusherConnectionState.error;
+    }
+  }
+
+  /// Subscribe to a channel
+  Future<void> subscribeToChannel(String channelName) async {
+    try {
+      if (_subscriptions.containsKey(channelName)) {
+        debugPrint('Already subscribed to $channelName');
+        return;
+      }
+
+      await _pusher!.subscribe(channelName: channelName);
+      _subscriptions[channelName] = true;
+      debugPrint('✅ Subscribed to channel: $channelName');
+    } catch (e) {
+      debugPrint('❌ Failed to subscribe to $channelName: $e');
+    }
+  }
+
+  /// Unsubscribe from a channel
+  Future<void> unsubscribeFromChannel(String channelName) async {
+    try {
+      await _pusher!.unsubscribe(channelName: channelName);
+      _subscriptions.remove(channelName);
+      debugPrint('✅ Unsubscribed from channel: $channelName');
+    } catch (e) {
+      debugPrint('❌ Failed to unsubscribe from $channelName: $e');
+    }
+  }
+
+  /// Bind to an event on a channel
+  void bindEvent(String channelName, String eventName, Function(dynamic) callback) {
+    // Events are handled via onEvent callback
+    // Store callback for routing
+    final key = '$channelName:$eventName';
+    _subscriptions[key] = callback;
+  }
+
+  /// Disconnect from Pusher
+  Future<void> disconnect() async {
+    try {
+      await _pusher!.disconnect();
+      _subscriptions.clear();
+      debugPrint('✅ Pusher disconnected');
+    } catch (e) {
+      debugPrint('❌ Pusher disconnect error: $e');
+    }
+  }
+
+  // Event handlers
+  void _onConnectionStateChange(String? currentState, String? previousState) {
+    debugPrint('Pusher connection state changed: $previousState -> $currentState');
+    
+    switch (currentState) {
+      case 'CONNECTED':
+        _connectionState = PusherConnectionState.connected;
+        break;
+      case 'CONNECTING':
+        _connectionState = PusherConnectionState.connecting;
+        break;
+      case 'DISCONNECTED':
+        _connectionState = PusherConnectionState.disconnected;
+        break;
+      default:
+        _connectionState = PusherConnectionState.error;
+    }
+  }
+
+  void _onError(String message, int? code, dynamic e) {
+    debugPrint('Pusher error: $message (code: $code)');
+    _connectionState = PusherConnectionState.error;
+  }
+
+  void _onSubscriptionSucceeded(String channelName, dynamic data) {
+    debugPrint('✅ Successfully subscribed to: $channelName');
+  }
+
+  void _onSubscriptionError(String message, dynamic e) {
+    debugPrint('❌ Subscription error: $message');
+  }
+
+  void _onDecryptionFailure(String event, String reason) {
+    debugPrint('❌ Decryption failure for $event: $reason');
+  }
+
+  void _onMemberAdded(String channelName, dynamic member) {
+    debugPrint('Member added to $channelName');
+  }
+
+  void _onMemberRemoved(String channelName, dynamic member) {
+    debugPrint('Member removed from $channelName');
+  }
+
+  void _onEvent(PusherEvent event) {
+    debugPrint('📡 Pusher event: ${event.eventName} on ${event.channelName}');
+    
+    // Route event to registered callbacks
+    final key = '${event.channelName}:${event.eventName}';
+    final callback = _subscriptions[key];
+    
+    if (callback is Function) {
+      try {
+        callback(event.data);
+      } catch (e) {
+        debugPrint('❌ Error handling event $key: $e');
+      }
+    }
+  }
+}
