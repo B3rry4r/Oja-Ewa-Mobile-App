@@ -32,7 +32,7 @@ jobs:
         bundler-cache: true
 
     - name: Install Fastlane
-      run: gem install fastlane
+      run: gem install fastlane --no-document --force
 
     - name: Setup Git credentials for Match
       run: |
