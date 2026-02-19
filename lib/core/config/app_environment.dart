@@ -42,7 +42,7 @@ class AppEnv {
     defaultValue: 'https://ojaewa-pro-api-production-2254.up.railway.app',
   );
 
-  static String get pusherAuthEndpoint => '$apiBaseUrl/broadcasting/auth';
+  static String get pusherAuthEndpoint => '$apiBaseUrl/api/broadcasting/auth';
 
   // Access token storage for Pusher authorization
   static String? accessToken;

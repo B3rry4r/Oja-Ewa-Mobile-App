@@ -20,7 +20,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ordersAsync = ref.watch(ordersProvider);
+    final ordersAsync = ref.watch(ordersRealtimeProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),

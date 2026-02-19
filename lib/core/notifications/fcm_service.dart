@@ -28,6 +28,12 @@ class FCMService {
   /// Get the current FCM token
   String? get fcmToken => _fcmToken;
 
+  Future<bool> isPermissionGranted() async {
+    final settings = await _messaging.getNotificationSettings();
+    return settings.authorizationStatus == AuthorizationStatus.authorized ||
+        settings.authorizationStatus == AuthorizationStatus.provisional;
+  }
+
   /// Initialize FCM (call this after user is authenticated)
   Future<void> requestPermissionAndInitialize() async {
     if (_initialized) {

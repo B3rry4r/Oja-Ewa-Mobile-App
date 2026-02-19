@@ -22,6 +22,12 @@ class OptimisticCartNotifier extends Notifier<Cart?> {
   bool _initialized = false;
   bool _pendingSync = false;
 
+  void setCartFromRealtime(Cart cart) {
+    state = cart;
+    _initialized = true;
+    _pendingSync = false;
+  }
+
   @override
   Cart? build() {
     // Listen to the real cart provider for initial load AND when sync is requested

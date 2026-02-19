@@ -26,7 +26,7 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ordersAsync = ref.watch(sellerOrdersProvider(_selectedStatus));
+    final ordersAsync = ref.watch(sellerOrdersRealtimeProvider(_selectedStatus));
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
@@ -72,9 +72,10 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
                               ),
                               const SizedBox(height: 8),
                               TextButton(
-                                onPressed: () => ref.invalidate(
-                                  sellerOrdersProvider(_selectedStatus),
-                                ),
+                                onPressed: () {
+                                  ref.invalidate(sellerOrdersProvider(_selectedStatus));
+                                  ref.invalidate(sellerOrdersRealtimeProvider(_selectedStatus));
+                                },
                                 child: const Text('Retry'),
                               ),
                             ],
@@ -197,8 +198,11 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
     }
 
     return RefreshIndicator(
-      onRefresh: () async =>
-          ref.invalidate(sellerOrdersProvider(_selectedStatus)),
+      onRefresh: () async {
+        ref.invalidate(sellerOrdersProvider(_selectedStatus));
+        ref.invalidate(sellerOrdersRealtimeProvider(_selectedStatus));
+      },
+
       child: Column(
         children: [
           // Table Header

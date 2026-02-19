@@ -5,8 +5,6 @@ import 'bootstrap/app_bootstrap.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 import '../core/deep_links/deep_link_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:io';
 import '../core/network/network_providers.dart';
 import '../core/widgets/offline_screen.dart';
 import '../core/auth/auth_providers.dart';
@@ -36,23 +34,6 @@ class _AppState extends ConsumerState<App> {
     });
   }
 
-  Future<void> _initializeFcmForAuthenticatedUser(WidgetRef ref) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final pushEnabled = prefs.getBool('push_notifications_enabled') ?? true;
-      if (!pushEnabled) {
-        return;
-      }
-      if (Platform.isIOS) {
-        await ref.read(fcmServiceProvider).requestPermissionAndInitialize();
-      } else {
-        await ref.read(fcmServiceProvider).initializeWithoutPrompt();
-      }
-    } catch (_) {
-      // Swallow to avoid breaking app startup.
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -73,12 +54,14 @@ class _AppState extends ConsumerState<App> {
                 ref.read(subscriptionControllerProvider.notifier).refreshStatus();
                 // Initialize real-time subscriptions and FCM when user logs in.
                 PusherListeners.setupListeners(ref.container, pusherService);
-                _initializeFcmForAuthenticatedUser(ref);
+                PusherListeners.setCurrentUserId(null);
+                // FCM init now happens only when user explicitly enables push in settings.
               } else if (prev != null && prev.isNotEmpty) {
                 // Cleanup when user logs out.
-                final userId = ref.read(pusherUserIdProvider);
+                final userId = PusherListeners.currentUserId;
                 PusherListeners.unsubscribeAll(pusherService, userId);
                 ref.read(fcmServiceProvider).deleteToken();
+                PusherListeners.setCurrentUserId(null);
               }
             });
 

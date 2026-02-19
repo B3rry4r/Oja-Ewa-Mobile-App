@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/network/dio_clients.dart';
 
@@ -13,7 +12,24 @@ final sellerStatusApiProvider = Provider<SellerStatusApi>((ref) {
 /// Fetches the current user's seller profile status.
 /// Returns null if user has no seller profile or is not authenticated.
 /// Auto-disposes to ensure fresh data when navigating back to screens.
+class SellerStatusOverrideController extends Notifier<SellerStatus?> {
+  @override
+  SellerStatus? build() => null;
+
+  void setStatus(SellerStatus? status) {
+    state = status;
+  }
+}
+
+final sellerStatusOverrideProvider = NotifierProvider<SellerStatusOverrideController, SellerStatus?>(
+  SellerStatusOverrideController.new,
+);
+
 final mySellerStatusProvider = FutureProvider.autoDispose<SellerStatus?>((ref) async {
+  final override = ref.watch(sellerStatusOverrideProvider);
+  if (override != null) {
+    return override;
+  }
   final token = ref.watch(accessTokenProvider);
   if (token == null || token.isEmpty) {
     return null;

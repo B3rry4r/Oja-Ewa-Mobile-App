@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/core/network/dio_clients.dart';
@@ -33,6 +35,54 @@ final sellerOrdersProvider = FutureProvider.autoDispose.family<List<SellerOrder>
   final items = extractOrders(response);
   return items.map(SellerOrder.fromJson).toList();
 });
+
+class SellerOrdersRealtimeController extends AsyncNotifier<List<SellerOrder>> {
+  SellerOrdersRealtimeController(this._status);
+
+  final String? _status;
+
+  @override
+  FutureOr<List<SellerOrder>> build() {
+    final async = ref.watch(sellerOrdersProvider(_status));
+    async.whenData((data) {
+      state = AsyncData(data);
+    });
+    return async.value ?? const [];
+  }
+
+  void applyNewOrder(SellerOrder order) {
+    final current = state.value ?? const [];
+    state = AsyncData([order, ...current]);
+  }
+
+  void applyStatusUpdate(int orderId, String statusValue) {
+    final current = state.value ?? const [];
+    final updated = current
+        .map((order) => order.id == orderId
+            ? SellerOrder(
+                id: order.id,
+                orderNumber: order.orderNumber,
+                status: statusValue,
+                createdAt: order.createdAt,
+                customerName: order.customerName,
+                customerPhone: order.customerPhone,
+                shippingAddress: order.shippingAddress,
+                items: order.items,
+                totalPrice: order.totalPrice,
+                trackingNumber: order.trackingNumber,
+                shippedAt: order.shippedAt,
+                deliveredAt: order.deliveredAt,
+                cancellationReason: order.cancellationReason,
+              )
+            : order)
+        .toList();
+    state = AsyncData(updated);
+  }
+}
+
+final sellerOrdersRealtimeProvider = AsyncNotifierProvider.family<SellerOrdersRealtimeController, List<SellerOrder>, String?>(
+  SellerOrdersRealtimeController.new,
+);
 
 /// Provider for getting a single order's details
 final sellerOrderDetailsProvider = FutureProvider.autoDispose.family<SellerOrder, int>((ref, orderId) async {

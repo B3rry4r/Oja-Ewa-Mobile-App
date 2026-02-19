@@ -26,6 +26,7 @@ class OrderDetailsScreen extends ConsumerWidget {
     }
 
     final orderAsync = ref.watch(orderDetailsProvider(orderId));
+    final statusOverrides = ref.watch(orderStatusOverridesProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
@@ -90,6 +91,19 @@ class OrderDetailsScreen extends ConsumerWidget {
             }
 
             final order = OrderSummary.fromJson(data);
+            final overrideStatus = statusOverrides[order.id];
+            final effectiveOrder = overrideStatus == null
+                ? order
+                : OrderSummary(
+                    id: order.id,
+                    orderNumber: order.orderNumber,
+                    totalPrice: order.totalPrice,
+                    status: overrideStatus,
+                    paymentReference: order.paymentReference,
+                    trackingNumber: order.trackingNumber,
+                    createdAt: order.createdAt,
+                    items: order.items,
+                  );
 
             // Build shipping address from available fields
             final shippingAddress = data['shipping_address'] as String? ?? data['address'] as String?;
@@ -127,7 +141,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                     child: Column(
                       children: [
                         // Order Information section
-                        _buildOrderInformation(context, order),
+                        _buildOrderInformation(context, effectiveOrder),
 
                         const SizedBox(height: 16),
 
@@ -142,7 +156,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                         const SizedBox(height: 16),
 
                         // Payment section
-                        _buildPaymentDetails(order.totalPrice ?? 0, order.paymentReference),
+                        _buildPaymentDetails(effectiveOrder.totalPrice ?? 0, effectiveOrder.paymentReference),
 
                         const SizedBox(height: 16),
                       ],

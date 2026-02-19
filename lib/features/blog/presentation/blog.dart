@@ -102,7 +102,7 @@ class _BlogScreenState extends ConsumerState<BlogScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final recent = ref.watch(blogListProvider);
+    final recent = ref.watch(blogRealtimeProvider);
     final favorites = ref.watch(blogFavoritesProvider);
 
     final list = _showFavorites ? favorites : recent;

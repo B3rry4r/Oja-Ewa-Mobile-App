@@ -1,13 +1,16 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
-
+import 'dart:async';
 import '../../app/router/app_router.dart';
 import '../../features/cart/presentation/controllers/cart_controller.dart';
+import '../../features/cart/domain/cart.dart';
 import '../../features/orders/presentation/controllers/orders_controller.dart';
+import '../../features/blog/presentation/controllers/blog_controller.dart';
+import '../../features/your_shop/presentation/controllers/seller_orders_controller.dart';
 import '../../features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
+import '../../features/account/subfeatures/start_selling/domain/seller_status.dart';
+import '../../features/blog/domain/blog_post.dart';
 import '../../features/account/presentation/controllers/profile_controller.dart';
 import '../auth/auth_providers.dart';
 import '../widgets/in_app_notification.dart';
@@ -17,13 +20,18 @@ import 'pusher_service.dart';
 final GlobalKey<NavigatorState> pusherNavigatorKey = GlobalKey<NavigatorState>();
 
 /// Tracks the current user id used for Pusher subscriptions
-final pusherUserIdProvider = StateProvider<int?>((ref) => null);
+int? _pusherUserId;
 
 /// Sets up Pusher real-time event listeners
 /// 
 /// ACTUALLY WORKING - Events invalidate providers to force data refresh!
 class PusherListeners {
   PusherListeners._();
+
+  static int? get currentUserId => _pusherUserId;
+  static void setCurrentUserId(int? userId) {
+    _pusherUserId = userId;
+  }
 
   static void setupListeners(ProviderContainer container, PusherService pusher) {
     // Get user ID from auth state
@@ -34,7 +42,7 @@ class PusherListeners {
     }
 
     // Subscribe to public channels immediately
-    _subscribeToBlogUpdates(pusher);
+    _subscribeToBlogUpdates(pusher, container);
     
     // Listen for user profile to get user ID, then subscribe to private channels
     container.listen(
@@ -43,7 +51,7 @@ class PusherListeners {
         next.whenData((profile) {
           if (profile != null) {
             debugPrint('👤 User profile loaded, subscribing to channels for user ${profile.id}');
-            container.read(pusherUserIdProvider.notifier).state = profile.id;
+            setCurrentUserId(profile.id);
             subscribeToUserChannel(pusher, profile.id, container);
             
             // Check if user is a seller and subscribe to seller channels
@@ -90,9 +98,10 @@ class PusherListeners {
         final json = data is String ? jsonDecode(data) : data;
         final orderId = json['order_id'];
         final status = json['status'] as String?;
-        
-        // Invalidate to refresh - but also show notification
-        container.invalidate(ordersProvider);
+        if (orderId is int && status != null) {
+          container.read(ordersRealtimeProvider.notifier).applyStatusUpdate(orderId, status);
+          container.read(sellerOrdersRealtimeProvider(null).notifier).applyStatusUpdate(orderId, status);
+        }
         
         // Show in-app notification
         _showOrderUpdateNotification(orderId, status ?? 'updated');
@@ -107,13 +116,15 @@ class PusherListeners {
       
       try {
         final json = data is String ? jsonDecode(data) : data;
+        if (json is! Map<String, dynamic>) {
+          return;
+        }
         final itemsCount = json['items_count'] as int?;
-        
-        // Invalidate to refresh cart
-        container.invalidate(cartProvider);
+        final cart = Cart.fromWrappedResponse(json);
+        container.read(optimisticCartProvider.notifier).setCartFromRealtime(cart);
         
         // Show in-app notification
-        _showCartUpdateNotification(itemsCount ?? 0);
+        _showCartUpdateNotification(itemsCount ?? cart.itemsCount);
       } catch (e) {
         debugPrint('Error parsing cart update: $e');
       }
@@ -133,15 +144,23 @@ class PusherListeners {
     pusher.bindEvent(channelName, 'seller.approval.changed', (data) {
       debugPrint('🎉 SELLER APPROVAL CHANGED: $data');
       
-      // FORCE REFRESH - This unlocks the shop screen button!
-      container.invalidate(mySellerStatusProvider);
-      container.invalidate(isSellerApprovedProvider);
-      
       try {
         final json = data is String ? jsonDecode(data) : data;
         final status = json['status'] as String?;
         final businessName = json['business_name'] as String?;
         final rejectionReason = json['rejection_reason'] as String?;
+        if (status != null || rejectionReason != null || businessName != null) {
+          final statusValue = (status ?? '').isNotEmpty ? status! : 'pending';
+          final sellerStatus = SellerStatus(
+            registrationStatus: statusValue,
+            active: statusValue == 'approved',
+            rejectionReason: rejectionReason,
+            businessName: businessName,
+            badge: null,
+          );
+          container.read(sellerStatusOverrideProvider.notifier).setStatus(sellerStatus);
+        }
+        container.invalidate(isSellerApprovedProvider);
         
         _showSellerApprovalNotification(status ?? '', businessName, rejectionReason);
       } catch (e) {
@@ -182,8 +201,24 @@ class PusherListeners {
         final total = json['total'];
         final buyerName = json['buyer']?['name'] as String?;
         
-        // Invalidate to refresh orders
-        container.invalidate(ordersProvider);
+        if (orderId is int) {
+          final order = SellerOrder(
+            id: orderId,
+            orderNumber: orderId.toString(),
+            status: 'pending',
+            createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
+            customerName: buyerName,
+            customerPhone: json['buyer']?['phone'] as String?,
+            shippingAddress: null,
+            items: const [],
+            totalPrice: (total is num) ? total.toDouble() : double.tryParse(total?.toString() ?? '') ?? 0,
+            trackingNumber: null,
+            shippedAt: null,
+            deliveredAt: null,
+            cancellationReason: null,
+          );
+          container.read(sellerOrdersRealtimeProvider(null).notifier).applyNewOrder(order);
+        }
         
         // Show in-app notification
         _showNewOrderNotification(orderId, total, buyerName ?? 'Customer');
@@ -194,15 +229,23 @@ class PusherListeners {
   }
 
   /// Subscribe to public blog updates
-  static Future<void> _subscribeToBlogUpdates(PusherService pusher) async {
+  static Future<void> _subscribeToBlogUpdates(
+    PusherService pusher,
+    ProviderContainer container,
+  ) async {
     await pusher.subscribeToChannel('blog-updates');
     
     pusher.bindEvent('blog-updates', 'blog.published', (data) {
       debugPrint('📝 New blog published: $data');
       try {
         final json = data is String ? jsonDecode(data) : data;
+        if (json is! Map<String, dynamic>) {
+          return;
+        }
         final title = json['title'] as String?;
-        _showBlogUpdateNotification(title ?? 'New blog post');
+        final blog = BlogPost.fromJson(json);
+        container.read(blogRealtimeProvider.notifier).addBlog(blog);
+        _showBlogUpdateNotification(title ?? blog.title);
       } catch (e) {
         debugPrint('Error parsing blog: $e');
       }

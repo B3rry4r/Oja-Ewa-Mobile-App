@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 
 import '../../../../../app/widgets/app_header.dart';
 import '../../../../../core/resources/app_assets.dart';
@@ -25,38 +26,89 @@ class _NotificationsSettingsScreenState extends ConsumerState<NotificationsSetti
   }
 
   bool _pushEnabled = false;
+  bool _permissionGranted = false;
+  bool _hasRegisteredToken = false;
 
   Future<void> _loadPushNotificationState() async {
     final prefs = await SharedPreferences.getInstance();
     final enabled = prefs.getBool('push_notifications_enabled') ?? false;
+    final permissionGranted = prefs.getBool('push_notifications_permission_granted') ?? false;
+    final registeredToken = prefs.getBool('push_notifications_token_registered') ?? false;
     setState(() {
       _pushEnabled = enabled;
+      _permissionGranted = permissionGranted;
+      _hasRegisteredToken = registeredToken;
       _isLoading = false;
     });
   }
 
-  Future<void> _savePushNotificationState(bool enabled) async {
+  Future<void> _savePushNotificationState({
+    required bool enabled,
+    required bool permissionGranted,
+    required bool tokenRegistered,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('push_notifications_enabled', enabled);
+    await prefs.setBool('push_notifications_permission_granted', permissionGranted);
+    await prefs.setBool('push_notifications_token_registered', tokenRegistered);
   }
 
   Future<void> _handlePushToggle(bool newValue) async {
     try {
       if (newValue) {
-        // Enable push notifications - register with FCM
         final fcmService = ref.read(fcmServiceProvider);
-        await fcmService.requestPermissionAndInitialize();
+        if (Platform.isIOS) {
+          await fcmService.requestPermissionAndInitialize();
+        } else {
+          await fcmService.initializeWithoutPrompt();
+        }
+        final permissionGranted = await fcmService.isPermissionGranted();
+        final registeredToken = fcmService.fcmToken != null;
+        if (!permissionGranted || !registeredToken) {
+          if (mounted) {
+            AppSnackbars.showError(
+              context,
+              'Push notifications could not be enabled. Please allow permissions.',
+            );
+          }
+          await _savePushNotificationState(
+            enabled: false,
+            permissionGranted: permissionGranted,
+            tokenRegistered: registeredToken,
+          );
+          setState(() {
+            _pushEnabled = false;
+            _permissionGranted = permissionGranted;
+            _hasRegisteredToken = registeredToken;
+          });
+          return;
+        }
         if (mounted) AppSnackbars.showSuccess(context, 'Push notifications enabled');
+        await _savePushNotificationState(
+          enabled: true,
+          permissionGranted: permissionGranted,
+          tokenRegistered: registeredToken,
+        );
+        setState(() {
+          _pushEnabled = true;
+          _permissionGranted = permissionGranted;
+          _hasRegisteredToken = registeredToken;
+        });
       } else {
-        // Disable push notifications - delete FCM token
         final fcmService = ref.read(fcmServiceProvider);
         await fcmService.deleteToken();
+        await _savePushNotificationState(
+          enabled: false,
+          permissionGranted: false,
+          tokenRegistered: false,
+        );
+        setState(() {
+          _pushEnabled = false;
+          _permissionGranted = false;
+          _hasRegisteredToken = false;
+        });
         if (mounted) AppSnackbars.showSuccess(context, 'Push notifications disabled');
       }
-      
-      // Save state and update UI
-      await _savePushNotificationState(newValue);
-      setState(() => _pushEnabled = newValue);
     } catch (e) {
       if (mounted) AppSnackbars.showError(context, 'Failed to update notification settings');
     }
@@ -127,8 +179,8 @@ class _NotificationsSettingsScreenState extends ConsumerState<NotificationsSetti
   }
 
   Widget _buildPushToggle() {
-    final enabled = _pushEnabled;
-    
+    final enabled = _pushEnabled && _permissionGranted && _hasRegisteredToken;
+
     return Container(
       height: 54,
       margin: const EdgeInsets.only(bottom: 8),
