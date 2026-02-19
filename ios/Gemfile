@@ -5,3 +5,6 @@ ruby '3.1.7'
 # Pin Fastlane and its dependencies to avoid resolver conflicts in CI.
 gem 'fastlane', '~> 2.224'
 gem 'public_suffix', '6.0.2'
+# CocoaPods needed for Flutter iOS build in CI
+
+gem 'cocoapods', '~> 1.15'

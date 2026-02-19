@@ -37,6 +37,10 @@ jobs:
         gem install bundler --no-document
         bundle install
 
+    - name: Install CocoaPods
+      working-directory: ios
+      run: bundle exec pod install
+
     - name: Setup Git credentials for Match
       run: |
         git config --global user.email "ci@github.com"
