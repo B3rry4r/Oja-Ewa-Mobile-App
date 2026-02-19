@@ -14,6 +14,7 @@ import '../core/notifications/fcm_service.dart';
 import '../core/realtime/pusher_listeners.dart';
 import '../core/realtime/pusher_providers.dart';
 import '../core/network/dio_clients.dart';
+import '../core/realtime/pusher_service.dart';
 
 /// Global navigator key for deep link navigation
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -36,6 +37,14 @@ class _AppState extends ConsumerState<App> {
     });
   }
 
+  Future<void> _ensurePusherConnected(WidgetRef ref, PusherService pusherService) async {
+    if (!pusherService.isInitialized) {
+      final dio = ref.read(laravelDioProvider);
+      await pusherService.initialize(dio: dio);
+    }
+    PusherListeners.setupListeners(ref.container, pusherService);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -48,27 +57,27 @@ class _AppState extends ConsumerState<App> {
         return Consumer(
           builder: (context, ref, _) {
             final isOnline = ref.watch(isOnlineProvider);
+            final token = ref.watch(accessTokenProvider);
             final content = AppBootstrap(child: child ?? const SizedBox.shrink());
+
+            if (token != null && token.isNotEmpty) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final pusherService = ref.read(pusherServiceProvider);
+                _ensurePusherConnected(ref, pusherService);
+              });
+            }
 
             ref.listen<String?>(accessTokenProvider, (prev, next) async {
               final pusherService = ref.read(pusherServiceProvider);
               if (next != null && next.isNotEmpty) {
                 ref.read(subscriptionControllerProvider.notifier).refreshStatus();
-                if (!kIsWeb) {
-                  if (!pusherService.isInitialized) {
-                    final dio = ref.read(laravelDioProvider);
-                    await pusherService.initialize(dio: dio);
-                  }
-                  PusherListeners.setupListeners(ref.container, pusherService);
-                }
+                await _ensurePusherConnected(ref, pusherService);
                 // FCM init now happens only when user explicitly enables push in settings.
               } else if (prev != null && prev.isNotEmpty) {
                 // Cleanup when user logs out.
-                if (!kIsWeb) {
-                  final userId = PusherListeners.currentUserId;
-                  PusherListeners.unsubscribeAll(pusherService, userId);
-                  PusherListeners.setCurrentUserId(null);
-                }
+                final userId = PusherListeners.currentUserId;
+                PusherListeners.unsubscribeAll(pusherService, userId);
+                PusherListeners.setCurrentUserId(null);
                 ref.read(fcmServiceProvider).deleteToken();
               }
             });

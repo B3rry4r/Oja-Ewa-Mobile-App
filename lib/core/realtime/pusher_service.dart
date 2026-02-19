@@ -31,6 +31,10 @@ class PusherService {
     if (_initialized) {
       return;
     }
+    if (kIsWeb) {
+      debugPrint('⚠️ Pusher not initialized on web (missing JS SDK).');
+      return;
+    }
     try {
       _dio = dio;
       _pusher = PusherChannelsFlutter.getInstance();

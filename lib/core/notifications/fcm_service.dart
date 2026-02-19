@@ -157,6 +157,25 @@ class FCMService {
     });
   }
 
+  Future<void> sendWebTestRegistration() async {
+    if (!kIsWeb) {
+      return;
+    }
+    if (_notificationsApi == null) {
+      debugPrint('NotificationsApi not available for web test registration');
+      return;
+    }
+    try {
+      await _notificationsApi.registerDeviceToken(
+        token: 'web-test-token',
+        deviceType: 'web',
+      );
+      debugPrint('Web test token registered');
+    } catch (e) {
+      debugPrint('Web test registration failed: $e');
+    }
+  }
+
   /// Subscribe to a topic
   Future<void> subscribeToTopic(String topic) async {
     try {

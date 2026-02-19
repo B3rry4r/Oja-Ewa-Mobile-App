@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 import '../../../../../app/widgets/app_header.dart';
 import '../../../../../core/resources/app_assets.dart';
@@ -62,6 +63,9 @@ class _NotificationsSettingsScreenState extends ConsumerState<NotificationsSetti
             ? await fcmService.requestPermissionAndInitialize()
             : await fcmService.initializeWithoutPrompt();
         final permissionGranted = await fcmService.isPermissionGranted();
+        if (kIsWeb) {
+          await fcmService.sendWebTestRegistration();
+        }
         if (!permissionGranted || !registeredToken) {
           debugPrint('Notifications enable failed: permission=$permissionGranted token=$registeredToken');
           if (mounted) {
