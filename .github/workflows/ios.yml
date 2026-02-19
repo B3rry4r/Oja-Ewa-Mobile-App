@@ -32,7 +32,10 @@ jobs:
         bundler-cache: true
 
     - name: Install Fastlane
-      run: gem install fastlane --no-document --force
+      working-directory: ios
+      run: |
+        gem install bundler --no-document
+        bundle install
 
     - name: Setup Git credentials for Match
       run: |
@@ -133,13 +136,13 @@ jobs:
         echo "=== Checking Fastfile ==="
         if [ -f "fastlane/Fastfile" ]; then
           echo "Fastfile found"
-          fastlane lanes
+          bundle exec fastlane lanes
         else
           echo "Fastfile not found"
           exit 1
         fi
 
-        fastlane ios beta
+        bundle exec fastlane ios beta
 
     # NEW STEP - Upload the full xcodebuild log if build fails
     - name: Upload xcodebuild logs
