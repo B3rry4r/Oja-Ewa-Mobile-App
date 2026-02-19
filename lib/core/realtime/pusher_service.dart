@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 
 import '../config/app_environment.dart' show AppEnv;
-
 enum PusherConnectionState {
   connecting,
   connected,
@@ -17,13 +18,21 @@ class PusherService {
 
   PusherChannelsFlutter? _pusher;
   final Map<String, dynamic> _subscriptions = {};
-  
+
+  Dio? _dio;
+  bool _initialized = false;
   PusherConnectionState _connectionState = PusherConnectionState.disconnected;
   PusherConnectionState get connectionState => _connectionState;
 
+  bool get isInitialized => _initialized;
+
   /// Initialize Pusher
-  Future<void> initialize() async {
+  Future<void> initialize({Dio? dio}) async {
+    if (_initialized) {
+      return;
+    }
     try {
+      _dio = dio;
       _pusher = PusherChannelsFlutter.getInstance();
       
       // Get Pusher config from environment
@@ -45,30 +54,58 @@ class PusherService {
         // Auth endpoint for private channels
         authEndpoint: authEndpoint,
         onAuthorizer: (channelName, socketId, options) async {
-          // This callback provides auth headers for the authEndpoint request
-          // Pusher SDK will automatically send socket_id and channel_name as POST params
           final token = AppEnv.accessToken;
           if (token == null || token.isEmpty) {
             debugPrint('⚠️ No auth token available for Pusher authorization');
             return {};
           }
-          
-          debugPrint('🔐 Pusher authorizing channel: $channelName with socket_id: $socketId');
-          
-          // Return headers that will be sent with the POST request to authEndpoint
-          return {
-            'Authorization': 'Bearer $token',
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-          };
+
+          try {
+            debugPrint('🔐 Pusher authorizing channel: $channelName with socket_id: $socketId');
+            final dioClient = _dio ?? Dio();
+            final response = await dioClient.post(
+              authEndpoint,
+              data: {
+                'channel_name': channelName,
+                'socket_id': socketId,
+              },
+              options: Options(
+                contentType: Headers.formUrlEncodedContentType,
+                headers: {
+                  'Authorization': 'Bearer $token',
+                  'Accept': 'application/json',
+                },
+              ),
+            );
+
+            if (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300) {
+              final data = response.data;
+              if (data is Map<String, dynamic>) {
+                return data;
+              }
+              if (data is String) {
+                return jsonDecode(data) as Map<String, dynamic>;
+              }
+            }
+
+            debugPrint(
+              '❌ Pusher auth failed ${response.statusCode}: ${response.data}',
+            );
+            return {};
+          } catch (e) {
+            debugPrint('❌ Pusher auth exception: $e');
+            return {};
+          }
         },
       );
 
       await _pusher!.connect();
+      _initialized = true;
       debugPrint('✅ Pusher initialized successfully');
     } catch (e) {
       debugPrint('❌ Pusher initialization error: $e');
       _connectionState = PusherConnectionState.error;
+      _initialized = false;
     }
   }
 

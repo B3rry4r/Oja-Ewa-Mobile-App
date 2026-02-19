@@ -35,10 +35,10 @@ class FCMService {
   }
 
   /// Initialize FCM (call this after user is authenticated)
-  Future<void> requestPermissionAndInitialize() async {
+  Future<bool> requestPermissionAndInitialize() async {
     if (_initialized) {
       debugPrint('FCM already initialized');
-      return;
+      return _fcmToken != null;
     }
 
     try {
@@ -63,7 +63,10 @@ class FCMService {
 
         // Send token to backend
         if (_fcmToken != null) {
-          await _sendTokenToBackend(_fcmToken!);
+          final registered = await _sendTokenToBackend(_fcmToken!);
+          if (!registered) {
+            debugPrint('FCM token registration failed');
+          }
         }
 
         // Listen for token refresh
@@ -80,18 +83,20 @@ class FCMService {
         FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
         
         _initialized = true;
+        return _fcmToken != null;
       } else {
         debugPrint('FCM Permission denied');
       }
     } catch (e) {
       debugPrint('FCM initialization error: $e');
     }
+    return false;
   }
 
   /// Attempt to register token without prompting (Android auto-grants).
-  Future<void> initializeWithoutPrompt() async {
+  Future<bool> initializeWithoutPrompt() async {
     if (_initialized) {
-      return;
+      return _fcmToken != null;
     }
 
     try {
@@ -101,7 +106,10 @@ class FCMService {
           status == AuthorizationStatus.provisional) {
         _fcmToken = await _messaging.getToken();
         if (_fcmToken != null) {
-          await _sendTokenToBackend(_fcmToken!);
+          final registered = await _sendTokenToBackend(_fcmToken!);
+          if (!registered) {
+            debugPrint('FCM token registration failed');
+          }
         }
         _messaging.onTokenRefresh.listen((newToken) {
           _fcmToken = newToken;
@@ -110,10 +118,12 @@ class FCMService {
         _setupMessageHandlers();
         FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
         _initialized = true;
+        return _fcmToken != null;
       }
     } catch (e) {
       debugPrint('FCM silent init error: $e');
     }
+    return false;
   }
 
   /// Setup foreground and background message handlers
@@ -186,10 +196,10 @@ class FCMService {
   }
 
   /// Send token to backend
-  Future<void> _sendTokenToBackend(String token) async {
+  Future<bool> _sendTokenToBackend(String token) async {
     if (_notificationsApi == null) {
       debugPrint('NotificationsApi not available, skipping token registration');
-      return;
+      return false;
     }
 
     try {
@@ -205,8 +215,10 @@ class FCMService {
         deviceType: deviceType,
       );
       debugPrint('FCM token registered with backend: $deviceType');
+      return true;
     } catch (e) {
       debugPrint('Error sending FCM token to backend: $e');
+      return false;
     }
   }
 }

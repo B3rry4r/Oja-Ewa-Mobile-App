@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,6 +13,7 @@ import '../core/subscriptions/subscription_controller.dart';
 import '../core/notifications/fcm_service.dart';
 import '../core/realtime/pusher_listeners.dart';
 import '../core/realtime/pusher_providers.dart';
+import '../core/network/dio_clients.dart';
 
 /// Global navigator key for deep link navigation
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -48,20 +50,26 @@ class _AppState extends ConsumerState<App> {
             final isOnline = ref.watch(isOnlineProvider);
             final content = AppBootstrap(child: child ?? const SizedBox.shrink());
 
-            ref.listen<String?>(accessTokenProvider, (prev, next) {
+            ref.listen<String?>(accessTokenProvider, (prev, next) async {
               final pusherService = ref.read(pusherServiceProvider);
               if (next != null && next.isNotEmpty) {
                 ref.read(subscriptionControllerProvider.notifier).refreshStatus();
-                // Initialize real-time subscriptions and FCM when user logs in.
-                PusherListeners.setupListeners(ref.container, pusherService);
-                PusherListeners.setCurrentUserId(null);
+                if (!kIsWeb) {
+                  if (!pusherService.isInitialized) {
+                    final dio = ref.read(laravelDioProvider);
+                    await pusherService.initialize(dio: dio);
+                  }
+                  PusherListeners.setupListeners(ref.container, pusherService);
+                }
                 // FCM init now happens only when user explicitly enables push in settings.
               } else if (prev != null && prev.isNotEmpty) {
                 // Cleanup when user logs out.
-                final userId = PusherListeners.currentUserId;
-                PusherListeners.unsubscribeAll(pusherService, userId);
+                if (!kIsWeb) {
+                  final userId = PusherListeners.currentUserId;
+                  PusherListeners.unsubscribeAll(pusherService, userId);
+                  PusherListeners.setCurrentUserId(null);
+                }
                 ref.read(fcmServiceProvider).deleteToken();
-                PusherListeners.setCurrentUserId(null);
               }
             });
 

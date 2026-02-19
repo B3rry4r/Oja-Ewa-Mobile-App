@@ -55,16 +55,15 @@ class _NotificationsSettingsScreenState extends ConsumerState<NotificationsSetti
 
   Future<void> _handlePushToggle(bool newValue) async {
     try {
+      debugPrint('Push toggle requested: $newValue');
       if (newValue) {
         final fcmService = ref.read(fcmServiceProvider);
-        if (Platform.isIOS) {
-          await fcmService.requestPermissionAndInitialize();
-        } else {
-          await fcmService.initializeWithoutPrompt();
-        }
+        final bool registeredToken = Platform.isIOS
+            ? await fcmService.requestPermissionAndInitialize()
+            : await fcmService.initializeWithoutPrompt();
         final permissionGranted = await fcmService.isPermissionGranted();
-        final registeredToken = fcmService.fcmToken != null;
         if (!permissionGranted || !registeredToken) {
+          debugPrint('Notifications enable failed: permission=$permissionGranted token=$registeredToken');
           if (mounted) {
             AppSnackbars.showError(
               context,

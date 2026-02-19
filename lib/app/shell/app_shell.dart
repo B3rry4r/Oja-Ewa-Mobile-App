@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/audio/audio_controller.dart';
 import '../../core/audio/audio_controls.dart';
 import '../../core/auth/auth_providers.dart';
-import '../../core/notifications/fcm_service.dart';
 import '../router/app_router.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
@@ -38,13 +37,6 @@ class _AppShellState extends ConsumerState<AppShell> {
       // Only initialize FCM after explicit enable in settings.
     });
 
-    ref.listen<String?>(accessTokenProvider, (prev, next) {
-      if (next == null || next.isEmpty) {
-        if (prev != null && prev.isNotEmpty) {
-          ref.read(fcmServiceProvider).deleteToken();
-        }
-      }
-    });
   }
 
   @override
