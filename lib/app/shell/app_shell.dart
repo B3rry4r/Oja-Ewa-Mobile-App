@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/audio/audio_controller.dart';
 import '../../core/audio/audio_controls.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import '../../core/auth/auth_providers.dart';
+import '../../core/notifications/fcm_service.dart';
+import '../../core/widgets/in_app_notification.dart';
 import '../router/app_router.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
@@ -33,10 +36,39 @@ class _AppShellState extends ConsumerState<AppShell> {
       ref.read(audioControllerProvider.notifier).initialize();
       // Prefetch categories for smoother UX
       ref.read(allCategoriesProvider);
-      
-      // Only initialize FCM after explicit enable in settings.
-    });
 
+      // Wire up foreground FCM message display as in-app banner
+      ref.read(fcmServiceProvider).setOnMessageCallback(_handleForegroundMessage);
+      ref.read(fcmServiceProvider).setOnNotificationTapCallback(_handleNotificationTap);
+    });
+  }
+
+  void _handleForegroundMessage(RemoteMessage message) {
+    if (!mounted) return;
+    final title = message.notification?.title ?? 'Notification';
+    final body = message.notification?.body ?? '';
+    InAppNotification.show(
+      context,
+      title: title,
+      message: body,
+      onTap: () => _handleNotificationTap(message.data),
+    );
+  }
+
+  void _handleNotificationTap(Map<String, dynamic> data) {
+    final type = data['type'] as String?;
+    if (!mounted) return;
+    switch (type) {
+      case 'order':
+        Navigator.of(context).pushNamed(AppRoutes.orders);
+        break;
+      case 'blog':
+        setState(() => _index = 3); // Blog tab
+        break;
+      default:
+        Navigator.of(context).pushNamed(AppRoutes.notifications);
+        break;
+    }
   }
 
   @override

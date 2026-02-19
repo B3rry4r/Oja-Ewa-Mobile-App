@@ -33,6 +33,8 @@ class PusherListeners {
     _pusherUserId = userId;
   }
 
+  static bool _listenersSetUp = false;
+
   static void setupListeners(ProviderContainer container, PusherService pusher) {
     // Get user ID from auth state
     final token = container.read(accessTokenProvider);
@@ -41,8 +43,21 @@ class PusherListeners {
       return;
     }
 
-    // Subscribe to public channels immediately
+    // Subscribe to public channels immediately (dedup handled in subscribeToChannel)
     _subscribeToBlogUpdates(pusher, container);
+
+    // Only attach listeners once per session to avoid duplicate subscriptions
+    if (_listenersSetUp) {
+      // If already set up, just subscribe immediately with current profile state
+      final profile = container.read(userProfileProvider).value;
+      if (profile != null) {
+        setCurrentUserId(profile.id);
+        subscribeToUserChannel(pusher, profile.id, container);
+        _checkAndSubscribeSellerChannels(pusher, profile.id, container);
+      }
+      return;
+    }
+    _listenersSetUp = true;
     
     // Listen for user profile to get user ID, then subscribe to private channels
     container.listen(
@@ -59,7 +74,12 @@ class PusherListeners {
           }
         });
       },
+      fireImmediately: true,
     );
+  }
+
+  static void resetListeners() {
+    _listenersSetUp = false;
   }
 
   static void _checkAndSubscribeSellerChannels(

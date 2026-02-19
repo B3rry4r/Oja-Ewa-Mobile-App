@@ -29,9 +29,14 @@ class FCMService {
   String? get fcmToken => _fcmToken;
 
   Future<bool> isPermissionGranted() async {
+    if (!kIsWeb && !Platform.isIOS) {
+      // On Android, if we have a token, permission is effectively granted
+      if (_fcmToken != null) return true;
+    }
     final settings = await _messaging.getNotificationSettings();
     return settings.authorizationStatus == AuthorizationStatus.authorized ||
-        settings.authorizationStatus == AuthorizationStatus.provisional;
+        settings.authorizationStatus == AuthorizationStatus.provisional ||
+        settings.authorizationStatus == AuthorizationStatus.notDetermined;
   }
 
   /// Initialize FCM (call this after user is authenticated)
@@ -100,10 +105,17 @@ class FCMService {
     }
 
     try {
-      final settings = await _messaging.getNotificationSettings();
-      final status = settings.authorizationStatus;
-      if (status == AuthorizationStatus.authorized ||
-          status == AuthorizationStatus.provisional) {
+      // On Android, request permission (API 33+ needs explicit grant, lower auto-grants)
+      final settings = await _messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      debugPrint('FCM Permission status: ${settings.authorizationStatus}');
+
+      // On Android, even notDetermined means we can still get a token
+      // Only skip if explicitly denied
+      if (settings.authorizationStatus != AuthorizationStatus.denied) {
         _fcmToken = await _messaging.getToken();
         if (_fcmToken != null) {
           final registered = await _sendTokenToBackend(_fcmToken!);
@@ -128,22 +140,22 @@ class FCMService {
 
   /// Setup foreground and background message handlers
   void _setupMessageHandlers() {
-    // Foreground messages
+    // Foreground messages - show as in-app notification banner
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Foreground message received: ${message.messageId}');
       debugPrint('Title: ${message.notification?.title}');
       debugPrint('Body: ${message.notification?.body}');
       debugPrint('Data: ${message.data}');
 
-      // TODO: Show local notification or update UI
+      // Show the notification as an in-app banner via the on-message callback
+      _onMessageCallback?.call(message);
     });
 
     // When user taps notification (app opened from notification)
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       debugPrint('Notification tapped: ${message.messageId}');
       debugPrint('Data: ${message.data}');
-
-      // TODO: Navigate to appropriate screen based on message.data
+      _onNotificationTapCallback?.call(message.data);
     });
 
     // Check if app was opened from a terminated state via notification
@@ -151,10 +163,20 @@ class FCMService {
       if (message != null) {
         debugPrint('App opened from terminated state via notification: ${message.messageId}');
         debugPrint('Data: ${message.data}');
-
-        // TODO: Navigate to appropriate screen
+        _onNotificationTapCallback?.call(message.data);
       }
     });
+  }
+
+  void Function(RemoteMessage)? _onMessageCallback;
+  void Function(Map<String, dynamic>)? _onNotificationTapCallback;
+
+  void setOnMessageCallback(void Function(RemoteMessage) callback) {
+    _onMessageCallback = callback;
+  }
+
+  void setOnNotificationTapCallback(void Function(Map<String, dynamic>) callback) {
+    _onNotificationTapCallback = callback;
   }
 
   Future<void> sendWebTestRegistration() async {

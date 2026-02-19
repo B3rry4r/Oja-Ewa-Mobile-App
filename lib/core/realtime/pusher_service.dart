@@ -18,6 +18,7 @@ class PusherService {
 
   PusherChannelsFlutter? _pusher;
   final Map<String, dynamic> _subscriptions = {};
+  final Set<String> _subscribedChannels = {};
 
   Dio? _dio;
   bool _initialized = false;
@@ -115,25 +116,33 @@ class PusherService {
 
   /// Subscribe to a channel
   Future<void> subscribeToChannel(String channelName) async {
+    if (_pusher == null) {
+      debugPrint('❌ Pusher not initialized, cannot subscribe to $channelName');
+      return;
+    }
+    if (_subscribedChannels.contains(channelName)) {
+      debugPrint('⏭️ Already subscribed to $channelName, skipping');
+      return;
+    }
     try {
-      if (_subscriptions.containsKey(channelName)) {
-        debugPrint('Already subscribed to $channelName');
-        return;
-      }
-
       await _pusher!.subscribe(channelName: channelName);
       _subscriptions[channelName] = true;
+      _subscribedChannels.add(channelName);
       debugPrint('✅ Subscribed to channel: $channelName');
     } catch (e) {
       debugPrint('❌ Failed to subscribe to $channelName: $e');
     }
   }
 
+  bool isSubscribed(String channelName) => _subscribedChannels.contains(channelName);
+
   /// Unsubscribe from a channel
   Future<void> unsubscribeFromChannel(String channelName) async {
+    if (_pusher == null) return;
     try {
       await _pusher!.unsubscribe(channelName: channelName);
       _subscriptions.remove(channelName);
+      _subscribedChannels.remove(channelName);
       debugPrint('✅ Unsubscribed from channel: $channelName');
     } catch (e) {
       debugPrint('❌ Failed to unsubscribe from $channelName: $e');
@@ -153,6 +162,8 @@ class PusherService {
     try {
       await _pusher!.disconnect();
       _subscriptions.clear();
+      _subscribedChannels.clear();
+      _initialized = false;
       debugPrint('✅ Pusher disconnected');
     } catch (e) {
       debugPrint('❌ Pusher disconnect error: $e');

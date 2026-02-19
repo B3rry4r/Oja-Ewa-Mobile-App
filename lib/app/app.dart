@@ -77,6 +77,7 @@ class _AppState extends ConsumerState<App> {
                 final userId = PusherListeners.currentUserId;
                 PusherListeners.unsubscribeAll(pusherService, userId);
                 PusherListeners.setCurrentUserId(null);
+                PusherListeners.resetListeners();
                 ref.read(fcmServiceProvider).deleteToken();
               }
             });
