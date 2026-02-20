@@ -47,12 +47,24 @@ class _AppShellState extends ConsumerState<AppShell> {
     if (!mounted) return;
     final title = message.notification?.title ?? 'Notification';
     final body = message.notification?.body ?? '';
-    InAppNotification.show(
-      context,
-      title: title,
-      message: body,
-      onTap: () => _handleNotificationTap(message.data),
-    );
+    // Use the navigator overlay so banner appears above all routes
+    final overlayContext = Navigator.of(context, rootNavigator: true).overlay?.context;
+    if (overlayContext != null) {
+      InAppNotification.show(
+        overlayContext,
+        title: title,
+        message: body,
+        onTap: () => _handleNotificationTap(message.data),
+      );
+    } else {
+      // Fallback to shell context
+      InAppNotification.show(
+        context,
+        title: title,
+        message: body,
+        onTap: () => _handleNotificationTap(message.data),
+      );
+    }
   }
 
   void _handleNotificationTap(Map<String, dynamic> data) {

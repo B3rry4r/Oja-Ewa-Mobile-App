@@ -66,13 +66,20 @@ class _NotificationsSettingsScreenState extends ConsumerState<NotificationsSetti
         if (kIsWeb) {
           await fcmService.sendWebTestRegistration();
         }
-        if (!permissionGranted || !registeredToken) {
+        if (!registeredToken) {
           debugPrint('Notifications enable failed: permission=$permissionGranted token=$registeredToken');
           if (mounted) {
-            AppSnackbars.showError(
-              context,
-              'Push notifications could not be enabled. Please allow permissions.',
-            );
+            if (!permissionGranted) {
+              AppSnackbars.showError(
+                context,
+                'Please enable notifications in your device Settings, then try again.',
+              );
+            } else {
+              AppSnackbars.showError(
+                context,
+                'Could not register for push notifications. Please try again.',
+              );
+            }
           }
           await _savePushNotificationState(
             enabled: false,

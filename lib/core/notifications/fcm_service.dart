@@ -29,21 +29,35 @@ class FCMService {
   String? get fcmToken => _fcmToken;
 
   Future<bool> isPermissionGranted() async {
-    if (!kIsWeb && !Platform.isIOS) {
-      // On Android, if we have a token, permission is effectively granted
-      if (_fcmToken != null) return true;
-    }
+    if (_fcmToken != null) return true;
+    if (kIsWeb) return false;
     final settings = await _messaging.getNotificationSettings();
     return settings.authorizationStatus == AuthorizationStatus.authorized ||
-        settings.authorizationStatus == AuthorizationStatus.provisional ||
-        settings.authorizationStatus == AuthorizationStatus.notDetermined;
+        settings.authorizationStatus == AuthorizationStatus.provisional;
   }
 
   /// Initialize FCM (call this after user is authenticated)
   Future<bool> requestPermissionAndInitialize() async {
-    if (_initialized) {
-      debugPrint('FCM already initialized');
-      return _fcmToken != null;
+    if (_initialized && _fcmToken != null) {
+      debugPrint('FCM already initialized with token');
+      return true;
+    }
+    // If not initialized but permissions already granted, skip the prompt
+    if (!_initialized) {
+      final existing = await _messaging.getNotificationSettings();
+      if (existing.authorizationStatus == AuthorizationStatus.authorized ||
+          existing.authorizationStatus == AuthorizationStatus.provisional) {
+        // Already granted - just get the token without prompting
+        _fcmToken ??= await _messaging.getToken();
+        if (_fcmToken != null) {
+          _initialized = true;
+          await _sendTokenToBackend(_fcmToken!);
+          _messaging.onTokenRefresh.listen((t) { _fcmToken = t; _sendTokenToBackend(t); });
+          _setupMessageHandlers();
+          FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+          return true;
+        }
+      }
     }
 
     try {
