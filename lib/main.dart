@@ -28,6 +28,40 @@ Future<void> main() async {
   // Register background handler immediately
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+  // Register foreground message listener at boot - BEFORE any user login
+  // so notifications work as soon as FCM delivers them.
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    debugPrint('Foreground message received: ${message.messageId}');
+    debugPrint('Title: ${message.notification?.title}');
+    debugPrint('Body: ${message.notification?.body}');
+    debugPrint('Data: ${message.data}');
+
+    final notification = message.notification;
+    if (notification == null || kIsWeb) return;
+
+    flutterLocalNotificationsPlugin.show(
+      message.hashCode,
+      notification.title,
+      notification.body,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'ojaewa_high_importance_channel',
+          'Ojaewa Notifications',
+          importance: Importance.max,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+          playSound: true,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+      payload: message.data.entries.map((e) => '${e.key}=${e.value}').join('&'),
+    );
+  });
+
   // Initialize flutter_local_notifications and create Android channel at boot
   // so system notifications always work regardless of user toggle state.
   if (!kIsWeb) {
