@@ -13,7 +13,7 @@
             android:resource="@color/notification_color" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="ojaewa_notifications" />
+            android:value="ojaewa_high_importance_channel" />
         
         <activity
             android:name=".MainActivity"

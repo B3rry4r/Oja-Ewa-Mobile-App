@@ -1,5 +1,8 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'bootstrap/app_bootstrap.dart';
 import 'router/app_router.dart';
@@ -34,6 +37,28 @@ class _AppState extends ConsumerState<App> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(deepLinkHandlerProvider).init(navigatorKey);
     });
+  }
+
+  void _autoInitFcmIfEnabled(WidgetRef ref) async {
+    try {
+      final fcmService = ref.read(fcmServiceProvider);
+      // Always create the notification channel early so system tray works
+      await fcmService.createChannelEarly();
+      // Register the onMessage handler early so foreground notifications show
+      await fcmService.setupForegroundHandler();
+
+      final prefs = await SharedPreferences.getInstance();
+      final pushEnabled = prefs.getBool('push_notifications_enabled') ?? false;
+      if (!pushEnabled) return;
+
+      if (Platform.isIOS) {
+        await fcmService.requestPermissionAndInitialize();
+      } else if (!kIsWeb) {
+        await fcmService.initializeWithoutPrompt();
+      }
+    } catch (e) {
+      debugPrint('Auto FCM init error: $e');
+    }
   }
 
   Future<void> _ensurePusherConnected(WidgetRef ref, PusherService pusherService) async {
@@ -71,7 +96,8 @@ class _AppState extends ConsumerState<App> {
               if (next != null && next.isNotEmpty) {
                 ref.read(subscriptionControllerProvider.notifier).refreshStatus();
                 await _ensurePusherConnected(ref, pusherService);
-                // FCM init now happens only when user explicitly enables push in settings.
+                // Auto-init FCM if user previously enabled push notifications
+                _autoInitFcmIfEnabled(ref);
               } else if (prev != null && prev.isNotEmpty) {
                 // Cleanup when user logs out.
                 final userId = PusherListeners.currentUserId;

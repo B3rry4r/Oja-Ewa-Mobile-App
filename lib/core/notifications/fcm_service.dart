@@ -17,8 +17,10 @@ const AndroidNotificationChannel _channel = AndroidNotificationChannel(
   'ojaewa_high_importance_channel',
   'Ojaewa Notifications',
   description: 'This channel is used for important Ojaewa notifications.',
-  importance: Importance.high,
+  importance: Importance.max,
   playSound: true,
+  enableVibration: true,
+  enableLights: true,
 );
 
 /// Background message handler (must be top-level function)
@@ -40,6 +42,17 @@ class FCMService {
   bool _initialized = false;
   bool _localNotificationsInitialized = false;
   bool _messageHandlersSetUp = false;
+
+  /// Call this once at app startup to create the channel early
+  Future<void> createChannelEarly() async {
+    if (kIsWeb) return;
+    try {
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(_channel);
+    } catch (_) {}
+  }
 
   Future<void> _initLocalNotifications() async {
     if (_localNotificationsInitialized || kIsWeb) return;
@@ -254,6 +267,44 @@ class FCMService {
       debugPrint('FCM silent init error: $e');
     }
     return false;
+  }
+
+  /// Register onMessage listener early so foreground notifications work
+  /// even before the user explicitly enables push in settings.
+  Future<void> setupForegroundHandler() async {
+    if (_messageHandlersSetUp) return;
+    _messageHandlersSetUp = true;
+    await _initLocalNotifications();
+
+    // On iOS, show notification alert/sound/badge when app is foreground
+    await _messaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      debugPrint('Foreground message received: ${message.messageId}');
+      debugPrint('Title: ${message.notification?.title}');
+      debugPrint('Body: ${message.notification?.body}');
+      debugPrint('Data: ${message.data}');
+      _showLocalNotification(message);
+      _onMessageCallback?.call(message);
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      debugPrint('Notification tapped: ${message.messageId}');
+      _onNotificationTapCallback?.call(message.data);
+    });
+
+    _messaging.getInitialMessage().then((RemoteMessage? message) {
+      if (message != null) {
+        debugPrint('App opened from terminated via notification: ${message.messageId}');
+        _onNotificationTapCallback?.call(message.data);
+      }
+    });
+
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
   /// Setup foreground and background message handlers
