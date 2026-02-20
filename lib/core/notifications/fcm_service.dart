@@ -39,6 +39,7 @@ class FCMService {
   String? _fcmToken;
   bool _initialized = false;
   bool _localNotificationsInitialized = false;
+  bool _messageHandlersSetUp = false;
 
   Future<void> _initLocalNotifications() async {
     if (_localNotificationsInitialized || kIsWeb) return;
@@ -81,8 +82,9 @@ class FCMService {
     _localNotificationsInitialized = true;
   }
 
-  void _showLocalNotification(RemoteMessage message) {
+  Future<void> _showLocalNotification(RemoteMessage message) async {
     if (kIsWeb) return;
+    if (!_localNotificationsInitialized) return;
     final notification = message.notification;
     if (notification == null) return;
 
@@ -92,7 +94,7 @@ class FCMService {
       channelDescription: _channel.description,
       importance: Importance.high,
       priority: Priority.high,
-      icon: '@drawable/ic_notification',
+      icon: '@mipmap/ic_launcher',
       playSound: true,
     );
     const iosDetails = DarwinNotificationDetails(
@@ -110,13 +112,17 @@ class FCMService {
         .map((e) => '${e.key}=${e.value}')
         .join('&');
 
-    flutterLocalNotificationsPlugin.show(
-      notification.hashCode,
-      notification.title,
-      notification.body,
-      details,
-      payload: payloadEntries.isNotEmpty ? payloadEntries : null,
-    );
+    try {
+      await flutterLocalNotificationsPlugin.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        details,
+        payload: payloadEntries.isNotEmpty ? payloadEntries : null,
+      );
+    } catch (e) {
+      debugPrint('❌ Error showing local notification: $e');
+    }
   }
 
   /// Get the current FCM token
@@ -137,6 +143,7 @@ class FCMService {
       return true;
     }
     _initialized = false;
+    _messageHandlersSetUp = false;
     try {
       // Check if permission is already granted - if so, skip the prompt
       final existing = await _messaging.getNotificationSettings();
@@ -213,6 +220,7 @@ class FCMService {
       return true;
     }
     _initialized = false;
+    _messageHandlersSetUp = false;
 
     try {
       // On Android, request permission (API 33+ needs explicit grant, lower auto-grants)
@@ -250,6 +258,8 @@ class FCMService {
 
   /// Setup foreground and background message handlers
   Future<void> _setupMessageHandlers() async {
+    if (_messageHandlersSetUp) return;
+    _messageHandlersSetUp = true;
     await _initLocalNotifications();
 
     // On iOS, tell FCM to show notification while app is in foreground too
