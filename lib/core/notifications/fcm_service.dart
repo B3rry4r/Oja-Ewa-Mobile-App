@@ -2,10 +2,24 @@ import 'dart:async';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/notifications/data/notifications_api.dart';
 import '../../features/notifications/data/notifications_repository_impl.dart';
+
+/// Top-level plugin instance for use in background handler
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+/// Android notification channel for high-importance foreground notifications
+const AndroidNotificationChannel _channel = AndroidNotificationChannel(
+  'ojaewa_high_importance_channel',
+  'Ojaewa Notifications',
+  description: 'This channel is used for important Ojaewa notifications.',
+  importance: Importance.high,
+  playSound: true,
+);
 
 /// Background message handler (must be top-level function)
 @pragma('vm:entry-point')
@@ -24,6 +38,64 @@ class FCMService {
   final NotificationsApi? _notificationsApi;
   String? _fcmToken;
   bool _initialized = false;
+  bool _localNotificationsInitialized = false;
+
+  Future<void> _initLocalNotifications() async {
+    if (_localNotificationsInitialized || kIsWeb) return;
+
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
+
+    await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+    // Create Android notification channel
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_channel);
+
+    _localNotificationsInitialized = true;
+  }
+
+  void _showLocalNotification(RemoteMessage message) {
+    if (kIsWeb) return;
+    final notification = message.notification;
+    if (notification == null) return;
+
+    final androidDetails = AndroidNotificationDetails(
+      _channel.id,
+      _channel.name,
+      channelDescription: _channel.description,
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@drawable/ic_notification',
+      playSound: true,
+    );
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+    final details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    flutterLocalNotificationsPlugin.show(
+      notification.hashCode,
+      notification.title,
+      notification.body,
+      details,
+    );
+  }
 
   /// Get the current FCM token
   String? get fcmToken => _fcmToken;
@@ -42,23 +114,24 @@ class FCMService {
       debugPrint('FCM already initialized with token');
       return true;
     }
-    // If not initialized but permissions already granted, skip the prompt
-    if (!_initialized) {
+    _initialized = false;
+    try {
+      // Check if permission is already granted - if so, skip the prompt
       final existing = await _messaging.getNotificationSettings();
       if (existing.authorizationStatus == AuthorizationStatus.authorized ||
           existing.authorizationStatus == AuthorizationStatus.provisional) {
-        // Already granted - just get the token without prompting
+        // Already granted - just get token without system dialog
         _fcmToken ??= await _messaging.getToken();
         if (_fcmToken != null) {
           _initialized = true;
           await _sendTokenToBackend(_fcmToken!);
           _messaging.onTokenRefresh.listen((t) { _fcmToken = t; _sendTokenToBackend(t); });
-          _setupMessageHandlers();
+          await _setupMessageHandlers();
           FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
           return true;
         }
       }
-    }
+    } catch (_) {}
 
     try {
       // Request permissions (iOS - Android auto-granted)
@@ -96,7 +169,7 @@ class FCMService {
         });
 
         // Setup message handlers
-        _setupMessageHandlers();
+        await _setupMessageHandlers();
 
         // Register background handler
         FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -114,9 +187,10 @@ class FCMService {
 
   /// Attempt to register token without prompting (Android auto-grants).
   Future<bool> initializeWithoutPrompt() async {
-    if (_initialized) {
-      return _fcmToken != null;
+    if (_initialized && _fcmToken != null) {
+      return true;
     }
+    _initialized = false;
 
     try {
       // On Android, request permission (API 33+ needs explicit grant, lower auto-grants)
@@ -141,7 +215,7 @@ class FCMService {
           _fcmToken = newToken;
           _sendTokenToBackend(newToken);
         });
-        _setupMessageHandlers();
+        await _setupMessageHandlers();
         FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
         _initialized = true;
         return _fcmToken != null;
@@ -153,15 +227,27 @@ class FCMService {
   }
 
   /// Setup foreground and background message handlers
-  void _setupMessageHandlers() {
-    // Foreground messages - show as in-app notification banner
+  Future<void> _setupMessageHandlers() async {
+    await _initLocalNotifications();
+
+    // On iOS, tell FCM to show notification while app is in foreground too
+    await _messaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    // Foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Foreground message received: ${message.messageId}');
       debugPrint('Title: ${message.notification?.title}');
       debugPrint('Body: ${message.notification?.body}');
       debugPrint('Data: ${message.data}');
 
-      // Show the notification as an in-app banner via the on-message callback
+      // Show a real system notification via flutter_local_notifications
+      _showLocalNotification(message);
+
+      // Also call the in-app banner callback
       _onMessageCallback?.call(message);
     });
 

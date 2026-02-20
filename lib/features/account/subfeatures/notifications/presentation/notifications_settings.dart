@@ -59,13 +59,16 @@ class _NotificationsSettingsScreenState extends ConsumerState<NotificationsSetti
       debugPrint('Push toggle requested: $newValue');
       if (newValue) {
         final fcmService = ref.read(fcmServiceProvider);
-        final bool registeredToken = Platform.isIOS
-            ? await fcmService.requestPermissionAndInitialize()
-            : await fcmService.initializeWithoutPrompt();
-        final permissionGranted = await fcmService.isPermissionGranted();
+        bool registeredToken;
         if (kIsWeb) {
           await fcmService.sendWebTestRegistration();
+          registeredToken = true;
+        } else if (Platform.isIOS) {
+          registeredToken = await fcmService.requestPermissionAndInitialize();
+        } else {
+          registeredToken = await fcmService.initializeWithoutPrompt();
         }
+        final permissionGranted = await fcmService.isPermissionGranted();
         if (!registeredToken) {
           debugPrint('Notifications enable failed: permission=$permissionGranted token=$registeredToken');
           if (mounted) {
