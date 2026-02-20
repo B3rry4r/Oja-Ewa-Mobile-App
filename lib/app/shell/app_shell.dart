@@ -68,14 +68,50 @@ class _AppShellState extends ConsumerState<AppShell> {
   }
 
   void _handleNotificationTap(Map<String, dynamic> data) {
-    final type = data['type'] as String?;
     if (!mounted) return;
+    final type = data['type'] as String?;
+    final id = data['id'];
+    final orderId = data['order_id'] ?? id;
+    final productId = data['product_id'] ?? id;
+
     switch (type) {
       case 'order':
-        Navigator.of(context).pushNamed(AppRoutes.orders);
+      case 'order_status':
+        if (orderId != null) {
+          Navigator.of(context).pushNamed(
+            AppRoutes.orderDetails,
+            arguments: int.tryParse(orderId.toString()),
+          );
+        } else {
+          Navigator.of(context).pushNamed(AppRoutes.orders);
+        }
+        break;
+      case 'new_order':
+        // Seller receiving new order - go to shop orders
+        Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
+        break;
+      case 'product':
+      case 'product_approval':
+        if (productId != null) {
+          Navigator.of(context).pushNamed(
+            AppRoutes.yourShopDashboard,
+          );
+        }
         break;
       case 'blog':
-        setState(() => _index = 3); // Blog tab
+        setState(() => _index = 3); // Blog tab index
+        break;
+      case 'seller_approval':
+        Navigator.of(context).pushNamed(AppRoutes.sellerApprovalStatus);
+        break;
+      case 'business_approval':
+        Navigator.of(context).pushNamed(AppRoutes.businessApprovalStatus);
+        break;
+      case 'cart':
+        Navigator.of(context).pushNamed(AppRoutes.cart);
+        break;
+      case 'test':
+        Navigator.of(context).pushNamed(AppRoutes.notifications);
         break;
       default:
         Navigator.of(context).pushNamed(AppRoutes.notifications);

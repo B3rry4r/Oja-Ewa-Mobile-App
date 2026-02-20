@@ -54,7 +54,23 @@ class FCMService {
       iOS: iosSettings,
     );
 
-    await flutterLocalNotificationsPlugin.initialize(initSettings);
+    await flutterLocalNotificationsPlugin.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        // User tapped a local notification - call tap callback with data
+        final payload = response.payload;
+        if (payload != null && _onNotificationTapCallback != null) {
+          try {
+            final data = Map<String, dynamic>.from(
+              {for (final e in payload.split('&')) e.split('=')[0]: e.split('=')[1]},
+            );
+            _onNotificationTapCallback?.call(data);
+          } catch (_) {
+            _onNotificationTapCallback?.call({'type': payload});
+          }
+        }
+      },
+    );
 
     // Create Android notification channel
     await flutterLocalNotificationsPlugin
@@ -89,11 +105,17 @@ class FCMService {
       iOS: iosDetails,
     );
 
+    // Build payload from message data for tap navigation
+    final payloadEntries = message.data.entries
+        .map((e) => '${e.key}=${e.value}')
+        .join('&');
+
     flutterLocalNotificationsPlugin.show(
       notification.hashCode,
       notification.title,
       notification.body,
       details,
+      payload: payloadEntries.isNotEmpty ? payloadEntries : null,
     );
   }
 

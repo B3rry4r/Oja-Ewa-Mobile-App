@@ -52,6 +52,12 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Ojá-Ẹwà needs access to your camera to let you take photos for your profile, products, and business listings.</string>
 
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
