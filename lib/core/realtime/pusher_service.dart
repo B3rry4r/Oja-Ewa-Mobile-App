@@ -66,7 +66,7 @@ class PusherService {
           }
 
           try {
-            debugPrint('🔐 Pusher authorizing channel: $channelName with socket_id: $socketId');
+            debugPrint('🔐 Pusher authorizing channel: $channelName with socket_id: "$socketId"');
             final dioClient = _dio ?? Dio();
             final response = await dioClient.post(
               authEndpoint,
@@ -79,9 +79,12 @@ class PusherService {
                 headers: {
                   'Authorization': 'Bearer $token',
                   'Accept': 'application/json',
+                  'X-Socket-Id': socketId,
                 },
               ),
             );
+
+            debugPrint('📡 Pusher auth response: ${response.statusCode} ${response.data}');
 
             if (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300) {
               final data = response.data;

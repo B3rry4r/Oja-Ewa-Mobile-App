@@ -332,12 +332,18 @@ class FCMService {
     // Foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Foreground message received: ${message.messageId}');
-      debugPrint('Title: ${message.notification?.title}');
-      debugPrint('Body: ${message.notification?.body}');
-      debugPrint('Data: ${message.data}');
-
-      // Show a real system notification via flutter_local_notifications
-      _showLocalNotification(message);
+      
+      // If the app is in foreground and has a notification block, 
+      // the system tray notification is often handled by the OS on modern Android/iOS 
+      // depending on settings. To avoid duplicates, we only show local if necessary.
+      // On iOS, setForegroundNotificationPresentationOptions handles the banner.
+      
+      if (Platform.isAndroid) {
+        // Only show local notification on Android if it's a 'data' only message
+        // OR if you want custom behavior. If it has a 'notification' block,
+        // FCM often shows it automatically depending on the channel importance.
+        _showLocalNotification(message);
+      }
 
       // Also call the in-app banner callback
       _onMessageCallback?.call(message);
