@@ -16,6 +16,7 @@ class RemoteLogger {
   /// Sends a log entry to the server.
   /// [level] can be 'error', 'info', 'warning', or 'debug'.
   static Future<void> log(String level, String message, {Map<String, dynamic>? context}) async {
+    return; // DISABLED TEMPORARILY FOR STABILITY
     if (_isLogging) return; // Prevent infinite loops
     _isLogging = true;
     

@@ -57,10 +57,9 @@ class PusherService {
         onDecryptionFailure: _onDecryptionFailure,
         onMemberAdded: _onMemberAdded,
         onMemberRemoved: _onMemberRemoved,
-        // Using onAuthorizer only, so authEndpoint should be empty
+        // Using onAuthorizer ONLY to prevent conflicting authorization logic
         onAuthorizer: (channelName, socketId, options) async {
           final token = AppEnv.accessToken;
-          final appId = "2116718"; // From backend agent
           if (token == null || token.isEmpty) {
             debugPrint('⚠️ No auth token available for Pusher authorization');
             return {};
@@ -70,9 +69,9 @@ class PusherService {
             debugPrint('🔐 Pusher authorizing channel: $channelName with socket_id: $socketId');
             final dioClient = _dio ?? Dio();
             
-            // Using Form Data as it is the most compatible with Laravel's BroadcastController
+            // Standard form-data authorization for Laravel
             final response = await dioClient.post(
-              authEndpoint,
+              AppEnv.pusherAuthEndpoint,
               data: {
                 'channel_name': channelName,
                 'socket_id': socketId,
@@ -83,7 +82,6 @@ class PusherService {
                   'Authorization': 'Bearer $token',
                   'Accept': 'application/json',
                   'X-Socket-Id': socketId,
-                  'X-App-ID': appId,
                 },
               ),
             );
