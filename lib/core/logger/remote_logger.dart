@@ -11,16 +11,18 @@ class RemoteLogger {
     receiveTimeout: const Duration(seconds: 5),
   ));
 
+  static bool _isLogging = false;
+
   /// Sends a log entry to the server.
   /// [level] can be 'error', 'info', 'warning', or 'debug'.
   static Future<void> log(String level, String message, {Map<String, dynamic>? context}) async {
-    // Only log in debug/profile mode or specific environments if desired
-    // For now, we log everything as requested to catch physical device issues.
+    if (_isLogging) return; // Prevent infinite loops
+    _isLogging = true;
     
     final token = AppEnv.accessToken;
     
     try {
-      debugPrint('📤 Sending remote log: [$level] $message');
+      // debugPrint('📤 Sending remote log: [$level] $message');
       
       await _dio.post(
         '/api/logs/client',
@@ -41,8 +43,9 @@ class RemoteLogger {
         ),
       );
     } catch (e) {
-      // We don't throw here to avoid infinite loops or crashing the app due to logging failure
-      debugPrint('⚠️ Could not send remote log: $e');
+      // Fail silently to avoid recursion/crashing
+    } finally {
+      _isLogging = false;
     }
   }
 
