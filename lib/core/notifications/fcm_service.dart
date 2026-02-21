@@ -281,39 +281,7 @@ class FCMService {
   /// Register onMessage listener early so foreground notifications work
   /// even before the user explicitly enables push in settings.
   Future<void> setupForegroundHandler() async {
-    if (_messageHandlersSetUp) return;
-    _messageHandlersSetUp = true;
-    await _initLocalNotifications();
-
-    // On iOS, show notification alert/sound/badge when app is foreground
-    await _messaging.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint('Foreground message received: ${message.messageId}');
-      debugPrint('Title: ${message.notification?.title}');
-      debugPrint('Body: ${message.notification?.body}');
-      debugPrint('Data: ${message.data}');
-      _showLocalNotification(message);
-      _onMessageCallback?.call(message);
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint('Notification tapped: ${message.messageId}');
-      _onNotificationTapCallback?.call(message.data);
-    });
-
-    _messaging.getInitialMessage().then((RemoteMessage? message) {
-      if (message != null) {
-        debugPrint('App opened from terminated via notification: ${message.messageId}');
-        _onNotificationTapCallback?.call(message.data);
-      }
-    });
-
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    await _setupMessageHandlers();
   }
 
   /// Setup foreground and background message handlers
@@ -333,15 +301,9 @@ class FCMService {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Foreground message received: ${message.messageId}');
       
-      // If the app is in foreground and has a notification block, 
-      // the system tray notification is often handled by the OS on modern Android/iOS 
-      // depending on settings. To avoid duplicates, we only show local if necessary.
-      // On iOS, setForegroundNotificationPresentationOptions handles the banner.
-      
+      // Prevent duplicates: Only show manual local notification on Android
+      // because iOS shows the banner automatically via setForegroundNotificationPresentationOptions
       if (Platform.isAndroid) {
-        // Only show local notification on Android if it's a 'data' only message
-        // OR if you want custom behavior. If it has a 'notification' block,
-        // FCM often shows it automatically depending on the channel importance.
         _showLocalNotification(message);
       }
 
