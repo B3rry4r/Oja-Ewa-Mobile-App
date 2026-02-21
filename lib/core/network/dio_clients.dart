@@ -36,7 +36,6 @@ final dioClientsProvider = Provider<DioClients>((ref) {
     final dio = Dio(options);
     dio.interceptors.add(OfflineInterceptor(ref));
     dio.interceptors.add(AuthTokenInterceptor(ref));
-    dio.interceptors.add(RemoteLogInterceptor());
 
     // Debug-only request logging
     // (no request bodies to avoid leaking PII)

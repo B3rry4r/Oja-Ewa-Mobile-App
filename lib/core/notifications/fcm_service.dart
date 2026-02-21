@@ -292,11 +292,13 @@ class FCMService {
     await _initLocalNotifications();
 
     // On iOS, tell FCM to show notification while app is in foreground too
-    await _messaging.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    if (Platform.isIOS) {
+      await _messaging.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    }
 
     // Foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -327,6 +329,8 @@ class FCMService {
         _onNotificationTapCallback?.call(message.data);
       }
     });
+
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
   void Function(RemoteMessage)? _onMessageCallback;
