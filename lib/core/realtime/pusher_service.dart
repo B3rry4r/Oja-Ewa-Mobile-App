@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 
 import '../config/app_environment.dart' show AppEnv;
+import '../logger/remote_logger.dart';
 enum PusherConnectionState {
   connecting,
   connected,
@@ -56,18 +57,20 @@ class PusherService {
         onDecryptionFailure: _onDecryptionFailure,
         onMemberAdded: _onMemberAdded,
         onMemberRemoved: _onMemberRemoved,
-        // Auth endpoint for private channels
-        authEndpoint: authEndpoint,
+        // Using onAuthorizer only, so authEndpoint should be empty
         onAuthorizer: (channelName, socketId, options) async {
           final token = AppEnv.accessToken;
+          final appId = "2116718"; // From backend agent
           if (token == null || token.isEmpty) {
             debugPrint('⚠️ No auth token available for Pusher authorization');
             return {};
           }
 
           try {
-            debugPrint('🔐 Pusher authorizing channel: $channelName with socket_id: "$socketId"');
+            debugPrint('🔐 Pusher authorizing channel: $channelName with socket_id: $socketId');
             final dioClient = _dio ?? Dio();
+            
+            // Using Form Data as it is the most compatible with Laravel's BroadcastController
             final response = await dioClient.post(
               authEndpoint,
               data: {
@@ -75,11 +78,12 @@ class PusherService {
                 'socket_id': socketId,
               },
               options: Options(
-                contentType: Headers.jsonContentType,
+                contentType: Headers.formUrlEncodedContentType,
                 headers: {
                   'Authorization': 'Bearer $token',
                   'Accept': 'application/json',
                   'X-Socket-Id': socketId,
+                  'X-App-ID': appId,
                 },
               ),
             );
@@ -99,9 +103,20 @@ class PusherService {
             debugPrint(
               '❌ Pusher auth failed ${response.statusCode}: ${response.data}',
             );
+            RemoteLogger.error('Pusher Auth Failed', context: {
+              'channel': channelName,
+              'socket_id': socketId,
+              'statusCode': response.statusCode,
+              'responseData': response.data,
+            });
             return {};
           } catch (e) {
             debugPrint('❌ Pusher auth exception: $e');
+            RemoteLogger.error('Pusher Auth Exception', context: {
+              'channel': channelName,
+              'socket_id': socketId,
+              'error': e.toString(),
+            });
             return {};
           }
         },

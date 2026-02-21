@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/notifications/data/notifications_api.dart';
 import '../../features/notifications/data/notifications_repository_impl.dart';
+import '../logger/remote_logger.dart';
 
 /// Top-level plugin instance for use in background handler
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -419,6 +420,10 @@ class FCMService {
       return true;
     } catch (e) {
       debugPrint('Error sending FCM token to backend: $e');
+      RemoteLogger.error('FCM Token Registration Failed', context: {
+        'token': token,
+        'error': e.toString(),
+      });
       return false;
     }
   }

@@ -92,8 +92,14 @@ class PusherListeners {
       mySellerStatusProvider,
       (previous, next) {
         next.whenData((sellerStatus) {
-          if (sellerStatus != null) {
-            debugPrint('🏪 Seller detected, subscribing to seller channels');
+          if (sellerStatus != null && sellerStatus.registrationStatus == 'approved') {
+            debugPrint('🏪 Approved seller detected, subscribing to seller channels');
+            subscribeToSellerChannel(pusher, userId, container);
+          } else if (sellerStatus != null) {
+            debugPrint('🏪 Seller not approved (${sellerStatus.registrationStatus}), subscribing to basic status channel');
+            // Still subscribe to the private seller channel for approval updates,
+            // but the subscribeToSellerChannel method will handle the 'orders' part.
+            // For now, let's keep it simple and just guard the call.
             subscribeToSellerChannel(pusher, userId, container);
           }
         });
@@ -209,43 +215,46 @@ class PusherListeners {
       }
     });
 
-    // Subscribe to all seller orders channel - NEW ORDERS
-    await pusher.subscribeToChannel('private-seller.orders');
-    
-    pusher.bindEvent('private-seller.orders', 'order.new', (data) {
-      debugPrint('🆕 NEW ORDER RECEIVED: $data');
+    // Subscribe to all seller orders channel - NEW ORDERS - ONLY IF APPROVED
+    final sellerStatus = container.read(mySellerStatusProvider).value;
+    if (sellerStatus?.registrationStatus == 'approved') {
+      await pusher.subscribeToChannel('private-seller.orders');
       
-      try {
-        final json = data is String ? jsonDecode(data) : data;
-        final orderId = json['order_id'];
-        final total = json['total'];
-        final buyerName = json['buyer']?['name'] as String?;
+      pusher.bindEvent('private-seller.orders', 'order.new', (data) {
+        debugPrint('🆕 NEW ORDER RECEIVED: $data');
         
-        if (orderId is int) {
-          final order = SellerOrder(
-            id: orderId,
-            orderNumber: orderId.toString(),
-            status: 'pending',
-            createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
-            customerName: buyerName,
-            customerPhone: json['buyer']?['phone'] as String?,
-            shippingAddress: null,
-            items: const [],
-            totalPrice: (total is num) ? total.toDouble() : double.tryParse(total?.toString() ?? '') ?? 0,
-            trackingNumber: null,
-            shippedAt: null,
-            deliveredAt: null,
-            cancellationReason: null,
-          );
-          container.read(sellerOrdersRealtimeProvider(null).notifier).applyNewOrder(order);
+        try {
+          final json = data is String ? jsonDecode(data) : data;
+          final orderId = json['order_id'];
+          final total = json['total'];
+          final buyerName = json['buyer']?['name'] as String?;
+          
+          if (orderId is int) {
+            final order = SellerOrder(
+              id: orderId,
+              orderNumber: orderId.toString(),
+              status: 'pending',
+              createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
+              customerName: buyerName,
+              customerPhone: json['buyer']?['phone'] as String?,
+              shippingAddress: null,
+              items: const [],
+              totalPrice: (total is num) ? total.toDouble() : double.tryParse(total?.toString() ?? '') ?? 0,
+              trackingNumber: null,
+              shippedAt: null,
+              deliveredAt: null,
+              cancellationReason: null,
+            );
+            container.read(sellerOrdersRealtimeProvider(null).notifier).applyNewOrder(order);
+          }
+          
+          // Show in-app notification
+          _showNewOrderNotification(orderId, total, buyerName ?? 'Customer');
+        } catch (e) {
+          debugPrint('Error parsing new order: $e');
         }
-        
-        // Show in-app notification
-        _showNewOrderNotification(orderId, total, buyerName ?? 'Customer');
-      } catch (e) {
-        debugPrint('Error parsing new order: $e');
-      }
-    });
+      });
+    }
   }
 
   /// Subscribe to public blog updates

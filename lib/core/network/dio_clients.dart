@@ -6,6 +6,7 @@ import '../constants/network_constants.dart';
 import 'auth_token_interceptor.dart';
 import 'debug_log_interceptor.dart';
 import 'offline_interceptor.dart';
+import 'remote_log_interceptor.dart';
 
 /// Holds two separate Dio instances:
 /// - Laravel API
@@ -35,6 +36,7 @@ final dioClientsProvider = Provider<DioClients>((ref) {
     final dio = Dio(options);
     dio.interceptors.add(OfflineInterceptor(ref));
     dio.interceptors.add(AuthTokenInterceptor(ref));
+    dio.interceptors.add(RemoteLogInterceptor());
 
     // Debug-only request logging
     // (no request bodies to avoid leaking PII)
