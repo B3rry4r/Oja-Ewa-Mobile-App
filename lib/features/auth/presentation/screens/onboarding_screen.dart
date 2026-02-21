@@ -1,13 +1,41 @@
 // onboarding_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:video_player/video_player.dart';
 
 import 'package:ojaewa/core/resources/app_assets.dart';
-
 import 'package:ojaewa/app/router/app_router.dart';
 
-class OnboardingScreen extends StatelessWidget {
+class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
+
+  @override
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  late VideoPlayerController _controller;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.asset(AppImages.coxVideo)
+      ..initialize().then((_) {
+        setState(() {
+          _initialized = true;
+        });
+        _controller.setLooping(true);
+        _controller.setVolume(0.0);
+        _controller.play();
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +44,7 @@ class OnboardingScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Hero image - expands to fill available space
+            // Hero video - expands to fill available space
             Expanded(
               child: _buildHeroSection(),
             ),
@@ -45,69 +73,35 @@ class OnboardingScreen extends StatelessWidget {
     return Stack(
       alignment: Alignment.topCenter,
       children: [
-        // Hero Image - expands to fill available space
+        // Hero Video
         ClipRRect(
           borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(25),
             bottomRight: Radius.circular(25),
           ),
-          child: Image.asset(
-            AppImages.onboarding,
-            width: double.infinity,
-            height: double.infinity,
-            fit: BoxFit.cover,
+          child: SizedBox.expand(
+            child: _initialized
+                ? FittedBox(
+                    fit: BoxFit.cover,
+                    child: SizedBox(
+                      width: _controller.value.size.width,
+                      height: _controller.value.size.height,
+                      child: VideoPlayer(_controller),
+                    ),
+                  )
+                : Container(
+                    color: Colors.black12,
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFFDAF40),
+                      ),
+                    ),
+                  ),
           ),
         ),
-
-        // Page Indicator Dots
-        // Positioned(
-        //   top: 500, // Aligns with the bottom of the image
-        //   child: _buildPageIndicator(),
-        // ),
       ],
     );
   }
-
-  // Widget _buildPageIndicator() {
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.center,
-  //     children: [
-  //       // Active dot
-  //       Container(
-  //         width: 12,
-  //         height: 12,
-  //         decoration: BoxDecoration(
-  //           color: const Color(0xFFFDAF40),
-  //           borderRadius: BorderRadius.circular(17),
-  //         ),
-  //       ),
-
-  //       const SizedBox(width: 20),
-
-  //       // Inactive dot (with border)
-  //       Container(
-  //         width: 12,
-  //         height: 12,
-  //         decoration: BoxDecoration(
-  //           border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
-  //           borderRadius: BorderRadius.circular(17),
-  //         ),
-  //       ),
-
-  //       const SizedBox(width: 20),
-
-  //       // Inactive dot (with border)
-  //       Container(
-  //         width: 12,
-  //         height: 12,
-  //         decoration: BoxDecoration(
-  //           border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
-  //           borderRadius: BorderRadius.circular(17),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
 
   Widget _buildHeadline() {
     return const Text(
@@ -154,7 +148,7 @@ class OnboardingScreen extends StatelessWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Campton',
-                    color: Color(0xFFFFFBF5), // #fffbf5
+                    color: Color(0xFFFFFBF5),
                   ),
                 ),
               ),

@@ -75,7 +75,7 @@ class PusherService {
                 'socket_id': socketId,
               },
               options: Options(
-                contentType: Headers.formUrlEncodedContentType,
+                contentType: Headers.jsonContentType,
                 headers: {
                   'Authorization': 'Bearer $token',
                   'Accept': 'application/json',
@@ -199,7 +199,7 @@ class PusherService {
   }
 
   void _onSubscriptionError(String message, dynamic e) {
-    debugPrint('❌ Subscription error: $message');
+    debugPrint('❌ Pusher Subscription error: $message, data: $e');
   }
 
   void _onDecryptionFailure(String event, String reason) {
