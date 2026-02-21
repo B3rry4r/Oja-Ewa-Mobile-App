@@ -36,6 +36,7 @@ class _AppState extends ConsumerState<App> {
     // Initialize deep link handler after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(deepLinkHandlerProvider).init(navigatorKey);
+      _autoInitFcmIfEnabled(ref);
     });
   }
 

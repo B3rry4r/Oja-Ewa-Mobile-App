@@ -25,73 +25,16 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Register background handler immediately
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  // Register foreground message listener at boot - BEFORE any user login
-  // so notifications work as soon as FCM delivers them.
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    debugPrint('Foreground message received: ${message.messageId}');
-    debugPrint('Title: ${message.notification?.title}');
-    debugPrint('Body: ${message.notification?.body}');
-    debugPrint('Data: ${message.data}');
-
-    final notification = message.notification;
-    if (notification == null || kIsWeb) return;
-
-    flutterLocalNotificationsPlugin.show(
-      message.hashCode,
-      notification.title,
-      notification.body,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'ojaewa_high_importance_channel',
-          'Ojaewa Notifications',
-          importance: Importance.max,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
-          playSound: true,
-        ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
-      ),
-      payload: message.data.entries.map((e) => '${e.key}=${e.value}').join('&'),
-    );
-  });
-
-  // Initialize flutter_local_notifications and create Android channel at boot
-  // so system notifications always work regardless of user toggle state.
-  if (!kIsWeb) {
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: false,
-      requestBadgePermission: false,
-      requestSoundPermission: false,
-    );
-    await flutterLocalNotificationsPlugin.initialize(
-      const InitializationSettings(android: androidSettings, iOS: iosSettings),
-    );
-
-    // Create the Android high-importance channel early
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(const AndroidNotificationChannel(
-          'ojaewa_high_importance_channel',
-          'Ojaewa Notifications',
-          description: 'This channel is used for important Ojaewa notifications.',
-          importance: Importance.max,
-          playSound: true,
-          enableVibration: true,
-          enableLights: true,
-        ));
-  }
-
   // Ensure auth token is loaded before any network calls.
   final container = ProviderContainer();
   await container.read(authControllerProvider.notifier).loadFromStorage();
+
+  // Create FCM notification channel early for Android
+  try {
+    await container.read(fcmServiceProvider).createChannelEarly();
+  } catch (e) {
+    debugPrint('Error creating FCM channel: $e');
+  }
 
   runApp(
     UncontrolledProviderScope(

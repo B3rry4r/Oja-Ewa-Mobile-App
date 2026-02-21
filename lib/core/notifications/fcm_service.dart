@@ -57,7 +57,7 @@ class FCMService {
   Future<void> _initLocalNotifications() async {
     if (_localNotificationsInitialized || kIsWeb) return;
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings('@drawable/ic_notification');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -107,7 +107,7 @@ class FCMService {
       channelDescription: _channel.description,
       importance: Importance.high,
       priority: Priority.high,
-      icon: '@mipmap/ic_launcher',
+      icon: '@drawable/ic_notification',
       playSound: true,
     );
     const iosDetails = DarwinNotificationDetails(
@@ -157,40 +157,49 @@ class FCMService {
     }
     _initialized = false;
     _messageHandlersSetUp = false;
-    try {
-      // Check if permission is already granted - if so, skip the prompt
-      final existing = await _messaging.getNotificationSettings();
-      if (existing.authorizationStatus == AuthorizationStatus.authorized ||
-          existing.authorizationStatus == AuthorizationStatus.provisional) {
-        // Already granted - just get token without system dialog
-        _fcmToken ??= await _messaging.getToken();
-        if (_fcmToken != null) {
-          _initialized = true;
-          await _sendTokenToBackend(_fcmToken!);
-          _messaging.onTokenRefresh.listen((t) { _fcmToken = t; _sendTokenToBackend(t); });
-          await _setupMessageHandlers();
-          FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-          return true;
-        }
+
+    // Check if permission is already granted - if so, skip the prompt
+    final existing = await _messaging.getNotificationSettings();
+    bool isGranted = existing.authorizationStatus == AuthorizationStatus.authorized ||
+        existing.authorizationStatus == AuthorizationStatus.provisional;
+
+    if (!isGranted) {
+      try {
+        // Request permissions (iOS - Android auto-granted)
+        final settings = await _messaging.requestPermission(
+          alert: true,
+          announcement: false,
+          badge: true,
+          carPlay: false,
+          criticalAlert: false,
+          provisional: false,
+          sound: true,
+        );
+        debugPrint('FCM Permission status: ${settings.authorizationStatus}');
+        isGranted = settings.authorizationStatus == AuthorizationStatus.authorized ||
+            settings.authorizationStatus == AuthorizationStatus.provisional;
+      } catch (e) {
+        debugPrint('Error requesting FCM permissions: $e');
       }
-    } catch (_) {}
+    }
 
-    try {
-      // Request permissions (iOS - Android auto-granted)
-      final settings = await _messaging.requestPermission(
-        alert: true,
-        announcement: false,
-        badge: true,
-        carPlay: false,
-        criticalAlert: false,
-        provisional: false,
-        sound: true,
-      );
+    if (isGranted) {
+      try {
+        // For iOS, it's safer to wait for APNs token before getting FCM token
+        if (!kIsWeb && Platform.isIOS) {
+          String? apnsToken = await _messaging.getAPNSToken();
+          int retryCount = 0;
+          while (apnsToken == null && retryCount < 5) {
+            await Future.delayed(const Duration(seconds: 1));
+            apnsToken = await _messaging.getAPNSToken();
+            retryCount++;
+            debugPrint('Waiting for APNs token (attempt $retryCount)...');
+          }
+          if (apnsToken == null) {
+            debugPrint('APNs token is still null after retries');
+          }
+        }
 
-      debugPrint('FCM Permission status: ${settings.authorizationStatus}');
-
-      if (settings.authorizationStatus == AuthorizationStatus.authorized ||
-          settings.authorizationStatus == AuthorizationStatus.provisional) {
         // Get FCM token
         _fcmToken = await _messaging.getToken();
         debugPrint('FCM Token: $_fcmToken');
@@ -218,11 +227,11 @@ class FCMService {
         
         _initialized = true;
         return _fcmToken != null;
-      } else {
-        debugPrint('FCM Permission denied');
+      } catch (e) {
+        debugPrint('FCM initialization error: $e');
       }
-    } catch (e) {
-      debugPrint('FCM initialization error: $e');
+    } else {
+      debugPrint('FCM Permission denied');
     }
     return false;
   }
