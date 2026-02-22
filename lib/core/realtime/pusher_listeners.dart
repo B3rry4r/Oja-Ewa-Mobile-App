@@ -34,9 +34,10 @@ class PusherListeners {
   }
 
   static bool _listenersSetUp = false;
+  static int? _listenerUserId;
 
   static void setupListeners(ProviderContainer container, PusherService pusher) {
-    // Get user ID from auth state
+    // Get auth token to ensure we should be listening
     final token = container.read(accessTokenProvider);
     if (token == null || token.isEmpty) {
       debugPrint('⚠️ No auth token - skipping Pusher subscriptions');
@@ -46,14 +47,19 @@ class PusherListeners {
     // Subscribe to public channels immediately (dedup handled in subscribeToChannel)
     _subscribeToBlogUpdates(pusher, container);
 
-    // Only attach listeners once per session to avoid duplicate subscriptions
+    // Only attach user-specific listeners once per user session
     if (_listenersSetUp) {
-      // If already set up, just subscribe immediately with current profile state
       final profile = container.read(userProfileProvider).value;
-      if (profile != null) {
+      if (profile != null && profile.id != _listenerUserId) {
+        debugPrint('👤 User changed from $_listenerUserId to ${profile.id}, resetting listeners');
+        // If user changed, we need to re-attach or at least subscribe to new channels
+        // For simplicity in this static class, we'll just subscribe to the new user's channels
+        // since the listeners themselves are already attached to the providers.
         setCurrentUserId(profile.id);
+        _listenerUserId = profile.id;
         subscribeToUserChannel(pusher, profile.id, container);
-        _checkAndSubscribeSellerChannels(pusher, profile.id, container);
+        // Note: _checkAndSubscribeSellerChannels adds NEW listeners, so we shouldn't call it here 
+        // if _listenersSetUp is true unless we manage those listeners.
       }
       return;
     }
@@ -64,9 +70,10 @@ class PusherListeners {
       userProfileProvider,
       (previous, next) {
         next.whenData((profile) {
-          if (profile != null) {
+          if (profile != null && profile.id != _listenerUserId) {
             debugPrint('👤 User profile loaded, subscribing to channels for user ${profile.id}');
             setCurrentUserId(profile.id);
+            _listenerUserId = profile.id;
             subscribeToUserChannel(pusher, profile.id, container);
             
             // Check if user is a seller and subscribe to seller channels
@@ -80,6 +87,7 @@ class PusherListeners {
 
   static void resetListeners() {
     _listenersSetUp = false;
+    _listenerUserId = null;
   }
 
   static void _checkAndSubscribeSellerChannels(
@@ -87,6 +95,10 @@ class PusherListeners {
     int userId,
     ProviderContainer container,
   ) {
+    // Flag to avoid multiple listeners for seller status on the same user session
+    // Since this is called inside the userProfileProvider listener, it's mostly safe,
+    // but good to be careful.
+    
     // Listen for seller status to determine if we should subscribe to seller channels
     container.listen(
       mySellerStatusProvider,
@@ -97,13 +109,11 @@ class PusherListeners {
             subscribeToSellerChannel(pusher, userId, container);
           } else if (sellerStatus != null) {
             debugPrint('🏪 Seller not approved (${sellerStatus.registrationStatus}), subscribing to basic status channel');
-            // Still subscribe to the private seller channel for approval updates,
-            // but the subscribeToSellerChannel method will handle the 'orders' part.
-            // For now, let's keep it simple and just guard the call.
             subscribeToSellerChannel(pusher, userId, container);
           }
         });
       },
+      fireImmediately: true,
     );
   }
 

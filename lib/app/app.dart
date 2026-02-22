@@ -36,7 +36,12 @@ class _AppState extends ConsumerState<App> {
     // Initialize deep link handler after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(deepLinkHandlerProvider).init(navigatorKey);
-      _autoInitFcmIfEnabled(ref);
+      
+      // Run initial check for auth and connectivity
+      final token = ref.read(accessTokenProvider);
+      if (token != null && token.isNotEmpty) {
+        _handleAuthChange(null, token);
+      }
     });
   }
 
@@ -70,6 +75,25 @@ class _AppState extends ConsumerState<App> {
     PusherListeners.setupListeners(ref.container, pusherService);
   }
 
+  Future<void> _handleAuthChange(String? prev, String? next) async {
+    final pusherService = ref.read(pusherServiceProvider);
+    if (next != null && next.isNotEmpty) {
+      // User logged in or already signed in on startup
+      ref.read(subscriptionControllerProvider.notifier).refreshStatus();
+      if (ref.read(isOnlineProvider)) {
+        await _ensurePusherConnected(ref, pusherService);
+      }
+      _autoInitFcmIfEnabled(ref);
+    } else if (prev != null && prev.isNotEmpty) {
+      // Cleanup when user logs out.
+      final userId = PusherListeners.currentUserId;
+      PusherListeners.unsubscribeAll(pusherService, userId);
+      PusherListeners.setCurrentUserId(null);
+      PusherListeners.resetListeners();
+      ref.read(fcmServiceProvider).deleteToken();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -82,30 +106,21 @@ class _AppState extends ConsumerState<App> {
         return Consumer(
           builder: (context, ref, _) {
             final isOnline = ref.watch(isOnlineProvider);
-            final token = ref.watch(accessTokenProvider);
             final content = AppBootstrap(child: child ?? const SizedBox.shrink());
 
-            if (token != null && token.isNotEmpty) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                final pusherService = ref.read(pusherServiceProvider);
-                _ensurePusherConnected(ref, pusherService);
-              });
-            }
+            // Handle auth-dependent side effects
+            ref.listen<String?>(accessTokenProvider, (prev, next) {
+              _handleAuthChange(prev, next);
+            });
 
-            ref.listen<String?>(accessTokenProvider, (prev, next) async {
-              final pusherService = ref.read(pusherServiceProvider);
-              if (next != null && next.isNotEmpty) {
-                ref.read(subscriptionControllerProvider.notifier).refreshStatus();
-                await _ensurePusherConnected(ref, pusherService);
-                // Auto-init FCM if user previously enabled push notifications
-                _autoInitFcmIfEnabled(ref);
-              } else if (prev != null && prev.isNotEmpty) {
-                // Cleanup when user logs out.
-                final userId = PusherListeners.currentUserId;
-                PusherListeners.unsubscribeAll(pusherService, userId);
-                PusherListeners.setCurrentUserId(null);
-                PusherListeners.resetListeners();
-                ref.read(fcmServiceProvider).deleteToken();
+            // Handle reconnection side effects
+            ref.listen<bool>(isOnlineProvider, (prev, next) async {
+              if (next && !(prev ?? false)) {
+                final token = ref.read(accessTokenProvider);
+                if (token != null && token.isNotEmpty) {
+                  final pusherService = ref.read(pusherServiceProvider);
+                  await _ensurePusherConnected(ref, pusherService);
+                }
               }
             });
 

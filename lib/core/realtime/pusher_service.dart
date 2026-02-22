@@ -23,6 +23,7 @@ class PusherService {
 
   Dio? _dio;
   bool _initialized = false;
+  Future<void>? _initializeFuture;
   PusherConnectionState _connectionState = PusherConnectionState.disconnected;
   PusherConnectionState get connectionState => _connectionState;
 
@@ -33,8 +34,19 @@ class PusherService {
     if (_initialized) {
       return;
     }
+    
+    if (_initializeFuture != null) {
+      return _initializeFuture;
+    }
+
+    _initializeFuture = _performInitialize(dio: dio);
+    return _initializeFuture;
+  }
+
+  Future<void> _performInitialize({Dio? dio}) async {
     if (kIsWeb) {
       debugPrint('⚠️ Pusher not initialized on web (missing JS SDK).');
+      _initializeFuture = null;
       return;
     }
     try {
