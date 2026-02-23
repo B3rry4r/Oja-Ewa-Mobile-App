@@ -92,19 +92,37 @@ class AuthTokenInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    // Handle 401 Unauthorized from server - token is invalid/expired
+    // Handle 401 Unauthorized from the LARAVEL API only.
+    //
+    // IMPORTANT: The AI backend (ojaewa-ai-production-*.up.railway.app) may
+    // return 401 for its own reasons (e.g. different token validation).
+    // We must NOT sign the user out because of AI backend 401s — only
+    // a 401 from the Laravel API on an authenticated endpoint should do that.
+    //
+    // We identify Laravel API requests by the path starting with '/api/'.
+    // AI backend paths start with '/ai/'.
     if (err.response?.statusCode == 401 && !_handlingUnauthorized) {
       final path = err.requestOptions.path;
-      
+
+      // Only act on Laravel API paths (/api/...), not AI paths (/ai/...)
+      final isLaravelPath = path.startsWith('/api/');
+
       // Don't logout for login/register failures or public endpoints
-      if (!_isPublicPath(path) && !path.contains('/api/login') && !path.contains('/api/register')) {
+      if (isLaravelPath &&
+          !_isPublicPath(path) &&
+          !path.contains('/api/login') &&
+          !path.contains('/api/register')) {
         _handlingUnauthorized = true;
-        
+
         try {
-          // Clear the stored token
+          // Clear the stored token from secure storage
           await _ref.read(secureTokenStorageProvider).deleteAccessToken();
-          // Clear the auth state by invalidating the auth controller
-          _ref.invalidate(authControllerProvider);
+          // Sign out locally — this sets state to AuthUnauthenticated.
+          // Do NOT call _ref.invalidate(authControllerProvider) — that resets
+          // the controller to AuthUnknown and breaks the bootstrap flow.
+          await _ref
+              .read(authControllerProvider.notifier)
+              .signOutLocal();
         } catch (_) {
           // Ignore errors during cleanup
         } finally {
@@ -112,7 +130,7 @@ class AuthTokenInterceptor extends Interceptor {
         }
       }
     }
-    
+
     handler.next(err);
   }
 }

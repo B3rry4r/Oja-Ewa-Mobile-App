@@ -2,13 +2,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import '../auth/auth_controller.dart';
+import '../auth/auth_state.dart';
 
-/// Resolves immediately — auth is already loaded from storage in main()
-/// before the ProviderContainer is passed to the widget tree.
-/// This provider exists only to let AppBootstrap await readiness.
+/// Ensures auth state is fully resolved before the app UI renders.
+///
+/// If the state is still [AuthUnknown] (e.g. after a logout that invalidated
+/// the controller), this will call [loadFromStorage] so the controller
+/// transitions to either [AuthAuthenticated] or [AuthUnauthenticated].
+/// The provider does NOT resolve until the state is definitively known.
 final authBootstrapProvider = FutureProvider<void>((ref) async {
-  // Auth token is already loaded in main() via loadFromStorage().
-  // Watching authControllerProvider here ensures we wait until it is ready.
+  final authState = ref.read(authControllerProvider);
+
+  // If state is unknown (e.g. fresh controller after invalidation),
+  // load the token from storage before proceeding.
+  if (authState is AuthUnknown) {
+    await ref.read(authControllerProvider.notifier).loadFromStorage();
+  }
+
+  // Now watch so AppBootstrap rebuilds if auth state changes later.
   ref.watch(authControllerProvider);
 });
 

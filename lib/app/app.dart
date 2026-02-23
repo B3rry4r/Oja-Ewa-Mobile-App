@@ -36,12 +36,11 @@ class _AppState extends ConsumerState<App> {
     // Initialize deep link handler after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(deepLinkHandlerProvider).init(navigatorKey);
-      
-      // Run initial check for auth and connectivity
-      final token = ref.read(accessTokenProvider);
-      if (token != null && token.isNotEmpty) {
-        _handleAuthChange(null, token);
-      }
+      // NOTE: Do NOT manually call _handleAuthChange here on startup.
+      // The ref.listen on accessTokenProvider (in build) will fire with
+      // prev=null, next=token as soon as authBootstrapProvider resolves,
+      // which correctly triggers Pusher/FCM/subscription setup at the
+      // right time — after the widget tree is fully ready.
     });
   }
 

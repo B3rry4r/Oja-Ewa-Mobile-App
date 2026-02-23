@@ -6,7 +6,6 @@ import 'package:ojaewa/core/errors/app_exception.dart';
 
 import '../../data/auth_repository_impl.dart';
 import '../../../account/presentation/controllers/profile_controller.dart';
-import '../../../../core/auth/auth_controller.dart';
 import '../../../account/subfeatures/your_address/presentation/controllers/address_controller.dart';
 import '../../../cart/presentation/controllers/cart_controller.dart';
 import '../../../notifications/presentation/controllers/notifications_controller.dart';
@@ -166,8 +165,10 @@ class AuthFlowController extends AsyncNotifier<void> {
     // Search suggestions can be personalized
     ref.invalidate(searchSuggestionsProvider);
 
-    // Reset auth state (forces any listeners/interceptors to see unauthenticated)
-    ref.invalidate(authControllerProvider);
+    // NOTE: Do NOT invalidate authControllerProvider here — invalidation resets
+    // the controller to AuthUnknown which breaks the bootstrap flow on next start.
+    // signOutLocal() (called above via authRepository.logout()) already sets
+    // the state to AuthUnauthenticated correctly.
 
   }
 
