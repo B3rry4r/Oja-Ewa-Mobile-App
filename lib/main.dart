@@ -13,14 +13,17 @@ import 'core/auth/auth_controller.dart';
 import 'core/notifications/fcm_service.dart';
 import 'firebase_options.dart';
 
-/// Top-level background message handler
+/// Top-level background message handler — must be a top-level function.
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   debugPrint('Background message: ${message.notification?.title}');
 }
 
-Future<void> main() async {
+Future<void> _bootstrap() async {
+  // ensureInitialized MUST be called in the same zone as runApp.
+  // That's why all setup is inside _bootstrap(), which is called
+  // from inside runZonedGuarded below.
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
@@ -28,7 +31,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialize Analytics & Crashlytics — NOT supported on web
+  // Crashlytics & Analytics — NOT supported on web
   if (!kIsWeb) {
     await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
@@ -46,7 +49,7 @@ Future<void> main() async {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
-  // Ensure auth token is loaded before any network calls.
+  // Load auth token from secure storage before building the widget tree.
   final container = ProviderContainer();
   await container.read(authControllerProvider.notifier).loadFromStorage();
 
@@ -59,15 +62,19 @@ Future<void> main() async {
     }
   }
 
-  // Wrap the app in runZonedGuarded so ALL async errors (even those outside
-  // Flutter's zone) are caught and forwarded to Crashlytics.
-  runZonedGuarded(
-    () => runApp(
-      UncontrolledProviderScope(
-        container: container,
-        child: const App(),
-      ),
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const App(),
     ),
+  );
+}
+
+void main() {
+  // runZonedGuarded wraps EVERYTHING including ensureInitialized and runApp
+  // so they all run in the same zone — required by Flutter on web.
+  runZonedGuarded(
+    _bootstrap,
     (error, stack) {
       if (!kIsWeb) {
         FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
