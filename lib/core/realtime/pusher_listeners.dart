@@ -36,6 +36,10 @@ class PusherListeners {
   static bool _listenersSetUp = false;
   static int? _listenerUserId;
 
+  // Track container.listen subscriptions so we can cancel them on reset
+  static ProviderSubscription? _profileSubscription;
+  static ProviderSubscription? _sellerStatusSubscription;
+
   static void setupListeners(ProviderContainer container, PusherService pusher) {
     // Get auth token to ensure we should be listening
     final token = container.read(accessTokenProvider);
@@ -47,26 +51,26 @@ class PusherListeners {
     // Subscribe to public channels immediately (dedup handled in subscribeToChannel)
     _subscribeToBlogUpdates(pusher, container);
 
-    // Only attach user-specific listeners once per user session
+    // Guard: only attach ONE set of user-specific listeners per session.
+    // Without this, every reconnect adds a duplicate permanent listener to the
+    // root ProviderContainer — those duplicates fire simultaneously on every
+    // profile update and cause state corruption / crashes.
     if (_listenersSetUp) {
+      // If the user ID changed (shouldn't happen normally), subscribe to new channels.
       final profile = container.read(userProfileProvider).value;
       if (profile != null && profile.id != _listenerUserId) {
-        debugPrint('👤 User changed from $_listenerUserId to ${profile.id}, resetting listeners');
-        // If user changed, we need to re-attach or at least subscribe to new channels
-        // For simplicity in this static class, we'll just subscribe to the new user's channels
-        // since the listeners themselves are already attached to the providers.
+        debugPrint('👤 User changed from $_listenerUserId to ${profile.id}');
         setCurrentUserId(profile.id);
         _listenerUserId = profile.id;
         subscribeToUserChannel(pusher, profile.id, container);
-        // Note: _checkAndSubscribeSellerChannels adds NEW listeners, so we shouldn't call it here 
-        // if _listenersSetUp is true unless we manage those listeners.
       }
       return;
     }
     _listenersSetUp = true;
-    
-    // Listen for user profile to get user ID, then subscribe to private channels
-    container.listen(
+
+    // Listen for user profile to get user ID, then subscribe to private channels.
+    // Store the subscription so it can be cancelled on logout/reset.
+    _profileSubscription = container.listen(
       userProfileProvider,
       (previous, next) {
         next.whenData((profile) {
@@ -75,8 +79,6 @@ class PusherListeners {
             setCurrentUserId(profile.id);
             _listenerUserId = profile.id;
             subscribeToUserChannel(pusher, profile.id, container);
-            
-            // Check if user is a seller and subscribe to seller channels
             _checkAndSubscribeSellerChannels(pusher, profile.id, container);
           }
         });
@@ -86,6 +88,12 @@ class PusherListeners {
   }
 
   static void resetListeners() {
+    // Cancel stored subscriptions to prevent them firing after logout
+    _profileSubscription?.close();
+    _profileSubscription = null;
+    _sellerStatusSubscription?.close();
+    _sellerStatusSubscription = null;
+
     _listenersSetUp = false;
     _listenerUserId = null;
   }
@@ -95,20 +103,16 @@ class PusherListeners {
     int userId,
     ProviderContainer container,
   ) {
-    // Flag to avoid multiple listeners for seller status on the same user session
-    // Since this is called inside the userProfileProvider listener, it's mostly safe,
-    // but good to be careful.
-    
-    // Listen for seller status to determine if we should subscribe to seller channels
-    container.listen(
+    // Cancel any existing seller status subscription before adding a new one
+    _sellerStatusSubscription?.close();
+
+    _sellerStatusSubscription = container.listen(
       mySellerStatusProvider,
       (previous, next) {
         next.whenData((sellerStatus) {
-          if (sellerStatus != null && sellerStatus.registrationStatus == 'approved') {
-            debugPrint('🏪 Approved seller detected, subscribing to seller channels');
-            subscribeToSellerChannel(pusher, userId, container);
-          } else if (sellerStatus != null) {
-            debugPrint('🏪 Seller not approved (${sellerStatus.registrationStatus}), subscribing to basic status channel');
+          if (sellerStatus != null) {
+            final status = sellerStatus.registrationStatus;
+            debugPrint('🏪 Seller status: $status — subscribing to seller channels');
             subscribeToSellerChannel(pusher, userId, container);
           }
         });
