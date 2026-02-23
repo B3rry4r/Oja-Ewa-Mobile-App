@@ -38,9 +38,8 @@ class _AppState extends ConsumerState<App> {
       ref.read(deepLinkHandlerProvider).init(navigatorKey);
       // NOTE: Do NOT manually call _handleAuthChange here on startup.
       // The ref.listen on accessTokenProvider (in build) will fire with
-      // prev=null, next=token as soon as authBootstrapProvider resolves,
-      // which correctly triggers Pusher/FCM/subscription setup at the
-      // right time — after the widget tree is fully ready.
+      // prev=null, next=token once the widget tree is fully ready,
+      // which correctly triggers Pusher/FCM/subscription setup.
     });
   }
 
