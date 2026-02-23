@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -20,7 +22,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -28,23 +30,19 @@ Future<void> main() async {
 
   // Initialize Analytics & Crashlytics — NOT supported on web
   if (!kIsWeb) {
-    FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+    await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
 
-    // Pass all uncaught "fatal" errors from the framework to Crashlytics
-    FlutterError.onError = (errorDetails) {
-      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-    };
+    // Pass all uncaught Flutter framework errors to Crashlytics
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+    // Pass all uncaught async errors (outside Flutter framework) to Crashlytics
     PlatformDispatcher.instance.onError = (error, stack) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
-  }
 
-  // Register background handler immediately (not supported on web)
-  if (!kIsWeb) {
+    // Register background FCM handler (not supported on web)
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
@@ -52,17 +50,29 @@ Future<void> main() async {
   final container = ProviderContainer();
   await container.read(authControllerProvider.notifier).loadFromStorage();
 
-  // Create FCM notification channel early for Android
-  try {
-    await container.read(fcmServiceProvider).createChannelEarly();
-  } catch (e) {
-    debugPrint('Error creating FCM channel: $e');
+  // Create FCM notification channel early for Android (not supported on web)
+  if (!kIsWeb) {
+    try {
+      await container.read(fcmServiceProvider).createChannelEarly();
+    } catch (e) {
+      debugPrint('Error creating FCM channel: $e');
+    }
   }
 
-  runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const App(),
+  // Wrap the app in runZonedGuarded so ALL async errors (even those outside
+  // Flutter's zone) are caught and forwarded to Crashlytics.
+  runZonedGuarded(
+    () => runApp(
+      UncontrolledProviderScope(
+        container: container,
+        child: const App(),
+      ),
     ),
+    (error, stack) {
+      if (!kIsWeb) {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      }
+      debugPrint('Uncaught error: $error\n$stack');
+    },
   );
 }

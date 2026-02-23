@@ -1,7 +1,8 @@
 plugins {
     // Add the Google services Gradle plugin
-    // Version managed by Flutter's Gradle plugin to avoid conflicts
     id("com.google.gms.google-services") version "4.3.15" apply false
+    // Add the Firebase Crashlytics Gradle plugin
+    id("com.google.firebase.crashlytics") version "3.0.3" apply false
 }
 
 allprojects {

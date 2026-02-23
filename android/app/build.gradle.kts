@@ -8,6 +8,8 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
     // Add the Google services Gradle plugin
     id("com.google.gms.google-services")
+    // Add the Firebase Crashlytics plugin
+    id("com.google.firebase.crashlytics")
 }
 
 // Load keystore properties from key.properties file
