@@ -46,6 +46,7 @@ class _AppState extends ConsumerState<App> {
   }
 
   void _autoInitFcmIfEnabled(WidgetRef ref) async {
+    if (kIsWeb) return; // FCM not supported on web
     try {
       final fcmService = ref.read(fcmServiceProvider);
       // Always create the notification channel early so system tray works
@@ -59,7 +60,7 @@ class _AppState extends ConsumerState<App> {
 
       if (Platform.isIOS) {
         await fcmService.requestPermissionAndInitialize();
-      } else if (!kIsWeb) {
+      } else {
         await fcmService.initializeWithoutPrompt();
       }
     } catch (e) {

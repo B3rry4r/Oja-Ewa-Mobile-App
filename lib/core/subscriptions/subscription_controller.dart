@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../auth/auth_controller.dart';
+import '../auth/auth_state.dart';
 import 'subscription_constants.dart';
 import 'subscription_models.dart';
 import 'subscription_repository.dart';
@@ -49,8 +51,13 @@ class SubscriptionState {
 class SubscriptionController extends AsyncNotifier<SubscriptionState> {
   @override
   FutureOr<SubscriptionState> build() async {
-    // Load initial subscription status
-    return _loadStatus();
+    // Only load subscription status when authenticated
+    final authState = ref.watch(authControllerProvider);
+    if (authState is AuthAuthenticated) {
+      return _loadStatus();
+    }
+    // Return empty state for unauthenticated users — no network call
+    return const SubscriptionState();
   }
 
   Future<SubscriptionState> _loadStatus() async {

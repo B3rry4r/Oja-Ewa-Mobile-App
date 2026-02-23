@@ -288,6 +288,7 @@ class FCMService {
   /// Setup foreground and background message handlers
   Future<void> _setupMessageHandlers() async {
     if (_messageHandlersSetUp) return;
+    if (kIsWeb) return; // FCM message handlers not supported on web
     _messageHandlersSetUp = true;
     await _initLocalNotifications();
 

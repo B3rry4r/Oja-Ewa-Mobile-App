@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import '../auth/auth_controller.dart';
 
-/// Kicks off loading auth state from secure storage at app start.
-///
-/// This is separated so we can trigger it from a small bootstrap widget.
+/// Resolves immediately — auth is already loaded from storage in main()
+/// before the ProviderContainer is passed to the widget tree.
+/// This provider exists only to let AppBootstrap await readiness.
 final authBootstrapProvider = FutureProvider<void>((ref) async {
-  await ref.read(authControllerProvider.notifier).loadFromStorage();
+  // Auth token is already loaded in main() via loadFromStorage().
+  // Watching authControllerProvider here ensures we wait until it is ready.
+  ref.watch(authControllerProvider);
 });
 
 /// Tracks device connectivity with initial state.
