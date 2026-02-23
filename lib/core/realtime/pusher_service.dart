@@ -56,7 +56,6 @@ class PusherService {
       // Get Pusher config from environment
       final pusherKey = AppEnv.pusherKey;
       final pusherCluster = AppEnv.pusherCluster;
-      final authEndpoint = AppEnv.pusherAuthEndpoint;
       
       await _pusher!.init(
         apiKey: pusherKey,

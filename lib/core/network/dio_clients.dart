@@ -6,7 +6,7 @@ import '../constants/network_constants.dart';
 import 'auth_token_interceptor.dart';
 import 'debug_log_interceptor.dart';
 import 'offline_interceptor.dart';
-import 'remote_log_interceptor.dart';
+// import 'remote_log_interceptor.dart'; // reserved for future use;
 
 /// Holds two separate Dio instances:
 /// - Laravel API
