@@ -14,7 +14,7 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  late VideoPlayerController _controller;
+  VideoPlayerController? _controller;
   bool _initialized = false;
 
   @override
@@ -24,23 +24,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _initVideo() async {
-    _controller = VideoPlayerController.asset(AppImages.coxVideo2);
-    try {
-      await _controller.initialize();
-      if (!mounted) return;
-      await _controller.setLooping(true);
-      await _controller.setVolume(1.0);
-      await _controller.play();
-      setState(() => _initialized = true);
-    } catch (e) {
-      debugPrint('Video init error: $e');
-      if (mounted) setState(() => _initialized = false);
+    // Try cox2.mp4 first; fall back to cox.mp4 if unsupported codec/format
+    for (final asset in [AppImages.coxVideo2, AppImages.coxVideo]) {
+      try {
+        final controller = VideoPlayerController.asset(asset);
+        await controller.initialize();
+        if (!mounted) {
+          await controller.dispose();
+          return;
+        }
+        _controller = controller;
+        await controller.setLooping(true);
+        await controller.setVolume(1.0);
+        await controller.play();
+        setState(() => _initialized = true);
+        return; // success — stop trying
+      } catch (e) {
+        debugPrint('Video init error for $asset: $e');
+      }
     }
+    // Both failed — show black background, no crash
+    if (mounted) setState(() => _initialized = false);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
@@ -79,12 +88,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       );
     }
 
+    final controller = _controller;
+    if (controller == null) return const ColoredBox(color: Colors.black);
+
     return FittedBox(
       fit: BoxFit.cover,
       child: SizedBox(
-        width: _controller.value.size.width,
-        height: _controller.value.size.height,
-        child: VideoPlayer(_controller),
+        width: controller.value.size.width,
+        height: controller.value.size.height,
+        child: VideoPlayer(controller),
       ),
     );
   }
