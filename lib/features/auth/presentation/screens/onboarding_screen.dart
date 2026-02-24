@@ -20,14 +20,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset(AppImages.coxVideo2)
-      ..initialize().then((_) {
-        if (!mounted) return;
-        setState(() => _initialized = true);
-        _controller.setLooping(true);
-        _controller.setVolume(1.0); // Full volume — plays with sound
-        _controller.play();
-      });
+    _initVideo();
+  }
+
+  Future<void> _initVideo() async {
+    _controller = VideoPlayerController.asset(AppImages.coxVideo2);
+    try {
+      await _controller.initialize();
+      if (!mounted) return;
+      await _controller.setLooping(true);
+      await _controller.setVolume(1.0);
+      await _controller.play();
+      setState(() => _initialized = true);
+    } catch (e) {
+      debugPrint('Video init error: $e');
+      if (mounted) setState(() => _initialized = false);
+    }
   }
 
   @override

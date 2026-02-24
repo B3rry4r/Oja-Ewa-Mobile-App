@@ -70,6 +70,7 @@ flutter:
 
   assets:
     - assets/cox.mp4
+    - assets/cox2.mp4
     - assets/
     - assets/fonts/
     - assets/docs/
