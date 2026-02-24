@@ -20,13 +20,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset(AppImages.coxVideo)
+    _controller = VideoPlayerController.asset(AppImages.coxVideo2)
       ..initialize().then((_) {
-        setState(() {
-          _initialized = true;
-        });
+        if (!mounted) return;
+        setState(() => _initialized = true);
         _controller.setLooping(true);
-        _controller.setVolume(0.0);
+        _controller.setVolume(1.0); // Full volume — plays with sound
         _controller.play();
       });
   }
@@ -40,63 +39,103 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Hero video - expands to fill available space
-            Expanded(
-              child: _buildHeroSection(),
-            ),
-            // Bottom content - fixed at bottom, no scrolling
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildHeadline(),
-                  const SizedBox(height: 16),
-                  _buildActionButtons(context),
-                  const SizedBox(height: 16),
-                  _buildTermsAndPrivacy(context),
-                ],
-              ),
-            ),
+      backgroundColor: Colors.black,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // ── Layer 1: Full-screen video ──────────────────────────────
+          _buildFullScreenVideo(),
+
+          // ── Layer 2: Dark gradient — makes bottom content readable ──
+          _buildGradientOverlay(),
+
+          // ── Layer 3: Content on top ─────────────────────────────────
+          SafeArea(
+            child: _buildContent(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // Full-screen video (covers the entire Scaffold, edge-to-edge)
+  // ──────────────────────────────────────────────────────────────────
+  Widget _buildFullScreenVideo() {
+    if (!_initialized) {
+      return const ColoredBox(
+        color: Colors.black,
+        child: Center(
+          child: CircularProgressIndicator(color: Color(0xFFFDAF40)),
+        ),
+      );
+    }
+
+    return FittedBox(
+      fit: BoxFit.cover,
+      child: SizedBox(
+        width: _controller.value.size.width,
+        height: _controller.value.size.height,
+        child: VideoPlayer(_controller),
+      ),
+    );
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // Gradient overlay — transparent at top, dark at bottom
+  // Keeps headline + buttons readable against any video frame
+  // ──────────────────────────────────────────────────────────────────
+  Widget _buildGradientOverlay() {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0.0, 0.45, 1.0],
+          colors: [
+            Colors.transparent,
+            Colors.transparent,
+            Color(0xE6000000), // ~90% black at very bottom
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeroSection() {
-    return Stack(
-      alignment: Alignment.topCenter,
+  // ──────────────────────────────────────────────────────────────────
+  // Content: logo at top, headline + buttons pinned to bottom
+  // ──────────────────────────────────────────────────────────────────
+  Widget _buildContent(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Hero Video
-        ClipRRect(
-          borderRadius: const BorderRadius.only(
-            bottomLeft: Radius.circular(25),
-            bottomRight: Radius.circular(25),
+        // Small logo / brand mark at top-left
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+          child: Image.asset(
+            AppImages.logoOutline,
+            height: 36,
+            color: Colors.white,
+            errorBuilder: (context, error, stack) => const SizedBox.shrink(),
           ),
-          child: SizedBox.expand(
-            child: _initialized
-                ? FittedBox(
-                    fit: BoxFit.cover,
-                    child: SizedBox(
-                      width: _controller.value.size.width,
-                      height: _controller.value.size.height,
-                      child: VideoPlayer(_controller),
-                    ),
-                  )
-                : Container(
-                    color: Colors.black12,
-                    child: const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFFFDAF40),
-                      ),
-                    ),
-                  ),
+        ),
+
+        // Push everything else to the bottom
+        const Spacer(),
+
+        // Headline + buttons + T&C
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildHeadline(),
+              const SizedBox(height: 24),
+              _buildActionButtons(context),
+              const SizedBox(height: 16),
+              _buildTermsAndPrivacy(context),
+            ],
           ),
         ),
       ],
@@ -107,10 +146,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return const Text(
       'The Pan-African\nBeauty Market',
       style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.w600,
+        fontSize: 28,
+        fontWeight: FontWeight.w700,
         fontFamily: 'Campton',
-        color: Color(0xFF1E2021),
+        color: Colors.white,
         height: 1.2,
       ),
     );
@@ -119,123 +158,80 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _buildActionButtons(BuildContext context) {
     return Column(
       children: [
-        // Primary CTA Button
-        Container(
+        // Primary CTA — Create account
+        SizedBox(
           width: double.infinity,
           height: 57,
-          decoration: BoxDecoration(
-            color: const Color(0xFFFDAF40),
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
+          child: ElevatedButton(
+            onPressed: () =>
+                Navigator.of(context).pushNamed(AppRoutes.createAccount),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFDAF40),
+              foregroundColor: const Color(0xFFFFFBF5),
+              elevation: 8,
+              shadowColor: const Color(0xFFFDAF40).withValues(alpha: 0.4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
-            ],
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(8),
-              onTap: () {
-                Navigator.of(context).pushNamed(AppRoutes.createAccount);
-              },
-              child: const Center(
-                child: Text(
-                  'Create account',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Campton',
-                    color: Color(0xFFFFFBF5),
-                  ),
-                ),
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Campton',
               ),
             ),
+            child: const Text('Create account'),
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
 
-        // Secondary Buttons Row
+        // Secondary row — Sign in + Continue as guest
         Row(
           children: [
-            // Sign In Button
             Expanded(
-              child: Container(
-                height: 57,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFFFDAF40),
-                    width: 1.5,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(8),
-                    onTap: () {
-                      Navigator.of(context).pushNamed(AppRoutes.signIn);
-                    },
-                    child: const Center(
-                      child: Text(
-                        'Sign in',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Campton',
-                          color: Color(0xFFFDAF40),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+              child: _outlineButton(
+                label: 'Sign in',
+                onTap: () => Navigator.of(context).pushNamed(AppRoutes.signIn),
               ),
             ),
-
-            const SizedBox(width: 16),
-
-            // Continue as Guest Button
+            const SizedBox(width: 12),
             Expanded(
-              child: Container(
-                height: 57,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFFFDAF40),
-                    width: 1.5,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(8),
-                    onTap: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        AppRoutes.home,
-                        (route) => false,
-                      );
-                    },
-                    child: const Center(
-                      child: Text(
-                        'Continue as guest',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Campton',
-                          color: Color(0xFFFDAF40),
-                        ),
-                      ),
-                    ),
-                  ),
+              child: _outlineButton(
+                label: 'Continue as guest',
+                onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRoutes.home,
+                  (route) => false,
                 ),
               ),
             ),
           ],
         ),
       ],
+    );
+  }
+
+  Widget _outlineButton({
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return SizedBox(
+      height: 57,
+      child: OutlinedButton(
+        onPressed: onTap,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: const Color(0xFFFDAF40),
+          side: const BorderSide(color: Color(0xFFFDAF40), width: 1.5),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Campton',
+          ),
+        ),
+        child: Text(label),
+      ),
     );
   }
 
@@ -247,7 +243,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           style: const TextStyle(
             fontSize: 12,
             fontFamily: 'Campton',
-            color: Color(0xFF777F84),
+            color: Color(0xCCFFFFFF), // white with slight transparency
             height: 1.4,
           ),
           children: [
@@ -259,9 +255,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 decoration: TextDecoration.underline,
               ),
               recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  Navigator.of(context).pushNamed(AppRoutes.termsOfService);
-                },
+                ..onTap = () =>
+                    Navigator.of(context).pushNamed(AppRoutes.termsOfService),
             ),
             const TextSpan(text: ' and '),
             TextSpan(
@@ -271,9 +266,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 decoration: TextDecoration.underline,
               ),
               recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  Navigator.of(context).pushNamed(AppRoutes.privacyPolicy);
-                },
+                ..onTap = () =>
+                    Navigator.of(context).pushNamed(AppRoutes.privacyPolicy),
             ),
           ],
         ),

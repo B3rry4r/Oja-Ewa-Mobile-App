@@ -33,7 +33,11 @@ class _AppShellState extends ConsumerState<AppShell> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(audioControllerProvider.notifier).initialize();
+      // Only play background music when the user is authenticated
+      final token = ref.read(accessTokenProvider);
+      if (token != null && token.isNotEmpty) {
+        ref.read(audioControllerProvider.notifier).initialize();
+      }
       // Prefetch categories for smoother UX
       ref.read(allCategoriesProvider);
 
