@@ -24,27 +24,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _initVideo() async {
-    // Try cox2.mp4 first; fall back to cox.mp4 if unsupported codec/format
-    for (final asset in [AppImages.coxVideo2, AppImages.coxVideo]) {
-      try {
-        final controller = VideoPlayerController.asset(asset);
-        await controller.initialize();
-        if (!mounted) {
-          await controller.dispose();
-          return;
-        }
-        _controller = controller;
-        await controller.setLooping(true);
-        await controller.setVolume(1.0);
-        await controller.play();
-        setState(() => _initialized = true);
-        return; // success — stop trying
-      } catch (e) {
-        debugPrint('Video init error for $asset: $e');
+    try {
+      final controller = VideoPlayerController.asset(AppImages.coxVideo);
+      await controller.initialize();
+      if (!mounted) {
+        await controller.dispose();
+        return;
       }
+      _controller = controller;
+      await controller.setLooping(true);
+      await controller.play();
+      setState(() => _initialized = true);
+    } catch (e) {
+      debugPrint('Video init error: $e');
+      if (mounted) setState(() => _initialized = false);
     }
-    // Both failed — show black background, no crash
-    if (mounted) setState(() => _initialized = false);
   }
 
   @override

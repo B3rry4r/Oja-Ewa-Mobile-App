@@ -84,6 +84,14 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> setReferralCode({required String referralCode}) async {
     await api.setReferralCode(referralCode: referralCode);
   }
+
+  @override
+  Future<void> deleteAccount() async {
+    // Call the backend to permanently delete the account
+    await api.deleteAccount();
+    // Always clear local session after deletion
+    await authController.signOutLocal();
+  }
 }
 
 /// Providers live in the data layer per structure guide.

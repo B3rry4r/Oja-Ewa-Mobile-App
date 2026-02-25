@@ -30,4 +30,7 @@ abstract interface class AuthRepository {
 
   /// Apply referral code after OAuth sign-up (authenticated endpoint)
   Future<void> setReferralCode({required String referralCode});
+
+  /// Permanently delete the authenticated user's account and sign out locally.
+  Future<void> deleteAccount();
 }

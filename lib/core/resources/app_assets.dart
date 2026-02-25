@@ -53,5 +53,4 @@ abstract class AppImages {
   static const String appIconPng2 = 'assets/app_icon/icon2.png';
   static const String appBackground = 'assets/app_icon/background.png';
   static const String coxVideo = 'assets/cox.mp4';
-  static const String coxVideo2 = 'assets/cox2.mp4';
 }

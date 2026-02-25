@@ -137,6 +137,19 @@ class AuthApi {
     }
   }
 
+  /// Permanently delete the authenticated user's account.
+  ///
+  /// Backend contract: DELETE /api/account
+  /// Requires: Authorization: Bearer <token>
+  /// Expected response: 200 OK with {"message": "Account deleted successfully"}
+  Future<void> deleteAccount() async {
+    try {
+      await _dio.delete('/api/account');
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
   /// Apply referral code after OAuth sign-up (authenticated endpoint)
   Future<void> setReferralCode({required String referralCode}) async {
     try {

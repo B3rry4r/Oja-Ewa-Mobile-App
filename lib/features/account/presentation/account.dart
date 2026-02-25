@@ -20,6 +20,8 @@ import 'package:ojaewa/core/subscriptions/subscription_constants.dart';
 import 'package:ojaewa/core/subscriptions/subscription_controller.dart';
 import 'package:ojaewa/core/subscriptions/iap_service.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/widgets/confirmation_modal.dart';
+import 'package:ojaewa/features/auth/data/auth_repository_impl.dart';
 import 'package:ojaewa/features/notifications/data/notifications_repository_impl.dart';
 
 class AccountScreen extends ConsumerWidget {
@@ -549,6 +551,10 @@ class AccountScreen extends ConsumerWidget {
         if (_isTestUser(ref))
           _buildTestNotificationButton(context, ref),
         
+        // Delete Account — only shown when logged in
+        if (isLoggedIn)
+          _buildDeleteAccountButton(context, ref),
+
         // Sign Out or Sign In based on auth state
         Container(
           height: 48,
@@ -645,6 +651,91 @@ class AccountScreen extends ConsumerWidget {
       if (context.mounted) {
         AppSnackbars.showError(context, 'Could not open email app');
       }
+    }
+  }
+
+  Widget _buildDeleteAccountButton(BuildContext context, WidgetRef ref) {
+    return Container(
+      height: 48,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            ConfirmationModal.show(
+              context,
+              title: 'Delete Account',
+              message:
+                  'Are you sure you want to permanently delete your account? '
+                  'This action cannot be undone. All your data, orders, and '
+                  'profile information will be permanently removed.',
+              confirmLabel: 'Delete Account',
+              cancelLabel: 'Cancel',
+              onConfirm: () => _handleDeleteAccount(context, ref),
+            );
+          },
+          borderRadius: BorderRadius.circular(8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF7E5E5),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.delete_forever_outlined,
+                      size: 16,
+                      color: Color(0xFFD32F2F),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Delete Account',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFFD32F2F),
+                    ),
+                  ),
+                ],
+              ),
+              const Icon(
+                Icons.chevron_right,
+                size: 20,
+                color: Color(0xFFD32F2F),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleDeleteAccount(BuildContext context, WidgetRef ref) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+    try {
+      await ref.read(authRepositoryProvider).deleteAccount();
+      if (!context.mounted) return;
+      Navigator.of(context).pop(); // close loader
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.onboarding,
+        (r) => false,
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      Navigator.of(context).pop(); // close loader
+      AppSnackbars.showError(context, 'Failed to delete account. Please try again.');
     }
   }
 
