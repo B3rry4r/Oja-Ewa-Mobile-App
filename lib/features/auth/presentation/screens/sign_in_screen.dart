@@ -134,8 +134,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
             const SizedBox(height: 20),
 
-            // Google Sign In Button
-            _buildGoogleSignIn(),
+            // Google Sign In Button — temporarily disabled
+            // _buildGoogleSignIn(),
 
             const SizedBox(height: 20),
 

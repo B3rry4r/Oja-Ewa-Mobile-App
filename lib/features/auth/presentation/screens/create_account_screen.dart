@@ -252,8 +252,8 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
             const SizedBox(height: 20),
 
-            // Google Sign In Button
-            _buildGoogleSignInButton(),
+            // Google Sign In Button — temporarily disabled
+            // _buildGoogleSignInButton(),
 
             const SizedBox(height: 20),
 
