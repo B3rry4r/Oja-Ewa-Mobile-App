@@ -43,7 +43,7 @@ class HomeScreen extends ConsumerWidget {
                       const SizedBox(height: 24),
 
                       // For You - AI Personalized Section
-                      _buildForYouSection(context, ref),
+                      // _buildForYouSection(context, ref),
 
                       const SizedBox(height: 12),
 

@@ -170,6 +170,7 @@ class _AppShellState extends ConsumerState<AppShell> {
       children: [
         const AudioControlsButton(),
         const SizedBox(height: 10),
+        /*
         if (isLoggedIn) ...[
           const SizedBox(height: 10),
           FloatingActionButton.extended(
@@ -188,6 +189,7 @@ class _AppShellState extends ConsumerState<AppShell> {
             ),
           ),
         ],
+        */
         const SizedBox(height: 10),
         FloatingActionButton.extended(
           heroTag: 'start-selling-fab',

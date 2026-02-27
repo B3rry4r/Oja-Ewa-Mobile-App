@@ -54,10 +54,12 @@ import '../../features/your_shop/subfeatures/manage_shop/manage_shop.dart';
 import '../../features/your_shop/subfeatures/manage_shop/sub_features/delete_shop.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/edit_business.dart';
 import '../../features/your_shop/subfeatures/add_edit_product/seller_category_selection.dart';
+/*
 import '../../features/ai/presentation/screens/ai_chat_screen.dart';
 import '../../features/ai/presentation/screens/style_dna_quiz_screen.dart';
 import '../../features/ai/presentation/screens/personalized_recommendations_screen.dart';
 import '../../features/ai/presentation/screens/seller_analytics_screen.dart';
+*/
 
 /// Central place for route names.
 abstract class AppRoutes {
@@ -481,29 +483,29 @@ abstract class AppRouter {
         );
 
       // AI Features
-      case AppRoutes.aiChat:
-        return MaterialPageRoute<void>(
-          settings: settings,
-          builder: (_) => const AuthGuard(child: AiChatScreen()),
-        );
+      // case AppRoutes.aiChat:
+      //   return MaterialPageRoute<void>(
+      //     settings: settings,
+      //     builder: (_) => const AuthGuard(child: AiChatScreen()),
+      //   );
 
-      case AppRoutes.styleDnaQuiz:
-        return MaterialPageRoute<void>(
-          settings: settings,
-          builder: (_) => const AuthGuard(child: StyleDnaQuizScreen()),
-        );
+      // case AppRoutes.styleDnaQuiz:
+      //   return MaterialPageRoute<void>(
+      //     settings: settings,
+      //     builder: (_) => const AuthGuard(child: StyleDnaQuizScreen()),
+      //   );
 
-      case AppRoutes.personalizedRecommendations:
-        return MaterialPageRoute<void>(
-          settings: settings,
-          builder: (_) => const AuthGuard(child: PersonalizedRecommendationsScreen()),
-        );
+      // case AppRoutes.personalizedRecommendations:
+      //   return MaterialPageRoute<void>(
+      //     settings: settings,
+      //     builder: (_) => const AuthGuard(child: PersonalizedRecommendationsScreen()),
+      //   );
 
-      case AppRoutes.sellerAnalytics:
-        return MaterialPageRoute<void>(
-          settings: settings,
-          builder: (_) => const AuthGuard(child: SellerAnalyticsScreen()),
-        );
+      // case AppRoutes.sellerAnalytics:
+      //   return MaterialPageRoute<void>(
+      //     settings: settings,
+      //     builder: (_) => const AuthGuard(child: SellerAnalyticsScreen()),
+      //   );
 
       case AppRoutes.home:
       default:

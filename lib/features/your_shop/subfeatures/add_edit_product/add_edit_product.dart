@@ -163,6 +163,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     ],
 
                     // AI Description Generator
+                    /*
                     if (_requiresExtendedFields) ...[
                       AiDescriptionGenerator(
                         nameController: _nameController,
@@ -176,6 +177,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                       ),
                       const SizedBox(height: 16),
                     ],
+                    */
 
                     // Description
                     _buildTextField(

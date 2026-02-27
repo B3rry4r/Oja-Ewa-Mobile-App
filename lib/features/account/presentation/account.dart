@@ -199,9 +199,11 @@ class AccountScreen extends ConsumerWidget {
                           _buildSubscriptionStatusCard(ref),
 
                           // AI Features section
+                          /*
                           const SizedBox(height: 24),
                           _buildSectionHeader('AI Features'),
                           _buildAiFeaturesList(context),
+                          */
                         ],
 
                         // Business section

@@ -56,7 +56,20 @@ class _FaqsScreenState extends ConsumerState<FaqsScreen> {
                       },
                       data: (items) {
                         if (items.isEmpty) {
-                          return _buildAskAiFallback(context);
+                          // return _buildAskAiFallback(context);
+                          return const Padding(
+                            padding: EdgeInsets.only(top: 32),
+                            child: Center(
+                              child: Text(
+                                'No matching FAQs found',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Campton',
+                                  color: Color(0xFF777F84),
+                                ),
+                              ),
+                            ),
+                          );
                         }
 
                         return Column(
@@ -68,7 +81,7 @@ class _FaqsScreenState extends ConsumerState<FaqsScreen> {
                             ],
                             const SizedBox(height: 16),
                             // Always show Ask AI option at the bottom
-                            _buildAskAiButton(context),
+                            // _buildAskAiButton(context),
                             const SizedBox(height: 24),
                           ],
                         );

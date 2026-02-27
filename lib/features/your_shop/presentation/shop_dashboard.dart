@@ -80,7 +80,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
               ),
               const SizedBox(height: 16),
               // AI Analytics Button
-              _buildAiAnalyticsButton(context, ref, userId),
+              // _buildAiAnalyticsButton(context, ref, userId),
               const SizedBox(height: 32),
               const Text(
                 "Orders in Process",
