@@ -426,7 +426,7 @@ class AccountScreen extends ConsumerWidget {
     final hasPro = subscription != null && subscription.status.isActive;
     final expiresText = subscription?.expiresAt != null
         ? 'Expires on ${subscription!.expiresAt.toLocal().toString().split(' ').first}'
-        : 'Subscribe to unlock seller AI tools';
+        : 'Subscribe to unlock premium seller tools';
 
     return Container(
       padding: const EdgeInsets.all(16),
