@@ -188,7 +188,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               textStyle: const TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Campton',
               ),
@@ -239,7 +239,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             borderRadius: BorderRadius.circular(8),
           ),
           textStyle: const TextStyle(
-            fontSize: 15,
+            fontSize: 13,
             fontWeight: FontWeight.w600,
             fontFamily: 'Campton',
           ),
