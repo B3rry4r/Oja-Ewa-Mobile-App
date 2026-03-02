@@ -199,26 +199,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
         const SizedBox(height: 12),
 
-        // Secondary row — Sign in + Continue as guest
-        Row(
-          children: [
-            Expanded(
-              child: _outlineButton(
-                label: 'Sign in',
-                onTap: () => Navigator.of(context).pushNamed(AppRoutes.signIn),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _outlineButton(
-                label: 'Continue as guest',
-                onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
-                  AppRoutes.home,
-                  (route) => false,
-                ),
-              ),
-            ),
-          ],
+        // Sign in
+        _outlineButton(
+          label: 'Sign in',
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.signIn),
+        ),
+
+        const SizedBox(height: 12),
+
+        // Continue as guest
+        _outlineButton(
+          label: 'Continue as guest',
+          onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
+            AppRoutes.home,
+            (route) => false,
+          ),
         ),
       ],
     );
@@ -229,6 +224,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     required VoidCallback onTap,
   }) {
     return SizedBox(
+      width: double.infinity,
       height: 57,
       child: OutlinedButton(
         onPressed: onTap,
@@ -239,7 +235,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             borderRadius: BorderRadius.circular(8),
           ),
           textStyle: const TextStyle(
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: FontWeight.w600,
             fontFamily: 'Campton',
           ),
