@@ -2,6 +2,15 @@ name: iOS Build and Deploy
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - debug/ios-startup-isolation
+
+run-name: iOS TestFlight (${{ github.ref_name }})
+
+concurrency:
+  group: ios-testflight-${{ github.ref_name || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
@@ -10,6 +19,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Setup Flutter
       uses: subosito/flutter-action@v2

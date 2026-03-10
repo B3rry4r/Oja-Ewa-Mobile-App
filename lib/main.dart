@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/app.dart';
+import 'core/config/startup_debug_flags.dart';
 import 'core/auth/auth_controller.dart';
 import 'core/notifications/fcm_service.dart';
 import 'firebase_options.dart';
@@ -91,12 +92,16 @@ Future<void> _bootstrap() async {
       debugPrint('Crashlytics initialization failed: $error\n$stack');
     }
 
-    try {
-      FirebaseMessaging.onBackgroundMessage(
-        _firebaseMessagingBackgroundHandler,
-      );
-    } catch (error, stack) {
-      await _recordStartupError(error, stack, fatal: false);
+    if (!StartupDebugFlags.shouldDisableFcmAtStartup) {
+      try {
+        FirebaseMessaging.onBackgroundMessage(
+          _firebaseMessagingBackgroundHandler,
+        );
+      } catch (error, stack) {
+        await _recordStartupError(error, stack, fatal: false);
+      }
+    } else {
+      debugPrint('iOS startup isolation: skipping FCM background handler');
     }
   }
 
@@ -111,12 +116,14 @@ Future<void> _bootstrap() async {
   }());
 
   // Create FCM notification channel early for Android (not supported on web)
-  if (!kIsWeb) {
+  if (!kIsWeb && !StartupDebugFlags.shouldDisableLocalNotificationsAtStartup) {
     try {
       await container.read(fcmServiceProvider).createChannelEarly();
     } catch (e) {
       debugPrint('Error creating FCM channel: $e');
     }
+  } else if (StartupDebugFlags.shouldDisableLocalNotificationsAtStartup) {
+    debugPrint('iOS startup isolation: skipping local notifications setup');
   }
 
   runApp(UncontrolledProviderScope(container: container, child: const App()));

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/notifications/data/notifications_api.dart';
 import '../../features/notifications/data/notifications_repository_impl.dart';
+import '../config/startup_debug_flags.dart';
 import '../logger/remote_logger.dart';
 
 /// Top-level plugin instance for use in background handler
@@ -35,7 +36,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 /// Firebase Cloud Messaging Service
 class FCMService {
-  FCMService({NotificationsApi? notificationsApi}) : _notificationsApi = notificationsApi;
+  FCMService({NotificationsApi? notificationsApi})
+    : _notificationsApi = notificationsApi;
 
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   final NotificationsApi? _notificationsApi;
@@ -47,18 +49,29 @@ class FCMService {
   /// Call this once at app startup to create the channel early
   Future<void> createChannelEarly() async {
     if (kIsWeb) return;
+    if (StartupDebugFlags.shouldDisableLocalNotificationsAtStartup) {
+      debugPrint('iOS startup isolation: skipping createChannelEarly');
+      return;
+    }
     try {
       await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin
+          >()
           ?.createNotificationChannel(_channel);
     } catch (_) {}
   }
 
   Future<void> _initLocalNotifications() async {
     if (_localNotificationsInitialized || kIsWeb) return;
+    if (StartupDebugFlags.shouldDisableLocalNotificationsAtStartup) {
+      debugPrint('iOS startup isolation: skipping local notifications init');
+      return;
+    }
 
-    const androidSettings = AndroidInitializationSettings('@drawable/ic_notification');
+    const androidSettings = AndroidInitializationSettings(
+      '@drawable/ic_notification',
+    );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -76,9 +89,10 @@ class FCMService {
         final payload = response.payload;
         if (payload != null && _onNotificationTapCallback != null) {
           try {
-            final data = Map<String, dynamic>.from(
-              {for (final e in payload.split('&')) e.split('=')[0]: e.split('=')[1]},
-            );
+            final data = Map<String, dynamic>.from({
+              for (final e in payload.split('&'))
+                e.split('=')[0]: e.split('=')[1],
+            });
             _onNotificationTapCallback?.call(data);
           } catch (_) {
             _onNotificationTapCallback?.call({'type': payload});
@@ -90,7 +104,8 @@ class FCMService {
     // Create Android notification channel
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(_channel);
 
     _localNotificationsInitialized = true;
@@ -161,7 +176,8 @@ class FCMService {
 
     // Check if permission is already granted - if so, skip the prompt
     final existing = await _messaging.getNotificationSettings();
-    bool isGranted = existing.authorizationStatus == AuthorizationStatus.authorized ||
+    bool isGranted =
+        existing.authorizationStatus == AuthorizationStatus.authorized ||
         existing.authorizationStatus == AuthorizationStatus.provisional;
 
     if (!isGranted) {
@@ -177,7 +193,8 @@ class FCMService {
           sound: true,
         );
         debugPrint('FCM Permission status: ${settings.authorizationStatus}');
-        isGranted = settings.authorizationStatus == AuthorizationStatus.authorized ||
+        isGranted =
+            settings.authorizationStatus == AuthorizationStatus.authorized ||
             settings.authorizationStatus == AuthorizationStatus.provisional;
       } catch (e) {
         debugPrint('Error requesting FCM permissions: $e');
@@ -224,8 +241,10 @@ class FCMService {
         await _setupMessageHandlers();
 
         // Register background handler
-        FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-        
+        FirebaseMessaging.onBackgroundMessage(
+          _firebaseMessagingBackgroundHandler,
+        );
+
         _initialized = true;
         return _fcmToken != null;
       } catch (e) {
@@ -269,7 +288,9 @@ class FCMService {
           _sendTokenToBackend(newToken);
         });
         await _setupMessageHandlers();
-        FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+        FirebaseMessaging.onBackgroundMessage(
+          _firebaseMessagingBackgroundHandler,
+        );
         _initialized = true;
         return _fcmToken != null;
       }
@@ -304,7 +325,7 @@ class FCMService {
     // Foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Foreground message received: ${message.messageId}');
-      
+
       // Prevent duplicates: Only show manual local notification on Android
       // because iOS shows the banner automatically via setForegroundNotificationPresentationOptions
       if (Platform.isAndroid) {
@@ -325,7 +346,9 @@ class FCMService {
     // Check if app was opened from a terminated state via notification
     _messaging.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
-        debugPrint('App opened from terminated state via notification: ${message.messageId}');
+        debugPrint(
+          'App opened from terminated state via notification: ${message.messageId}',
+        );
         debugPrint('Data: ${message.data}');
         _onNotificationTapCallback?.call(message.data);
       }
@@ -341,7 +364,9 @@ class FCMService {
     _onMessageCallback = callback;
   }
 
-  void setOnNotificationTapCallback(void Function(Map<String, dynamic>) callback) {
+  void setOnNotificationTapCallback(
+    void Function(Map<String, dynamic>) callback,
+  ) {
     _onNotificationTapCallback = callback;
   }
 
@@ -391,7 +416,7 @@ class FCMService {
       if (_fcmToken != null && _notificationsApi != null) {
         await _notificationsApi.deleteDeviceToken(token: _fcmToken!);
       }
-      
+
       // Then delete from Firebase
       await _messaging.deleteToken();
       _fcmToken = null;
@@ -425,10 +450,10 @@ class FCMService {
       return true;
     } catch (e) {
       debugPrint('Error sending FCM token to backend: $e');
-      RemoteLogger.error('FCM Token Registration Failed', context: {
-        'token': token,
-        'error': e.toString(),
-      });
+      RemoteLogger.error(
+        'FCM Token Registration Failed',
+        context: {'token': token, 'error': e.toString()},
+      );
       return false;
     }
   }

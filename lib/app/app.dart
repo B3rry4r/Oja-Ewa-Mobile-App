@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'bootstrap/app_bootstrap.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
+import '../core/config/startup_debug_flags.dart';
 import '../core/deep_links/deep_link_handler.dart';
 import '../core/network/network_providers.dart';
 import '../core/widgets/offline_screen.dart';
@@ -35,6 +36,10 @@ class _AppState extends ConsumerState<App> {
     super.initState();
     // Initialize deep link handler after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (StartupDebugFlags.shouldDisableDeepLinksAtStartup) {
+        debugPrint('iOS startup isolation: skipping deep link initialization');
+        return;
+      }
       ref.read(deepLinkHandlerProvider).init(navigatorKey);
       // NOTE: Do NOT manually call _handleAuthChange here on startup.
       // The ref.listen on accessTokenProvider (in build) will fire with
@@ -45,6 +50,10 @@ class _AppState extends ConsumerState<App> {
 
   void _autoInitFcmIfEnabled(WidgetRef ref) async {
     if (kIsWeb) return; // FCM not supported on web
+    if (StartupDebugFlags.shouldDisableFcmAtStartup) {
+      debugPrint('iOS startup isolation: skipping FCM auto-init');
+      return;
+    }
     try {
       final fcmService = ref.read(fcmServiceProvider);
       // Always create the notification channel early so system tray works
