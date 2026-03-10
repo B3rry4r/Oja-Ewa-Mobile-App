@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import '../../data/orders_repository_impl.dart';
+import '../../domain/logistics_models.dart';
 import '../../domain/order_models.dart';
 
 final ordersProvider = FutureProvider<List<OrderSummary>>((ref) async {
@@ -23,9 +24,10 @@ class OrderStatusOverridesController extends Notifier<Map<int, String>> {
   }
 }
 
-final orderStatusOverridesProvider = NotifierProvider<OrderStatusOverridesController, Map<int, String>>(
-  OrderStatusOverridesController.new,
-);
+final orderStatusOverridesProvider =
+    NotifierProvider<OrderStatusOverridesController, Map<int, String>>(
+      OrderStatusOverridesController.new,
+    );
 
 class OrdersRealtimeController extends AsyncNotifier<List<OrderSummary>> {
   @override
@@ -40,29 +42,38 @@ class OrdersRealtimeController extends AsyncNotifier<List<OrderSummary>> {
   void applyStatusUpdate(int orderId, String status) {
     final current = state.value ?? const [];
     final updated = current
-        .map((order) => order.id == orderId
-            ? OrderSummary(
-                id: order.id,
-                orderNumber: order.orderNumber,
-                totalPrice: order.totalPrice,
-                status: status,
-                paymentReference: order.paymentReference,
-                trackingNumber: order.trackingNumber,
-                createdAt: order.createdAt,
-                items: order.items,
-              )
-            : order)
+        .map(
+          (order) => order.id == orderId
+              ? OrderSummary(
+                  id: order.id,
+                  orderNumber: order.orderNumber,
+                  totalPrice: order.totalPrice,
+                  deliveryFee: order.deliveryFee,
+                  status: status,
+                  paymentStatus: order.paymentStatus,
+                  paymentReference: order.paymentReference,
+                  trackingNumber: order.trackingNumber,
+                  createdAt: order.createdAt,
+                  items: order.items,
+                  shipments: order.shipments,
+                )
+              : order,
+        )
         .toList();
     state = AsyncData(updated);
     ref.read(orderStatusOverridesProvider.notifier).setStatus(orderId, status);
   }
 }
 
-final ordersRealtimeProvider = AsyncNotifierProvider<OrdersRealtimeController, List<OrderSummary>>(
-  OrdersRealtimeController.new,
-);
+final ordersRealtimeProvider =
+    AsyncNotifierProvider<OrdersRealtimeController, List<OrderSummary>>(
+      OrdersRealtimeController.new,
+    );
 
-final orderDetailsProvider = FutureProvider.family<Map<String, dynamic>, int>((ref, orderId) async {
+final orderDetailsProvider = FutureProvider.family<Map<String, dynamic>, int>((
+  ref,
+  orderId,
+) async {
   final token = ref.watch(accessTokenProvider);
   if (token == null || token.isEmpty) return const {};
 
@@ -77,25 +88,35 @@ class OrderActionsController extends AsyncNotifier<void> {
 
   Future<PaymentLink> createOrderAndPaymentLink({
     required List<Map<String, dynamic>> items,
-    required String shippingName,
-    required String shippingPhone,
-    required String shippingAddress,
-    required String shippingCity,
-    required String shippingState,
-    required String shippingCountry,
+    int? addressId,
+    String? shippingName,
+    String? shippingPhone,
+    String? shippingAddress,
+    String? shippingCity,
+    String? shippingState,
+    String? shippingCountry,
+    String? shippingZipCode,
+    required List<SelectedShippingQuote> selectedQuotes,
   }) async {
     state = const AsyncLoading();
     try {
-      final order = await ref.read(ordersRepositoryProvider).createOrder(
-        items: items,
-        shippingName: shippingName,
-        shippingPhone: shippingPhone,
-        shippingAddress: shippingAddress,
-        shippingCity: shippingCity,
-        shippingState: shippingState,
-        shippingCountry: shippingCountry,
-      );
-      final link = await ref.read(ordersRepositoryProvider).createOrderPaymentLink(orderId: order.id);
+      final order = await ref
+          .read(ordersRepositoryProvider)
+          .createOrder(
+            items: items,
+            addressId: addressId,
+            shippingName: shippingName,
+            shippingPhone: shippingPhone,
+            shippingAddress: shippingAddress,
+            shippingCity: shippingCity,
+            shippingState: shippingState,
+            shippingCountry: shippingCountry,
+            shippingZipCode: shippingZipCode,
+            selectedQuotes: selectedQuotes,
+          );
+      final link = await ref
+          .read(ordersRepositoryProvider)
+          .createOrderPaymentLink(orderId: order.id);
       // We intentionally do not clear cart automatically here; backend docs suggest clearing after successful order creation.
       // We can do it after payment verification.
       state = const AsyncData(null);
@@ -110,7 +131,9 @@ class OrderActionsController extends AsyncNotifier<void> {
   Future<PaymentVerifyResult> verifyPayment({required String reference}) async {
     state = const AsyncLoading();
     try {
-      final res = await ref.read(ordersRepositoryProvider).verifyPayment(reference: reference);
+      final res = await ref
+          .read(ordersRepositoryProvider)
+          .verifyPayment(reference: reference);
       state = const AsyncData(null);
       ref.invalidate(ordersProvider);
       return res;
@@ -121,4 +144,7 @@ class OrderActionsController extends AsyncNotifier<void> {
   }
 }
 
-final orderActionsProvider = AsyncNotifierProvider<OrderActionsController, void>(OrderActionsController.new);
+final orderActionsProvider =
+    AsyncNotifierProvider<OrderActionsController, void>(
+      OrderActionsController.new,
+    );

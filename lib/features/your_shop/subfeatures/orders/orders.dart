@@ -26,7 +26,9 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ordersAsync = ref.watch(sellerOrdersRealtimeProvider(_selectedStatus));
+    final ordersAsync = ref.watch(
+      sellerOrdersRealtimeProvider(_selectedStatus),
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
@@ -73,8 +75,14 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
                               const SizedBox(height: 8),
                               TextButton(
                                 onPressed: () {
-                                  ref.invalidate(sellerOrdersProvider(_selectedStatus));
-                                  ref.invalidate(sellerOrdersRealtimeProvider(_selectedStatus));
+                                  ref.invalidate(
+                                    sellerOrdersProvider(_selectedStatus),
+                                  );
+                                  ref.invalidate(
+                                    sellerOrdersRealtimeProvider(
+                                      _selectedStatus,
+                                    ),
+                                  );
                                 },
                                 child: const Text('Retry'),
                               ),
@@ -132,9 +140,12 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
       child: Row(
         children: [
           _buildTab("All Orders", null),
-          _buildTab("Pending", "pending"),
+          _buildTab("Pending", "pending_booking"),
+          _buildTab("Booking Failed", "booking_failed"),
+          _buildTab("Booked", "booked"),
           _buildTab("Processing", "processing"),
           _buildTab("Shipped", "shipped"),
+          _buildTab("In Transit", "in_transit"),
           _buildTab("Delivered", "delivered"),
           _buildTab("Cancelled", "cancelled"),
         ],
@@ -226,7 +237,7 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
                 final order = filteredOrders[index];
                 final dateFormat = DateFormat('MMM d');
                 return _OrderRow(
-                  orderId: order.id,
+                  orderId: order.orderId,
                   orderNumber: '#${order.orderNumber}',
                   date: dateFormat.format(order.createdAt),
                   customer: order.customerName ?? '—',
@@ -261,11 +272,18 @@ class _OrderRow extends StatelessWidget {
   Color get _statusColor {
     switch (status.toLowerCase()) {
       case 'pending':
+      case 'pending_booking':
         return const Color(0xFF1565C0);
+      case 'booking_failed':
+        return const Color(0xFFC62828);
+      case 'booked':
+        return const Color(0xFF6A1B9A);
       case 'processing':
         return const Color(0xFF3095CE);
       case 'shipped':
         return const Color(0xFF2E7D32);
+      case 'in_transit':
+        return const Color(0xFF00897B);
       case 'delivered':
         return const Color(0xFF70B673);
       case 'cancelled':
@@ -278,11 +296,18 @@ class _OrderRow extends StatelessWidget {
   String get _statusLabel {
     switch (status.toLowerCase()) {
       case 'pending':
+      case 'pending_booking':
         return 'Pending';
+      case 'booking_failed':
+        return 'Booking Failed';
+      case 'booked':
+        return 'Booked';
       case 'processing':
         return 'Processing';
       case 'shipped':
         return 'Shipped';
+      case 'in_transit':
+        return 'In Transit';
       case 'delivered':
         return 'Delivered';
       case 'cancelled':

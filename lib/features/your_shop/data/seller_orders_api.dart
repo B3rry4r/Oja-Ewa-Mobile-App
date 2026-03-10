@@ -9,7 +9,7 @@ class SellerOrdersApi {
   final Dio _dio;
 
   /// GET /api/seller/orders - List orders for seller
-  /// [status] - Filter by: pending, processing, shipped, delivered, cancelled
+  /// [status] - Shipment statuses, e.g. pending_booking, processing, shipped.
   /// [perPage] - Items per page (1-50, default: 10)
   Future<Map<String, dynamic>> listOrders({
     String? status,
@@ -21,7 +21,10 @@ class SellerOrdersApi {
       if (status != null) queryParams['status'] = status;
       if (perPage != null) queryParams['per_page'] = perPage;
 
-      final res = await _dio.get('/api/seller/orders', queryParameters: queryParams);
+      final res = await _dio.get(
+        '/api/seller/orders',
+        queryParameters: queryParams,
+      );
       final data = res.data;
       if (data is Map<String, dynamic>) {
         return data;
@@ -35,7 +38,7 @@ class SellerOrdersApi {
     }
   }
 
-  /// GET /api/seller/orders/{orderId} - Get seller order details
+  /// GET /api/seller/orders/{orderId} - Get seller shipment details within an order
   Future<Map<String, dynamic>> getOrderDetails(int orderId) async {
     try {
       final res = await _dio.get('/api/seller/orders/$orderId');
@@ -49,8 +52,8 @@ class SellerOrdersApi {
     }
   }
 
-  /// PATCH /api/seller/orders/{orderId}/status - Update order status
-  /// [status] - New status: processing, shipped, delivered, cancelled
+  /// PATCH /api/seller/orders/{orderId}/status - Update seller shipment status
+  /// [status] - New status: processing, shipped, in_transit, delivered, cancelled
   /// [trackingNumber] - Optional tracking number (recommended when shipping)
   /// [reason] - Optional reason (required for cancellation)
   Future<Map<String, dynamic>> updateOrderStatus({
@@ -64,7 +67,10 @@ class SellerOrdersApi {
       if (trackingNumber != null) body['tracking_number'] = trackingNumber;
       if (reason != null) body['reason'] = reason;
 
-      final res = await _dio.patch('/api/seller/orders/$orderId/status', data: body);
+      final res = await _dio.patch(
+        '/api/seller/orders/$orderId/status',
+        data: body,
+      );
       final data = res.data;
       if (data is! Map<String, dynamic>) {
         throw const FormatException('Unexpected response');

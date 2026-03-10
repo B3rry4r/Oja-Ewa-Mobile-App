@@ -9,6 +9,7 @@ class CartProductSnapshot {
     required this.price,
     required this.size,
     required this.processingDays,
+    required this.sellerProfileId,
     required this.sellerBusinessName,
   });
 
@@ -22,6 +23,7 @@ class CartProductSnapshot {
 
   /// Backend product field in cart response.
   final int? processingDays;
+  final int? sellerProfileId;
 
   final String? sellerBusinessName;
 
@@ -40,7 +42,12 @@ class CartProductSnapshot {
       price: parseNum(json['price']),
       size: json['size'] as String?,
       processingDays: (parseNum(json['processing_days']))?.toInt(),
-      sellerBusinessName: seller is Map<String, dynamic> ? seller['business_name'] as String? : null,
+      sellerProfileId: seller is Map<String, dynamic>
+          ? (parseNum(seller['id']))?.toInt()
+          : null,
+      sellerBusinessName: seller is Map<String, dynamic>
+          ? seller['business_name'] as String?
+          : null,
     );
   }
 }
@@ -80,8 +87,8 @@ class CartItem {
     }
 
     final processingTime = json['processing_time'];
-    final processingTimeLabel = processingTime is Map<String, dynamic> 
-        ? processingTime['label'] as String? 
+    final processingTimeLabel = processingTime is Map<String, dynamic>
+        ? processingTime['label'] as String?
         : null;
 
     return CartItem(
@@ -93,7 +100,9 @@ class CartItem {
       selectedSize: (json['selected_size'] as String?) ?? '',
       processingTimeType: (json['processing_time_type'] as String?) ?? 'normal',
       processingTimeLabel: processingTimeLabel,
-      product: CartProductSnapshot.fromJson((json['product'] as Map?)?.cast<String, dynamic>() ?? const {}),
+      product: CartProductSnapshot.fromJson(
+        (json['product'] as Map?)?.cast<String, dynamic>() ?? const {},
+      ),
     );
   }
 }
@@ -124,7 +133,10 @@ class Cart {
 
     final itemsRaw = payload['items'];
     final items = (itemsRaw is List)
-        ? itemsRaw.whereType<Map<String, dynamic>>().map(CartItem.fromJson).toList()
+        ? itemsRaw
+              .whereType<Map<String, dynamic>>()
+              .map(CartItem.fromJson)
+              .toList()
         : const <CartItem>[];
 
     return Cart(

@@ -7,6 +7,7 @@ class OrderItemProductSnapshot {
     required this.name,
     required this.image,
     required this.price,
+    required this.sellerProfileId,
     required this.sellerBusinessName,
   });
 
@@ -14,6 +15,7 @@ class OrderItemProductSnapshot {
   final String name;
   final String? image;
   final num? price;
+  final int? sellerProfileId;
   final String? sellerBusinessName;
 
   static num? _parseNum(dynamic v) {
@@ -29,7 +31,51 @@ class OrderItemProductSnapshot {
       name: (json['name'] as String?) ?? '',
       image: json['image'] as String?,
       price: _parseNum(json['price']),
-      sellerBusinessName: seller is Map<String, dynamic> ? seller['business_name'] as String? : null,
+      sellerProfileId: seller is Map<String, dynamic>
+          ? _parseNum(seller['id'])?.toInt()
+          : null,
+      sellerBusinessName: seller is Map<String, dynamic>
+          ? seller['business_name'] as String?
+          : null,
+    );
+  }
+}
+
+@immutable
+class ShipmentSummary {
+  const ShipmentSummary({
+    required this.id,
+    required this.sellerProfileId,
+    required this.provider,
+    required this.serviceName,
+    required this.status,
+    required this.trackingNumber,
+    required this.shippingFee,
+  });
+
+  final int id;
+  final int sellerProfileId;
+  final String? provider;
+  final String? serviceName;
+  final String? status;
+  final String? trackingNumber;
+  final num? shippingFee;
+
+  static num? _parseNum(dynamic v) {
+    if (v is num) return v;
+    if (v is String) return num.tryParse(v);
+    return null;
+  }
+
+  static ShipmentSummary fromJson(Map<String, dynamic> json) {
+    return ShipmentSummary(
+      id: _parseNum(json['id'])?.toInt() ?? 0,
+      sellerProfileId: _parseNum(json['seller_profile_id'])?.toInt() ?? 0,
+      provider: json['provider'] as String?,
+      serviceName: json['service_name'] as String?,
+      status: json['status'] as String?,
+      trackingNumber: json['tracking_number'] as String?,
+      shippingFee: _parseNum(json['shipping_fee']),
     );
   }
 }
@@ -62,7 +108,9 @@ class OrderItem {
       productId: _parseNum(json['product_id'])?.toInt() ?? 0,
       quantity: _parseNum(json['quantity'])?.toInt() ?? 0,
       unitPrice: _parseNum(json['unit_price']),
-      product: OrderItemProductSnapshot.fromJson((json['product'] as Map?)?.cast<String, dynamic>() ?? const {}),
+      product: OrderItemProductSnapshot.fromJson(
+        (json['product'] as Map?)?.cast<String, dynamic>() ?? const {},
+      ),
     );
   }
 }
@@ -73,21 +121,27 @@ class OrderSummary {
     required this.id,
     required this.orderNumber,
     required this.totalPrice,
+    required this.deliveryFee,
     required this.status,
+    required this.paymentStatus,
     required this.paymentReference,
     required this.trackingNumber,
     required this.createdAt,
     required this.items,
+    required this.shipments,
   });
 
   final int id;
   final String? orderNumber;
   final num? totalPrice;
+  final num? deliveryFee;
   final String? status;
+  final String? paymentStatus;
   final String? paymentReference;
   final String? trackingNumber;
   final DateTime? createdAt;
   final List<OrderItem> items;
+  final List<ShipmentSummary> shipments;
 
   static num? _parseNum(dynamic v) {
     if (v is num) return v;
@@ -97,15 +151,29 @@ class OrderSummary {
 
   static OrderSummary fromJson(Map<String, dynamic> json) {
     final rawItems = json['order_items'] ?? json['items'];
+    final rawShipments = json['shipments'];
     return OrderSummary(
       id: _parseNum(json['id'])?.toInt() ?? 0,
       orderNumber: json['order_number'] as String?,
       totalPrice: _parseNum(json['total_price']),
+      deliveryFee: _parseNum(json['delivery_fee']),
       status: json['status'] as String?,
+      paymentStatus: json['payment_status'] as String?,
       paymentReference: json['payment_reference'] as String?,
       trackingNumber: json['tracking_number'] as String?,
       createdAt: DateTime.tryParse((json['created_at'] as String?) ?? ''),
-      items: (rawItems is List) ? rawItems.whereType<Map<String, dynamic>>().map(OrderItem.fromJson).toList() : const [],
+      items: (rawItems is List)
+          ? rawItems
+                .whereType<Map<String, dynamic>>()
+                .map(OrderItem.fromJson)
+                .toList()
+          : const [],
+      shipments: (rawShipments is List)
+          ? rawShipments
+                .whereType<Map<String, dynamic>>()
+                .map(ShipmentSummary.fromJson)
+                .toList()
+          : const [],
     );
   }
 }

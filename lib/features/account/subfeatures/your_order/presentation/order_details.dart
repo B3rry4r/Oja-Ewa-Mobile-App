@@ -16,7 +16,9 @@ class OrderDetailsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final args = ModalRoute.of(context)?.settings.arguments;
-    final orderId = (args is Map && args['orderId'] is int) ? args['orderId'] as int : null;
+    final orderId = (args is Map && args['orderId'] is int)
+        ? args['orderId'] as int
+        : null;
 
     if (orderId == null) {
       return const Scaffold(
@@ -98,25 +100,31 @@ class OrderDetailsScreen extends ConsumerWidget {
                     id: order.id,
                     orderNumber: order.orderNumber,
                     totalPrice: order.totalPrice,
+                    deliveryFee: order.deliveryFee,
                     status: overrideStatus,
+                    paymentStatus: order.paymentStatus,
                     paymentReference: order.paymentReference,
                     trackingNumber: order.trackingNumber,
                     createdAt: order.createdAt,
                     items: order.items,
+                    shipments: order.shipments,
                   );
 
             // Build shipping address from available fields
-            final shippingAddress = data['shipping_address'] as String? ?? data['address'] as String?;
+            final shippingAddress =
+                data['shipping_address'] as String? ??
+                data['address'] as String?;
             final shippingCity = data['shipping_city'] as String?;
             final shippingState = data['shipping_state'] as String?;
             final shippingCountry = data['shipping_country'] as String?;
-            final shippingToParts = [
-              shippingAddress,
-              shippingCity,
-              shippingState,
-              shippingCountry,
-            ].whereType<String>().where((part) => part.trim().isNotEmpty).toList();
-            final shippingTo = shippingToParts.isEmpty ? null : shippingToParts.join(', ');
+            final shippingToParts =
+                [shippingAddress, shippingCity, shippingState, shippingCountry]
+                    .whereType<String>()
+                    .where((part) => part.trim().isNotEmpty)
+                    .toList();
+            final shippingTo = shippingToParts.isEmpty
+                ? null
+                : shippingToParts.join(', ');
 
             return Column(
               children: [
@@ -155,15 +163,24 @@ class OrderDetailsScreen extends ConsumerWidget {
 
                         const SizedBox(height: 16),
 
+                        if (effectiveOrder.shipments.isNotEmpty) ...[
+                          _buildShipments(effectiveOrder.shipments),
+                          const SizedBox(height: 16),
+                        ],
+
                         // Payment section
-                        _buildPaymentDetails(effectiveOrder.totalPrice ?? 0, effectiveOrder.paymentReference),
+                        _buildPaymentDetails(
+                          effectiveOrder.totalPrice ?? 0,
+                          effectiveOrder.deliveryFee,
+                          effectiveOrder.paymentStatus,
+                          effectiveOrder.paymentReference,
+                        ),
 
                         const SizedBox(height: 16),
                       ],
                     ),
                   ),
                 ),
-
               ],
             );
           },
@@ -175,8 +192,8 @@ class OrderDetailsScreen extends ConsumerWidget {
   Widget _buildOrderInformation(BuildContext context, OrderSummary order) {
     final orderedOn = order.createdAt != null
         ? '${order.createdAt!.day.toString().padLeft(2, '0')}/'
-          '${order.createdAt!.month.toString().padLeft(2, '0')}/'
-          '${order.createdAt!.year}'
+              '${order.createdAt!.month.toString().padLeft(2, '0')}/'
+              '${order.createdAt!.year}'
         : '—';
     final orderNumber = order.orderNumber ?? '#${order.id}';
     final statusLabel = OrderStatusUi.label(order.status);
@@ -263,13 +280,16 @@ class OrderDetailsScreen extends ConsumerWidget {
                 onTap: () async {
                   await Clipboard.setData(ClipboardData(text: orderNumber));
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Copied')),
-                    );
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(const SnackBar(content: Text('Copied')));
                   }
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     border: Border.all(color: const Color(0xFFCCCCCC)),
                     borderRadius: BorderRadius.circular(4),
@@ -343,7 +363,9 @@ class OrderDetailsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
 
           Text(
-            (shippingTo == null || shippingTo.trim().isEmpty) ? 'Not provided' : shippingTo,
+            (shippingTo == null || shippingTo.trim().isEmpty)
+                ? 'Not provided'
+                : shippingTo,
             style: const TextStyle(
               fontSize: 14,
               fontFamily: 'Campton',
@@ -399,14 +421,22 @@ class OrderDetailsScreen extends ConsumerWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: (img == null || img.isEmpty)
-              ? const AppImagePlaceholder(width: 80, height: 68, borderRadius: 4)
+              ? const AppImagePlaceholder(
+                  width: 80,
+                  height: 68,
+                  borderRadius: 4,
+                )
               : Image.network(
                   img,
                   width: 80,
                   height: 68,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) =>
-                      const AppImagePlaceholder(width: 80, height: 68, borderRadius: 4),
+                      const AppImagePlaceholder(
+                        width: 80,
+                        height: 68,
+                        borderRadius: 4,
+                      ),
                 ),
         ),
 
@@ -471,8 +501,93 @@ class OrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPaymentDetails(num total, String? paymentReference) {
-    final subtotal = total;
+  Widget _buildShipments(List<ShipmentSummary> shipments) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFCCCCCC)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Shipments',
+            style: TextStyle(
+              fontSize: 16,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF3C4042),
+            ),
+          ),
+          const SizedBox(height: 16),
+          for (int i = 0; i < shipments.length; i++) ...[
+            _buildShipmentRow(shipments[i]),
+            if (i < shipments.length - 1) const Divider(height: 24),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShipmentRow(ShipmentSummary shipment) {
+    final provider = shipment.provider?.toUpperCase() ?? 'PROVIDER';
+    final serviceName = shipment.serviceName ?? 'Shipping service';
+    final status = OrderStatusUi.label(shipment.status);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '$provider • $serviceName',
+          style: const TextStyle(
+            fontSize: 14,
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF241508),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Status: $status',
+          style: const TextStyle(
+            fontSize: 13,
+            fontFamily: 'Campton',
+            color: Color(0xFF3C4042),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Shipping Fee: ${formatPrice(shipment.shippingFee ?? 0)}',
+          style: const TextStyle(
+            fontSize: 13,
+            fontFamily: 'Campton',
+            color: Color(0xFF3C4042),
+          ),
+        ),
+        if ((shipment.trackingNumber ?? '').isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            'Tracking Number: ${shipment.trackingNumber}',
+            style: const TextStyle(
+              fontSize: 13,
+              fontFamily: 'Campton',
+              color: Color(0xFF3C4042),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildPaymentDetails(
+    num total,
+    num? deliveryFee,
+    String? paymentStatus,
+    String? paymentReference,
+  ) {
+    final subtotal = deliveryFee == null ? total : (total - deliveryFee);
 
     return Container(
       width: double.infinity,
@@ -493,9 +608,7 @@ class OrderDetailsScreen extends ConsumerWidget {
               color: Color(0xFF3C4042),
             ),
           ),
-
           const SizedBox(height: 16),
-
           if (paymentReference != null && paymentReference.isNotEmpty) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -525,7 +638,6 @@ class OrderDetailsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
           ],
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -539,7 +651,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                 ),
               ),
               Text(
-                formatPrice(subtotal),
+                formatPrice(subtotal < 0 ? 0 : subtotal),
                 style: const TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
@@ -549,9 +661,7 @@ class OrderDetailsScreen extends ConsumerWidget {
               ),
             ],
           ),
-
           const SizedBox(height: 8),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -564,9 +674,9 @@ class OrderDetailsScreen extends ConsumerWidget {
                   color: Color(0xFF3C4042),
                 ),
               ),
-              const Text(
-                '₦0',
-                style: TextStyle(
+              Text(
+                formatPrice(deliveryFee ?? 0),
+                style: const TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w700,
@@ -575,9 +685,33 @@ class OrderDetailsScreen extends ConsumerWidget {
               ),
             ],
           ),
-
+          if (paymentStatus != null && paymentStatus.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Payment Status',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF3C4042),
+                  ),
+                ),
+                Text(
+                  paymentStatus,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontFamily: 'Campton',
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF3C4042),
+                  ),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 8),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

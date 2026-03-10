@@ -14,6 +14,7 @@ import 'package:ojaewa/features/orders/presentation/controllers/orders_controlle
 import 'package:ojaewa/features/cart/presentation/controllers/checkout_controller.dart';
 import 'package:ojaewa/features/cart/presentation/widgets/payment_method_sheet.dart';
 import 'package:ojaewa/features/orders/data/orders_repository_impl.dart';
+import 'package:ojaewa/features/orders/domain/logistics_models.dart';
 import 'package:ojaewa/features/cart/presentation/screens/momo_payment_screen.dart';
 
 class OrderConfirmationScreen extends ConsumerStatefulWidget {
@@ -31,6 +32,7 @@ class _OrderConfirmationScreenState
     extends ConsumerState<OrderConfirmationScreen> {
   static const _returnArgKey = 'returnTo';
   static const _returnToOrderConfirmation = 'orderConfirmation';
+  final Map<int, String> _selectedQuotesBySeller = {};
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,7 @@ class _OrderConfirmationScreenState
     final cartAsync = ref.watch(cartProvider);
     final addressesAsync = ref.watch(addressesProvider);
     final isBusy = ref.watch(orderActionsProvider).isLoading;
+    final checkoutItems = ref.watch(checkoutOrderItemsProvider);
 
     // Use optimistic cart if available, otherwise fall back to cartProvider
     final cart = optimisticCart ?? cartAsync.asData?.value;
@@ -50,6 +53,12 @@ class _OrderConfirmationScreenState
     final selectedAddress =
         addresses.where((a) => a.isDefault).firstOrNull ??
         (addresses.isNotEmpty ? addresses.first : null);
+    final logisticsRequest = ref.watch(
+      logisticsQuoteRequestProvider(selectedAddress),
+    );
+    final shippingQuotesAsync = logisticsRequest == null
+        ? const AsyncData<List<SellerShippingQuotes>>([])
+        : ref.watch(logisticsQuotesProvider(logisticsRequest));
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F1),
@@ -88,6 +97,11 @@ class _OrderConfirmationScreenState
                           const SizedBox(height: 24),
                           _buildAddressSection(context, selectedAddress),
                           const SizedBox(height: 32),
+                          _buildShippingSection(
+                            cart: cart,
+                            quotesAsync: shippingQuotesAsync,
+                          ),
+                          const SizedBox(height: 32),
                           _buildItemsSection(cart.items.length),
                           const SizedBox(height: 32),
                         ],
@@ -97,6 +111,7 @@ class _OrderConfirmationScreenState
 
             _buildOrderSummary(
               cart: cart,
+              quotesAsync: shippingQuotesAsync,
               isBusy: isBusy,
               onPlaceOrder: isBusy
                   ? null
@@ -109,16 +124,65 @@ class _OrderConfirmationScreenState
                         return;
                       }
 
-                      final items = ref.read(checkoutOrderItemsProvider);
-                      if (items.isEmpty) {
+                      if (checkoutItems.isEmpty) {
                         AppSnackbars.showError(context, 'Your cart is empty');
                         return;
                       }
+                      final quoteGroups = shippingQuotesAsync.asData?.value;
+                      if (shippingQuotesAsync.isLoading) {
+                        AppSnackbars.showError(
+                          context,
+                          'Shipping options are still loading',
+                        );
+                        return;
+                      }
+                      if (shippingQuotesAsync.hasError || quoteGroups == null) {
+                        AppSnackbars.showError(
+                          context,
+                          'Failed to load shipping options',
+                        );
+                        return;
+                      }
+                      if (quoteGroups.isEmpty) {
+                        AppSnackbars.showError(
+                          context,
+                          'No shipping options available for this cart',
+                        );
+                        return;
+                      }
+                      final missingQuotes = quoteGroups
+                          .where(
+                            (group) =>
+                                (_selectedQuotesBySeller[group
+                                            .sellerProfileId] ??
+                                        '')
+                                    .isEmpty,
+                          )
+                          .toList();
+                      if (missingQuotes.isNotEmpty) {
+                        AppSnackbars.showError(
+                          context,
+                          'Choose one shipping option for each seller',
+                        );
+                        return;
+                      }
+                      final selectedQuotes = quoteGroups
+                          .map(
+                            (group) => SelectedShippingQuote(
+                              sellerProfileId: group.sellerProfileId,
+                              quoteReference:
+                                  _selectedQuotesBySeller[group
+                                      .sellerProfileId]!,
+                            ),
+                          )
+                          .toList();
 
                       // Show payment method selection
-                      final paymentMethod = await PaymentMethodSheet.show(context);
+                      final paymentMethod = await PaymentMethodSheet.show(
+                        context,
+                      );
                       if (paymentMethod == null) return;
-                      
+
                       if (!context.mounted) return;
 
                       try {
@@ -126,20 +190,28 @@ class _OrderConfirmationScreenState
                         final order = await ref
                             .read(ordersRepositoryProvider)
                             .createOrder(
-                              items: items,
+                              items: checkoutItems,
+                              addressId: selectedAddress.id,
                               shippingName: selectedAddress.fullName,
                               shippingPhone: selectedAddress.phone,
                               shippingAddress: selectedAddress.addressLine,
                               shippingCity: selectedAddress.city,
                               shippingState: selectedAddress.state,
                               shippingCountry: selectedAddress.country,
+                              shippingZipCode: selectedAddress.postCode,
+                              selectedQuotes: selectedQuotes,
                             );
 
                         if (!context.mounted) return;
 
                         if (paymentMethod == 'momo') {
                           // MoMo payment flow
-                          await _handleMoMoPayment(context, ref, order.id, selectedAddress.phone);
+                          await _handleMoMoPayment(
+                            context,
+                            ref,
+                            order.id,
+                            selectedAddress.phone,
+                          );
                         } else {
                           // Paystack payment flow (original)
                           await _handlePaystackPayment(context, ref, order.id);
@@ -158,6 +230,170 @@ class _OrderConfirmationScreenState
         ),
       ),
     );
+  }
+
+  Widget _buildShippingSection({
+    required Cart cart,
+    required AsyncValue<List<SellerShippingQuotes>> quotesAsync,
+  }) {
+    final sellerNames = _sellerNamesById(cart);
+
+    return quotesAsync.when(
+      loading: () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            'Shipping Options',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1E2021),
+            ),
+          ),
+          SizedBox(height: 12),
+          LinearProgressIndicator(),
+        ],
+      ),
+      error: (error, _) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Shipping Options',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1E2021),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Failed to load shipping options: $error',
+            style: const TextStyle(color: Color(0xFFB3261E)),
+          ),
+        ],
+      ),
+      data: (groups) {
+        _syncSelectedQuotes(groups);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Shipping Options',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1E2021),
+              ),
+            ),
+            const SizedBox(height: 12),
+            if (groups.isEmpty)
+              const Text(
+                'No shipping options available yet for this address.',
+                style: TextStyle(color: Color(0xFF777F84)),
+              ),
+            for (final group in groups) ...[
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFCCCCCC)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      sellerNames[group.sellerProfileId] ??
+                          'Seller #${group.sellerProfileId}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF241508),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    for (final quote in group.quotes)
+                      RadioListTile<String>(
+                        contentPadding: EdgeInsets.zero,
+                        value: quote.quoteReference,
+                        groupValue:
+                            _selectedQuotesBySeller[group.sellerProfileId],
+                        activeColor: const Color(0xFFFDAF40),
+                        title: Text(quote.serviceName),
+                        subtitle: Text(
+                          [
+                            quote.provider.toUpperCase(),
+                            if (quote.estimatedDays != null)
+                              '${quote.estimatedDays} day(s)',
+                          ].join(' • '),
+                        ),
+                        secondary: Text(
+                          formatPrice(quote.amount),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF241508),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() {
+                            _selectedQuotesBySeller[group.sellerProfileId] =
+                                value;
+                          });
+                        },
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  void _syncSelectedQuotes(List<SellerShippingQuotes> groups) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final next = <int, String>{};
+      for (final group in groups) {
+        final existing = _selectedQuotesBySeller[group.sellerProfileId];
+        final hasExisting = group.quotes.any(
+          (quote) => quote.quoteReference == existing,
+        );
+        if (hasExisting && existing != null) {
+          next[group.sellerProfileId] = existing;
+          continue;
+        }
+        if (group.quotes.length == 1) {
+          next[group.sellerProfileId] = group.quotes.first.quoteReference;
+        }
+      }
+      final changed =
+          next.length != _selectedQuotesBySeller.length ||
+          next.entries.any(
+            (entry) => _selectedQuotesBySeller[entry.key] != entry.value,
+          );
+      if (!changed) return;
+      setState(() {
+        _selectedQuotesBySeller
+          ..clear()
+          ..addAll(next);
+      });
+    });
+  }
+
+  Map<int, String> _sellerNamesById(Cart cart) {
+    final names = <int, String>{};
+    for (final item in cart.items) {
+      final sellerId = item.product.sellerProfileId;
+      if (sellerId == null || sellerId == 0) continue;
+      final businessName = item.product.sellerBusinessName;
+      if (businessName == null || businessName.isEmpty) continue;
+      names[sellerId] = businessName;
+    }
+    return names;
   }
 
   Widget _buildAddressSection(BuildContext context, Address? address) {
@@ -265,11 +501,31 @@ class _OrderConfirmationScreenState
 
   Widget _buildOrderSummary({
     required Cart? cart,
+    required AsyncValue<List<SellerShippingQuotes>> quotesAsync,
     required bool isBusy,
     required VoidCallback? onPlaceOrder,
   }) {
     final subtotal = cart?.total ?? 0;
-    const deliveryFee = 2000; // Flat delivery fee ₦2,000
+    final deliveryFee =
+        quotesAsync.asData?.value.fold<num>(0, (sum, group) {
+          final selectedQuoteReference =
+              _selectedQuotesBySeller[group.sellerProfileId];
+          final selectedQuote = group.quotes.firstWhere(
+            (quote) => quote.quoteReference == selectedQuoteReference,
+            orElse: () => const ShippingQuote(
+              quoteReference: '',
+              provider: '',
+              serviceCode: '',
+              serviceName: '',
+              amount: 0,
+              currency: 'NGN',
+              estimatedDays: null,
+              expiresAt: null,
+            ),
+          );
+          return sum + selectedQuote.amount;
+        }) ??
+        0;
     final total = subtotal + deliveryFee;
 
     return Container(
@@ -416,18 +672,12 @@ class _OrderConfirmationScreenState
       final uri = Uri.tryParse(link.paymentUrl);
       if (uri == null || link.paymentUrl.isEmpty) {
         if (context.mounted) {
-          AppSnackbars.showError(
-            context,
-            'Failed to generate payment link',
-          );
+          AppSnackbars.showError(context, 'Failed to generate payment link');
         }
         return;
       }
-      
-      await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
+
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (e) {
       if (context.mounted) {
         AppSnackbars.showError(
