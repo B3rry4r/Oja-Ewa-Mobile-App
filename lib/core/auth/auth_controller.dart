@@ -17,13 +17,20 @@ class AuthController extends Notifier<AuthState> {
   }
 
   Future<void> loadFromStorage() async {
-    final token = await ref.read(secureTokenStorageProvider).readAccessToken();
-    if (token == null || token.isEmpty) {
+    try {
+      final token = await ref
+          .read(secureTokenStorageProvider)
+          .readAccessToken();
+      if (token == null || token.isEmpty) {
+        AppEnv.accessToken = null;
+        state = const AuthUnauthenticated();
+      } else {
+        AppEnv.accessToken = token; // Set for Pusher authorization
+        state = AuthAuthenticated(accessToken: token);
+      }
+    } catch (_) {
       AppEnv.accessToken = null;
       state = const AuthUnauthenticated();
-    } else {
-      AppEnv.accessToken = token; // Set for Pusher authorization
-      state = AuthAuthenticated(accessToken: token);
     }
   }
 
@@ -40,4 +47,6 @@ class AuthController extends Notifier<AuthState> {
   }
 }
 
-final authControllerProvider = NotifierProvider<AuthController, AuthState>(AuthController.new);
+final authControllerProvider = NotifierProvider<AuthController, AuthState>(
+  AuthController.new,
+);

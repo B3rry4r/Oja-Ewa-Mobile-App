@@ -66,7 +66,10 @@ class _AppState extends ConsumerState<App> {
     }
   }
 
-  Future<void> _ensurePusherConnected(WidgetRef ref, PusherService pusherService) async {
+  Future<void> _ensurePusherConnected(
+    WidgetRef ref,
+    PusherService pusherService,
+  ) async {
     if (!pusherService.isInitialized) {
       final dio = ref.read(laravelDioProvider);
       await pusherService.initialize(dio: dio);
@@ -79,7 +82,9 @@ class _AppState extends ConsumerState<App> {
     if (next != null && next.isNotEmpty) {
       // User logged in or already signed in on startup
       ref.read(subscriptionControllerProvider.notifier).refreshStatus();
-      if (ref.read(isOnlineProvider)) {
+      final canProbeConnectivity = kIsWeb || !Platform.isIOS;
+      final isOnline = canProbeConnectivity ? ref.read(isOnlineProvider) : true;
+      if (isOnline) {
         await _ensurePusherConnected(ref, pusherService);
       }
       _autoInitFcmIfEnabled(ref);
@@ -104,8 +109,13 @@ class _AppState extends ConsumerState<App> {
       builder: (context, child) {
         return Consumer(
           builder: (context, ref, _) {
-            final isOnline = ref.watch(isOnlineProvider);
-            final content = AppBootstrap(child: child ?? const SizedBox.shrink());
+            final content = AppBootstrap(
+              child: child ?? const SizedBox.shrink(),
+            );
+            final shouldWatchConnectivity = kIsWeb || !Platform.isIOS;
+            final isOnline = shouldWatchConnectivity
+                ? ref.watch(isOnlineProvider)
+                : true;
 
             // Handle auth-dependent side effects
             ref.listen<String?>(accessTokenProvider, (prev, next) {
@@ -113,15 +123,17 @@ class _AppState extends ConsumerState<App> {
             });
 
             // Handle reconnection side effects
-            ref.listen<bool>(isOnlineProvider, (prev, next) async {
-              if (next && !(prev ?? false)) {
-                final token = ref.read(accessTokenProvider);
-                if (token != null && token.isNotEmpty) {
-                  final pusherService = ref.read(pusherServiceProvider);
-                  await _ensurePusherConnected(ref, pusherService);
+            if (kIsWeb || !Platform.isIOS) {
+              ref.listen<bool>(isOnlineProvider, (prev, next) async {
+                if (next && !(prev ?? false)) {
+                  final token = ref.read(accessTokenProvider);
+                  if (token != null && token.isNotEmpty) {
+                    final pusherService = ref.read(pusherServiceProvider);
+                    await _ensurePusherConnected(ref, pusherService);
+                  }
                 }
-              }
-            });
+              });
+            }
 
             if (isOnline) {
               return content;

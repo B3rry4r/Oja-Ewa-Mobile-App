@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 
 /// Pass-through bootstrap widget.
 ///
-/// Auth is loaded in main() before runApp() via loadFromStorage(), so by the
-/// time the widget tree builds, authControllerProvider is already in a
-/// definitive state (AuthAuthenticated or AuthUnauthenticated).
+/// Auth loading is kicked off from main(), but launch no longer blocks on
+/// secure-storage I/O. The splash screen waits for the auth state to resolve
+/// if startup work is still in flight.
 ///
-/// The SplashScreen handles the initial routing decision by reading
-/// accessTokenProvider directly. No FutureProvider gating is needed here —
-/// that approach caused navigator stack corruption when the FutureProvider
-/// re-ran after connectivity or other rebuilds temporarily replaced the
-/// entire widget tree with a loading spinner.
+/// No FutureProvider gating is needed here — that approach caused navigator
+/// stack corruption when the FutureProvider re-ran after connectivity or other
+/// rebuilds temporarily replaced the entire widget tree with a loading spinner.
 class AppBootstrap extends StatelessWidget {
   const AppBootstrap({super.key, required this.child});
 

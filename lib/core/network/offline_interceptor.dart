@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'network_providers.dart';
@@ -11,9 +14,20 @@ class OfflineInterceptor extends Interceptor {
   final Ref _ref;
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    if (!kIsWeb && Platform.isIOS) {
+      handler.next(options);
+      return;
+    }
+
     final connectivity = _ref.read(connectivityProvider).value;
-    final isOnline = connectivity != null && connectivity.isNotEmpty && !connectivity.contains(ConnectivityResult.none);
+    final isOnline =
+        connectivity != null &&
+        connectivity.isNotEmpty &&
+        !connectivity.contains(ConnectivityResult.none);
 
     if (!isOnline) {
       handler.reject(

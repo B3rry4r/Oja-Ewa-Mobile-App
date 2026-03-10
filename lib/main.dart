@@ -13,10 +13,41 @@ import 'core/auth/auth_controller.dart';
 import 'core/notifications/fcm_service.dart';
 import 'firebase_options.dart';
 
+bool _firebaseInitialized = false;
+bool _crashlyticsInitialized = false;
+
+Future<void> _recordStartupError(
+  Object error,
+  StackTrace stack, {
+  required bool fatal,
+}) async {
+  debugPrint('Startup error: $error\n$stack');
+
+  if (kIsWeb || !_firebaseInitialized || !_crashlyticsInitialized) {
+    return;
+  }
+
+  try {
+    await FirebaseCrashlytics.instance.recordError(error, stack, fatal: fatal);
+  } catch (crashlyticsError, crashlyticsStack) {
+    debugPrint(
+      'Failed to record Crashlytics error: $crashlyticsError\n$crashlyticsStack',
+    );
+  }
+}
+
 /// Top-level background message handler — must be a top-level function.
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    _firebaseInitialized = true;
+  } catch (error, stack) {
+    debugPrint('Background Firebase initialization failed: $error\n$stack');
+    return;
+  }
   debugPrint('Background message: ${message.notification?.title}');
 }
 
@@ -27,31 +58,57 @@ Future<void> _bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  // Crashlytics & Analytics — NOT supported on web
-  if (!kIsWeb) {
-    await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-
-    // Pass all uncaught Flutter framework errors to Crashlytics
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-
-    // Pass all uncaught async errors (outside Flutter framework) to Crashlytics
-    PlatformDispatcher.instance.onError = (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      return true;
-    };
-
-    // Register background FCM handler (not supported on web)
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    _firebaseInitialized = true;
+  } catch (error, stack) {
+    debugPrint('Firebase initialization failed: $error\n$stack');
   }
 
-  // Load auth token from secure storage before building the widget tree.
+  // Crashlytics & Analytics — NOT supported on web
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    _recordStartupError(
+      details.exception,
+      details.stack ?? StackTrace.current,
+      fatal: true,
+    );
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    _recordStartupError(error, stack, fatal: true);
+    return true;
+  };
+
+  if (!kIsWeb && _firebaseInitialized) {
+    try {
+      await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+      _crashlyticsInitialized = true;
+    } catch (error, stack) {
+      debugPrint('Crashlytics initialization failed: $error\n$stack');
+    }
+
+    try {
+      FirebaseMessaging.onBackgroundMessage(
+        _firebaseMessagingBackgroundHandler,
+      );
+    } catch (error, stack) {
+      await _recordStartupError(error, stack, fatal: false);
+    }
+  }
+
+  // Kick off auth restoration without blocking first paint.
   final container = ProviderContainer();
-  await container.read(authControllerProvider.notifier).loadFromStorage();
+  unawaited(() async {
+    try {
+      await container.read(authControllerProvider.notifier).loadFromStorage();
+    } catch (error, stack) {
+      await _recordStartupError(error, stack, fatal: false);
+    }
+  }());
 
   // Create FCM notification channel early for Android (not supported on web)
   if (!kIsWeb) {
@@ -62,24 +119,13 @@ Future<void> _bootstrap() async {
     }
   }
 
-  runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const App(),
-    ),
-  );
+  runApp(UncontrolledProviderScope(container: container, child: const App()));
 }
 
 void main() {
   // runZonedGuarded wraps EVERYTHING including ensureInitialized and runApp
   // so they all run in the same zone — required by Flutter on web.
-  runZonedGuarded(
-    _bootstrap,
-    (error, stack) {
-      if (!kIsWeb) {
-        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      }
-      debugPrint('Uncaught error: $error\n$stack');
-    },
-  );
+  runZonedGuarded(_bootstrap, (error, stack) async {
+    await _recordStartupError(error, stack, fatal: true);
+  });
 }
