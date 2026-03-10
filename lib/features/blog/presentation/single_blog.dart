@@ -113,7 +113,7 @@ class BlogDetailScreen extends ConsumerWidget {
                                 fit: BoxFit.cover,
                                 width: 165,
                                 height: 100,
-                                errorBuilder: (_, __, ___) =>
+                                errorBuilder: (_, _, _) =>
                                     const AppImagePlaceholder(
                                       width: 150,
                                       height: 100,
