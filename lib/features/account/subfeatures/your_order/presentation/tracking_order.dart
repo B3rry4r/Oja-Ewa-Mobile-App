@@ -81,6 +81,7 @@ class TrackingOrderScreen extends ConsumerWidget {
                   final trackingData =
                       trackingResponse['data'] as Map<String, dynamic>? ??
                       trackingResponse;
+                  final overviewSteps = _extractOverviewSteps(trackingData);
                   final shipments = _extractShipmentTrackings(
                     trackingData: trackingData,
                     orderDetails: orderAsync.asData?.value,
@@ -91,6 +92,8 @@ class TrackingOrderScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if (overviewSteps.isNotEmpty)
+                          _buildOrderOverviewCard(overviewSteps),
                         for (int i = 0; i < shipments.length; i++) ...[
                           _buildShipmentTrackingCard(
                             context: context,
@@ -195,6 +198,49 @@ class TrackingOrderScreen extends ConsumerWidget {
         steps: steps,
       ),
     ];
+  }
+
+  List<TimelineStep> _extractOverviewSteps(Map<String, dynamic> trackingData) {
+    final stagesRaw = trackingData['stages'] as List?;
+    final stages =
+        stagesRaw
+            ?.whereType<Map>()
+            .map((m) => Map<String, dynamic>.from(m))
+            .map(_TrackingStage.fromJson)
+            .toList() ??
+        [];
+    if (stages.isEmpty) {
+      return const [];
+    }
+    return _mapStagesToTimelineSteps(stages);
+  }
+
+  Widget _buildOrderOverviewCard(List<TimelineStep> steps) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFCCCCCC)),
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Order Overview',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Campton',
+              color: Color(0xFF1E2021),
+            ),
+          ),
+          const SizedBox(height: 20),
+          _buildTrackingTimeline(steps),
+        ],
+      ),
+    );
   }
 
   Widget _buildShipmentTrackingCard({
@@ -397,47 +443,6 @@ class TrackingOrderScreen extends ConsumerWidget {
     List<_TrackingStage> stages, {
     String? fallbackStatus,
   }) => _timelineFromStages(stages, fallbackStatus: fallbackStatus);
-
-  List<TimelineStep> _orderTimeline(List<TimelineStep> steps) {
-    const order = ['Order Placed', 'Processing', 'Shipped', 'Delivered'];
-    final sorted = <TimelineStep>[];
-    for (final label in order) {
-      final match = steps
-          .where((s) => s.title.toLowerCase().contains(label.toLowerCase()))
-          .toList();
-      if (match.isNotEmpty) {
-        sorted.add(match.first);
-      }
-    }
-    // Add any unknown steps at end
-    for (final s in steps) {
-      if (!sorted.contains(s)) sorted.add(s);
-    }
-    return sorted;
-  }
-
-  List<TimelineStep> _defaultTimeline(String? status) =>
-      _fallbackTimelineForStatus(status);
-
-  TimelineStep _timelineStep(
-    String title,
-    bool isCompleted, {
-    bool isCurrent = false,
-  }) {
-    return TimelineStep(
-      title: title,
-      timestamp: isCompleted ? 'Completed' : '—',
-      isCompleted: isCompleted,
-      isCurrent: isCurrent,
-      dotColor: isCompleted ? const Color(0xFF603814) : const Color(0xFFE9E9E9),
-      textColor: isCompleted
-          ? const Color(0xFF241508)
-          : const Color(0xFFBEBEBE),
-      timeColor: isCompleted
-          ? const Color(0xFF777F84)
-          : const Color(0xFFDEDEDE),
-    );
-  }
 }
 
 class _ShipmentTrackingView {
@@ -458,31 +463,31 @@ class _ShipmentTrackingView {
   factory _ShipmentTrackingView.fromTrackingJson({
     required Map<String, dynamic> tracking,
   }) {
-    final stagesRaw = tracking['stages'] as List?;
+    final eventsRaw =
+        (tracking['events'] as List?) ?? (tracking['stages'] as List?);
     final stages =
-        stagesRaw
+        eventsRaw
             ?.whereType<Map>()
             .map((m) => Map<String, dynamic>.from(m))
             .map(_TrackingStage.fromJson)
             .toList() ??
         [];
+    final sellerName = tracking['seller_name'] as String?;
+    final provider = tracking['provider'] as String?;
+    final status = tracking['status'] as String?;
     return _ShipmentTrackingView(
       title:
           (tracking['service_name'] as String?) ??
-          (tracking['provider'] as String?)?.toUpperCase() ??
+          provider?.toUpperCase() ??
           'Shipment',
       subtitle: [
-        if ((tracking['provider'] as String? ?? '').isNotEmpty)
-          (tracking['provider'] as String).toUpperCase(),
-        if ((tracking['status'] as String? ?? '').isNotEmpty)
-          tracking['status'] as String,
+        if ((sellerName ?? '').isNotEmpty) sellerName!,
+        if ((provider ?? '').isNotEmpty) provider!.toUpperCase(),
+        if ((status ?? '').isNotEmpty) status!,
       ].join(' • '),
       estimatedDelivery: tracking['estimated_delivery'] as String?,
       trackingNumber: tracking['tracking_number'] as String?,
-      steps: _timelineFromStages(
-        stages,
-        fallbackStatus: tracking['status'] as String?,
-      ),
+      steps: _timelineFromStages(stages, fallbackStatus: status),
     );
   }
 
@@ -495,6 +500,7 @@ class _ShipmentTrackingView {
     final serviceName = shipment['service_name'] as String?;
     final status = shipment['status'] as String?;
     final trackingNumber = shipment['tracking_number'] as String?;
+    final sellerName = shipment['seller_name'] as String?;
 
     return _ShipmentTrackingView(
       title: serviceName?.isNotEmpty == true
@@ -503,6 +509,7 @@ class _ShipmentTrackingView {
                 ? provider!.toUpperCase()
                 : 'Shipment'),
       subtitle: [
+        if ((sellerName ?? '').isNotEmpty) sellerName!,
         if ((provider ?? '').isNotEmpty) provider!.toUpperCase(),
         if ((status ?? '').isNotEmpty) status!,
       ].join(' • '),
@@ -588,7 +595,14 @@ List<TimelineStep> _timelineFromStages(
     );
   }).toList();
 
-  const order = ['Order Placed', 'Processing', 'Shipped', 'Delivered'];
+  const order = [
+    'Order Placed',
+    'Payment Confirmed',
+    'Shipment booked',
+    'Processing',
+    'Shipped',
+    'Delivered',
+  ];
   final sorted = <TimelineStep>[];
   for (final label in order) {
     final match = normalized

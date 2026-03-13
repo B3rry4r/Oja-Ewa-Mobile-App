@@ -70,7 +70,10 @@ class ShipmentSummary {
   static ShipmentSummary fromJson(Map<String, dynamic> json) {
     return ShipmentSummary(
       id: _parseNum(json['id'])?.toInt() ?? 0,
-      sellerProfileId: _parseNum(json['seller_profile_id'])?.toInt() ?? 0,
+      sellerProfileId:
+          _parseNum(json['seller_profile_id'])?.toInt() ??
+          _parseNum(json['seller_id'])?.toInt() ??
+          0,
       provider: json['provider'] as String?,
       serviceName: json['service_name'] as String?,
       status: json['status'] as String?,

@@ -1,6 +1,6 @@
 # Logistics Checkout and Multi-Seller Fulfillment API
 
-This document describes the new backend contract for:
+This document describes the frontend-facing backend contract for:
 
 - shipping quote discovery
 - multi-seller checkout
@@ -8,7 +8,6 @@ This document describes the new backend contract for:
 - payment finalization across multiple gateways
 - shipment-based seller fulfillment
 - buyer tracking
-- environment setup for GIG Logistics and DHL
 
 This is the contract the frontend should use going forward.
 
@@ -1086,161 +1085,19 @@ Add these to your `.env`.
 
 ### Logistics general
 
-```env
-LOGISTICS_DEFAULT_PROVIDER=gig
-LOGISTICS_DEFAULT_CURRENCY=NGN
-LOGISTICS_QUOTE_TTL_MINUTES=30
-LOGISTICS_DEFAULT_WEIGHT_KG=1.0
-LOGISTICS_DEFAULT_LENGTH_CM=30
-LOGISTICS_DEFAULT_WIDTH_CM=20
-LOGISTICS_DEFAULT_HEIGHT_CM=10
-```
+## Frontend Integration Notes
 
-### GIG Logistics
+- this document is for frontend consumption only
+- provider setup, credentials, and vendor-specific implementation details are backend/internal concerns
+- the frontend should rely only on the REST and realtime contracts documented above
+- the frontend does not need to know whether a quote or shipment came from GIG or DHL internals beyond the normalized `provider`, `service_name`, `amount`, `tracking_number`, and `status` fields returned by our API
 
-```env
-GIG_LOGISTICS_ENABLED=true
-GIG_LOGISTICS_BASE_URL=https://your-gig-api-base-url
-GIG_LOGISTICS_USERNAME=your_gig_username
-GIG_LOGISTICS_PASSWORD=your_gig_password
-GIG_LOGISTICS_TOKEN=
-GIG_LOGISTICS_LOGIN_PATH=/reference/post_login-1
-GIG_LOGISTICS_QUOTE_PATH=/quotes
-GIG_LOGISTICS_SHIPMENT_PATH=/shipments
-GIG_LOGISTICS_TRACKING_PATH=/tracking
-GIG_LOGISTICS_TIMEOUT=30
-```
+## Current Frontend Assumptions
 
-#### Notes
-
-- if GIG gives you bearer-token auth, set `GIG_LOGISTICS_TOKEN`
-- if GIG gives you basic auth, use `GIG_LOGISTICS_USERNAME` and `GIG_LOGISTICS_PASSWORD`
-- replace the path values with the real paths from your GIG partner docs
-- `GIG_LOGISTICS_BASE_URL` must be the actual API host, not the public docs host
-
-### DHL
-
-```env
-DHL_ENABLED=true
-DHL_BASE_URL=https://api-m.dhl.com
-DHL_USERNAME=your_dhl_username
-DHL_PASSWORD=your_dhl_password
-DHL_API_KEY=your_dhl_api_key
-DHL_API_SECRET=your_dhl_api_secret
-DHL_ACCOUNT_NUMBER=your_dhl_account_number
-DHL_QUOTE_PATH=/rates
-DHL_SHIPMENT_PATH=/shipments
-DHL_TRACKING_PATH=/track/shipments
-DHL_PICKUP_PATH=/pickups
-DHL_ADDRESS_VALIDATION_PATH=/address-validate
-DHL_TIMEOUT=30
-```
-
-#### Notes
-
-- some DHL setups use API key only
-- some use API key + basic auth
-- use the credential format from your DHL app/account
-- if you are using MyDHL API, ensure your DHL account is allowed to rate and create shipments
-
-### Paystack
-
-```env
-PAYSTACK_PUBLIC_KEY=pk_test_xxx
-PAYSTACK_SECRET_KEY=sk_test_xxx
-```
-
-### MoMo
-
-```env
-MOMO_ENVIRONMENT=sandbox
-MOMO_TARGET_ENVIRONMENT=sandbox
-MOMO_API_USER=your_api_user
-MOMO_API_KEY=your_api_key
-MOMO_SUBSCRIPTION_KEY=your_subscription_key
-MOMO_CURRENCY=NGN
-MOMO_CALLBACK_URL=https://your-domain.com/api/webhook/momo
-```
-
----
-
-## Setup Checklist
-
-### 1. Run migrations
-
-```bash
-php artisan migrate
-```
-
-### 2. Set provider credentials
-
-Populate:
-
-- GIG envs
-- DHL envs
-- Paystack envs
-- MoMo envs
-
-### 3. Enable the providers you want
-
-Examples:
-
-```env
-GIG_LOGISTICS_ENABLED=true
-DHL_ENABLED=false
-```
-
-or
-
-```env
-GIG_LOGISTICS_ENABLED=true
-DHL_ENABLED=true
-```
-
-### 4. Put the real provider endpoint paths
-
-The placeholders in config are not guaranteed to match the final production endpoints.
-
-Update these once you confirm from provider onboarding docs:
-
-- GIG quote path
-- GIG shipment path
-- GIG tracking path
-- DHL quote path
-- DHL shipment path
-- DHL tracking path
-
-### 5. Test in stages
-
-Recommended sequence:
-
-1. quote endpoint only
-2. create order using stored quote
-3. payment initialization
-4. payment confirmation
-5. shipment booking after payment
-6. seller shipment updates
-7. buyer multi-shipment tracking
-
----
-
-## Known Current Assumptions
-
-These are important for the frontend and ops team to know:
-
-- package dimensions/weight currently use default fallback config values
-- provider-specific quote/create payload shaping is implemented in a normalized adapter pattern, but real production payload keys may need adjustment once final credentials and live docs are confirmed
-- shipment booking currently happens immediately after payment confirmation
-- there is no provider webhook controller yet for GIG/DHL event ingestion
-- order cancellation currently cancels local shipment records; external provider cancellation should be added once provider cancellation APIs are confirmed in production
-
----
-
-## Recommended Next Backend Enhancements
-
-1. Add actual product shipment dimensions and weights.
-2. Add provider webhook endpoints for GIG and DHL tracking events.
-3. Add shipment retry queue for `booking_failed`.
-4. Add admin shipment dashboard.
-5. Add shipment label download endpoint if needed by seller/admin apps.
-
+- shipping is selected per seller group
+- one order can contain many shipments
+- one payment covers the full order total
+- shipment booking starts after payment is confirmed
+- buyer order screens must render `shipments[]`
+- seller order screens should treat each shipment as the unit of fulfillment
+- websocket events should be treated as refresh triggers, with REST as the source of truth
