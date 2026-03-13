@@ -266,6 +266,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
 
   Widget _buildRequirementItem(String text, bool isMet) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(
           isMet ? Icons.check_circle_rounded : Icons.circle_outlined,
@@ -273,13 +274,15 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
           color: isMet ? const Color(0xFF4CAF50) : const Color(0xFF777F84),
         ),
         const SizedBox(width: 8),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
-            color: isMet ? const Color(0xFF4CAF50) : const Color(0xFF777F84),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              fontFamily: 'Campton',
+              color: isMet ? const Color(0xFF4CAF50) : const Color(0xFF777F84),
+            ),
           ),
         ),
       ],

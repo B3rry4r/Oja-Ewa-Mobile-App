@@ -14,10 +14,11 @@ import '../ui/snackbars.dart';
 /// - Paystack: ojaewa://payment/callback?reference=xxx&status=success
 /// - MoMo: ojaewa://payment/callback?status=success&reference=xxx&order_id=123&gateway=momo
 class DeepLinkHandler {
-  DeepLinkHandler(this._ref);
+  DeepLinkHandler(this._ref, {AppLinks? appLinks})
+    : _appLinks = appLinks ?? AppLinks();
 
   final Ref _ref;
-  final AppLinks _appLinks = AppLinks();
+  final AppLinks _appLinks;
   StreamSubscription<Uri>? _subscription;
 
   GlobalKey<NavigatorState>? _navigatorKey;
