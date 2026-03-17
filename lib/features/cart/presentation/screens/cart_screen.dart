@@ -527,7 +527,7 @@ class _CheckoutSection extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '+ ${formatPrice(2000)} delivery fee at checkout',
+                  'Delivery fee calculated at checkout',
                   style: const TextStyle(fontSize: 12, color: Color(0xFFFBFBFB)),
                 ),
               ),
