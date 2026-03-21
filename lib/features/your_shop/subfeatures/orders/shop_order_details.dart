@@ -88,10 +88,25 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
 
           // Details List
           _buildDetailTile("Order Date", dateFormat.format(order.createdAt)),
+          if (order.shipmentId != 0)
+            _buildDetailTile("Shipment ID", order.shipmentId.toString()),
           if (order.customerName != null)
             _buildDetailTile("Customer", order.customerName!),
           if (order.customerPhone != null)
             _buildDetailTile("Phone", order.customerPhone!),
+          if (order.provider != null || order.serviceName != null)
+            _buildDetailTile(
+              "Shipping Service",
+              [
+                if ((order.provider ?? '').isNotEmpty)
+                  order.provider!.toUpperCase(),
+                if ((order.serviceName ?? '').isNotEmpty) order.serviceName!,
+              ].join(' • '),
+            ),
+          if (order.shippingFee != null)
+            _buildDetailTile("Shipping Fee", formatPrice(order.shippingFee!)),
+          if ((order.paymentStatus ?? '').isNotEmpty)
+            _buildDetailTile("Payment Status", order.paymentStatus!),
           if (order.shippingAddress != null)
             _buildDetailTile(
               "Shipping Address",
@@ -150,10 +165,23 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
   Map<String, dynamic> _getStatusConfig(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
+      case 'pending_booking':
         return {
           'label': 'Pending',
           'bgColor': const Color(0xFFE3F2FD),
           'textColor': const Color(0xFF1565C0),
+        };
+      case 'booking_failed':
+        return {
+          'label': 'Booking Failed',
+          'bgColor': const Color(0xFFFFEBEE),
+          'textColor': const Color(0xFFC62828),
+        };
+      case 'booked':
+        return {
+          'label': 'Booked',
+          'bgColor': const Color(0xFFF3E5F5),
+          'textColor': const Color(0xFF6A1B9A),
         };
       case 'processing':
         return {
@@ -166,6 +194,12 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
           'label': 'Shipped',
           'bgColor': const Color(0xFFE8F5E9),
           'textColor': const Color(0xFF2E7D32),
+        };
+      case 'in_transit':
+        return {
+          'label': 'In Transit',
+          'bgColor': const Color(0xFFE0F2F1),
+          'textColor': const Color(0xFF00897B),
         };
       case 'delivered':
         return {

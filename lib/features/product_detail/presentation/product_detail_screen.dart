@@ -898,7 +898,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                     ),
                   ),
                   Text(
-                    '+ ${formatPrice(2000)} delivery',
+                    'Delivery calculated at checkout',
                     style: TextStyle(
                       fontSize: 10,
                       color: const Color(0xFFE9E9E9).withValues(alpha: 0.8),

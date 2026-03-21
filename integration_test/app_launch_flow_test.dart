@@ -2,8 +2,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
-
 import 'package:ojaewa/app/app.dart';
 import 'package:ojaewa/core/auth/auth_controller.dart';
 import 'package:ojaewa/core/auth/auth_state.dart';
@@ -13,13 +13,15 @@ import 'package:ojaewa/features/categories/domain/category_catalog.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
 
 void main() {
-  testWidgets('App builds', (tester) async {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('unauthenticated app launch reaches onboarding flow', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          // Start in a known unauthenticated state so the splash screen
-          // navigates to onboarding without hitting secure storage.
-          authControllerProvider.overrideWith(() => _FakeAuthController()),
+          authControllerProvider.overrideWith(_FakeAuthController.new),
           audioControllerProvider.overrideWith(_FakeAudioController.new),
           allCategoriesProvider.overrideWithValue(
             const AsyncData(
@@ -40,14 +42,13 @@ void main() {
         child: const App(),
       ),
     );
+
     await tester.pump();
     await tester.pump(const Duration(seconds: 2));
 
-    // Basic smoke test: app builds without exceptions.
     expect(find.byType(MaterialApp), findsOneWidget);
-
-    final exception = tester.takeException();
-    expect(exception, isNull);
+    expect(find.text('Create account'), findsOneWidget);
+    expect(find.text('The Pan-African\nBeauty Market'), findsOneWidget);
   });
 }
 

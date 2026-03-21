@@ -17,13 +17,14 @@ import '../widgets/in_app_notification.dart';
 import 'pusher_service.dart';
 
 /// Global navigator key for showing notifications
-final GlobalKey<NavigatorState> pusherNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> pusherNavigatorKey =
+    GlobalKey<NavigatorState>();
 
 /// Tracks the current user id used for Pusher subscriptions
 int? _pusherUserId;
 
 /// Sets up Pusher real-time event listeners
-/// 
+///
 /// ACTUALLY WORKING - Events invalidate providers to force data refresh!
 class PusherListeners {
   PusherListeners._();
@@ -35,12 +36,26 @@ class PusherListeners {
 
   static bool _listenersSetUp = false;
   static int? _listenerUserId;
+  static const List<String?> _sellerOrderStatuses = [
+    null,
+    'pending_booking',
+    'booking_failed',
+    'booked',
+    'processing',
+    'shipped',
+    'in_transit',
+    'delivered',
+    'cancelled',
+  ];
 
   // Track container.listen subscriptions so we can cancel them on reset
   static ProviderSubscription? _profileSubscription;
   static ProviderSubscription? _sellerStatusSubscription;
 
-  static void setupListeners(ProviderContainer container, PusherService pusher) {
+  static void setupListeners(
+    ProviderContainer container,
+    PusherService pusher,
+  ) {
     // Get auth token to ensure we should be listening
     final token = container.read(accessTokenProvider);
     if (token == null || token.isEmpty) {
@@ -70,21 +85,22 @@ class PusherListeners {
 
     // Listen for user profile to get user ID, then subscribe to private channels.
     // Store the subscription so it can be cancelled on logout/reset.
-    _profileSubscription = container.listen(
-      userProfileProvider,
-      (previous, next) {
-        next.whenData((profile) {
-          if (profile != null && profile.id != _listenerUserId) {
-            debugPrint('👤 User profile loaded, subscribing to channels for user ${profile.id}');
-            setCurrentUserId(profile.id);
-            _listenerUserId = profile.id;
-            subscribeToUserChannel(pusher, profile.id, container);
-            _checkAndSubscribeSellerChannels(pusher, profile.id, container);
-          }
-        });
-      },
-      fireImmediately: true,
-    );
+    _profileSubscription = container.listen(userProfileProvider, (
+      previous,
+      next,
+    ) {
+      next.whenData((profile) {
+        if (profile != null && profile.id != _listenerUserId) {
+          debugPrint(
+            '👤 User profile loaded, subscribing to channels for user ${profile.id}',
+          );
+          setCurrentUserId(profile.id);
+          _listenerUserId = profile.id;
+          subscribeToUserChannel(pusher, profile.id, container);
+          _checkAndSubscribeSellerChannels(pusher, profile.id, container);
+        }
+      });
+    }, fireImmediately: true);
   }
 
   static void resetListeners() {
@@ -106,19 +122,20 @@ class PusherListeners {
     // Cancel any existing seller status subscription before adding a new one
     _sellerStatusSubscription?.close();
 
-    _sellerStatusSubscription = container.listen(
-      mySellerStatusProvider,
-      (previous, next) {
-        next.whenData((sellerStatus) {
-          if (sellerStatus != null) {
-            final status = sellerStatus.registrationStatus;
-            debugPrint('🏪 Seller status: $status — subscribing to seller channels');
-            subscribeToSellerChannel(pusher, userId, container);
-          }
-        });
-      },
-      fireImmediately: true,
-    );
+    _sellerStatusSubscription = container.listen(mySellerStatusProvider, (
+      previous,
+      next,
+    ) {
+      next.whenData((sellerStatus) {
+        if (sellerStatus != null) {
+          final status = sellerStatus.registrationStatus;
+          debugPrint(
+            '🏪 Seller status: $status — subscribing to seller channels',
+          );
+          subscribeToSellerChannel(pusher, userId, container);
+        }
+      });
+    }, fireImmediately: true);
   }
 
   /// Subscribe to user's private channel for order and cart updates
@@ -133,16 +150,18 @@ class PusherListeners {
     // Listen for order status updates - UPDATE STATE DIRECTLY
     pusher.bindEvent(channelName, 'order.status.updated', (data) {
       debugPrint('📦 Order status updated: $data');
-      
+
       try {
         final json = data is String ? jsonDecode(data) : data;
         final orderId = json['order_id'];
         final status = json['status'] as String?;
         if (orderId is int && status != null) {
-          container.read(ordersRealtimeProvider.notifier).applyStatusUpdate(orderId, status);
-          container.read(sellerOrdersRealtimeProvider(null).notifier).applyStatusUpdate(orderId, status);
+          container
+              .read(ordersRealtimeProvider.notifier)
+              .applyStatusUpdate(orderId, status);
         }
-        
+        container.invalidate(ordersProvider);
+
         // Show in-app notification
         _showOrderUpdateNotification(orderId, status ?? 'updated');
       } catch (e) {
@@ -150,10 +169,25 @@ class PusherListeners {
       }
     });
 
+    pusher.bindEvent(channelName, 'shipment.created', (data) {
+      debugPrint('📦 Shipment created: $data');
+      _handleBuyerShipmentEvent(container);
+    });
+
+    pusher.bindEvent(channelName, 'shipment.status.updated', (data) {
+      debugPrint('🚚 Shipment status updated: $data');
+      _handleBuyerShipmentEvent(container);
+    });
+
+    pusher.bindEvent(channelName, 'shipment.booking.failed', (data) {
+      debugPrint('⚠️ Shipment booking failed: $data');
+      _handleBuyerShipmentEvent(container);
+    });
+
     // Listen for cart updates - SYNC ACROSS DEVICES
     pusher.bindEvent(channelName, 'cart.updated', (data) {
       debugPrint('🛒 Cart updated: $data');
-      
+
       try {
         final json = data is String ? jsonDecode(data) : data;
         if (json is! Map<String, dynamic>) {
@@ -161,8 +195,10 @@ class PusherListeners {
         }
         final itemsCount = json['items_count'] as int?;
         final cart = Cart.fromWrappedResponse(json);
-        container.read(optimisticCartProvider.notifier).setCartFromRealtime(cart);
-        
+        container
+            .read(optimisticCartProvider.notifier)
+            .setCartFromRealtime(cart);
+
         // Show in-app notification
         _showCartUpdateNotification(itemsCount ?? cart.itemsCount);
       } catch (e) {
@@ -171,7 +207,7 @@ class PusherListeners {
     });
   }
 
-  /// Subscribe to seller's private channel for product approvals and new orders
+  /// Subscribe to seller's private channel for seller and shipment updates
   static Future<void> subscribeToSellerChannel(
     PusherService pusher,
     int sellerId,
@@ -183,7 +219,7 @@ class PusherListeners {
     // Listen for SELLER APPROVAL STATUS - UNLOCKS SHOP SCREEN
     pusher.bindEvent(channelName, 'seller.approval.changed', (data) {
       debugPrint('🎉 SELLER APPROVAL CHANGED: $data');
-      
+
       try {
         final json = data is String ? jsonDecode(data) : data;
         final status = json['status'] as String?;
@@ -198,11 +234,17 @@ class PusherListeners {
             businessName: businessName,
             badge: null,
           );
-          container.read(sellerStatusOverrideProvider.notifier).setStatus(sellerStatus);
+          container
+              .read(sellerStatusOverrideProvider.notifier)
+              .setStatus(sellerStatus);
         }
         container.invalidate(isSellerApprovedProvider);
-        
-        _showSellerApprovalNotification(status ?? '', businessName, rejectionReason);
+
+        _showSellerApprovalNotification(
+          status ?? '',
+          businessName,
+          rejectionReason,
+        );
       } catch (e) {
         debugPrint('Error parsing seller approval: $e');
       }
@@ -211,13 +253,13 @@ class PusherListeners {
     // Listen for PRODUCT approval status
     pusher.bindEvent(channelName, 'product.approval.changed', (data) {
       debugPrint('✅ Product approval changed: $data');
-      
+
       try {
         final json = data is String ? jsonDecode(data) : data;
         final productName = json['product_name'] as String?;
         final status = json['status'] as String?;
         final rejectionReason = json['rejection_reason'] as String?;
-        
+
         // Show in-app notification
         _showProductApprovalNotification(
           productName ?? 'Your product',
@@ -229,45 +271,45 @@ class PusherListeners {
       }
     });
 
-    // Subscribe to all seller orders channel - NEW ORDERS - ONLY IF APPROVED
     final sellerStatus = container.read(mySellerStatusProvider).value;
     if (sellerStatus?.registrationStatus == 'approved') {
-      await pusher.subscribeToChannel('private-seller.orders');
-      
-      pusher.bindEvent('private-seller.orders', 'order.new', (data) {
-        debugPrint('🆕 NEW ORDER RECEIVED: $data');
-        
+      pusher.bindEvent(channelName, 'shipment.created', (data) {
+        debugPrint('🆕 SELLER SHIPMENT CREATED: $data');
+        _handleSellerShipmentEvent(container);
         try {
           final json = data is String ? jsonDecode(data) : data;
           final orderId = json['order_id'];
-          final total = json['total'];
-          final buyerName = json['buyer']?['name'] as String?;
-          
-          if (orderId is int) {
-            final order = SellerOrder(
-              id: orderId,
-              orderNumber: orderId.toString(),
-              status: 'pending',
-              createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
-              customerName: buyerName,
-              customerPhone: json['buyer']?['phone'] as String?,
-              shippingAddress: null,
-              items: const [],
-              totalPrice: (total is num) ? total.toDouble() : double.tryParse(total?.toString() ?? '') ?? 0,
-              trackingNumber: null,
-              shippedAt: null,
-              deliveredAt: null,
-              cancellationReason: null,
-            );
-            container.read(sellerOrdersRealtimeProvider(null).notifier).applyNewOrder(order);
-          }
-          
-          // Show in-app notification
-          _showNewOrderNotification(orderId, total, buyerName ?? 'Customer');
+          final shipment = json['shipment'];
+          final total = json['total_amount'] ?? json['total'];
+          final sellerName = shipment is Map<String, dynamic>
+              ? shipment['seller_name'] as String?
+              : null;
+          _showNewOrderNotification(orderId, total, sellerName ?? 'Customer');
         } catch (e) {
-          debugPrint('Error parsing new order: $e');
+          debugPrint('Error parsing shipment.created notification: $e');
         }
       });
+
+      pusher.bindEvent(channelName, 'shipment.status.updated', (data) {
+        debugPrint('🚚 SELLER SHIPMENT STATUS UPDATED: $data');
+        _handleSellerShipmentEvent(container);
+      });
+
+      pusher.bindEvent(channelName, 'shipment.booking.failed', (data) {
+        debugPrint('⚠️ SELLER SHIPMENT BOOKING FAILED: $data');
+        _handleSellerShipmentEvent(container);
+      });
+    }
+  }
+
+  static void _handleBuyerShipmentEvent(ProviderContainer container) {
+    container.invalidate(ordersProvider);
+  }
+
+  static void _handleSellerShipmentEvent(ProviderContainer container) {
+    for (final status in _sellerOrderStatuses) {
+      container.invalidate(sellerOrdersProvider(status));
+      container.invalidate(sellerOrdersRealtimeProvider(status));
     }
   }
 
@@ -277,7 +319,7 @@ class PusherListeners {
     ProviderContainer container,
   ) async {
     await pusher.subscribeToChannel('blog-updates');
-    
+
     pusher.bindEvent('blog-updates', 'blog.published', (data) {
       debugPrint('📝 New blog published: $data');
       try {
@@ -302,7 +344,7 @@ class PusherListeners {
 
     String message = 'Order #$orderId is now $status';
     IconData icon = Icons.local_shipping;
-    
+
     if (status == 'completed') {
       message = 'Order #$orderId has been delivered!';
       icon = Icons.check_circle;
@@ -405,7 +447,11 @@ class PusherListeners {
     }
   }
 
-  static void _showNewOrderNotification(int orderId, dynamic total, String buyerName) {
+  static void _showNewOrderNotification(
+    int orderId,
+    dynamic total,
+    String buyerName,
+  ) {
     final context = pusherNavigatorKey.currentContext;
     if (context == null) return;
 

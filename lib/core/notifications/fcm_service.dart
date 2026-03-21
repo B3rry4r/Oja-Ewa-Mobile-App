@@ -35,14 +35,20 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 /// Firebase Cloud Messaging Service
 class FCMService {
-  FCMService({NotificationsApi? notificationsApi}) : _notificationsApi = notificationsApi;
+  FCMService({
+    NotificationsApi? notificationsApi,
+    FirebaseMessaging? messaging,
+  }) : _notificationsApi = notificationsApi,
+       _messaging = messaging;
 
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  final FirebaseMessaging? _messaging;
   final NotificationsApi? _notificationsApi;
   String? _fcmToken;
   bool _initialized = false;
   bool _localNotificationsInitialized = false;
   bool _messageHandlersSetUp = false;
+
+  FirebaseMessaging get messaging => _messaging ?? FirebaseMessaging.instance;
 
   /// Call this once at app startup to create the channel early
   Future<void> createChannelEarly() async {
@@ -145,7 +151,7 @@ class FCMService {
   Future<bool> isPermissionGranted() async {
     if (_fcmToken != null) return true;
     if (kIsWeb) return false;
-    final settings = await _messaging.getNotificationSettings();
+    final settings = await messaging.getNotificationSettings();
     return settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional;
   }
@@ -160,14 +166,14 @@ class FCMService {
     _messageHandlersSetUp = false;
 
     // Check if permission is already granted - if so, skip the prompt
-    final existing = await _messaging.getNotificationSettings();
+    final existing = await messaging.getNotificationSettings();
     bool isGranted = existing.authorizationStatus == AuthorizationStatus.authorized ||
         existing.authorizationStatus == AuthorizationStatus.provisional;
 
     if (!isGranted) {
       try {
         // Request permissions (iOS - Android auto-granted)
-        final settings = await _messaging.requestPermission(
+        final settings = await messaging.requestPermission(
           alert: true,
           announcement: false,
           badge: true,
@@ -188,11 +194,11 @@ class FCMService {
       try {
         // For iOS, it's safer to wait for APNs token before getting FCM token
         if (!kIsWeb && Platform.isIOS) {
-          String? apnsToken = await _messaging.getAPNSToken();
+          String? apnsToken = await messaging.getAPNSToken();
           int retryCount = 0;
           while (apnsToken == null && retryCount < 5) {
             await Future.delayed(const Duration(seconds: 1));
-            apnsToken = await _messaging.getAPNSToken();
+            apnsToken = await messaging.getAPNSToken();
             retryCount++;
             debugPrint('Waiting for APNs token (attempt $retryCount)...');
           }
@@ -202,7 +208,7 @@ class FCMService {
         }
 
         // Get FCM token
-        _fcmToken = await _messaging.getToken();
+        _fcmToken = await messaging.getToken();
         debugPrint('FCM Token: $_fcmToken');
 
         // Send token to backend
@@ -214,7 +220,7 @@ class FCMService {
         }
 
         // Listen for token refresh
-        _messaging.onTokenRefresh.listen((newToken) {
+        messaging.onTokenRefresh.listen((newToken) {
           _fcmToken = newToken;
           debugPrint('FCM Token refreshed: $newToken');
           _sendTokenToBackend(newToken);
@@ -247,7 +253,7 @@ class FCMService {
 
     try {
       // On Android, request permission (API 33+ needs explicit grant, lower auto-grants)
-      final settings = await _messaging.requestPermission(
+      final settings = await messaging.requestPermission(
         alert: true,
         badge: true,
         sound: true,
@@ -257,14 +263,14 @@ class FCMService {
       // On Android, even notDetermined means we can still get a token
       // Only skip if explicitly denied
       if (settings.authorizationStatus != AuthorizationStatus.denied) {
-        _fcmToken = await _messaging.getToken();
+        _fcmToken = await messaging.getToken();
         if (_fcmToken != null) {
           final registered = await _sendTokenToBackend(_fcmToken!);
           if (!registered) {
             debugPrint('FCM token registration failed');
           }
         }
-        _messaging.onTokenRefresh.listen((newToken) {
+        messaging.onTokenRefresh.listen((newToken) {
           _fcmToken = newToken;
           _sendTokenToBackend(newToken);
         });
@@ -294,7 +300,7 @@ class FCMService {
 
     // On iOS, tell FCM to show notification while app is in foreground too
     if (Platform.isIOS) {
-      await _messaging.setForegroundNotificationPresentationOptions(
+      await messaging.setForegroundNotificationPresentationOptions(
         alert: true,
         badge: true,
         sound: true,
@@ -323,7 +329,7 @@ class FCMService {
     });
 
     // Check if app was opened from a terminated state via notification
-    _messaging.getInitialMessage().then((RemoteMessage? message) {
+    messaging.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
         debugPrint('App opened from terminated state via notification: ${message.messageId}');
         debugPrint('Data: ${message.data}');
@@ -367,7 +373,7 @@ class FCMService {
   /// Subscribe to a topic
   Future<void> subscribeToTopic(String topic) async {
     try {
-      await _messaging.subscribeToTopic(topic);
+      await messaging.subscribeToTopic(topic);
       debugPrint('Subscribed to topic: $topic');
     } catch (e) {
       debugPrint('Error subscribing to topic $topic: $e');
@@ -377,7 +383,7 @@ class FCMService {
   /// Unsubscribe from a topic
   Future<void> unsubscribeFromTopic(String topic) async {
     try {
-      await _messaging.unsubscribeFromTopic(topic);
+      await messaging.unsubscribeFromTopic(topic);
       debugPrint('Unsubscribed from topic: $topic');
     } catch (e) {
       debugPrint('Error unsubscribing from topic $topic: $e');
@@ -393,7 +399,7 @@ class FCMService {
       }
       
       // Then delete from Firebase
-      await _messaging.deleteToken();
+      await messaging.deleteToken();
       _fcmToken = null;
       _initialized = false;
       debugPrint('FCM token deleted');
