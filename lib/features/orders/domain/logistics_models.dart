@@ -32,6 +32,13 @@ class ShippingQuote {
     return 0;
   }
 
+  static int? _parseNullableInt(dynamic value) {
+    if (value == null) return null;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value);
+    return null;
+  }
+
   static ShippingQuote fromJson(Map<String, dynamic> json) {
     return ShippingQuote(
       quoteReference: (json['quote_reference'] as String?) ?? '',
@@ -40,7 +47,7 @@ class ShippingQuote {
       serviceName: (json['service_name'] as String?) ?? '',
       amount: _parseNum(json['amount']),
       currency: (json['currency'] as String?) ?? 'NGN',
-      estimatedDays: _parseNum(json['estimated_days']).toInt(),
+      estimatedDays: _parseNullableInt(json['estimated_days']),
       expiresAt: DateTime.tryParse((json['expires_at'] as String?) ?? ''),
     );
   }

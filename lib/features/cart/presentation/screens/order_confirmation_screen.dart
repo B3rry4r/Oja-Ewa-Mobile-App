@@ -320,13 +320,20 @@ class _OrderConfirmationScreenState
                         groupValue:
                             _selectedQuotesBySeller[group.sellerProfileId],
                         activeColor: const Color(0xFFFDAF40),
-                        title: Text(quote.serviceName),
+                        title: Text(
+                          quote.serviceName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF241508),
+                          ),
+                        ),
                         subtitle: Text(
                           [
                             quote.provider.toUpperCase(),
                             if (quote.estimatedDays != null)
                               '${quote.estimatedDays} day(s)',
                           ].join(' • '),
+                          style: const TextStyle(color: Color(0xFF4A4036)),
                         ),
                         secondary: Text(
                           formatPrice(quote.amount),
