@@ -44,7 +44,6 @@ class HomeScreen extends ConsumerWidget {
 
                       // For You - AI Personalized Section
                       // _buildForYouSection(context, ref),
-
                       const SizedBox(height: 12),
 
                       // Hero Title
@@ -229,10 +228,9 @@ class HomeScreen extends ConsumerWidget {
                         Navigator.of(context).pushNamed(AppRoutes.music);
                       } else if (actionUrl.contains('school')) {
                         Navigator.of(context).pushNamed(AppRoutes.schools);
-                      } else if (actionUrl.contains('sustain')) {
-                        Navigator.of(
-                          context,
-                        ).pushNamed(AppRoutes.sustainability);
+                      } else if (actionUrl.contains('hardware') ||
+                          actionUrl.contains('sustain')) {
+                        Navigator.of(context).pushNamed(AppRoutes.hardware);
                       } else {
                         // Default to home for unknown relative paths
                         Navigator.of(context).pushNamed(AppRoutes.home);
@@ -455,14 +453,13 @@ class HomeScreen extends ConsumerWidget {
           iconAsset: AppIcons.schools,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.schools),
         ),
-        // Sustainability
+        // Hardware
         _buildCategoryItem(
           context: context,
-          title: 'Sustainability',
+          title: 'Hardware',
           color: const Color(0xFFA15E22),
-          iconAsset: AppIcons.sustainability,
-          onTap: () =>
-              Navigator.of(context).pushNamed(AppRoutes.sustainability),
+          iconAsset: AppIcons.hardware,
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.hardware),
         ),
       ],
     );
@@ -590,5 +587,4 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
-
 }

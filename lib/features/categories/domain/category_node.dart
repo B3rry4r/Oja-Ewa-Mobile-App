@@ -13,7 +13,8 @@ class CategoryNode {
   });
 
   final int id;
-  final String type; // market|beauty|brand|school|music|sustainability
+  final String
+  type; // textiles|afro_beauty_products|shoes_bags|art|school|hardware|sustainability
   final String name;
   final String slug;
   final String? description;
@@ -23,7 +24,10 @@ class CategoryNode {
   static CategoryNode fromJson(Map<String, dynamic> json) {
     final childrenRaw = json['children'];
     final children = (childrenRaw is List)
-        ? childrenRaw.whereType<Map<String, dynamic>>().map(CategoryNode.fromJson).toList()
+        ? childrenRaw
+              .whereType<Map<String, dynamic>>()
+              .map(CategoryNode.fromJson)
+              .toList()
         : const <CategoryNode>[];
 
     return CategoryNode(

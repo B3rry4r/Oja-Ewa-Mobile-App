@@ -15,7 +15,7 @@ import '../../features/home/subfeatures/brands/presentation/brands_screen.dart';
 import '../../features/home/subfeatures/market/presentation/market_screen.dart';
 import '../../features/home/subfeatures/music/presentation/music_screen.dart';
 import '../../features/home/subfeatures/schools/presentation/schools_screen.dart';
-import '../../features/home/subfeatures/sustainability/presentation/sustainability_screen.dart';
+import '../../features/home/subfeatures/hardware/presentation/hardware_screen.dart';
 import '../../features/account/subfeatures/edit_profile/presentation/edit_profile.dart';
 import '../../features/account/subfeatures/your_address/presentation/add_edit_address.dart';
 import '../../features/account/subfeatures/connect/connect.dart';
@@ -81,6 +81,7 @@ abstract class AppRoutes {
   static const brands = '/brands';
   static const music = '/music';
   static const schools = '/schools';
+  static const hardware = '/hardware';
   static const sustainability = '/sustainability';
 
   // Feature screens
@@ -225,10 +226,16 @@ abstract class AppRouter {
           builder: (_) => const SchoolsScreen(),
         );
 
+      case AppRoutes.hardware:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const HardwareScreen(),
+        );
+
       case AppRoutes.sustainability:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const SustainabilityScreen(),
+          builder: (_) => const HardwareScreen(),
         );
 
       case AppRoutes.editProfile:
@@ -479,7 +486,8 @@ abstract class AppRouter {
       case AppRoutes.sellerCategorySelection:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const AuthGuard(child: SellerCategorySelectionScreen()),
+          builder: (_) =>
+              const AuthGuard(child: SellerCategorySelectionScreen()),
         );
 
       // AI Features

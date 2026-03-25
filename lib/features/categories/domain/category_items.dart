@@ -32,7 +32,10 @@ class CategoryProductItem extends CategoryItem {
 
   static CategoryProductItem fromJson(Map<String, dynamic> json) {
     return CategoryProductItem(
-      id: (json['id'] as num?)?.toInt() ?? (json['product_id'] as num?)?.toInt() ?? 0,
+      id:
+          (json['id'] as num?)?.toInt() ??
+          (json['product_id'] as num?)?.toInt() ??
+          0,
       name: (json['name'] as String?) ?? (json['title'] as String?) ?? '',
       image: json['image'] as String? ?? json['image_url'] as String?,
       price: json['price']?.toString(),
@@ -119,11 +122,12 @@ CategoryItem parseCategoryItem(String type, Map<String, dynamic> json) {
     'shoes_bags',
     'afro_beauty_products',
     'art',
+    'hardware',
   };
   if (productTypes.contains(type)) {
     return CategoryProductItem.fromJson(json);
   }
-  
+
   // Art products sometimes include business_name from seller; treat as product.
   final category = json['category']?.toString();
   if (category == 'art') {

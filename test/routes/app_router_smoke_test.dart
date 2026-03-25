@@ -16,6 +16,7 @@ import 'package:ojaewa/features/auth/presentation/screens/reset_password_screen.
 import 'package:ojaewa/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:ojaewa/features/categories/domain/category_catalog.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
+import 'package:ojaewa/features/home/subfeatures/hardware/presentation/hardware_screen.dart';
 
 void main() {
   group('AppRouter smoke', () {
@@ -36,6 +37,38 @@ void main() {
       expect(find.byType(ResetPasswordScreen), findsOneWidget);
     });
 
+    testWidgets('builds the hardware route', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            categoriesByTypeProvider(
+              'hardware',
+            ).overrideWith((_) async => const []),
+          ],
+          child: _buildRouteBody(AppRoutes.hardware),
+        ),
+      );
+
+      expect(find.byType(HardwareScreen), findsOneWidget);
+    });
+
+    testWidgets('maps the legacy sustainability route to hardware', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            categoriesByTypeProvider(
+              'hardware',
+            ).overrideWith((_) async => const []),
+          ],
+          child: _buildRouteBody(AppRoutes.sustainability),
+        ),
+      );
+
+      expect(find.byType(HardwareScreen), findsOneWidget);
+    });
+
     testWidgets('redirects guarded routes to onboarding when unauthenticated', (
       tester,
     ) async {
@@ -44,7 +77,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            authControllerProvider.overrideWith(_UnauthenticatedAuthController.new),
+            authControllerProvider.overrideWith(
+              _UnauthenticatedAuthController.new,
+            ),
           ],
           child: MaterialApp(
             navigatorKey: navigatorKey,
@@ -62,13 +97,17 @@ void main() {
       expect(find.byType(OnboardingScreen), findsOneWidget);
     });
 
-    testWidgets('falls back to the app shell for unknown routes', (tester) async {
+    testWidgets('falls back to the app shell for unknown routes', (
+      tester,
+    ) async {
       final navigatorKey = GlobalKey<NavigatorState>();
 
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            authControllerProvider.overrideWith(_UnauthenticatedAuthController.new),
+            authControllerProvider.overrideWith(
+              _UnauthenticatedAuthController.new,
+            ),
             audioControllerProvider.overrideWith(_FakeAudioController.new),
             allCategoriesProvider.overrideWithValue(
               const AsyncData(

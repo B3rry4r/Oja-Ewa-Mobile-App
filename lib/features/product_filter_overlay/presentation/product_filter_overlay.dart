@@ -146,7 +146,7 @@ class ProductFilterOverlay extends StatelessWidget {
             runSpacing: 8,
             children: [
               _buildCategoryTag('Schools', isActive: false),
-              _buildCategoryTag('Sustainability', isActive: false),
+              _buildCategoryTag('Hardware', isActive: false),
             ],
           ),
 

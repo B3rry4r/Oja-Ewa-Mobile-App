@@ -66,7 +66,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
   final ScrollController _scrollController = ScrollController();
   late String _activeSlug;
   String? _activePill; // Track selected pill, null means 'All'
-  
+
   // Cache for category children to avoid re-fetching
   List<CategoryNode>? _cachedChildren;
   CategoryItemsState? _cachedCategoryState;
@@ -131,7 +131,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
 
     final leaves = leafNodes(children);
     final pillNames = <String>['All', ...leaves.map((c) => c.name)];
-    
+
     return _CategoryPills(
       pills: pillNames,
       selectedPill: _activePill,
@@ -200,7 +200,8 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
     final categoryItemsAsync = ref.watch(
       categoryItemsProvider((type: widget.type, slug: _activeSlug)),
     );
-    final hasActiveFilters = ref.watch(selectedFiltersProvider).hasFilters ||
+    final hasActiveFilters =
+        ref.watch(selectedFiltersProvider).hasFilters ||
         ref.watch(selectedFiltersProvider).hasSort;
     final filteredAsync = hasActiveFilters
         ? ref.watch(
@@ -234,9 +235,13 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                     final isLoading = categoryItemsAsync.isLoading;
                     final hasError = categoryItemsAsync.hasError;
                     final categoryState = categoryItemsAsync.value;
-                    
+
                     if (categoryState == null && _cachedCategoryState != null) {
-                      return _buildContent(_cachedCategoryState!, isLoading: isLoading, filteredAsync: filteredAsync);
+                      return _buildContent(
+                        _cachedCategoryState!,
+                        isLoading: isLoading,
+                        filteredAsync: filteredAsync,
+                      );
                     }
 
                     // Only show full-page loader on first load (no cached data)
@@ -262,7 +267,11 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
 
                     _cachedCategoryState = categoryState;
                     _lastLoadedSlug = _activeSlug;
-                    return _buildContent(categoryState, isLoading: isLoading, filteredAsync: filteredAsync);
+                    return _buildContent(
+                      categoryState,
+                      isLoading: isLoading,
+                      filteredAsync: filteredAsync,
+                    );
                   },
                 ),
               ),
@@ -280,17 +289,22 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
   }) {
     final kind = ListingKindMapper.fromType(widget.type);
     final businessFilters = ref.watch(businessListingFiltersProvider);
-    final hasBusinessFilters = kind == _ListingKind.business &&
+    final hasBusinessFilters =
+        kind == _ListingKind.business &&
         ((businessFilters.state ?? '').isNotEmpty ||
             (businessFilters.city ?? '').isNotEmpty ||
             (businessFilters.sort ?? '').isNotEmpty);
 
     final sustFilters = ref.watch(sustainabilityListingFiltersProvider);
-    final hasSustFilters = kind == _ListingKind.sustainability &&
+    final hasSustFilters =
+        kind == _ListingKind.sustainability &&
         (sustFilters.sort ?? '').isNotEmpty;
 
-    final hasActiveFilters = ref.watch(selectedFiltersProvider).hasFilters || ref.watch(selectedFiltersProvider).hasSort;
-    final effectiveFilteredAsync = filteredAsync ??
+    final hasActiveFilters =
+        ref.watch(selectedFiltersProvider).hasFilters ||
+        ref.watch(selectedFiltersProvider).hasSort;
+    final effectiveFilteredAsync =
+        filteredAsync ??
         (hasActiveFilters
             ? ref.watch(
                 filteredProductsProvider((
@@ -300,11 +314,14 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
               )
             : null);
 
-    final isRefreshing = isLoading && _lastLoadedSlug != null && _activeSlug != _lastLoadedSlug;
+    final isRefreshing =
+        isLoading && _lastLoadedSlug != null && _activeSlug != _lastLoadedSlug;
     final showInlineLoader = isLoading;
     // Cache children once loaded to avoid refetching
     if (_cachedChildren == null) {
-      final childrenAsync = ref.watch(categoryChildrenProvider(categoryState.category.id));
+      final childrenAsync = ref.watch(
+        categoryChildrenProvider(categoryState.category.id),
+      );
       if (childrenAsync.hasValue) {
         _cachedChildren = childrenAsync.value;
       }
@@ -350,7 +367,13 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                 return childrenAsync.when(
                   loading: () => const SizedBox(
                     height: 42,
-                    child: Center(child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))),
+                    child: Center(
+                      child: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
                   ),
                   error: (e, _) => const SizedBox(height: 42),
                   data: (children) {
@@ -392,14 +415,17 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                       builder: (context) {
                         if (hasBusinessFilters) {
                           final businessAsync = ref.watch(
-                            filteredBusinessesByCategoryProvider((slug: _activeSlug)),
+                            filteredBusinessesByCategoryProvider((
+                              slug: _activeSlug,
+                            )),
                           );
                           return businessAsync.when(
                             loading: () => const Padding(
                               padding: EdgeInsets.symmetric(vertical: 48),
                               child: Center(child: CircularProgressIndicator()),
                             ),
-                            error: (e, _) => Center(child: Text('Failed to load: $e')),
+                            error: (e, _) =>
+                                Center(child: Text('Failed to load: $e')),
                             data: (items) => _CategoryItemGrid(
                               type: widget.type,
                               items: items,
@@ -412,14 +438,17 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
 
                         if (hasSustFilters) {
                           final sustAsync = ref.watch(
-                            filteredSustainabilityByCategoryProvider((slug: _activeSlug)),
+                            filteredSustainabilityByCategoryProvider((
+                              slug: _activeSlug,
+                            )),
                           );
                           return sustAsync.when(
                             loading: () => const Padding(
                               padding: EdgeInsets.symmetric(vertical: 48),
                               child: Center(child: CircularProgressIndicator()),
                             ),
-                            error: (e, _) => Center(child: Text('Failed to load: $e')),
+                            error: (e, _) =>
+                                Center(child: Text('Failed to load: $e')),
                             data: (items) => _CategoryItemGrid(
                               type: widget.type,
                               items: items,
@@ -434,7 +463,8 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                           type: widget.type,
                           items: categoryState.items,
                           hasMore: categoryState.hasMore,
-                          isLoadingMore: categoryState.isLoadingMore || showInlineLoader,
+                          isLoadingMore:
+                              categoryState.isLoadingMore || showInlineLoader,
                           onTap: _onCategoryItemTap,
                         );
                       },
@@ -551,6 +581,7 @@ extension ListingKindMapper on _ListingKind {
       case 'textiles':
       case 'shoes_bags':
       case 'afro_beauty_products':
+      case 'hardware':
         return _ListingKind.product;
       case 'school':
       case 'art_services':
@@ -562,7 +593,6 @@ extension ListingKindMapper on _ListingKind {
     }
   }
 }
-
 
 class _SortFilterRow extends ConsumerWidget {
   const _SortFilterRow({
@@ -633,11 +663,12 @@ class _SortFilterRow extends ConsumerWidget {
     // Business & Sustainability: separate state providers, no category picker.
     final hasSort = kind == _ListingKind.business
         ? (ref.watch(businessListingFiltersProvider).sort ?? '').isNotEmpty
-        : (ref.watch(sustainabilityListingFiltersProvider).sort ?? '').isNotEmpty;
+        : (ref.watch(sustainabilityListingFiltersProvider).sort ?? '')
+              .isNotEmpty;
 
     final hasFilters = kind == _ListingKind.business
         ? ((ref.watch(businessListingFiltersProvider).state ?? '').isNotEmpty ||
-            (ref.watch(businessListingFiltersProvider).city ?? '').isNotEmpty)
+              (ref.watch(businessListingFiltersProvider).city ?? '').isNotEmpty)
         : false;
 
     return Padding(
@@ -653,7 +684,8 @@ class _SortFilterRow extends ConsumerWidget {
                 context: context,
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
-                builder: (_) => SimpleSortSheet(isBusiness: kind == _ListingKind.business),
+                builder: (_) =>
+                    SimpleSortSheet(isBusiness: kind == _ListingKind.business),
               );
               onFiltersChanged();
             },
@@ -757,7 +789,9 @@ class _CategoryPills extends StatelessWidget {
         separatorBuilder: (context, index) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final pill = pills[index];
-          final isSelected = pill == 'All' ? selectedPill == null : pill == selectedPill;
+          final isSelected = pill == 'All'
+              ? selectedPill == null
+              : pill == selectedPill;
 
           return GestureDetector(
             onTap: () => onTap(pill),
@@ -862,7 +896,7 @@ class _CategoryItemGrid extends StatelessWidget {
         return Product(
           id: p.id.toString(),
           title: p.name,
-          priceLabel: formatPrice(num.tryParse(p.price ?? '')), 
+          priceLabel: formatPrice(num.tryParse(p.price ?? '')),
           rating: (p.avgRating ?? 0).toDouble(),
           reviewCount: 0,
           imageUrl: p.image,
