@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -5,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
+import 'package:ojaewa/features/adverts/domain/advert.dart';
 import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
@@ -37,8 +40,8 @@ class HomeScreen extends ConsumerWidget {
 
                       const SizedBox(height: 24),
 
-                      // Promo Cards (Horizontal Scroll) - now API driven via /api/adverts
-                      _buildAdvertsOrFallback(ref),
+                      // Promo banner - full-width fade carousel via /api/adverts
+                      _buildAdvertsOrFallback(context, ref),
 
                       const SizedBox(height: 24),
 
@@ -188,205 +191,100 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAdvertsOrFallback(WidgetRef ref) {
+  Widget _buildAdvertsOrFallback(BuildContext context, WidgetRef ref) {
     final advertsAsync = ref.watch(advertsByPositionProvider('banner'));
 
     return advertsAsync.when(
       loading: () => const SizedBox(
-        height: 160,
+        height: 220,
         child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
       ),
       error: (_, __) => _buildPromoCardsSection(),
       data: (adverts) {
         if (adverts.isEmpty) return _buildPromoCardsSection();
 
-        return SizedBox(
-          height: 160,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.only(left: 16),
-            itemCount: adverts.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 16),
-            itemBuilder: (context, index) {
-              final ad = adverts[index];
-              return GestureDetector(
-                onTap: () async {
-                  final actionUrl = ad.actionUrl;
-                  if (actionUrl != null && actionUrl.isNotEmpty) {
-                    // Handle relative URLs as in-app navigation
-                    if (actionUrl.startsWith('/')) {
-                      // Relative URL - navigate within the app
-                      // Map known paths to app routes
-                      if (actionUrl.contains('textiles')) {
-                        Navigator.of(context).pushNamed(AppRoutes.market);
-                      } else if (actionUrl.contains('beauty')) {
-                        Navigator.of(context).pushNamed(AppRoutes.beauty);
-                      } else if (actionUrl.contains('shoes') ||
-                          actionUrl.contains('bags')) {
-                        Navigator.of(context).pushNamed(AppRoutes.brands);
-                      } else if (actionUrl.contains('art')) {
-                        Navigator.of(context).pushNamed(AppRoutes.music);
-                      } else if (actionUrl.contains('school')) {
-                        Navigator.of(context).pushNamed(AppRoutes.schools);
-                      } else if (actionUrl.contains('hardware') ||
-                          actionUrl.contains('sustain')) {
-                        Navigator.of(context).pushNamed(AppRoutes.hardware);
-                      } else {
-                        // Default to home for unknown relative paths
-                        Navigator.of(context).pushNamed(AppRoutes.home);
-                      }
-                    } else {
-                      // Absolute URL - open externally
-                      final uri = Uri.tryParse(actionUrl);
-                      if (uri != null &&
-                          (uri.scheme == 'http' || uri.scheme == 'https')) {
-                        await launchUrl(
-                          uri,
-                          mode: LaunchMode.externalApplication,
-                        );
-                      }
-                    }
-                  }
-                },
-                child: Container(
-                  width: 254,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: const Color(0xFFFDAF40),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: ad.imageUrl == null
-                      ? Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                ad.title,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              if ((ad.description ?? '').trim().isNotEmpty) ...[
-                                const SizedBox(height: 6),
-                                Text(
-                                  ad.description!,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Colors.black),
-                                ),
-                              ],
-                            ],
-                          ),
-                        )
-                      : Image.network(ad.imageUrl!, fit: BoxFit.cover),
-                ),
-              );
-            },
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: _AdvertFadeCarousel(
+            adverts: adverts,
+            onTap: (ad) => _handleAdvertTap(context, ad),
           ),
         );
       },
     );
   }
 
+  Future<void> _handleAdvertTap(BuildContext context, Advert ad) async {
+    final actionUrl = ad.actionUrl;
+    if (actionUrl == null || actionUrl.isEmpty) return;
+
+    if (actionUrl.startsWith('/')) {
+      if (actionUrl.contains('textiles')) {
+        Navigator.of(context).pushNamed(AppRoutes.market);
+      } else if (actionUrl.contains('beauty')) {
+        Navigator.of(context).pushNamed(AppRoutes.beauty);
+      } else if (actionUrl.contains('shoes') || actionUrl.contains('bags')) {
+        Navigator.of(context).pushNamed(AppRoutes.brands);
+      } else if (actionUrl.contains('art')) {
+        Navigator.of(context).pushNamed(AppRoutes.music);
+      } else if (actionUrl.contains('school')) {
+        Navigator.of(context).pushNamed(AppRoutes.schools);
+      } else if (actionUrl.contains('hardware') ||
+          actionUrl.contains('sustain')) {
+        Navigator.of(context).pushNamed(AppRoutes.hardware);
+      } else {
+        Navigator.of(context).pushNamed(AppRoutes.home);
+      }
+      return;
+    }
+
+    final uri = Uri.tryParse(actionUrl);
+    if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
   Widget _buildPromoCardsSection() {
-    return SizedBox(
-      height: 160,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.only(left: 16),
-        children: [
-          // Promo Card 1 - 40% Off
-          Container(
-            width: 254,
-            margin: const EdgeInsets.only(right: 16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFDAF40),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Stack(
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: AspectRatio(
+        aspectRatio: _AdvertFadeCarousel.aspectRatio,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Color(0xFFFDAF40),
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                // Decorative Circles
-                Positioned(
-                  right: 20,
-                  top: 10,
-                  child: Container(
-                    width: 77,
-                    height: 77,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.black, width: 1),
-                    ),
+                Text(
+                  'Discover curated drops',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF241508),
+                    fontFamily: 'Campton',
                   ),
                 ),
-                Positioned(
-                  right: 20,
-                  top: 73,
-                  child: Container(
-                    width: 77,
-                    height: 77,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.black, width: 1),
-                    ),
-                  ),
-                ),
-                // Promo Text
-                const Positioned(
-                  left: 24,
-                  top: 40,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '40%',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                          height: 1,
-                        ),
-                      ),
-                      Text(
-                        'off',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
+                SizedBox(height: 8),
+                Text(
+                  'Fashion, beauty, art, education, and hardware in one marketplace.',
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.35,
+                    color: Color(0xFF241508),
+                    fontFamily: 'Campton',
                   ),
                 ),
               ],
             ),
           ),
-
-          // Promo Card 2
-          Container(
-            width: 257,
-            margin: const EdgeInsets.only(right: 16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFA15E22),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Center(
-              child: Text(
-                'Special Offer',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -584,6 +482,196 @@ class HomeScreen extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _AdvertFadeCarousel extends StatefulWidget {
+  const _AdvertFadeCarousel({required this.adverts, required this.onTap});
+
+  static const double aspectRatio = 16 / 9;
+
+  final List<Advert> adverts;
+  final Future<void> Function(Advert advert) onTap;
+
+  @override
+  State<_AdvertFadeCarousel> createState() => _AdvertFadeCarouselState();
+}
+
+class _AdvertFadeCarouselState extends State<_AdvertFadeCarousel> {
+  Timer? _timer;
+  int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void didUpdateWidget(covariant _AdvertFadeCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.adverts.length != widget.adverts.length) {
+      _currentIndex = 0;
+      _startTimer();
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    if (widget.adverts.length <= 1) return;
+
+    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (!mounted) return;
+      setState(() {
+        _currentIndex = (_currentIndex + 1) % widget.adverts.length;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentAdvert = widget.adverts[_currentIndex];
+
+    return Column(
+      children: [
+        AspectRatio(
+          aspectRatio: _AdvertFadeCarousel.aspectRatio,
+          child: GestureDetector(
+            onTap: () => widget.onTap(currentAdvert),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 700),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              transitionBuilder: (child, animation) =>
+                  FadeTransition(opacity: animation, child: child),
+              child: _AdvertBannerCard(
+                key: ValueKey(currentAdvert.id),
+                advert: currentAdvert,
+              ),
+            ),
+          ),
+        ),
+        if (widget.adverts.length > 1) ...[
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(widget.adverts.length, (index) {
+              final isActive = index == _currentIndex;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                width: isActive ? 18 : 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: isActive
+                      ? const Color(0xFF603814)
+                      : const Color(0xFFD7C6B6),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              );
+            }),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _AdvertBannerCard extends StatelessWidget {
+  const _AdvertBannerCard({super.key, required this.advert});
+
+  final Advert advert;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = advert.title.trim();
+    final description = (advert.description ?? '').trim();
+    final imageUrl = (advert.imageUrl ?? '').trim();
+    final hasImage = imageUrl.isNotEmpty;
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: const Color(0xFFFDAF40),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (hasImage)
+            Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+            ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: hasImage
+                  ? const LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Color(0xD9241508),
+                        Color(0x99241508),
+                        Color(0x33241508),
+                      ],
+                    )
+                  : const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFFFDAF40), Color(0xFFDD995C)],
+                    ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 22,
+                    height: 1.1,
+                    fontWeight: FontWeight.w700,
+                    color: hasImage ? Colors.white : const Color(0xFF241508),
+                    fontFamily: 'Campton',
+                  ),
+                ),
+                if (description.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 280),
+                    child: Text(
+                      description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.35,
+                        color: hasImage
+                            ? Colors.white.withValues(alpha: 0.92)
+                            : const Color(0xFF241508),
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
