@@ -9,6 +9,8 @@ abstract class AppIcons {
   static const String bag = 'assets/icons/bag.svg';
   static const String apologies = 'assets/icons/Apologies.png';
   static const String blog = 'assets/icons/blog.svg';
+  static const String brandMarkBlack = 'assets/icons/Black.svg';
+  static const String brandMarkWhite = 'assets/icons/White.svg';
   static const String beauty = 'assets/icons/Icons/afro_beauty.svg';
   static const String brands = 'assets/icons/Icons/footwears_bags.svg';
   static const String market = 'assets/icons/Icons/textile.svg';
