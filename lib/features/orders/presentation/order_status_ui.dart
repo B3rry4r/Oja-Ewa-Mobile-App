@@ -23,7 +23,7 @@ class OrderStatusUi {
       'out_for_delivery' => const Color(0xFF3095CE),
       'processing' => const Color(0xFF3095CE),
       'paid' => const Color(0xFF3095CE),
-      'cancelled' => const Color(0xFFCCCCCC),
+      'cancelled' => const Color(0xFF8B8B8B),
       'pending' => const Color(0xFFFDAF40),
       _ => const Color(0xFF3095CE),
     };

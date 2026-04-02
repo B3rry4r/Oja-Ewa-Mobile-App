@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'bootstrap/app_bootstrap.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
+import 'theme/theme_mode_controller.dart';
 import '../core/deep_links/deep_link_handler.dart';
 import '../core/network/network_providers.dart';
 import '../core/widgets/offline_screen.dart';
@@ -33,6 +34,7 @@ class _AppState extends ConsumerState<App> {
   @override
   void initState() {
     super.initState();
+    ref.read(appThemeModeProvider);
     // Initialize deep link handler after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(deepLinkHandlerProvider).init(navigatorKey);
@@ -100,12 +102,14 @@ class _AppState extends ConsumerState<App> {
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = ref.watch(appThemeModeProvider);
+
     return MaterialApp(
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       builder: (context, child) {
         return Consumer(
           builder: (context, ref, _) {

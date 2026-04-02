@@ -2,15 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
-import 'package:ojaewa/core/auth/auth_providers.dart';
-import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
-import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
-
-import '../../../app/router/app_router.dart';
 
 import 'package:ojaewa/core/widgets/product_card.dart';
 import '../../product_detail/presentation/product_detail_screen.dart';
@@ -41,126 +37,20 @@ class WishlistScreen extends ConsumerWidget {
     final wishlist = ref.watch(wishlistProvider);
     final actions = ref.watch(wishlistActionsProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF603814),
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            // Header with buttons
-            _buildHeader(context, ref),
-
-            // Main Content
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFF8F1), // #FFF8F1
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: AppBottomNavBar.height,
-                  ),
-                  child: wishlist.when(
-                    loading: () => const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(Color(0xFFFDAF40)),
-                      ),
-                    ),
-                    error: (e, st) => Center(
-                      child: Text(
-                        UiErrorMessage.from(e),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    data: (items) => _buildWishlistContent(
-                      context,
-                      ref,
-                      items,
-                      actions.isLoading,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, WidgetRef ref) {
-    final accessToken = ref.watch(accessTokenProvider);
-    final isAuthenticated = accessToken != null && accessToken.isNotEmpty;
-    final unreadCount = isAuthenticated
-        ? ref
-              .watch(unreadCountProvider)
-              .maybeWhen(data: (count) => count, orElse: () => 0)
-        : 0;
-
-    return Container(
-      height: 104,
-      color: const Color(0xFF603814),
-      padding: const EdgeInsets.only(top: 32),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Row(
-              children: [
-                // Notification icon with badge
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    HeaderIconButton(
-                      asset: AppIcons.notification,
-                      onTap: () => Navigator.of(
-                        context,
-                      ).pushNamed(AppRoutes.notifications),
-                      iconColor: Colors.white,
-                    ),
-                    if (unreadCount > 0)
-                      Positioned(
-                        right: -4,
-                        top: -4,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFDAF40),
-                            shape: BoxShape.circle,
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 18,
-                            minHeight: 18,
-                          ),
-                          child: Text(
-                            unreadCount > 99 ? '99+' : unreadCount.toString(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'Campton',
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(width: 8),
-                HeaderIconButton(
-                  asset: AppIcons.bag,
-                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.cart),
-                  iconColor: Colors.white,
-                ),
-              ],
-            ),
+    return AppPageScaffold(
+      title: 'Wishlist',
+      showBack: false,
+      includeBottomNavSpacing: true,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: AppBottomNavBar.height),
+        child: wishlist.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, st) => Center(
+            child: Text(UiErrorMessage.from(e), textAlign: TextAlign.center),
           ),
-        ],
+          data: (items) =>
+              _buildWishlistContent(context, ref, items, actions.isLoading),
+        ),
       ),
     );
   }
@@ -183,30 +73,9 @@ class WishlistScreen extends ConsumerWidget {
 
     return Column(
       children: [
-        const SizedBox(height: 30),
-
-        // Screen Title
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Wishlist',
-              style: TextStyle(
-                fontSize: 33,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Campton',
-                color: Color(0xFF241508),
-              ),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
         Expanded(
           child: GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.zero,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 10,
@@ -270,6 +139,11 @@ class WishlistScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyStateContent() {
+    final colors =
+        WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+            Brightness.dark
+        ? AppThemeColors.dark
+        : AppThemeColors.light;
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -278,7 +152,7 @@ class WishlistScreen extends ConsumerWidget {
             const SizedBox(height: 30),
 
             // Screen Title
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'Wishlist',
@@ -286,7 +160,7 @@ class WishlistScreen extends ConsumerWidget {
                   fontSize: 33,
                   fontWeight: FontWeight.w600,
                   fontFamily: 'Campton',
-                  color: Color(0xFF241508), // #241508
+                  color: colors.textPrimary,
                 ),
               ),
             ),
@@ -294,17 +168,17 @@ class WishlistScreen extends ConsumerWidget {
             const SizedBox(height: 60),
 
             // Empty state illustration area
-            _buildEmptyStateIllustration(),
+            _buildEmptyStateIllustration(colors),
 
             const SizedBox(height: 70),
 
             // Empty state messages
-            _buildEmptyStateMessages(),
+            _buildEmptyStateMessages(colors),
 
             const SizedBox(height: 48),
 
             // CTA Button
-            _buildKeepShoppingButton(),
+            _buildKeepShoppingButton(colors),
 
             const SizedBox(height: 40),
           ],
@@ -313,7 +187,7 @@ class WishlistScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyStateIllustration() {
+  Widget _buildEmptyStateIllustration(AppThemeColors colors) {
     return Center(
       child: Stack(
         alignment: Alignment.center,
@@ -323,8 +197,8 @@ class WishlistScreen extends ConsumerWidget {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: const Color(0xFFF5E0CE), // #F5E0CE
-              borderRadius: BorderRadius.circular(12),
+              color: colors.surfaceSecondary,
+              borderRadius: BorderRadius.circular(24),
             ),
           ),
 
@@ -336,28 +210,23 @@ class WishlistScreen extends ConsumerWidget {
               shape: BoxShape.circle,
               color: Colors.transparent,
             ),
-            child: const Icon(
-              Icons.favorite_border,
-              size: 80,
-              color: Color(0xFF603814), // Using theme color for icon
-            ),
+            child: Icon(Icons.favorite_border, size: 80, color: colors.accent),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildEmptyStateMessages() {
-    return const Column(
+  Widget _buildEmptyStateMessages(AppThemeColors colors) {
+    return Column(
       children: [
-        // Main message
         Text(
           'Nothing saved yet',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w600,
             fontFamily: 'Campton',
-            color: Color(0xFF241508), // #241508
+            color: colors.textPrimary,
             height: 1.2,
           ),
           textAlign: TextAlign.center,
@@ -365,14 +234,13 @@ class WishlistScreen extends ConsumerWidget {
 
         SizedBox(height: 12),
 
-        // Sub message
         Text(
           'Your saved items drop here',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: Color(0xFF1E2021), // #1E2021
+            color: colors.textSecondary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -380,7 +248,7 @@ class WishlistScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildKeepShoppingButton() {
+  Widget _buildKeepShoppingButton(AppThemeColors colors) {
     return Center(
       child: SizedBox(
         width: 210,
@@ -388,12 +256,12 @@ class WishlistScreen extends ConsumerWidget {
         child: ElevatedButton(
           onPressed: onKeepShoppingPressed ?? _defaultKeepShoppingPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFFDAF40), // #FDAF40
-            foregroundColor: const Color(0xFFFFFBF5), // #FFFBF5
+            backgroundColor: colors.accent,
+            foregroundColor: colors.onAccent,
             elevation: 8,
-            shadowColor: const Color(0xFFFDAF40).withValues(alpha: 0.6),
+            shadowColor: colors.shadow,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(18),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
           ),

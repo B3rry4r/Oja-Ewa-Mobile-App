@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
 
@@ -29,118 +30,120 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final imageColor = Color(product.imageColor ?? 0xFFD9D9D9);
 
     final Widget content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-            Container(
-              height: 152,
-              decoration: BoxDecoration(
-                color: imageColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (product.imageUrl != null && product.imageUrl!.trim().isNotEmpty)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        product.imageUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(color: imageColor),
-                      ),
+        Container(
+          height: 152,
+          decoration: BoxDecoration(
+            color: imageColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (product.imageUrl != null &&
+                  product.imageUrl!.trim().isNotEmpty)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    product.imageUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(color: imageColor),
+                  ),
+                ),
+              if (product.imageUrl == null || product.imageUrl!.trim().isEmpty)
+                const Center(
+                  child: AppImagePlaceholder(
+                    width: 96,
+                    height: 96,
+                    borderRadius: 0,
+                    backgroundColor: Colors.transparent,
+                  ),
+                ),
+              Positioned(
+                right: 12,
+                bottom: 12,
+                child: GestureDetector(
+                  onTap: onFavoriteTap,
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: colors.accent,
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                  if (product.imageUrl == null || product.imageUrl!.trim().isEmpty)
-                    const Center(
-                      child: AppImagePlaceholder(
-                        width: 96,
-                        height: 96,
-                        borderRadius: 0,
-                        backgroundColor: Colors.transparent,
-                      ),
-                    ),
-                  Positioned(
-                    right: 12,
-                    bottom: 12,
-                    child: GestureDetector(
-                      onTap: onFavoriteTap,
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.shopping_bag_outlined,
-                          size: 20,
-                          color: Color(0xFF241508),
-                        ),
-                      ),
+                    child: Icon(
+                      Icons.shopping_bag_outlined,
+                      size: 20,
+                      color: colors.onAccent,
                     ),
                   ),
-                ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          product.title,
+          style: TextStyle(
+            fontSize: 16,
+            color: colors.textPrimary,
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w400,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          product.priceLabel,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: colors.textPrimary,
+            fontFamily: 'Campton',
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Container(
+              width: 12,
+              height: 12,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFDB80),
+                shape: BoxShape.circle,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(width: 4),
             Text(
-              product.title,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Color(0xFF241508),
+              product.rating.toStringAsFixed(1),
+              style: TextStyle(
+                fontSize: 12,
+                color: colors.textPrimary,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(width: 4),
             Text(
-              product.priceLabel,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF241508),
+              '(${product.reviewCount})',
+              style: TextStyle(
+                fontSize: 10,
+                color: colors.textSecondary,
                 fontFamily: 'Campton',
+                fontWeight: FontWeight.w400,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFFDB80),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  product.rating.toStringAsFixed(1),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF241508),
-                    fontFamily: 'Campton',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '(${product.reviewCount})',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Color(0xFF777F84),
-                    fontFamily: 'Campton',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
+          ],
+        ),
       ],
     );
 

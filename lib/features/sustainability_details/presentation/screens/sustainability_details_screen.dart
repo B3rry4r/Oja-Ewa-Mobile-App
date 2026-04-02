@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import '../controllers/sustainability_details_controller.dart';
 
 class SustainabilityDetailsScreen extends ConsumerWidget {
@@ -11,15 +13,12 @@ class SustainabilityDetailsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(sustainabilityDetailsProvider(initiativeId));
+    final colors = context.appColors;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF603814),
-        foregroundColor: Colors.white,
-        title: const Text('Initiative'),
-      ),
-      body: async.when(
+    return AppPageScaffold(
+      title: 'Initiative',
+      showActions: false,
+      child: async.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => const Center(child: Text('Failed to load initiative')),
         data: (d) => Padding(
@@ -27,7 +26,14 @@ class SustainabilityDetailsScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(d.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              Text(
+                d.title,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: colors.textPrimary,
+                ),
+              ),
               const SizedBox(height: 8),
               if ((d.description ?? '').trim().isNotEmpty) Text(d.description!),
               const SizedBox(height: 16),

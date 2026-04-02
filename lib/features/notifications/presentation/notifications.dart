@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
 import 'package:ojaewa/features/notifications/domain/app_notification.dart';
@@ -11,7 +12,6 @@ import 'package:ojaewa/features/notifications/presentation/controllers/notificat
 import 'package:ojaewa/features/notifications/presentation/notification_detail.dart';
 import 'package:ojaewa/features/business_details/presentation/screens/business_details_screen.dart';
 import 'package:ojaewa/features/product_detail/presentation/product_detail_screen.dart';
-import 'package:ojaewa/features/account/subfeatures/your_order/presentation/order_details.dart';
 import 'package:ojaewa/features/your_shop/subfeatures/orders/shop_order_details.dart';
 
 class NotificationsScreen extends ConsumerWidget {
@@ -21,28 +21,10 @@ class NotificationsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notifications = ref.watch(notificationsListProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF603814),
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            Container(
-              color: const Color(0xFF603814),
-              child: const AppHeader(
-                backgroundColor: Color(0xFF603814),
-                iconColor: Colors.white,
-                showActions: false,
-              ),
-            ),
-            // Main content card
-            Expanded(
-              child: _buildNotificationContent(context, ref, notifications),
-            ),
-          ],
-        ),
-      ),
-      // Bottom navigation bar
+    return AppPageScaffold(
+      title: 'Notifications',
+      showActions: false,
+      child: _buildNotificationContent(context, ref, notifications),
     );
   }
 
@@ -51,109 +33,91 @@ class NotificationsScreen extends ConsumerWidget {
     WidgetRef ref,
     AsyncValue notifications,
   ) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFF8F1),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(28),
-          topRight: Radius.circular(28),
-        ),
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 18, top: 16, bottom: 20),
-              child: Text(
-                'Notifications',
-                style: TextStyle(
-                  fontSize: 33,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
-                ),
-              ),
-            ),
-            // Notification list
-            notifications.when(
-              loading: () => const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation(Color(0xFFFDAF40)),
-                  ),
-                ),
-              ),
-              error: (e, st) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  AppSnackbars.showError(context, UiErrorMessage.from(e));
-                });
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Center(child: Text('Failed to load notifications.')),
-                );
-              },
+    final colors = context.appColors;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Notification list
+                  notifications.when(
+                    loading: () => const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                    error: (e, st) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        AppSnackbars.showError(context, UiErrorMessage.from(e));
+                      });
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: Center(
+                          child: Text(
+                            'Failed to load notifications.',
+                            style: TextStyle(color: colors.textSecondary),
+                          ),
+                        ),
+                      );
+                    },
 
-              data: (items) {
-                if (items.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 48),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                    data: (items) {
+                      if (items.isEmpty) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 48),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'You have no notifications',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontFamily: 'Campton',
+                                    fontWeight: FontWeight.w700,
+                                    color: colors.textPrimary,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'We\'ll let you know when something important happens.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: 'Campton',
+                                    fontWeight: FontWeight.w400,
+                                    color: colors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      return Column(
                         children: [
-                          Text(
-                            'You have no notifications',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontFamily: 'Campton',
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF241508),
+                          for (final n in items)
+                            _buildNotificationItem(
+                              context: context,
+                              ref: ref,
+                              notification: n,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'We\'ll let you know when something important happens.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'Campton',
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFF777F84),
-                            ),
-                          ),
                         ],
-                      ),
-                    ),
-                  );
-                }
-
-                return Column(
-                  children: [
-                    for (final n in items) _buildNotificationItem(
-                      context: context,
-                      ref: ref,
-                      notification: n,
-                    ),
-                  ],
-                );
-              },
-            ),
-            ],
-          ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -162,21 +126,27 @@ class NotificationsScreen extends ConsumerWidget {
     required WidgetRef ref,
     required AppNotification notification,
   }) {
+    final colors = context.appColors;
     final isUnread = !notification.isRead;
-    final title = notification.title.isNotEmpty ? notification.title : 'Notification';
+    final title = notification.title.isNotEmpty
+        ? notification.title
+        : 'Notification';
     final body = notification.body;
-    final timeAgo = notification.createdAt != null 
-        ? _formatTimeAgo(notification.createdAt!) 
+    final timeAgo = notification.createdAt != null
+        ? _formatTimeAgo(notification.createdAt!)
         : '';
 
     return GestureDetector(
       onTap: () {
         // Mark as read optimistically when opening
         if (isUnread) {
-          ref.read(notificationsActionsProvider.notifier).markAsRead(notification.id).catchError((e) {
-            if (!context.mounted) return;
-            AppSnackbars.showError(context, UiErrorMessage.from(e));
-          });
+          ref
+              .read(notificationsActionsProvider.notifier)
+              .markAsRead(notification.id)
+              .catchError((e) {
+                if (!context.mounted) return;
+                AppSnackbars.showError(context, UiErrorMessage.from(e));
+              });
         }
 
         final deepLink = notification.deepLink;
@@ -188,7 +158,8 @@ class NotificationsScreen extends ConsumerWidget {
         // Fallback: open detail
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => NotificationDetailScreen(notification: notification),
+            builder: (_) =>
+                NotificationDetailScreen(notification: notification),
           ),
         );
       },
@@ -196,9 +167,11 @@ class NotificationsScreen extends ConsumerWidget {
         margin: const EdgeInsets.symmetric(vertical: 6),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isUnread ? const Color(0xFFFDAF40).withAlpha(20) : Colors.transparent,
+          color: isUnread
+              ? colors.accent.withValues(alpha: 0.08)
+              : colors.surface,
           border: Border.all(
-            color: isUnread ? const Color(0xFFFDAF40) : const Color(0xFFCCCCCC),
+            color: isUnread ? colors.accent : colors.border,
             width: isUnread ? 1.5 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
@@ -212,14 +185,13 @@ class NotificationsScreen extends ConsumerWidget {
                 width: 10,
                 height: 10,
                 margin: const EdgeInsets.only(top: 6, right: 12),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFDAF40),
+                decoration: BoxDecoration(
+                  color: colors.accent,
                   shape: BoxShape.circle,
                 ),
               )
             else
               const SizedBox(width: 22), // Spacer to align content
-            
             // Notification content
             Expanded(
               child: Column(
@@ -232,7 +204,7 @@ class NotificationsScreen extends ConsumerWidget {
                       fontSize: 16,
                       fontFamily: 'Campton',
                       fontWeight: isUnread ? FontWeight.w600 : FontWeight.w500,
-                      color: const Color(0xFF241508),
+                      color: colors.textPrimary,
                     ),
                   ),
                   if (body.isNotEmpty) ...[
@@ -244,7 +216,9 @@ class NotificationsScreen extends ConsumerWidget {
                         fontSize: 14,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
-                        color: isUnread ? const Color(0xFF1E2021) : const Color(0xFF777F84),
+                        color: isUnread
+                            ? colors.textPrimary
+                            : colors.textSecondary,
                         height: 1.4,
                       ),
                       maxLines: 2,
@@ -255,23 +229,23 @@ class NotificationsScreen extends ConsumerWidget {
                   // Time
                   Text(
                     timeAgo,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF777F84),
+                      color: colors.textTertiary,
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             // Arrow indicator
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(top: 4),
               child: Icon(
                 Icons.chevron_right,
-                color: Color(0xFF777F84),
+                color: colors.textTertiary,
                 size: 20,
               ),
             ),
@@ -298,7 +272,9 @@ class NotificationsScreen extends ConsumerWidget {
         final id = int.tryParse(segments[1]);
         if (id != null) {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => BusinessDetailsScreen(businessId: id)),
+            MaterialPageRoute(
+              builder: (_) => BusinessDetailsScreen(businessId: id),
+            ),
           );
           return;
         }
@@ -308,7 +284,9 @@ class NotificationsScreen extends ConsumerWidget {
         final id = int.tryParse(segments[1]);
         if (id != null) {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => ProductDetailsScreen(productId: id)),
+            MaterialPageRoute(
+              builder: (_) => ProductDetailsScreen(productId: id),
+            ),
           );
           return;
         }
@@ -330,7 +308,9 @@ class NotificationsScreen extends ConsumerWidget {
           final orderId = int.tryParse(segments[2]);
           if (orderId != null) {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => ShopOrderDetailsScreen(orderId: orderId)),
+              MaterialPageRoute(
+                builder: (_) => ShopOrderDetailsScreen(orderId: orderId),
+              ),
             );
             return;
           }

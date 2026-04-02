@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_status_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/domain/business_status.dart';
 import 'package:ojaewa/features/home/subfeatures/beauty/presentation/business_profile_beauty.dart';
@@ -14,41 +15,34 @@ class BusinessSettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // Main background from IR
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const AppHeader(
-                backgroundColor: Color(0xFFFFF8F1),
-                iconColor: Color(0xFF241508),
-              ),
-              const SizedBox(height: 18),
-              _buildTitleAndAddButton(context),
-              const SizedBox(height: 16),
-              _buildBusinessList(context, ref),
-            ],
-          ),
-        ),
+    return AppPageScaffold(
+      scrollable: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 18),
+          _buildTitleAndAddButton(context),
+          const SizedBox(height: 16),
+          _buildBusinessList(context, ref),
+        ],
       ),
     );
   }
 
   /// Title and "Add New Business" action
   Widget _buildTitleAndAddButton(BuildContext context) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Column(
         children: [
-          const Text(
+          Text(
             "Your Business",
             style: TextStyle(
               fontSize: 33,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -64,20 +58,20 @@ class BusinessSettingsScreen extends ConsumerWidget {
                   vertical: 14,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFDAF40),
-                  borderRadius: BorderRadius.circular(8),
+                  color: colors.accent,
+                  borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
+                      color: colors.accent.withValues(alpha: 0.4),
                       blurRadius: 16,
                       offset: const Offset(0, 8),
                     ),
                   ],
                 ),
-                child: const Text(
+                child: Text(
                   "Add New Business",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: colors.onAccent,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Campton',
@@ -93,6 +87,7 @@ class BusinessSettingsScreen extends ConsumerWidget {
 
   /// List of business items
   Widget _buildBusinessList(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final businessesAsync = ref.watch(myBusinessStatusesProvider);
 
     return businessesAsync.when(
@@ -117,8 +112,7 @@ class BusinessSettingsScreen extends ConsumerWidget {
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           itemCount: businesses.length,
-          separatorBuilder: (_, __) =>
-              const Divider(color: Color(0xFFDEDEDE), height: 1),
+          separatorBuilder: (_, __) => Divider(color: colors.border, height: 1),
           itemBuilder: (context, index) {
             final b = businesses[index];
             final status = b.storeStatus;
@@ -143,8 +137,8 @@ class BusinessSettingsScreen extends ConsumerWidget {
                 chipText = 'Deactivated';
                 break;
               default:
-                chipBg = const Color(0xFF777F84).withAlpha(25);
-                chipFg = const Color(0xFF777F84);
+                chipBg = colors.textTertiary.withAlpha(25);
+                chipFg = colors.textTertiary;
                 chipText = status.isEmpty ? 'Unknown' : status;
             }
 
@@ -159,11 +153,11 @@ class BusinessSettingsScreen extends ConsumerWidget {
                   Expanded(
                     child: Text(
                       b.businessName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF241508),
+                        color: colors.textPrimary,
                       ),
                     ),
                   ),
@@ -189,7 +183,7 @@ class BusinessSettingsScreen extends ConsumerWidget {
                 ],
               ),
               trailing: IconButton(
-                icon: const Icon(Icons.more_horiz, color: Color(0xFF1E2021)),
+                icon: Icon(Icons.more_horiz, color: colors.textPrimary),
                 onPressed: () => _showBusinessActions(context, b),
               ),
             );
@@ -247,10 +241,12 @@ class BusinessSettingsScreen extends ConsumerWidget {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) {
+        final colors = context.appColors;
         return Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFFFFF8F1),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+          decoration: BoxDecoration(
+            color: colors.surfaceElevated,
+            border: Border(top: BorderSide(color: colors.border)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
           ),
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -262,7 +258,7 @@ class BusinessSettingsScreen extends ConsumerWidget {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: colors.borderStrong,
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -276,7 +272,7 @@ class BusinessSettingsScreen extends ConsumerWidget {
                   );
                 },
               ),
-              const Divider(color: Color(0xFFDEDEDE)),
+              Divider(color: colors.border),
               // TODO: Uncomment when subscription feature is active
               // _buildModalOption(
               //   label: "Manage Payment",
@@ -320,7 +316,7 @@ class BusinessSettingsScreen extends ConsumerWidget {
           fontSize: 16,
           fontFamily: 'Campton',
           fontWeight: FontWeight.w400,
-          color: isDestructive ? Colors.red : const Color(0xFF1E2021),
+          color: isDestructive ? Colors.red : Colors.black,
         ),
       ),
       onTap: onTap,

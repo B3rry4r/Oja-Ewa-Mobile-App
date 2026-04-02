@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+
 class TribePickerSheet extends StatelessWidget {
   const TribePickerSheet({
     super.key,
@@ -12,6 +14,7 @@ class TribePickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return SafeArea(
       child: Column(
         children: [
@@ -24,8 +27,9 @@ class TribePickerSheet extends StatelessWidget {
           ),
           Container(
             width: double.infinity,
-            decoration: const BoxDecoration(
-              color: Color(0xFFFFF8F1),
+            decoration: BoxDecoration(
+              color: colors.surfaceElevated,
+              border: Border(top: BorderSide(color: colors.border)),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(28),
                 topRight: Radius.circular(28),
@@ -39,13 +43,13 @@ class TribePickerSheet extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Select tribe',
                         style: TextStyle(
                           fontSize: 20,
                           fontFamily: 'Campton',
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF241508),
+                          color: colors.textPrimary,
                         ),
                       ),
                       GestureDetector(
@@ -53,13 +57,13 @@ class TribePickerSheet extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFFDEDEDE)),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: colors.border),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.close,
                             size: 24,
-                            color: Color(0xFF241508),
+                            color: colors.textPrimary,
                           ),
                         ),
                       ),
@@ -71,7 +75,10 @@ class TribePickerSheet extends StatelessWidget {
                   return InkWell(
                     onTap: () => Navigator.of(context).pop(t),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       child: Row(
                         children: [
                           Icon(
@@ -79,17 +86,17 @@ class TribePickerSheet extends StatelessWidget {
                                 ? Icons.radio_button_checked
                                 : Icons.radio_button_off,
                             color: isSelected
-                                ? const Color(0xFFA15E22)
-                                : const Color(0xFF777F84),
+                                ? colors.accent
+                                : colors.textTertiary,
                           ),
                           const SizedBox(width: 12),
                           Text(
                             t,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontFamily: 'Campton',
                               fontWeight: FontWeight.w400,
-                              color: Color(0xFF241508),
+                              color: colors.textPrimary,
                             ),
                           ),
                         ],

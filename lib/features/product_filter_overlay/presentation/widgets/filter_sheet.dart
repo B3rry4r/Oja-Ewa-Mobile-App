@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/features/product/domain/product_filters.dart';
@@ -87,6 +88,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   }
 
   Widget _buildFilterSheet(ProductFilters filters) {
+    final colors = context.appColors;
     // Determine which filters to show based on category type
     // - textiles: all filters including fabric_type
     // - shoes_bags: all filters except fabric_type
@@ -97,8 +99,8 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
 
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFF8F1),
+      decoration: BoxDecoration(
+        color: colors.surfaceElevated,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -182,6 +184,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     required String? selected,
     required Function(String?) onSelected,
   }) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Wrap(
@@ -194,14 +197,10 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: isSelected
-                    ? const Color(0xFFA15E22)
-                    : Colors.transparent,
+                color: isSelected ? colors.accent : Colors.transparent,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: isSelected
-                      ? const Color(0xFFA15E22)
-                      : const Color(0xFFCCCCCC),
+                  color: isSelected ? colors.accent : colors.border,
                 ),
               ),
               child: Text(
@@ -210,7 +209,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                   fontSize: 14,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
-                  color: isSelected ? Colors.white : const Color(0xFF1E2021),
+                  color: isSelected ? colors.onAccent : colors.textPrimary,
                 ),
               ),
             ),
@@ -221,6 +220,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   }
 
   Widget _buildPriceRangeFilter(PriceRange priceRange) {
+    final colors = context.appColors;
     final currentRange =
         _priceRange ?? RangeValues(priceRange.min, priceRange.max);
 
@@ -233,18 +233,18 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
             children: [
               Text(
                 formatPrice(currentRange.start.toInt()),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
-                  color: Color(0xFF1E2021),
+                  color: colors.textPrimary,
                 ),
               ),
               Text(
                 formatPrice(currentRange.end.toInt()),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
-                  color: Color(0xFF1E2021),
+                  color: colors.textPrimary,
                 ),
               ),
             ],
@@ -254,8 +254,8 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
             values: currentRange,
             min: priceRange.min,
             max: priceRange.max,
-            activeColor: const Color(0xFFA15E22),
-            inactiveColor: const Color(0xFFE0E0E0),
+            activeColor: colors.accent,
+            inactiveColor: colors.border,
             onChanged: (values) {
               setState(() => _priceRange = values);
             },
@@ -266,26 +266,27 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   }
 
   Widget _buildHeader() {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Title
-          const Text(
+          Text(
             'Filter By',
             style: TextStyle(
               fontSize: 20,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF301C0A),
+              color: colors.textPrimary,
             ),
           ),
 
           // Close button
           HeaderIconButton(
             asset: AppIcons.back,
-            iconColor: const Color(0xFF301C0A),
+            iconColor: colors.textPrimary,
             onTap: () => Navigator.of(context).pop(),
           ),
         ],
@@ -294,21 +295,23 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   }
 
   Widget _buildSectionTitle(String title) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
           fontFamily: 'Campton',
           fontWeight: FontWeight.w600,
-          color: Color(0xFF301C0A),
+          color: colors.textPrimary,
         ),
       ),
     );
   }
 
   Widget _buildActionButtons() {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -329,18 +332,18 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               },
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                side: const BorderSide(color: Color(0xFFFDAF40)),
+                side: BorderSide(color: colors.accent),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'Clear Filters',
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFFFDAF40),
+                  color: colors.accent,
                 ),
               ),
             ),
@@ -382,20 +385,20 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                backgroundColor: const Color(0xFFFDAF40),
+                backgroundColor: colors.accent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 elevation: 4,
-                shadowColor: const Color(0xFFFDAF40).withValues(alpha: 0.5),
+                shadowColor: colors.accent.withValues(alpha: 0.5),
               ),
-              child: const Text(
+              child: Text(
                 'Show Results',
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFFFFFBF5),
+                  color: colors.onAccent,
                 ),
               ),
             ),

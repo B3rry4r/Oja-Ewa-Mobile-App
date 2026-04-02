@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/widgets/error_state_widget.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/business_details/presentation/controllers/business_details_controller.dart';
@@ -34,6 +35,7 @@ class SchoolDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     BusinessDetails business,
   ) {
+    final colors = context.appColors;
     final schoolName = business.businessName;
     // Use school_biography if available, otherwise fall back to business_description
     final biography =
@@ -45,62 +47,34 @@ class SchoolDetailScreen extends ConsumerWidget {
     final websiteUrl = business.websiteUrl;
     final imageUrl = business.imageUrl;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Stack(
+    return AppPageScaffold(
+      bottomBar: _buildBottomRegistrationCard(context, websiteUrl, businessId),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 280),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Main scrollable content
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 104), // Space for standard header
-                  // School Header Card with Image
-                  _buildSchoolHeader(schoolName, imageUrl),
-
-                  const SizedBox(height: 20),
-
-                  // School Biography Section
-                  _buildBiographySection(biography),
-
-                  const SizedBox(height: 16),
-
-                  // Classes Section
-                  _buildClassesSection(classes),
-
-                  const SizedBox(height: 16),
-
-                  // Contact Details Section
-                  _buildContactSection(email, phone, location),
-
-                  const SizedBox(height: 16),
-
-                  // Reviews Section
-                  _buildReviewsSection(context, ref),
-
-                  const SizedBox(
-                    height: 280,
-                  ), // Space for bottom registration card
-                ],
-              ),
-            ),
-
-            // Fixed Top App Bar
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
-            ),
-
-            // Fixed Bottom Registration Card
-            _buildBottomRegistrationCard(context, websiteUrl, businessId),
+            _buildSchoolHeader(context, schoolName, imageUrl),
+            const SizedBox(height: 20),
+            _buildBiographySection(context, biography),
+            const SizedBox(height: 16),
+            _buildClassesSection(context, classes),
+            const SizedBox(height: 16),
+            _buildContactSection(context, email, phone, location),
+            const SizedBox(height: 16),
+            _buildReviewsSection(context, ref),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSchoolHeader(String schoolName, String? imageUrl) {
+  Widget _buildSchoolHeader(
+    BuildContext context,
+    String schoolName,
+    String? imageUrl,
+  ) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -134,11 +108,11 @@ class SchoolDetailScreen extends ConsumerWidget {
               children: [
                 Text(
                   schoolName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF241508),
+                    color: colors.textPrimary,
                     height: 1.2,
                   ),
                 ),
@@ -151,34 +125,30 @@ class SchoolDetailScreen extends ConsumerWidget {
                     Container(
                       width: 12,
                       height: 12,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFFDB80),
+                      decoration: BoxDecoration(
+                        color: colors.accentSoft,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.star,
-                        size: 8,
-                        color: Color(0xFFFDAF40),
-                      ),
+                      child: Icon(Icons.star, size: 8, color: colors.accent),
                     ),
                     const SizedBox(width: 4),
-                    const Text(
+                    Text(
                       '4.0',
                       style: TextStyle(
                         fontSize: 12,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF241508),
+                        color: colors.textPrimary,
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Text(
+                    Text(
                       '(8)',
                       style: TextStyle(
                         fontSize: 10,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF777F84),
+                        color: colors.textTertiary,
                       ),
                     ),
                   ],
@@ -191,34 +161,43 @@ class SchoolDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBiographySection(String biography) {
+  Widget _buildBiographySection(BuildContext context, String biography) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.surfaceElevated,
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.18),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'School Biography',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             biography,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
-              color: Color(0xFF1E2021),
+              color: colors.textSecondary,
               height: 1.5,
             ),
           ),
@@ -227,24 +206,33 @@ class SchoolDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildClassesSection(List<ClassItem> classes) {
+  Widget _buildClassesSection(BuildContext context, List<ClassItem> classes) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.surfaceElevated,
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.18),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Classes',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
@@ -258,11 +246,11 @@ class SchoolDetailScreen extends ConsumerWidget {
                   Expanded(
                     child: Text(
                       classItem.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF1E2021),
+                        color: colors.textSecondary,
                         height: 1.4,
                       ),
                     ),
@@ -271,11 +259,11 @@ class SchoolDetailScreen extends ConsumerWidget {
                       classItem.duration!.isNotEmpty)
                     Text(
                       classItem.duration!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF603814),
+                        color: colors.accent,
                       ),
                     ),
                 ],
@@ -287,24 +275,38 @@ class SchoolDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContactSection(String email, String phone, String location) {
+  Widget _buildContactSection(
+    BuildContext context,
+    String email,
+    String phone,
+    String location,
+  ) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.surfaceElevated,
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.18),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Contact Details',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
 
@@ -312,6 +314,7 @@ class SchoolDetailScreen extends ConsumerWidget {
 
           // Address
           _buildContactItem(
+            context: context,
             icon: Icons.location_on,
             title: 'Address',
             content: location,
@@ -321,6 +324,7 @@ class SchoolDetailScreen extends ConsumerWidget {
 
           // Phone
           _buildContactItem(
+            context: context,
             icon: Icons.phone,
             title: 'Phone Number',
             content: phone,
@@ -330,6 +334,7 @@ class SchoolDetailScreen extends ConsumerWidget {
 
           // Email
           _buildContactItem(
+            context: context,
             icon: Icons.email,
             title: 'Email Address',
             content: email,
@@ -339,6 +344,7 @@ class SchoolDetailScreen extends ConsumerWidget {
 
           // Working Hours
           _buildContactItem(
+            context: context,
             icon: Icons.access_time,
             title: 'Working hours',
             content: 'Monday to Friday: 9am - 6pm\nSaturday - Sunday: Closed',
@@ -349,10 +355,12 @@ class SchoolDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildContactItem({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String content,
   }) {
+    final colors = context.appColors;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -360,10 +368,10 @@ class SchoolDetailScreen extends ConsumerWidget {
           width: 28,
           height: 28,
           decoration: BoxDecoration(
-            color: const Color(0xFF603814),
-            borderRadius: BorderRadius.circular(4),
+            color: colors.accent,
+            borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, size: 18, color: Colors.white),
+          child: Icon(icon, size: 18, color: colors.onAccent),
         ),
 
         const SizedBox(width: 8),
@@ -374,21 +382,21 @@ class SchoolDetailScreen extends ConsumerWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF1E2021),
+                  color: colors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 content,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF1E2021),
+                  color: colors.textSecondary,
                   height: 1.6,
                 ),
               ),
@@ -400,6 +408,7 @@ class SchoolDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildReviewsSection(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final reviewsPage = ref
         .watch(reviewsProvider((type: 'business', id: businessId)))
         .maybeWhen(data: (d) => d, orElse: () => null);
@@ -421,7 +430,7 @@ class SchoolDetailScreen extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFDEDEDE)),
+          border: Border.all(color: colors.border),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
@@ -436,11 +445,11 @@ class SchoolDetailScreen extends ConsumerWidget {
                   children: [
                     Text(
                       'Reviews ($reviewCount)',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF1E2021),
+                        color: colors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 9),
@@ -448,11 +457,11 @@ class SchoolDetailScreen extends ConsumerWidget {
                       children: [
                         Text(
                           avgRating,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontFamily: 'Campton',
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF1E2021),
+                            color: colors.textPrimary,
                           ),
                         ),
                         const SizedBox(width: 4),
@@ -481,10 +490,10 @@ class SchoolDetailScreen extends ConsumerWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.add_circle_outline,
                     size: 24,
-                    color: Color(0xFF603814),
+                    color: colors.textPrimary,
                   ),
                 ),
               ],
@@ -495,6 +504,7 @@ class SchoolDetailScreen extends ConsumerWidget {
 
               // First review from API
               _buildReviewItem(
+                context: context,
                 name: firstReview.user?.displayName ?? '',
                 date: firstReview.createdAt != null
                     ? _formatDate(firstReview.createdAt!)
@@ -530,12 +540,14 @@ class SchoolDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildReviewItem({
+    required BuildContext context,
     required String name,
     required String date,
     required int rating,
     required String title,
     required String review,
   }) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -545,20 +557,20 @@ class SchoolDetailScreen extends ConsumerWidget {
           children: [
             Text(
               name,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: Color(0xFF3C4042),
+                color: colors.textSecondary,
               ),
             ),
             Text(
               date,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: Color(0xFFB1B1B1),
+                color: colors.textTertiary,
               ),
             ),
           ],
@@ -587,11 +599,11 @@ class SchoolDetailScreen extends ConsumerWidget {
           // Review title
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w500,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
         ],
@@ -602,11 +614,11 @@ class SchoolDetailScreen extends ConsumerWidget {
           // Review text
           Text(
             review,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
               height: 1.5,
             ),
           ),
@@ -620,39 +632,41 @@ class SchoolDetailScreen extends ConsumerWidget {
     String? websiteUrl,
     int? schoolBusinessId,
   ) {
+    final colors = context.appColors;
     return Positioned(
       bottom: 0,
       left: 0,
       right: 0,
       child: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF603814),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+        decoration: BoxDecoration(
+          color: colors.surfaceElevated,
+          border: Border(top: BorderSide(color: colors.border)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Register',
               style: TextStyle(
                 fontSize: 20,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w700,
-                color: Color(0xFFFBFBFB),
+                color: colors.textPrimary,
               ),
             ),
 
             const SizedBox(height: 8),
 
-            const Text(
+            Text(
               'Register via Ojá-Ẹwà and have access to sell or showcase on Ojá-Ẹwà after graduation without payment or Register via the school website without the above benefit',
               style: TextStyle(
                 fontSize: 14,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: Color(0xFFFBFBFB),
+                color: colors.textSecondary,
                 height: 1.5,
               ),
             ),
@@ -674,20 +688,20 @@ class SchoolDetailScreen extends ConsumerWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFDAF40),
+                  backgroundColor: colors.accent,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   elevation: 8,
-                  shadowColor: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+                  shadowColor: colors.accent.withValues(alpha: 0.3),
                 ),
-                child: const Text(
+                child: Text(
                   'Register via Ojá-Ẹwà',
                   style: TextStyle(
                     fontSize: 16,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFFFFFBF5),
+                    color: colors.onAccent,
                   ),
                 ),
               ),
@@ -704,21 +718,19 @@ class SchoolDetailScreen extends ConsumerWidget {
                     ? () => _launchWebsite(websiteUrl)
                     : null,
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFFFDAF40), width: 1.5),
+                  side: BorderSide(color: colors.accent, width: 1.5),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(18),
                   ),
-                  disabledForegroundColor: const Color(
-                    0xFFFDAF40,
-                  ).withValues(alpha: 0.5),
+                  disabledForegroundColor: colors.accent.withValues(alpha: 0.5),
                 ),
-                child: const Text(
+                child: Text(
                   'Visit School',
                   style: TextStyle(
                     fontSize: 16,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFFFDAF40),
+                    color: colors.accent,
                   ),
                 ),
               ),

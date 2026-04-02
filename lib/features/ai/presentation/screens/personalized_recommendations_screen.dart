@@ -11,7 +11,7 @@ import '../../domain/ai_models.dart';
 import '../controllers/ai_personalization_controller.dart';
 
 /// Personalized Recommendations Screen
-/// 
+///
 /// Shows AI-curated product recommendations based on user's style DNA profile.
 class PersonalizedRecommendationsScreen extends ConsumerStatefulWidget {
   const PersonalizedRecommendationsScreen({super.key});
@@ -38,7 +38,9 @@ class _PersonalizedRecommendationsScreenState
     final userId = user?.id.toString() ?? '';
 
     final profileAsync = ref.watch(styleProfileProvider(userId));
-    final recommendationsAsync = ref.watch(personalizedRecommendationsProvider(userId));
+    final recommendationsAsync = ref.watch(
+      personalizedRecommendationsProvider(userId),
+    );
     final profile = profileAsync.asData?.value;
     final hasProfile = profile != null;
 
@@ -78,7 +80,7 @@ class _PersonalizedRecommendationsScreenState
                       profileAsync.when(
                         loading: () => _buildProfileLoading(),
                         error: (e, st) => _buildNoProfile(),
-                        data: (profile) => profile != null 
+                        data: (profile) => profile != null
                             ? _buildProfileCard(profile)
                             : _buildNoProfile(),
                       ),
@@ -101,13 +103,17 @@ class _PersonalizedRecommendationsScreenState
                                   final filtered = _selectedCategory == null
                                       ? recommendations
                                       : recommendations
-                                          .where((r) => r.category == _selectedCategory)
-                                          .toList();
-                                  
+                                            .where(
+                                              (r) =>
+                                                  r.category ==
+                                                  _selectedCategory,
+                                            )
+                                            .toList();
+
                                   if (filtered.isEmpty) {
                                     return _buildEmptyRecommendations();
                                   }
-                                  
+
                                   return _buildRecommendationsGrid(filtered);
                                 },
                               )
@@ -180,7 +186,8 @@ class _PersonalizedRecommendationsScreenState
                 ),
               ),
               InkWell(
-                onTap: () => Navigator.of(context).pushNamed(AppRoutes.styleDnaQuiz),
+                onTap: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.styleDnaQuiz),
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
@@ -202,14 +209,18 @@ class _PersonalizedRecommendationsScreenState
               height: 1.4,
             ),
           ),
-          if (profile.preferredStyles != null && profile.preferredStyles!.isNotEmpty) ...[
+          if (profile.preferredStyles != null &&
+              profile.preferredStyles!.isNotEmpty) ...[
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: profile.preferredStyles!.take(4).map((style) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
@@ -339,7 +350,10 @@ class _PersonalizedRecommendationsScreenState
               onTap: () => setState(() => _selectedCategory = value),
               borderRadius: BorderRadius.circular(20),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? _primaryColor : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
@@ -409,7 +423,11 @@ class _PersonalizedRecommendationsScreenState
                 color: _cardColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.cloud_off, size: 40, color: _textSecondary),
+              child: const Icon(
+                Icons.cloud_off,
+                size: 40,
+                color: _textSecondary,
+              ),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -440,7 +458,10 @@ class _PersonalizedRecommendationsScreenState
               },
               borderRadius: BorderRadius.circular(8),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: _primaryColor),
                   borderRadius: BorderRadius.circular(8),
@@ -474,7 +495,11 @@ class _PersonalizedRecommendationsScreenState
                 color: _cardColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.search_off, size: 40, color: _textSecondary),
+              child: const Icon(
+                Icons.search_off,
+                size: 40,
+                color: _textSecondary,
+              ),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -502,7 +527,9 @@ class _PersonalizedRecommendationsScreenState
     );
   }
 
-  Widget _buildRecommendationsGrid(List<PersonalizedRecommendation> recommendations) {
+  Widget _buildRecommendationsGrid(
+    List<PersonalizedRecommendation> recommendations,
+  ) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -524,12 +551,15 @@ class _PersonalizedRecommendationsScreenState
 
     return ProductCard(
       product: product,
-      onTap: () => Navigator.of(context).pushNamed('/product/${recommendation.id}'),
+      onTap: () =>
+          Navigator.of(context).pushNamed('/product/${recommendation.id}'),
       onFavoriteTap: () {},
     );
   }
 
-  Product _mapRecommendationToProduct(PersonalizedRecommendation recommendation) {
+  Product _mapRecommendationToProduct(
+    PersonalizedRecommendation recommendation,
+  ) {
     return Product(
       id: recommendation.id,
       title: recommendation.name,

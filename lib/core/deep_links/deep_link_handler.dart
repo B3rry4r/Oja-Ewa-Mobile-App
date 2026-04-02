@@ -4,6 +4,7 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/theme/app_theme_colors.dart';
 import '../../features/home/subfeatures/schools/presentation/controllers/school_registration_controller.dart';
 import '../../features/orders/presentation/controllers/orders_controller.dart';
 import '../ui/snackbars.dart';
@@ -70,7 +71,8 @@ class DeepLinkHandler {
   Future<void> _handlePaymentCallback(Uri uri) async {
     final reference = uri.queryParameters['reference'];
     final status = uri.queryParameters['status'];
-    final gateway = uri.queryParameters['gateway']; // 'momo' or 'paystack' or null
+    final gateway =
+        uri.queryParameters['gateway']; // 'momo' or 'paystack' or null
     final orderIdStr = uri.queryParameters['order_id'];
 
     final context = _navigatorKey?.currentContext;
@@ -120,7 +122,11 @@ class DeepLinkHandler {
     }
   }
 
-  void _handleMoMoCallback(BuildContext context, String? status, String? orderIdStr) {
+  void _handleMoMoCallback(
+    BuildContext context,
+    String? status,
+    String? orderIdStr,
+  ) {
     // MoMo callback - payment already verified by backend
     if (status == 'success') {
       final orderId = orderIdStr != null ? int.tryParse(orderIdStr) : null;
@@ -183,11 +189,12 @@ class DeepLinkHandler {
   }
 
   void _showLoading(BuildContext context, String message) {
+    final colors = context.appColors;
     showGeneralDialog(
       context: context,
       barrierDismissible: false,
       barrierLabel: 'Loading',
-      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+      barrierColor: colors.shadow.withValues(alpha: 0.82),
       pageBuilder: (context, anim1, anim2) {
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -196,7 +203,7 @@ class DeepLinkHandler {
               width: 280,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFFBF5),
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Column(
@@ -214,10 +221,10 @@ class DeepLinkHandler {
                   Text(
                     message,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF1E2021),
+                      color: colors.textPrimary,
                       fontFamily: 'Campton',
                     ),
                   ),
@@ -231,11 +238,12 @@ class DeepLinkHandler {
   }
 
   void _showPaymentSuccess(BuildContext context, int? orderId) {
+    final colors = context.appColors;
     showGeneralDialog(
       context: context,
       barrierDismissible: false,
       barrierLabel: 'PaymentSuccess',
-      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+      barrierColor: colors.shadow.withValues(alpha: 0.82),
       pageBuilder: (context, anim1, anim2) {
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -246,7 +254,7 @@ class DeepLinkHandler {
                 width: 342,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFFBF5),
+                  color: colors.surface,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Column(
@@ -267,24 +275,24 @@ class DeepLinkHandler {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       'Payment Successful',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF603814),
+                        color: colors.textPrimary,
                         fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Your order has been placed successfully!',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF1E2021),
+                        color: colors.textSecondary,
                         fontFamily: 'Campton',
                       ),
                     ),
@@ -305,17 +313,15 @@ class DeepLinkHandler {
                               height: 57,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: const Color(0xFFCCCCCC),
-                                ),
+                                border: Border.all(color: colors.border),
                               ),
-                              child: const Center(
+                              child: Center(
                                 child: Text(
                                   'Continue',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF595F63),
+                                    color: colors.textPrimary,
                                     fontFamily: 'Campton',
                                   ),
                                 ),
@@ -377,11 +383,12 @@ class DeepLinkHandler {
   }
 
   void _showSchoolPaymentSuccess(BuildContext context) {
+    final colors = context.appColors;
     showGeneralDialog(
       context: context,
       barrierDismissible: false,
       barrierLabel: 'SchoolPaymentSuccess',
-      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+      barrierColor: colors.shadow.withValues(alpha: 0.82),
       pageBuilder: (context, anim1, anim2) {
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -392,7 +399,7 @@ class DeepLinkHandler {
                 width: 342,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFFBF5),
+                  color: colors.surface,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Column(
@@ -413,24 +420,24 @@ class DeepLinkHandler {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       'Registration Complete',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF603814),
+                        color: colors.textPrimary,
                         fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Your school registration payment was successful!',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF1E2021),
+                        color: colors.textSecondary,
                         fontFamily: 'Campton',
                       ),
                     ),
@@ -484,11 +491,12 @@ class DeepLinkHandler {
   }
 
   void _showPaymentFailed(BuildContext context, String message) {
+    final colors = context.appColors;
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: 'PaymentFailed',
-      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+      barrierColor: colors.shadow.withValues(alpha: 0.82),
       pageBuilder: (context, anim1, anim2) {
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -499,7 +507,7 @@ class DeepLinkHandler {
                 width: 342,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFFBF5),
+                  color: colors.surface,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Column(
@@ -520,13 +528,13 @@ class DeepLinkHandler {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       'Payment Failed',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF603814),
+                        color: colors.textPrimary,
                         fontFamily: 'Campton',
                       ),
                     ),
@@ -534,10 +542,10 @@ class DeepLinkHandler {
                     Text(
                       message,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF1E2021),
+                        color: colors.textSecondary,
                         fontFamily: 'Campton',
                       ),
                     ),
@@ -585,11 +593,12 @@ class DeepLinkHandler {
   }
 
   void _showPaymentPending(BuildContext context) {
+    final colors = context.appColors;
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: 'PaymentPending',
-      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+      barrierColor: colors.shadow.withValues(alpha: 0.82),
       pageBuilder: (context, anim1, anim2) {
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -600,7 +609,7 @@ class DeepLinkHandler {
                 width: 342,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFFBF5),
+                  color: colors.surface,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Column(
@@ -621,24 +630,24 @@ class DeepLinkHandler {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       'Payment Pending',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF603814),
+                        color: colors.textPrimary,
                         fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Your payment is still being processed. Please check your orders later.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF1E2021),
+                        color: colors.textSecondary,
                         fontFamily: 'Campton',
                       ),
                     ),
@@ -653,7 +662,9 @@ class DeepLinkHandler {
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
+                              color: const Color(
+                                0xFFFDAF40,
+                              ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                             ),

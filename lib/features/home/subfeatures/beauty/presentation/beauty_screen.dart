@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
 import 'package:ojaewa/features/categories/presentation/screens/category_screen.dart';
 import 'package:ojaewa/features/product/presentation/screens/product_listing_screen.dart';
@@ -15,27 +16,29 @@ class BeautyScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Use categoriesByTypeProvider - backend now returns full nested tree
-    final productsAsync = ref.watch(categoriesByTypeProvider('afro_beauty_products'));
+    final productsAsync = ref.watch(
+      categoriesByTypeProvider('afro_beauty_products'),
+    );
 
     // Check async state
     final isLoading = productsAsync.isLoading;
     final hasError = productsAsync.hasError;
 
     if (isLoading) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF603814),
-        body: SafeArea(child: Center(child: CircularProgressIndicator())),
+      return Scaffold(
+        backgroundColor: context.appColors.background,
+        body: const SafeArea(child: Center(child: CircularProgressIndicator())),
       );
     }
 
     if (hasError) {
       return Scaffold(
-        backgroundColor: const Color(0xFF603814),
+        backgroundColor: context.appColors.background,
         body: SafeArea(
           child: Center(
             child: Text(
               'Failed to load categories',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: context.appColors.textPrimary),
             ),
           ),
         ),
@@ -67,7 +70,9 @@ class BeautyScreen extends ConsumerWidget {
 
         final slug = item == 'View All'
             ? parent.slug
-            : (parent.children.firstWhere((ch) => ch.name == item, orElse: () => parent).slug);
+            : (parent.children
+                  .firstWhere((ch) => ch.name == item, orElse: () => parent)
+                  .slug);
 
         Navigator.of(context).push(
           MaterialPageRoute(

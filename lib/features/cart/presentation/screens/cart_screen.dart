@@ -3,7 +3,8 @@ import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/cart/domain/cart.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
@@ -34,39 +35,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final isInitialLoading = ref.watch(cartProvider).isLoading && cart == null;
     final hasError = ref.watch(cartProvider).hasError && cart == null;
 
-    return Scaffold(
-      backgroundColor: Color(0xFF603814),
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            Container(
-              color: const Color(0xFF603814),
-              child: const AppHeader(
-                backgroundColor: Color(0xFF603814),
-                iconColor: Colors.white,
-                showActions: false,
-              ),
-            ),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFF8F1),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-                ),
-                child: isInitialLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : hasError
-                    ? const Center(child: Text('Failed to load cart'))
-                    : cart == null
-                    ? const Center(child: Text('Your cart is empty.'))
-                    : _CartBody(cart: cart),
-              ),
-            ),
-            _CheckoutSection(cart: cart),
-          ],
-        ),
-      ),
+    return AppPageScaffold(
+      showActions: false,
+      bottomBar: _CheckoutSection(cart: cart),
+      child: isInitialLoading
+          ? const Center(child: CircularProgressIndicator())
+          : hasError
+          ? const Center(child: Text('Failed to load cart'))
+          : cart == null
+          ? const Center(child: Text('Your cart is empty.'))
+          : _CartBody(cart: cart),
     );
   }
 }
@@ -78,15 +56,16 @@ class _CartBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     if (cart.items.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'Your cart is empty.',
           style: TextStyle(
             fontSize: 16,
             fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
-            color: Color(0xFF1E2021),
+            color: colors.textPrimary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -97,14 +76,14 @@ class _CartBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        const Padding(
+        Padding(
           padding: EdgeInsets.symmetric(horizontal: 17),
           child: Text(
             'My Bag',
             style: TextStyle(
               fontSize: 33,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
+              color: colors.textPrimary,
             ),
           ),
         ),
@@ -132,6 +111,7 @@ class _CartRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final cartItem = item;
     final product = cartItem.product;
 
@@ -146,8 +126,8 @@ class _CartRow extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE))),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: colors.border)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +136,7 @@ class _CartRow extends ConsumerWidget {
             width: 122,
             height: 152,
             decoration: BoxDecoration(
-              color: const Color(0xFFD9D9D9),
+              color: colors.surfaceSecondary,
               borderRadius: BorderRadius.circular(8),
             ),
             child: product.image == null
@@ -194,9 +174,9 @@ class _CartRow extends ConsumerWidget {
                     Expanded(
                       child: Text(
                         product.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
-                          color: Color(0xFF241508),
+                          color: colors.textPrimary,
                         ),
                       ),
                     ),
@@ -210,10 +190,10 @@ class _CartRow extends ConsumerWidget {
                               cartItemId: cartItem.id,
                             );
                       },
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.delete_outline,
                         size: 20,
-                        color: Color(0xFF241508),
+                        color: colors.textPrimary,
                       ),
                     ),
                   ],
@@ -235,23 +215,23 @@ class _CartRow extends ConsumerWidget {
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: const Color(0xFFDEDEDE)),
+                        border: Border.all(color: colors.border),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             'Size: ${cartItem.selectedSize.isNotEmpty ? cartItem.selectedSize : "Select"}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: Color(0xFF3C4042),
+                              color: colors.textPrimary,
                             ),
                           ),
                           const SizedBox(width: 4),
-                          const Icon(
+                          Icon(
                             Icons.keyboard_arrow_down,
                             size: 18,
-                            color: Color(0xFF3C4042),
+                            color: colors.textPrimary,
                           ),
                         ],
                       ),
@@ -264,18 +244,18 @@ class _CartRow extends ConsumerWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.schedule,
                         size: 14,
-                        color: Color(0xFF777F84),
+                        color: colors.textSecondary,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         cartItem.processingTimeLabel!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontFamily: 'Campton',
-                          color: Color(0xFF777F84),
+                          color: colors.textSecondary,
                           height: 1.0,
                         ),
                       ),
@@ -288,10 +268,10 @@ class _CartRow extends ConsumerWidget {
                   children: [
                     Text(
                       formatPrice(cartItem.unitPrice ?? 0),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF241508),
+                        color: colors.textPrimary,
                       ),
                     ),
                     Container(
@@ -301,7 +281,7 @@ class _CartRow extends ConsumerWidget {
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: const Color(0xFFDEDEDE)),
+                        border: Border.all(color: colors.border),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -326,17 +306,17 @@ class _CartRow extends ConsumerWidget {
                               Icons.remove,
                               size: 20,
                               color: cartItem.quantity <= 1
-                                  ? const Color(0xFFCCCCCC)
-                                  : const Color(0xFF3C4042),
+                                  ? colors.borderStrong
+                                  : colors.textPrimary,
                             ),
                           ),
                           const SizedBox(width: 24),
                           Text(
                             '${cartItem.quantity}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF3C4042),
+                              color: colors.textPrimary,
                             ),
                           ),
                           const SizedBox(width: 24),
@@ -351,10 +331,10 @@ class _CartRow extends ConsumerWidget {
                                     newQuantity: cartItem.quantity + 1,
                                   );
                             },
-                            child: const Icon(
+                            child: Icon(
                               Icons.add,
                               size: 20,
-                              color: Color(0xFF3C4042),
+                              color: colors.textPrimary,
                             ),
                           ),
                         ],
@@ -376,6 +356,7 @@ class _CartRow extends ConsumerWidget {
     CartItem cartItem,
     List<String> sizes,
   ) {
+    final colors = context.appColors;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -383,8 +364,8 @@ class _CartRow extends ConsumerWidget {
       builder: (ctx) {
         return Container(
           width: double.infinity,
-          decoration: const BoxDecoration(
-            color: Color(0xFFFFF8F1),
+          decoration: BoxDecoration(
+            color: colors.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: SafeArea(
@@ -400,24 +381,24 @@ class _CartRow extends ConsumerWidget {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFDEDEDE),
+                      color: colors.border,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                 ),
                 // Title
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   child: Text(
                     'Select Size',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF241508),
+                      color: colors.textPrimary,
                     ),
                   ),
                 ),
-                const Divider(height: 1, color: Color(0xFFEEEEEE)),
+                Divider(height: 1, color: colors.border),
                 // Size options - full width list
                 ...sizes.map((size) {
                   final isSelected = size == cartItem.selectedSize;
@@ -441,7 +422,7 @@ class _CartRow extends ConsumerWidget {
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFFFDF3E7)
+                            ? colors.accentSoft
                             : Colors.transparent,
                       ),
                       child: Row(
@@ -454,16 +435,12 @@ class _CartRow extends ConsumerWidget {
                                 fontWeight: isSelected
                                     ? FontWeight.w600
                                     : FontWeight.w400,
-                                color: const Color(0xFF241508),
+                                color: colors.textPrimary,
                               ),
                             ),
                           ),
                           if (isSelected)
-                            const Icon(
-                              Icons.check,
-                              size: 20,
-                              color: Color(0xFFA15E22),
-                            ),
+                            Icon(Icons.check, size: 20, color: colors.accent),
                         ],
                       ),
                     ),
@@ -486,13 +463,15 @@ class _CheckoutSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final total = cart?.total ?? 0;
     final isEmpty = cart == null || cart!.items.isEmpty;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF603814),
+      decoration: BoxDecoration(
+        color: colors.surfaceElevated,
         borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        border: Border(top: BorderSide(color: colors.border)),
       ),
       child: SafeArea(
         top: false,
@@ -505,20 +484,20 @@ class _CheckoutSection extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Subtotal',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFFFBFBFB),
+                      color: colors.textPrimary,
                     ),
                   ),
                   Text(
                     formatPrice(total),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFFFBFBFB),
+                      color: colors.textPrimary,
                     ),
                   ),
                 ],
@@ -528,7 +507,7 @@ class _CheckoutSection extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Delivery fee calculated at checkout',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFFFBFBFB)),
+                  style: TextStyle(fontSize: 12, color: colors.textSecondary),
                 ),
               ),
               const SizedBox(height: 20),
@@ -544,27 +523,25 @@ class _CheckoutSection extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   decoration: BoxDecoration(
-                    color: isEmpty
-                        ? const Color(0xFFCCCCCC)
-                        : const Color(0xFFFDAF40),
+                    color: isEmpty ? colors.borderStrong : colors.accent,
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: isEmpty
                         ? null
                         : [
                             BoxShadow(
-                              color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+                              color: colors.accent.withValues(alpha: 0.3),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                             ),
                           ],
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'Checkout',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFFFFFBF5),
+                        color: colors.onAccent,
                       ),
                     ),
                   ),

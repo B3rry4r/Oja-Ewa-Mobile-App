@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 
 /// In-app notification overlay that shows at the top of the screen
 class InAppNotification {
@@ -14,7 +15,7 @@ class InAppNotification {
     required String message,
     required VoidCallback onTap,
     IconData icon = Icons.notifications,
-    Color backgroundColor = const Color(0xFF603814),
+    Color? backgroundColor,
     Duration duration = const Duration(seconds: 4),
   }) {
     // Dismiss existing notification if any
@@ -28,7 +29,7 @@ class InAppNotification {
         title: title,
         message: message,
         icon: icon,
-        backgroundColor: backgroundColor,
+        backgroundColor: backgroundColor ?? context.appColors.accent,
         onTap: () {
           dismiss();
           onTap();
@@ -74,7 +75,8 @@ class _InAppNotificationWidget extends StatefulWidget {
   final VoidCallback onDismiss;
 
   @override
-  State<_InAppNotificationWidget> createState() => _InAppNotificationWidgetState();
+  State<_InAppNotificationWidget> createState() =>
+      _InAppNotificationWidgetState();
 }
 
 class _InAppNotificationWidgetState extends State<_InAppNotificationWidget>
@@ -93,10 +95,7 @@ class _InAppNotificationWidgetState extends State<_InAppNotificationWidget>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, -1),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
   }
@@ -140,7 +139,7 @@ class _InAppNotificationWidgetState extends State<_InAppNotificationWidget>
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -152,14 +151,10 @@ class _InAppNotificationWidgetState extends State<_InAppNotificationWidget>
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(
-                          widget.icon,
-                          color: Colors.white,
-                          size: 24,
-                        ),
+                        child: Icon(widget.icon, color: Colors.white, size: 24),
                       ),
                       const SizedBox(width: 12),
 
@@ -182,7 +177,7 @@ class _InAppNotificationWidgetState extends State<_InAppNotificationWidget>
                             Text(
                               widget.message,
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
                                 fontSize: 13,
                                 fontFamily: 'Campton',
                               ),
@@ -195,7 +190,11 @@ class _InAppNotificationWidgetState extends State<_InAppNotificationWidget>
 
                       // Close button
                       IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                        icon: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                         onPressed: _dismiss,
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),

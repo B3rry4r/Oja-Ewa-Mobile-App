@@ -7,14 +7,15 @@ import '../../domain/ai_models.dart';
 import '../controllers/ai_analytics_controller.dart';
 
 /// Seller Analytics Dashboard Screen
-/// 
+///
 /// Shows AI-powered inventory forecasting, trend predictions,
 /// and smart analytics for sellers.
 class SellerAnalyticsScreen extends ConsumerStatefulWidget {
   const SellerAnalyticsScreen({super.key});
 
   @override
-  ConsumerState<SellerAnalyticsScreen> createState() => _SellerAnalyticsScreenState();
+  ConsumerState<SellerAnalyticsScreen> createState() =>
+      _SellerAnalyticsScreenState();
 }
 
 class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
@@ -40,7 +41,8 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
     final user = ref.read(userProfileProvider).value;
     if (user != null && !_isInitialized) {
       _isInitialized = true;
-      await ref.read(sellerAnalyticsControllerProvider.notifier)
+      await ref
+          .read(sellerAnalyticsControllerProvider.notifier)
           .initialize(user.id.toString());
     }
   }
@@ -123,18 +125,20 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               child: state.isLoading
                   ? const Center(
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(_primaryColor),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          _primaryColor,
+                        ),
                       ),
                     )
                   : state.error != null
-                      ? _buildErrorState(state.error!)
-                      : TabBarView(
-                          controller: _tabController,
-                          children: [
-                            _buildTrendsTab(state),
-                            _buildInventoryTab(state),
-                          ],
-                        ),
+                  ? _buildErrorState(state.error!)
+                  : TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildTrendsTab(state),
+                        _buildInventoryTab(state),
+                      ],
+                    ),
             ),
           ],
         ),
@@ -158,7 +162,10 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   .selectCategory(value),
               borderRadius: BorderRadius.circular(20),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? _primaryColor : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
@@ -196,7 +203,11 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                 color: _cardColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.cloud_off, size: 40, color: _textSecondary),
+              child: const Icon(
+                Icons.cloud_off,
+                size: 40,
+                color: _textSecondary,
+              ),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -220,10 +231,15 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
             ),
             const SizedBox(height: 24),
             InkWell(
-              onTap: () => ref.read(sellerAnalyticsControllerProvider.notifier).loadAllData(),
+              onTap: () => ref
+                  .read(sellerAnalyticsControllerProvider.notifier)
+                  .loadAllData(),
               borderRadius: BorderRadius.circular(8),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: _primaryColor),
                   borderRadius: BorderRadius.circular(8),
@@ -256,11 +272,23 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (state.trends!.trendingStyles.isNotEmpty)
-            _buildTrendCard('Trending Styles', state.trends!.trendingStyles, Icons.style),
+            _buildTrendCard(
+              'Trending Styles',
+              state.trends!.trendingStyles,
+              Icons.style,
+            ),
           if (state.trends!.trendingColors.isNotEmpty)
-            _buildTrendCard('Trending Colors', state.trends!.trendingColors, Icons.palette),
+            _buildTrendCard(
+              'Trending Colors',
+              state.trends!.trendingColors,
+              Icons.palette,
+            ),
           if (state.trends!.trendingTribes.isNotEmpty)
-            _buildTrendCard('Popular Cultures', state.trends!.trendingTribes, Icons.public),
+            _buildTrendCard(
+              'Popular Cultures',
+              state.trends!.trendingTribes,
+              Icons.public,
+            ),
           const SizedBox(height: 24),
         ],
       ),
@@ -306,7 +334,7 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
 
   Widget _buildTrendItem(int rank, TrendItem item) {
     final isPositive = (item.growth ?? 0) >= 0;
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -348,7 +376,9 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                 Icon(
                   isPositive ? Icons.arrow_upward : Icons.arrow_downward,
                   size: 14,
-                  color: isPositive ? const Color(0xFF4CAF50) : const Color(0xFFE57373),
+                  color: isPositive
+                      ? const Color(0xFF4CAF50)
+                      : const Color(0xFFE57373),
                 ),
                 const SizedBox(width: 2),
                 Text(
@@ -357,7 +387,9 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                     fontSize: 12,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w500,
-                    color: isPositive ? const Color(0xFF4CAF50) : const Color(0xFFE57373),
+                    color: isPositive
+                        ? const Color(0xFF4CAF50)
+                        : const Color(0xFFE57373),
                   ),
                 ),
               ],
@@ -415,7 +447,8 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
           ),
           const SizedBox(height: 16),
           ...prediction.predictions.take(5).map((p) => _buildPredictionItem(p)),
-          if (prediction.insights != null && prediction.insights!.isNotEmpty) ...[
+          if (prediction.insights != null &&
+              prediction.insights!.isNotEmpty) ...[
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
@@ -426,7 +459,11 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.lightbulb_outline, size: 16, color: _primaryColor),
+                  const Icon(
+                    Icons.lightbulb_outline,
+                    size: 16,
+                    color: _primaryColor,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -493,7 +530,10 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
 
   Widget _buildInventoryTab(SellerAnalyticsState state) {
     if (state.forecasts == null || state.forecasts!.isEmpty) {
-      return _buildEmptyState('No inventory forecasts available', Icons.inventory_2);
+      return _buildEmptyState(
+        'No inventory forecasts available',
+        Icons.inventory_2,
+      );
     }
 
     return ListView.builder(
@@ -537,7 +577,10 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               ),
               if (needsRestock && !isSummary)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFE57373).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
@@ -545,7 +588,11 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.warning_amber, size: 12, color: Color(0xFFE57373)),
+                      Icon(
+                        Icons.warning_amber,
+                        size: 12,
+                        color: Color(0xFFE57373),
+                      ),
                       SizedBox(width: 4),
                       Text(
                         'Restock',
@@ -573,7 +620,11 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.lightbulb_outline, size: 16, color: _primaryColor),
+                  const Icon(
+                    Icons.lightbulb_outline,
+                    size: 16,
+                    color: _primaryColor,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -595,7 +646,11 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                 const Icon(Icons.trending_up, size: 16, color: _primaryColor),
                 const SizedBox(width: 8),
                 Text(
-                  'Expected Demand: ${forecast.predictedDemand >= 100 ? "High" : forecast.predictedDemand >= 50 ? "Medium" : "Low"}',
+                  'Expected Demand: ${forecast.predictedDemand >= 100
+                      ? "High"
+                      : forecast.predictedDemand >= 50
+                      ? "Medium"
+                      : "Low"}',
                   style: const TextStyle(
                     fontSize: 13,
                     fontFamily: 'Campton',
@@ -609,11 +664,23 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
             const SizedBox(height: 16),
             Row(
               children: [
-                _buildStockIndicator('Current', forecast.currentStock, _textSecondary),
+                _buildStockIndicator(
+                  'Current',
+                  forecast.currentStock,
+                  _textSecondary,
+                ),
                 Container(width: 1, height: 32, color: Colors.white),
-                _buildStockIndicator('Predicted', forecast.predictedDemand, _primaryColor),
+                _buildStockIndicator(
+                  'Predicted',
+                  forecast.predictedDemand,
+                  _primaryColor,
+                ),
                 Container(width: 1, height: 32, color: Colors.white),
-                _buildStockIndicator('Recommended', forecast.recommendedStock, const Color(0xFF4CAF50)),
+                _buildStockIndicator(
+                  'Recommended',
+                  forecast.recommendedStock,
+                  const Color(0xFF4CAF50),
+                ),
               ],
             ),
           ],
@@ -888,26 +955,36 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
             ],
           ),
           const SizedBox(height: 12),
-          ...suggestions.take(3).map((suggestion) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('•  ', style: TextStyle(color: _primaryColor, fontWeight: FontWeight.bold)),
-                Expanded(
-                  child: Text(
-                    suggestion,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'Campton',
-                      color: _textDark,
-                      height: 1.4,
-                    ),
+          ...suggestions
+              .take(3)
+              .map(
+                (suggestion) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '•  ',
+                        style: TextStyle(
+                          color: _primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          suggestion,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontFamily: 'Campton',
+                            color: _textDark,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          )),
+              ),
         ],
       ),
     );

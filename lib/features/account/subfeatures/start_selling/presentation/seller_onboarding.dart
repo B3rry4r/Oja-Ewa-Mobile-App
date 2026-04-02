@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/core/subscriptions/subscription_constants.dart';
 import 'package:ojaewa/core/subscriptions/subscription_controller.dart';
@@ -15,6 +16,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final sellerStatusAsync = ref.watch(mySellerStatusProvider);
     final subscriptionAsync = ref.watch(subscriptionControllerProvider);
     final subscription = subscriptionAsync.value?.subscription;
@@ -22,8 +24,8 @@ class SellerOnboardingScreen extends ConsumerWidget {
 
     // If seller profile exists, redirect to appropriate screen
     return sellerStatusAsync.when(
-      loading: () => const Scaffold(
-        backgroundColor: Color(0xFFFFF8F1),
+      loading: () => Scaffold(
+        backgroundColor: colors.background,
         body: Center(child: CircularProgressIndicator()),
       ),
       error: (_, __) => _buildOnboardingContent(context, ref, hasPro),
@@ -34,107 +36,94 @@ class SellerOnboardingScreen extends ConsumerWidget {
             if (!context.mounted) return;
             if (status.isApprovedAndActive) {
               // Use pushReplacementNamed to prevent navigation loop
-              Navigator.of(context).pushReplacementNamed(AppRoutes.yourShopDashboard);
+              Navigator.of(
+                context,
+              ).pushReplacementNamed(AppRoutes.yourShopDashboard);
             } else {
               // Pending or rejected - show approval status screen
-              Navigator.of(context).pushReplacementNamed(AppRoutes.sellerApprovalStatus);
+              Navigator.of(
+                context,
+              ).pushReplacementNamed(AppRoutes.sellerApprovalStatus);
             }
           });
           // Show loading while redirecting
-          return const Scaffold(
-            backgroundColor: Color(0xFFFFF8F1),
+          return Scaffold(
+            backgroundColor: colors.background,
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        
+
         // No seller profile yet - show onboarding
         return _buildOnboardingContent(context, ref, hasPro);
       },
     );
   }
 
-  Widget _buildOnboardingContent(BuildContext context, WidgetRef ref, bool hasPro) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const AppHeader(
-                backgroundColor: Color(0xFFFFF8F1),
-                iconColor: Color(0xFF241508),
-              ),
+  Widget _buildOnboardingContent(
+    BuildContext context,
+    WidgetRef ref,
+    bool hasPro,
+  ) {
+    final colors = context.appColors;
+    return AppPageScaffold(
+      scrollable: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 32),
 
-              // Main content
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 32),
-
-                    // Main title
-                    const Text(
-                      'Sell on Ojá-Ẹwà',
-                      style: TextStyle(
-                        fontSize: 33,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Campton',
-                        color: Color(0xFF241508),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Subtitle
-                    const Text(
-                      'Tell your Story on Ojá-Ẹwà. Where makers build their legacy. List your work, tell your story, reach the world.',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'Campton',
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF1E2021),
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Quality Standards Banner
-                    _buildQualityStandardsBanner(),
-
-                    const SizedBox(height: 32),
-
-                    // "How it works" section
-                    _buildHowItWorksSection(),
-
-                    const SizedBox(height: 40),
-
-                    if (hasPro) ...[
-                      // Start Selling button
-                      _buildStartSellingButton(context),
-                      const SizedBox(height: 40),
-                    ] else ...[
-                      _buildSubscriptionGate(context, ref),
-                      const SizedBox(height: 24),
-                    ]
-                  ],
-                ),
-              ),
-            ],
+          Text(
+            'Sell on Ojá-Ẹwà',
+            style: TextStyle(
+              fontSize: 33,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Campton',
+              color: colors.textPrimary,
+            ),
           ),
-        ),
+
+          const SizedBox(height: 16),
+
+          Text(
+            'Tell your Story on Ojá-Ẹwà. Where makers build their legacy. List your work, tell your story, reach the world.',
+            style: TextStyle(
+              fontSize: 16,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w400,
+              color: colors.textSecondary,
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          _buildQualityStandardsBanner(context),
+
+          const SizedBox(height: 32),
+
+          _buildHowItWorksSection(context),
+
+          const SizedBox(height: 40),
+
+          if (hasPro) ...[
+            _buildStartSellingButton(context),
+            const SizedBox(height: 40),
+          ] else ...[
+            _buildSubscriptionGate(context, ref),
+            const SizedBox(height: 24),
+          ],
+        ],
       ),
     );
   }
 
-  Widget _buildQualityStandardsBanner() {
+  Widget _buildQualityStandardsBanner(BuildContext context) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF8F1),
+        color: colors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
+        border: Border.all(color: colors.accent, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,31 +133,31 @@ class SellerOnboardingScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFDAF40).withOpacity(0.1),
+                  color: colors.accent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.verified_user,
-                  color: Color(0xFFFDAF40),
+                  color: colors.accent,
                   size: 24,
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Our Quality Promise',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Campton',
-                    color: Color(0xFF241508),
+                    color: colors.textPrimary,
                   ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'At Ojá-Ẹwà your trust is our foundation. Every product on Ojá-Ẹwà must pass our verification for authenticity and craftsmanship.\n\n'
             'We guarantee: If a newly registered brand/product fails our review and does not meet our published Quality Standards, its registration fee will be fully refunded.\n\n'
             'We invest in your success by ensuring only excellence reaches our marketplace.\n\n'
@@ -177,7 +166,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Campton',
-              color: Color(0xFF1E2021),
+              color: colors.textSecondary,
               height: 1.5,
             ),
           ),
@@ -187,34 +176,35 @@ class SellerOnboardingScreen extends ConsumerWidget {
   }
 
   Widget _buildSubscriptionGate(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final subscriptionState = ref.watch(subscriptionControllerProvider);
     final isLoading = subscriptionState.value?.isLoading ?? false;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5E0CE),
+        color: colors.surfaceSecondary,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Ojaewa Pro Required',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               fontFamily: 'Campton',
-              color: Color(0xFF241508),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Subscribe to Ojaewa Pro to sell on the platform and publish your seller profile. AI tools are included.',
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Campton',
-              color: Color(0xFF777F84),
+              color: colors.textTertiary,
               height: 1.4,
             ),
           ),
@@ -223,37 +213,44 @@ class SellerOnboardingScreen extends ConsumerWidget {
             children: [
               Expanded(
                 child: InkWell(
-                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.termsOfService),
-                  child: const Text(
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.termsOfService),
+                  child: Text(
                     'View Terms of Service',
                     style: TextStyle(
                       fontSize: 12,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFFFDAF40),
+                      color: colors.accent,
                     ),
                   ),
                 ),
               ),
               const SizedBox(width: 12),
               ElevatedButton(
-                onPressed: isLoading ? null : () async {
-                  await ref.read(iapServiceProvider).purchaseSubscription(
-                        SubscriptionProducts.ojaewaProYearly,
-                      );
-                },
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                        await ref
+                            .read(iapServiceProvider)
+                            .purchaseSubscription(
+                              SubscriptionProducts.ojaewaProYearly,
+                            );
+                      },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFDAF40),
-                  foregroundColor: Colors.white,
-                  disabledBackgroundColor: const Color(0xFFCCCCCC),
+                  backgroundColor: colors.accent,
+                  foregroundColor: colors.onAccent,
+                  disabledBackgroundColor: colors.border,
                 ),
-                child: isLoading 
+                child: isLoading
                     ? const SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
                         ),
                       )
                     : const Text('Subscribe'),
@@ -265,7 +262,8 @@ class SellerOnboardingScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHowItWorksSection() {
+  Widget _buildHowItWorksSection(BuildContext context) {
+    final colors = context.appColors;
     const List<HowItWorksStep> steps = [
       HowItWorksStep(
         number: '1',
@@ -293,31 +291,31 @@ class SellerOnboardingScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // "How it works" title
-        const Text(
+        Text(
           'How it works',
           style: TextStyle(
             fontSize: 33,
             fontWeight: FontWeight.w600,
             fontFamily: 'Campton',
-            color: Color(0xFF241508),
+            color: colors.textPrimary,
           ),
         ),
-
-
 
         const SizedBox(height: 40),
 
         // Steps list
         Column(
           children: [
-            for (int i = 0; i < steps.length; i++) _buildStepItem(steps[i]),
+            for (int i = 0; i < steps.length; i++)
+              _buildStepItem(context, steps[i]),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildStepItem(HowItWorksStep step) {
+  Widget _buildStepItem(BuildContext context, HowItWorksStep step) {
+    final colors = context.appColors;
     return Container(
       margin: const EdgeInsets.only(bottom: 32),
       child: Row(
@@ -328,17 +326,17 @@ class SellerOnboardingScreen extends ConsumerWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: const Color(0xFF603814),
-              borderRadius: BorderRadius.circular(4),
+              color: colors.textPrimary,
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
               child: Text(
                 step.number,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Campton',
-                  color: Color(0xFFFFF8F1),
+                  color: colors.background,
                 ),
               ),
             ),
@@ -350,11 +348,11 @@ class SellerOnboardingScreen extends ConsumerWidget {
           Expanded(
             child: Text(
               step.description,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: Color(0xFF1E2021),
+                color: colors.textPrimary,
               ),
             ),
           ),
@@ -364,14 +362,15 @@ class SellerOnboardingScreen extends ConsumerWidget {
   }
 
   Widget _buildStartSellingButton(BuildContext context) {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.accent,
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+            color: colors.accent.withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -380,20 +379,20 @@ class SellerOnboardingScreen extends ConsumerWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(18),
           onTap: () {
             Navigator.of(context).pushNamed(AppRoutes.sellerRegistration);
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 32),
             alignment: Alignment.center,
-            child: const Text(
+            child: Text(
               'Start Selling',
               style: TextStyle(
                 fontSize: 16,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: colors.onAccent,
               ),
             ),
           ),

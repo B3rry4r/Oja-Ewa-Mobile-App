@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 
 /// Payment method selection bottom sheet
 /// Allows users to choose between Paystack and MTN MoMo
@@ -7,9 +8,10 @@ class PaymentMethodSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFFBF5),
+      decoration: BoxDecoration(
+        color: colors.surfaceElevated,
         borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
       child: SafeArea(
@@ -26,29 +28,29 @@ class PaymentMethodSheet extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFCCCCCC),
+                    color: colors.textTertiary.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               // Title
-              const Text(
+              Text(
                 'Select Payment Method',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF241508),
+                  color: colors.textPrimary,
                   fontFamily: 'Campton',
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Choose how you want to pay',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Color(0xFF777F84),
+                  color: colors.textTertiary,
                   fontFamily: 'Campton',
                 ),
               ),
@@ -100,17 +102,18 @@ class _PaymentMethodOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE5E5E5)),
+          border: Border.all(color: colors.border),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF000000).withValues(alpha: 0.05),
+              color: colors.shadow,
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -124,30 +127,26 @@ class _PaymentMethodOption extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1E2021),
+                      color: colors.textPrimary,
                       fontFamily: 'Campton',
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: Color(0xFF777F84),
+                      color: colors.textTertiary,
                       fontFamily: 'Campton',
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Color(0xFFCCCCCC),
-              size: 16,
-            ),
+            Icon(Icons.arrow_forward_ios, color: colors.textTertiary, size: 16),
           ],
         ),
       ),

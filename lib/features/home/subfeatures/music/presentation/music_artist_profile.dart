@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/widgets/error_state_widget.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/business_details/presentation/controllers/business_details_controller.dart';
@@ -33,6 +34,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
     WidgetRef ref,
     BusinessDetails business,
   ) {
+    final colors = context.appColors;
     final artistName = business.businessName;
     final biography = business.businessDescription ?? '';
     final email = business.businessEmail ?? '';
@@ -44,65 +46,40 @@ class MusicArtistProfileScreen extends ConsumerWidget {
     final spotify = business.spotify;
     final imageUrl = business.imageUrl;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Stack(
+    return AppPageScaffold(
+      bottomBar: _buildBottomContactCard(context, phone),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 180),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Main scrollable content
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 104), // Space for standard header
-                  // Artist Header with Image
-                  _buildArtistHeader(artistName, imageUrl),
-
-                  const SizedBox(height: 20),
-
-                  // Biography Section
-                  _buildBiographySection(biography),
-
-                  const SizedBox(height: 16),
-
-                  // Contact Details Section
-                  _buildContactSection(email, phone, location),
-
-                  const SizedBox(height: 16),
-
-                  // Social Links Section (YouTube & Spotify for music, plus Instagram & Facebook)
-                  _buildSocialLinksSection(
-                    instagram,
-                    facebook,
-                    youtube,
-                    spotify,
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Reviews Section
-                  _buildReviewsSection(context, ref),
-
-                  const SizedBox(height: 180), // Space for bottom card
-                ],
-              ),
+            _buildArtistHeader(context, artistName, imageUrl),
+            const SizedBox(height: 20),
+            _buildBiographySection(context, biography),
+            const SizedBox(height: 16),
+            _buildContactSection(context, email, phone, location),
+            const SizedBox(height: 16),
+            _buildSocialLinksSection(
+              context,
+              instagram,
+              facebook,
+              youtube,
+              spotify,
             ),
-
-            // Fixed Top App Bar
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
-            ),
-
-            // Fixed Bottom Contact Card
-            _buildBottomContactCard(context, phone),
+            const SizedBox(height: 16),
+            _buildReviewsSection(context, ref),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildArtistHeader(String artistName, String? imageUrl) {
+  Widget _buildArtistHeader(
+    BuildContext context,
+    String artistName,
+    String? imageUrl,
+  ) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -136,11 +113,11 @@ class MusicArtistProfileScreen extends ConsumerWidget {
               children: [
                 Text(
                   artistName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF241508),
+                    color: colors.textPrimary,
                     height: 1.2,
                   ),
                 ),
@@ -153,34 +130,30 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                     Container(
                       width: 12,
                       height: 12,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFFDB80),
+                      decoration: BoxDecoration(
+                        color: colors.accentSoft,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.star,
-                        size: 8,
-                        color: Color(0xFFFDAF40),
-                      ),
+                      child: Icon(Icons.star, size: 8, color: colors.accent),
                     ),
                     const SizedBox(width: 4),
-                    const Text(
+                    Text(
                       '4.0',
                       style: TextStyle(
                         fontSize: 12,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF241508),
+                        color: colors.textPrimary,
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Text(
+                    Text(
                       '(8)',
                       style: TextStyle(
                         fontSize: 10,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF777F84),
+                        color: colors.textTertiary,
                       ),
                     ),
                   ],
@@ -193,34 +166,43 @@ class MusicArtistProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBiographySection(String biography) {
+  Widget _buildBiographySection(BuildContext context, String biography) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.surfaceElevated,
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.18),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Biography',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             biography,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
-              color: Color(0xFF1E2021),
+              color: colors.textSecondary,
               height: 1.5,
             ),
           ),
@@ -229,24 +211,38 @@ class MusicArtistProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContactSection(String email, String phone, String location) {
+  Widget _buildContactSection(
+    BuildContext context,
+    String email,
+    String phone,
+    String location,
+  ) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.surfaceElevated,
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.18),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Contact Details',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
 
@@ -254,6 +250,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
 
           // Address
           _buildContactItem(
+            context: context,
             icon: Icons.location_on,
             title: 'Address',
             content: location,
@@ -267,6 +264,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
 
           // Phone
           _buildContactItem(
+            context: context,
             icon: Icons.phone,
             title: 'Phone Number',
             content: phone,
@@ -276,6 +274,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
 
           // Email
           _buildContactItem(
+            context: context,
             icon: Icons.email,
             title: 'Email Address',
             content: email,
@@ -285,6 +284,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
 
           // Working Hours
           _buildContactItem(
+            context: context,
             icon: Icons.access_time,
             title: 'Working hours',
             content: 'Monday to Friday: 9am - 6pm\nSaturday - Sunday: Closed',
@@ -295,12 +295,14 @@ class MusicArtistProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildContactItem({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String content,
     String? actionText,
     VoidCallback? onActionTap,
   }) {
+    final colors = context.appColors;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -308,10 +310,10 @@ class MusicArtistProfileScreen extends ConsumerWidget {
           width: 28,
           height: 28,
           decoration: BoxDecoration(
-            color: const Color(0xFF603814),
-            borderRadius: BorderRadius.circular(4),
+            color: colors.accent,
+            borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, size: 18, color: Colors.white),
+          child: Icon(icon, size: 18, color: colors.onAccent),
         ),
 
         const SizedBox(width: 8),
@@ -322,21 +324,21 @@ class MusicArtistProfileScreen extends ConsumerWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF1E2021),
+                  color: colors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 content,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
-                  color: Colors.black,
+                  color: colors.textSecondary,
                   height: 1.5,
                 ),
               ),
@@ -348,18 +350,18 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                     children: [
                       Text(
                         actionText,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontFamily: 'Campton',
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF3C4042),
+                          color: colors.textSecondary,
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(
+                      Icon(
                         Icons.arrow_forward,
                         size: 14,
-                        color: Color(0xFF3C4042),
+                        color: colors.textSecondary,
                       ),
                     ],
                   ),
@@ -373,28 +375,38 @@ class MusicArtistProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildSocialLinksSection(
+    BuildContext context,
     String instagram,
     String facebook,
     String? youtube,
     String? spotify,
   ) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.surfaceElevated,
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.18),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Social Links',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
 
@@ -403,6 +415,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
           // YouTube (Music-specific)
           if (youtube != null && youtube.isNotEmpty) ...[
             _buildSocialLinkItem(
+              context: context,
               icon: Icons.play_circle_outline,
               platform: 'YouTube',
               handle: youtube,
@@ -414,6 +427,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
           // Spotify (Music-specific)
           if (spotify != null && spotify.isNotEmpty) ...[
             _buildSocialLinkItem(
+              context: context,
               icon: Icons.music_note_outlined,
               platform: 'Spotify',
               handle: spotify,
@@ -424,6 +438,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
 
           // Instagram
           _buildSocialLinkItem(
+            context: context,
             icon: Icons.camera_alt_outlined,
             platform: 'Instagram',
             handle: instagram,
@@ -436,6 +451,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
 
           // Facebook
           _buildSocialLinkItem(
+            context: context,
             icon: Icons.facebook_outlined,
             platform: 'Facebook',
             handle: facebook,
@@ -458,11 +474,13 @@ class MusicArtistProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildSocialLinkItem({
+    required BuildContext context,
     required IconData icon,
     required String platform,
     required String handle,
     VoidCallback? onTap,
   }) {
+    final colors = context.appColors;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -473,10 +491,10 @@ class MusicArtistProfileScreen extends ConsumerWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: const Color(0xFF603814),
-              borderRadius: BorderRadius.circular(4),
+              color: colors.accent,
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, size: 18, color: Colors.white),
+            child: Icon(icon, size: 18, color: colors.onAccent),
           ),
 
           const SizedBox(width: 12),
@@ -488,21 +506,21 @@ class MusicArtistProfileScreen extends ConsumerWidget {
               children: [
                 Text(
                   platform,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF1E2021),
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   handle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
-                    color: Color(0xFFA15E22),
+                    color: colors.accent,
                   ),
                 ),
               ],
@@ -510,17 +528,14 @@ class MusicArtistProfileScreen extends ConsumerWidget {
           ),
 
           // Arrow icon
-          const Icon(
-            Icons.arrow_forward_ios,
-            size: 14,
-            color: Color(0xFF777F84),
-          ),
+          Icon(Icons.arrow_forward_ios, size: 14, color: colors.textTertiary),
         ],
       ),
     );
   }
 
   Widget _buildReviewsSection(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final reviewsPage = ref
         .watch(reviewsProvider((type: 'business', id: businessId)))
         .maybeWhen(data: (d) => d, orElse: () => null);
@@ -542,8 +557,16 @@ class MusicArtistProfileScreen extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFDEDEDE)),
-          borderRadius: BorderRadius.circular(8),
+          color: colors.surfaceElevated,
+          border: Border.all(color: colors.border),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: colors.shadow.withValues(alpha: 0.18),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -554,11 +577,11 @@ class MusicArtistProfileScreen extends ConsumerWidget {
               children: [
                 Text(
                   'Reviews ($reviewCount)',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E2021),
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 9),
@@ -566,26 +589,22 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                   children: [
                     Text(
                       avgRating,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF1E2021),
+                        color: colors.textPrimary,
                       ),
                     ),
                     const SizedBox(width: 4),
                     Container(
                       width: 12,
                       height: 12,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFFDB80),
+                      decoration: BoxDecoration(
+                        color: colors.accentSoft,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.star,
-                        size: 8,
-                        color: Color(0xFFFDAF40),
-                      ),
+                      child: Icon(Icons.star, size: 8, color: colors.accent),
                     ),
                   ],
                 ),
@@ -597,6 +616,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
 
               // First review from API
               _buildReviewItem(
+                context,
                 name: firstReview.user?.displayName ?? '',
                 date: firstReview.createdAt != null
                     ? _formatDate(firstReview.createdAt!)
@@ -631,13 +651,15 @@ class MusicArtistProfileScreen extends ConsumerWidget {
     return '$m ${dt.day}, ${dt.year}';
   }
 
-  Widget _buildReviewItem({
+  Widget _buildReviewItem(
+    BuildContext context, {
     required String name,
     required String date,
     required int rating,
     required String title,
     required String review,
   }) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -647,20 +669,20 @@ class MusicArtistProfileScreen extends ConsumerWidget {
           children: [
             Text(
               name,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: Color(0xFF3C4042),
+                color: colors.textSecondary,
               ),
             ),
             Text(
               date,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: Color(0xFFB1B1B1),
+                color: colors.textTertiary,
               ),
             ),
           ],
@@ -677,7 +699,7 @@ class MusicArtistProfileScreen extends ConsumerWidget {
               child: Icon(
                 index < rating ? Icons.star : Icons.star_border,
                 size: 12,
-                color: const Color(0xFFFFDB80),
+                color: index < rating ? colors.accent : colors.border,
               ),
             ),
           ),
@@ -689,11 +711,11 @@ class MusicArtistProfileScreen extends ConsumerWidget {
           // Review title
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w500,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
         ],
@@ -704,11 +726,11 @@ class MusicArtistProfileScreen extends ConsumerWidget {
           // Review text
           Text(
             review,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
-              color: Color(0xFF1E2021),
+              color: colors.textSecondary,
               height: 1.5,
             ),
           ),
@@ -718,14 +740,16 @@ class MusicArtistProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildBottomContactCard(BuildContext context, String phone) {
+    final colors = context.appColors;
     return Positioned(
       bottom: 0,
       left: 0,
       right: 0,
       child: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF603814),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+        decoration: BoxDecoration(
+          color: colors.surfaceElevated,
+          border: Border(top: BorderSide(color: colors.border)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 36),
         child: Row(
@@ -736,24 +760,25 @@ class MusicArtistProfileScreen extends ConsumerWidget {
               child: OutlinedButton(
                 onPressed: () => _makePhoneCall(phone),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFFFDAF40), width: 1.5),
+                  side: BorderSide(color: colors.accent, width: 1.5),
+                  backgroundColor: colors.surface,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 18),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.phone, size: 20, color: Color(0xFFFDAF40)),
-                    SizedBox(width: 4),
+                  children: [
+                    Icon(Icons.phone, size: 20, color: colors.accent),
+                    const SizedBox(width: 4),
                     Text(
                       'Call',
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFFFDAF40),
+                        color: colors.accent,
                       ),
                     ),
                   ],
@@ -769,30 +794,30 @@ class MusicArtistProfileScreen extends ConsumerWidget {
               child: ElevatedButton(
                 onPressed: () => _openWhatsApp(phone),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFDAF40),
+                  backgroundColor: colors.accent,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   elevation: 8,
-                  shadowColor: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+                  shadowColor: colors.accent.withValues(alpha: 0.3),
                   padding: const EdgeInsets.symmetric(vertical: 18),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(
                       Icons.chat_bubble_outline,
                       size: 20,
-                      color: Color(0xFFFFFBF5),
+                      color: colors.onAccent,
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Text(
                       'Whatsapp',
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFFFFFBF5),
+                        color: colors.onAccent,
                       ),
                     ),
                   ],

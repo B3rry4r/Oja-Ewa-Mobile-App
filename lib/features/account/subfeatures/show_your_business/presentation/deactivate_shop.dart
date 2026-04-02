@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 
 import '../../../../../app/router/app_router.dart';
 import '../../../../../core/widgets/confirmation_modal.dart';
@@ -14,113 +15,91 @@ class DeactivateShopScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final args = ModalRoute.of(context)?.settings.arguments;
     final businessId = (args is Map ? args['businessId'] : null) as int?;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: Column(
-        children: [
-          const AppHeader(
-            backgroundColor: Color(0xFFFFF8F1),
-            iconColor: Color(0xFF241508),
-            title: Text(
-              'Deactivate shop',
+    return AppPageScaffold(
+      title: 'Deactivate shop',
+      child: Padding(
+        padding: const EdgeInsets.all(0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24),
+            Text(
+              'Deactivate your shop',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 20,
                 fontFamily: 'Campton',
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF241508),
+                fontWeight: FontWeight.w700,
+                color: colors.textPrimary,
               ),
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Deactivate your shop',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF241508),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'This will hide your business from customers until you reactivate it.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF777F84),
-                    ),
-                  ),
-                  const Spacer(),
-                  InkWell(
-                    onTap: () {
-                      ConfirmationModal.show(
-                        context,
-                        title: 'Deactivate shop',
-                        message:
-                            'Are you sure you want to deactivate your shop?',
-                        confirmLabel: 'Deactivate',
-                        onConfirm: () async {
-                          if (businessId == null) {
-                            Navigator.of(context).pop();
-                            return;
-                          }
-                          await ref
-                              .read(businessManagementActionsProvider.notifier)
-                              .deactivate(businessId);
-                          if (!context.mounted) return;
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                            AppRoutes.home,
-                            (route) => false,
-                          );
-                        },
-                      );
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      width: double.infinity,
-                      height: 57,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFDAF40),
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(
-                              0xFFFDAF40,
-                            ).withValues(alpha: 0.4),
-                            blurRadius: 16,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Deactivate',
-                          style: TextStyle(
-                            color: Color(0xFFFFFBF5),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Campton',
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
+            const SizedBox(height: 8),
+            Text(
+              'This will hide your business from customers until you reactivate it.',
+              style: TextStyle(
+                fontSize: 14,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w400,
+                color: colors.textSecondary,
               ),
             ),
-          ),
-        ],
+            const Spacer(),
+            InkWell(
+              onTap: () {
+                ConfirmationModal.show(
+                  context,
+                  title: 'Deactivate shop',
+                  message: 'Are you sure you want to deactivate your shop?',
+                  confirmLabel: 'Deactivate',
+                  onConfirm: () async {
+                    if (businessId == null) {
+                      Navigator.of(context).pop();
+                      return;
+                    }
+                    await ref
+                        .read(businessManagementActionsProvider.notifier)
+                        .deactivate(businessId);
+                    if (!context.mounted) return;
+                    Navigator.of(
+                      context,
+                    ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+                  },
+                );
+              },
+              borderRadius: BorderRadius.circular(18),
+              child: Container(
+                width: double.infinity,
+                height: 57,
+                decoration: BoxDecoration(
+                  color: colors.accent,
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colors.accent.withValues(alpha: 0.4),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    'Deactivate',
+                    style: TextStyle(
+                      color: colors.onAccent,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Campton',
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }

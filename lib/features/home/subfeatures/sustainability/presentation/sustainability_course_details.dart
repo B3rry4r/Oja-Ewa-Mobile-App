@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/widgets/error_state_widget.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/reviews/presentation/controllers/reviews_controller.dart';
@@ -37,6 +38,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     SustainabilityDetails initiative,
   ) {
+    final colors = context.appColors;
     final title = initiative.title;
     final description = initiative.description ?? '';
     final category = initiative.category ?? '';
@@ -44,57 +46,32 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
     final progress = initiative.progressPercentage?.toInt() ?? 0;
     final imageUrl = initiative.imageUrl;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Stack(
+    return AppPageScaffold(
+      bottomBar: _buildBottomActionCard(context),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 180),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Main scrollable content
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 104), // Space for standard header
-                  // Course Header with Image
-                  _buildCourseHeader(title, imageUrl),
-
-                  const SizedBox(height: 20),
-
-                  // Description Section
-                  _buildDescriptionSection(description),
-
-                  const SizedBox(height: 16),
-
-                  // Event Details Section
-                  _buildEventDetailsSection(category, status, progress),
-
-                  const SizedBox(height: 16),
-
-                  // Reviews Section
-                  _buildReviewsSection(context, ref),
-
-                  const SizedBox(
-                    height: 180,
-                  ), // Space for bottom card and button
-                ],
-              ),
-            ),
-
-            // Fixed Top App Bar
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
-            ),
-
-            // Fixed Bottom Action Card
-            _buildBottomActionCard(context),
+            _buildCourseHeader(context, title, imageUrl),
+            const SizedBox(height: 20),
+            _buildDescriptionSection(context, description),
+            const SizedBox(height: 16),
+            _buildEventDetailsSection(context, category, status, progress),
+            const SizedBox(height: 16),
+            _buildReviewsSection(context, ref),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCourseHeader(String title, String? imageUrl) {
+  Widget _buildCourseHeader(
+    BuildContext context,
+    String title,
+    String? imageUrl,
+  ) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -128,11 +105,11 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF241508),
+                    color: colors.textPrimary,
                     height: 1.2,
                   ),
                 ),
@@ -145,34 +122,30 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                     Container(
                       width: 12,
                       height: 12,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFFDB80),
+                      decoration: BoxDecoration(
+                        color: colors.accentSoft,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.star,
-                        size: 8,
-                        color: Color(0xFFFDAF40),
-                      ),
+                      child: Icon(Icons.star, size: 8, color: colors.accent),
                     ),
                     const SizedBox(width: 4),
-                    const Text(
+                    Text(
                       '4.0',
                       style: TextStyle(
                         fontSize: 12,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF241508),
+                        color: colors.textPrimary,
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Text(
+                    Text(
                       '(8)',
                       style: TextStyle(
                         fontSize: 10,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF777F84),
+                        color: colors.textTertiary,
                       ),
                     ),
                   ],
@@ -185,34 +158,43 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDescriptionSection(String description) {
+  Widget _buildDescriptionSection(BuildContext context, String description) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.surfaceElevated,
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.18),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Description',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             description,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
-              color: Color(0xFF1E2021),
+              color: colors.textSecondary,
               height: 1.5,
             ),
           ),
@@ -222,10 +204,12 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildEventDetailsSection(
+    BuildContext context,
     String category,
     String status,
     int progress,
   ) {
+    final colors = context.appColors;
     // Capitalize first letter of category
     final displayCategory = category.isNotEmpty
         ? '${category[0].toUpperCase()}${category.substring(1)}'
@@ -238,19 +222,27 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.surfaceElevated,
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.18),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Initiative Details',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
 
@@ -258,6 +250,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
 
           // Category
           _buildEventDetailRow(
+            context: context,
             icon: Icons.category_outlined,
             label: 'Category',
             value: displayCategory,
@@ -267,6 +260,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
 
           // Status
           _buildEventDetailRow(
+            context: context,
             icon: Icons.check_circle_outline,
             label: 'Status',
             value: displayStatus,
@@ -276,6 +270,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
 
           // Progress
           _buildEventDetailRow(
+            context: context,
             icon: Icons.trending_up,
             label: 'Progress',
             value: '$progress%',
@@ -286,31 +281,33 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildEventDetailRow({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required String value,
   }) {
+    final colors = context.appColors;
     return Row(
       children: [
-        Icon(icon, size: 20, color: const Color(0xFFA15E22)),
+        Icon(icon, size: 20, color: colors.accent),
         const SizedBox(width: 12),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
-            color: Color(0xFF777F84),
+            color: colors.textSecondary,
           ),
         ),
         const Spacer(),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontFamily: 'Campton',
             fontWeight: FontWeight.w500,
-            color: Color(0xFF1E2021),
+            color: colors.textPrimary,
           ),
         ),
       ],
@@ -318,6 +315,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildReviewsSection(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final reviewsPage = ref
         .watch(reviewsProvider((type: 'initiative', id: initiativeId)))
         .maybeWhen(data: (d) => d, orElse: () => null);
@@ -339,8 +337,16 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
         margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFDEDEDE)),
-          borderRadius: BorderRadius.circular(8),
+          color: colors.surfaceElevated,
+          border: Border.all(color: colors.border),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: colors.shadow.withValues(alpha: 0.18),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -351,11 +357,11 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
               children: [
                 Text(
                   'Reviews ($reviewCount)',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E2021),
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 9),
@@ -363,26 +369,22 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                   children: [
                     Text(
                       avgRating,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontFamily: 'Campton',
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF1E2021),
+                        color: colors.textPrimary,
                       ),
                     ),
                     const SizedBox(width: 4),
                     Container(
                       width: 12,
                       height: 12,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFFDB80),
+                      decoration: BoxDecoration(
+                        color: colors.accentSoft,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.star,
-                        size: 8,
-                        color: Color(0xFFFDAF40),
-                      ),
+                      child: Icon(Icons.star, size: 8, color: colors.accent),
                     ),
                   ],
                 ),
@@ -394,6 +396,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
 
               // First review from API
               _buildReviewItem(
+                context,
                 name: firstReview.user?.displayName ?? '',
                 date: firstReview.createdAt != null
                     ? _formatDate(firstReview.createdAt!)
@@ -428,13 +431,15 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
     return '$m ${dt.day}, ${dt.year}';
   }
 
-  Widget _buildReviewItem({
+  Widget _buildReviewItem(
+    BuildContext context, {
     required String name,
     required String date,
     required int rating,
     required String title,
     required String review,
   }) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -444,20 +449,20 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
           children: [
             Text(
               name,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: Color(0xFF3C4042),
+                color: colors.textSecondary,
               ),
             ),
             Text(
               date,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: Color(0xFFB1B1B1),
+                color: colors.textTertiary,
               ),
             ),
           ],
@@ -474,7 +479,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
               child: Icon(
                 index < rating ? Icons.star : Icons.star_border,
                 size: 12,
-                color: const Color(0xFFFFDB80),
+                color: index < rating ? colors.accent : colors.border,
               ),
             ),
           ),
@@ -486,11 +491,11 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
           // Review title
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w500,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
         ],
@@ -501,11 +506,11 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
           // Review text
           Text(
             review,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
-              color: Color(0xFF1E2021),
+              color: colors.textSecondary,
               height: 1.5,
             ),
           ),
@@ -515,14 +520,16 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildBottomActionCard(BuildContext context) {
+    final colors = context.appColors;
     return Positioned(
       bottom: 0,
       left: 0,
       right: 0,
       child: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF603814),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+        decoration: BoxDecoration(
+          color: colors.surfaceElevated,
+          border: Border(top: BorderSide(color: colors.border)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -539,20 +546,20 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                   _showLearnMoreDialog(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFDAF40),
+                  backgroundColor: colors.accent,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   elevation: 8,
-                  shadowColor: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+                  shadowColor: colors.accent.withValues(alpha: 0.3),
                 ),
-                child: const Text(
+                child: Text(
                   'Learn More',
                   style: TextStyle(
                     fontSize: 16,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFFFFFBF5),
+                    color: colors.onAccent,
                   ),
                 ),
               ),
@@ -566,26 +573,35 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
   }
 
   void _showLearnMoreDialog(BuildContext context) {
+    final colors = context.appColors;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text(
+        backgroundColor: colors.surfaceElevated,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
           'Course Information',
-          style: TextStyle(fontFamily: 'Campton', fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontFamily: 'Campton',
+            fontWeight: FontWeight.w600,
+            color: colors.textPrimary,
+          ),
         ),
-        content: const Text(
+        content: Text(
           'Would you like to enroll in this course or get more details?',
-          style: TextStyle(fontFamily: 'Campton'),
+          style: TextStyle(fontFamily: 'Campton', color: colors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: const Text(
+            child: Text(
               'Cancel',
-              style: TextStyle(fontFamily: 'Campton', color: Color(0xFF777F84)),
+              style: TextStyle(
+                fontFamily: 'Campton',
+                color: colors.textSecondary,
+              ),
             ),
           ),
           ElevatedButton(
@@ -594,14 +610,14 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
               // Navigate to enrollment or details screen
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFDAF40),
+              backgroundColor: colors.accent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(14),
               ),
             ),
-            child: const Text(
+            child: Text(
               'Enroll Now',
-              style: TextStyle(fontFamily: 'Campton', color: Colors.white),
+              style: TextStyle(fontFamily: 'Campton', color: colors.onAccent),
             ),
           ),
         ],

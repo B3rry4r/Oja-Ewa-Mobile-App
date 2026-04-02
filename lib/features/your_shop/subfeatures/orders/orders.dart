@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/features/your_shop/presentation/controllers/seller_orders_controller.dart';
 
 import 'shop_order_details.dart';
@@ -26,101 +27,73 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final ordersAsync = ref.watch(
       sellerOrdersRealtimeProvider(_selectedStatus),
     );
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    return AppPageScaffold(
+      title: 'Orders',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSearchBar(),
+          const SizedBox(height: 28),
+          _buildFilterTabs(),
+          const SizedBox(height: 32),
+          Expanded(
+            child: ordersAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      "Orders",
-                      style: TextStyle(
-                        fontSize: 33,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF241508),
-                        fontFamily: 'Campton',
-                      ),
+                    Text(
+                      'Failed to load orders',
+                      style: TextStyle(color: colors.textSecondary),
                     ),
-                    const SizedBox(height: 14),
-                    _buildSearchBar(),
-                    const SizedBox(height: 28),
-                    _buildFilterTabs(),
-                    const SizedBox(height: 32),
-                    Expanded(
-                      child: ordersAsync.when(
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
-                        error: (e, _) => Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Failed to load orders',
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                              const SizedBox(height: 8),
-                              TextButton(
-                                onPressed: () {
-                                  ref.invalidate(
-                                    sellerOrdersProvider(_selectedStatus),
-                                  );
-                                  ref.invalidate(
-                                    sellerOrdersRealtimeProvider(
-                                      _selectedStatus,
-                                    ),
-                                  );
-                                },
-                                child: const Text('Retry'),
-                              ),
-                            ],
-                          ),
-                        ),
-                        data: (orders) => _buildOrdersList(orders),
-                      ),
+                    const SizedBox(height: 8),
+                    TextButton(
+                      onPressed: () {
+                        ref.invalidate(sellerOrdersProvider(_selectedStatus));
+                        ref.invalidate(
+                          sellerOrdersRealtimeProvider(_selectedStatus),
+                        );
+                      },
+                      child: const Text('Retry'),
                     ),
                   ],
                 ),
               ),
+              data: (orders) => _buildOrdersList(orders),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildSearchBar() {
+    final colors = context.appColors;
     return Container(
       height: 49,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFCCCCCC)),
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.border),
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, color: Color(0xFFA15E22), size: 24),
+          Icon(Icons.search, color: colors.accent, size: 24),
           const SizedBox(width: 16),
           Expanded(
             child: TextField(
               controller: _searchController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: "Search orders...",
                 hintStyle: TextStyle(
-                  color: Color(0xFFCCCCCC),
+                  color: colors.textTertiary,
                   fontSize: 16,
                   fontFamily: 'Campton',
                 ),
@@ -154,6 +127,7 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
   }
 
   Widget _buildTab(String label, String? status) {
+    final colors = context.appColors;
     final isSelected = _selectedStatus == status;
     return GestureDetector(
       onTap: () => setState(() => _selectedStatus = status),
@@ -161,16 +135,14 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
         margin: const EdgeInsets.only(right: 10),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFA15E22) : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-          border: isSelected
-              ? null
-              : Border.all(color: const Color(0xFFCCCCCC)),
+          color: isSelected ? colors.accent : colors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: isSelected ? colors.accent : colors.border),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : const Color(0xFF301C0A),
+            color: isSelected ? colors.onAccent : colors.textPrimary,
             fontSize: 14,
             fontFamily: 'Campton',
           ),
@@ -180,6 +152,7 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
   }
 
   Widget _buildOrdersList(List<SellerOrder> orders) {
+    final colors = context.appColors;
     final searchTerm = _searchController.text.toLowerCase();
     final filteredOrders = searchTerm.isEmpty
         ? orders
@@ -219,7 +192,7 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
           // Table Header
           Container(
             height: 40,
-            color: const Color(0xFFF5E0CE),
+            color: colors.surfaceSecondary,
             child: const Row(
               children: [
                 _Cell(text: "Order No", flex: 3, isHeader: true),
@@ -384,8 +357,8 @@ class _Cell extends StatelessWidget {
             fontSize: isHeader ? 10 : 12,
             fontWeight: FontWeight.w400,
             color: isHeader
-                ? const Color(0xFF777F84)
-                : const Color(0xFF000000).withValues(alpha: 0.97),
+                ? context.appColors.textTertiary
+                : context.appColors.textPrimary.withValues(alpha: 0.97),
             fontFamily: 'Campton',
           ),
           overflow: TextOverflow.ellipsis,

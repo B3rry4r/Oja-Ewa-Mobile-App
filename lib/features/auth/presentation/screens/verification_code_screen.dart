@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
@@ -64,13 +65,14 @@ class _VerificationCodeScreenState
 
   void _verifyCode() {
     if (_enteredCode.length != 4) return;
+    final colors = context.appColors;
 
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is! PasswordResetArgs) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Missing email for reset flow'),
-          backgroundColor: Color(0xFFFDAF40),
+          backgroundColor: colors.accent,
         ),
       );
       return;
@@ -83,20 +85,22 @@ class _VerificationCodeScreenState
   }
 
   void _resendCode() {
+    final colors = context.appColors;
     // Handle resend code logic
-    print('Resending code...');
+    debugPrint('Resending code...');
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text('New code sent to your email'),
-        backgroundColor: Color(0xFFFDAF40),
+        backgroundColor: colors.accent,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // #fff8f1
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Stack(
           children: [
@@ -110,16 +114,16 @@ class _VerificationCodeScreenState
                   width: 307,
                   height: 455,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
+                    color: colors.accent.withValues(alpha: 0.1),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(150),
                     ),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Icon(
                       Icons.verified_user_rounded,
                       size: 120,
-                      color: Color(0xFFFDAF40),
+                      color: colors.accent,
                     ),
                   ),
                 ),
@@ -171,12 +175,13 @@ class _VerificationCodeScreenState
   Widget _buildBackButton() {
     return HeaderIconButton(
       asset: AppIcons.back,
-      iconColor: const Color(0xFF241508),
+      iconColor: context.appColors.textPrimary,
       onTap: () => Navigator.of(context).maybePop(),
     );
   }
 
   Widget _buildTitleSection() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -186,7 +191,7 @@ class _VerificationCodeScreenState
             fontSize: 33,
             fontWeight: FontWeight.w600,
             fontFamily: 'Campton',
-            color: const Color(0xFF3C230C), // #3c230c
+            color: colors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -196,7 +201,7 @@ class _VerificationCodeScreenState
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF1E2021), // #1e2021
+            color: colors.textSecondary,
             height: 1.4,
           ),
         ),
@@ -205,6 +210,7 @@ class _VerificationCodeScreenState
   }
 
   Widget _buildCodeInputFields() {
+    final colors = context.appColors;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(4, (index) {
@@ -221,33 +227,24 @@ class _VerificationCodeScreenState
               fontSize: 24,
               fontWeight: FontWeight.w600,
               fontFamily: 'Campton',
-              color: const Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
             decoration: InputDecoration(
               counterText: '',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(
-                  color: Color(0xFFDEDEDE),
-                  width: 1,
-                ),
+                borderSide: BorderSide(color: colors.border, width: 1),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(
-                  color: Color(0xFFDEDEDE),
-                  width: 1,
-                ),
+                borderSide: BorderSide(color: colors.border, width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(
-                  color: Color(0xFFFDAF40),
-                  width: 2,
-                ),
+                borderSide: BorderSide(color: colors.accent, width: 2),
               ),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: colors.surface,
             ),
             onChanged: (value) {
               if (value.isNotEmpty && index < 3) {
@@ -273,6 +270,7 @@ class _VerificationCodeScreenState
   }
 
   Widget _buildResendCodeSection() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -282,7 +280,7 @@ class _VerificationCodeScreenState
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF777F84), // #777f84
+            color: colors.textTertiary,
           ),
         ),
         const SizedBox(height: 8),
@@ -299,7 +297,7 @@ class _VerificationCodeScreenState
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   fontFamily: 'Campton',
-                  color: const Color(0xFFFDAF40), // #fdaf40
+                  color: colors.accent,
                 ),
               ),
             ),
@@ -310,6 +308,7 @@ class _VerificationCodeScreenState
   }
 
   Widget _buildVerifyButton() {
+    final colors = context.appColors;
     final isComplete = _enteredCode.length == 4;
 
     return Container(
@@ -317,13 +316,13 @@ class _VerificationCodeScreenState
       height: 57,
       decoration: BoxDecoration(
         color: isComplete
-            ? const Color(0xFFFDAF40)
-            : const Color(0xFFFDAF40).withValues(alpha: 0.3),
+            ? colors.accent
+            : colors.accent.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         boxShadow: isComplete
             ? [
                 BoxShadow(
-                  color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+                  color: colors.accent.withValues(alpha: 0.3),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),
@@ -343,8 +342,8 @@ class _VerificationCodeScreenState
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Campton',
                 color: isComplete
-                    ? const Color(0xFFFFFBF5)
-                    : const Color(0xFFFFFBF5).withValues(alpha: 0.6),
+                    ? colors.onAccent
+                    : colors.onAccent.withValues(alpha: 0.6),
               ),
             ),
           ),

@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/router/app_router.dart';
-import '../../../../app/widgets/app_header.dart';
+import '../../../../app/theme/app_theme_colors.dart';
+import '../../../../app/widgets/app_page_scaffold.dart';
 import '../../../orders/data/orders_repository_impl.dart';
 import '../../../orders/presentation/controllers/orders_controller.dart';
 
@@ -80,9 +81,9 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
     }
 
     try {
-      final response = await ref.read(ordersRepositoryProvider).checkMoMoPaymentStatus(
-        referenceId: widget.referenceId,
-      );
+      final response = await ref
+          .read(ordersRepositoryProvider)
+          .checkMoMoPaymentStatus(referenceId: widget.referenceId);
 
       if (!mounted || _deepLinkHandled) return;
 
@@ -112,11 +113,12 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
   void _showSuccessAndNavigate() {
     Future.delayed(const Duration(seconds: 1), () {
       if (!mounted) return;
+      final colors = context.appColors;
       showGeneralDialog(
         context: context,
         barrierDismissible: false,
         barrierLabel: 'PaymentSuccess',
-        barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+        barrierColor: colors.shadow.withValues(alpha: 0.82),
         pageBuilder: (context, anim1, anim2) {
           return Scaffold(
             backgroundColor: Colors.transparent,
@@ -127,7 +129,7 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                   width: 342,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFFBF5),
+                    color: colors.surface,
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: Column(
@@ -148,24 +150,24 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
+                      Text(
                         'Payment Successful',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF603814),
+                          color: colors.textPrimary,
                           fontFamily: 'Campton',
                         ),
                       ),
                       const SizedBox(height: 12),
-                      const Text(
+                      Text(
                         'Your order has been placed successfully!',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
-                          color: Color(0xFF1E2021),
+                          color: colors.textSecondary,
                           fontFamily: 'Campton',
                         ),
                       ),
@@ -185,17 +187,15 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                                 height: 57,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: const Color(0xFFCCCCCC),
-                                  ),
+                                  border: Border.all(color: colors.border),
                                 ),
-                                child: const Center(
+                                child: Center(
                                   child: Text(
                                     'Continue',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF595F63),
+                                      color: colors.textPrimary,
                                       fontFamily: 'Campton',
                                     ),
                                   ),
@@ -220,7 +220,9 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                                   borderRadius: BorderRadius.circular(8),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
+                                      color: const Color(
+                                        0xFFFDAF40,
+                                      ).withValues(alpha: 0.4),
                                       blurRadius: 16,
                                       offset: const Offset(0, 8),
                                     ),
@@ -256,41 +258,20 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Column(
-          children: [
-            AppHeader(
-              backgroundColor: const Color(0xFFFFF8F1),
-              iconColor: const Color(0xFF241508),
-              showActions: false,
-              title: const Text(
-                'Processing Payment',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Campton',
-                  color: Color(0xFF241508),
-                ),
-              ),
-              onBack: () {
-                if (_status == 'pending') {
-                  _showCancelConfirmation();
-                } else {
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-            Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: _buildStatusContent(),
-                ),
-              ),
-            ),
-          ],
+    return AppPageScaffold(
+      title: 'Processing Payment',
+      showActions: false,
+      onBack: () {
+        if (_status == 'pending') {
+          _showCancelConfirmation();
+        } else {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: _buildStatusContent(),
         ),
       ),
     );
@@ -312,6 +293,7 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
   }
 
   Widget _buildPendingState() {
+    final colors = context.appColors;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -329,12 +311,12 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
           ),
         ),
         const SizedBox(height: 24),
-        const Text(
+        Text(
           'Waiting for Payment',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF603814),
+            color: colors.textPrimary,
             fontFamily: 'Campton',
           ),
         ),
@@ -342,9 +324,9 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
         Text(
           'Please check your phone (${widget.phone}) and approve the payment request',
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
-            color: Color(0xFF1E2021),
+            color: colors.textSecondary,
             fontFamily: 'Campton',
           ),
         ),
@@ -361,9 +343,9 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
           const SizedBox(height: 16),
           Text(
             'Verifying payment... (${_pollCount * 5}s)',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: Color(0xFF777F84),
+              color: colors.textTertiary,
               fontFamily: 'Campton',
             ),
           ),
@@ -373,6 +355,7 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
   }
 
   Widget _buildSuccessState() {
+    final colors = context.appColors;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -390,22 +373,22 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
           ),
         ),
         const SizedBox(height: 24),
-        const Text(
+        Text(
           'Payment Successful!',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF603814),
+            color: colors.textPrimary,
             fontFamily: 'Campton',
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'Your order has been confirmed',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 16,
-            color: Color(0xFF1E2021),
+            color: colors.textSecondary,
             fontFamily: 'Campton',
           ),
         ),
@@ -414,6 +397,7 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
   }
 
   Widget _buildFailedState() {
+    final colors = context.appColors;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -424,29 +408,25 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
             color: const Color(0xFFE53935).withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
-            Icons.error,
-            color: Color(0xFFE53935),
-            size: 50,
-          ),
+          child: const Icon(Icons.error, color: Color(0xFFE53935), size: 50),
         ),
         const SizedBox(height: 24),
-        const Text(
+        Text(
           'Payment Failed',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF603814),
+            color: colors.textPrimary,
             fontFamily: 'Campton',
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'The payment was not successful. Please try again.',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 16,
-            color: Color(0xFF1E2021),
+            color: colors.textSecondary,
             fontFamily: 'Campton',
           ),
         ),
@@ -478,6 +458,7 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
   }
 
   Widget _buildTimeoutState() {
+    final colors = context.appColors;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -495,22 +476,22 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
           ),
         ),
         const SizedBox(height: 24),
-        const Text(
+        Text(
           'Payment Timeout',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF603814),
+            color: colors.textPrimary,
             fontFamily: 'Campton',
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'We couldn\'t verify your payment. Please check your orders or try again.',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 16,
-            color: Color(0xFF1E2021),
+            color: colors.textSecondary,
             fontFamily: 'Campton',
           ),
         ),
@@ -524,15 +505,15 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                   height: 57,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFCCCCCC)),
+                    border: Border.all(color: colors.border),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'Try Again',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF595F63),
+                        color: colors.textPrimary,
                         fontFamily: 'Campton',
                       ),
                     ),

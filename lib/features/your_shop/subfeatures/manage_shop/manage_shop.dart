@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 
 import '../../../../../app/router/app_router.dart';
 
@@ -9,63 +10,45 @@ class ManageShopScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title: Manage Shop
-                  const Text(
-                    "Manage Shop",
-                    style: TextStyle(
-                      fontSize: 33,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF241508),
-                      fontFamily: 'Campton',
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Menu Options
-                  _buildMenuOption(
-                    title: "Edit Business Information",
-                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.editBusiness),
-                  ),
-                  _buildMenuOption(
-                    title: "Delete Shop",
-                    titleColor: const Color(0xFFC95353),
-                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.deleteShop),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+    final colors = context.appColors;
+    return AppPageScaffold(
+      title: 'Manage Shop',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildMenuOption(
+            context: context,
+            title: "Edit Business Information",
+            onTap: () =>
+                Navigator.of(context).pushNamed(AppRoutes.editBusiness),
+          ),
+          _buildMenuOption(
+            context: context,
+            title: "Delete Shop",
+            titleColor: const Color(0xFFC95353),
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.deleteShop),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildMenuOption({
+    required BuildContext context,
     required String title,
     required VoidCallback onTap,
-    Color titleColor = const Color(0xFF1E2021),
+    Color? titleColor,
   }) {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
       height: 72, // Height from IR
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: Color(0xFFDEDEDE), width: 1), // Divider style
+          bottom: BorderSide(
+            color: Theme.of(context).extension<AppThemeColors>()!.border,
+            width: 1,
+          ),
         ),
       ),
       child: InkWell(
@@ -78,15 +61,11 @@ class ManageShopScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: titleColor,
+                color: titleColor ?? colors.textPrimary,
                 fontFamily: 'Campton',
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: Color(0xFF777F84),
-            ),
+            Icon(Icons.arrow_forward_ios, size: 16, color: colors.textTertiary),
           ],
         ),
       ),

@@ -1,113 +1,83 @@
 // write_review_screen.dart
 import 'package:flutter/material.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 
 class WriteReviewScreen extends StatelessWidget {
   const WriteReviewScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF603814), // Main background color
-      body: SafeArea(
-        child: Column(
-          children: [
-            const AppHeader(iconColor: Colors.white),
+    final colors = context.appColors;
+    return AppPageScaffold(
+      title: 'Write a review',
+      showActions: false,
+      scrollable: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 60),
 
-            // Main content card (rounded top corners)
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFF8F1), // Card background
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
-                  ),
-                ),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 16),
+          // Rating Section
+          _buildRatingSection(context),
+          const SizedBox(height: 40),
 
-                      // Title
-                      const Text(
-                        'Write a review',
-                        style: TextStyle(
-                          fontSize: 33,
-                          fontFamily: 'Campton',
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF241508),
-                        ),
-                      ),
-                      const SizedBox(height: 60),
+          // Headline Input
+          _buildInputField(
+            context: context,
+            label: 'Headline',
+            hintText: 'sanusimot@gmail.com',
+            isEmailField: true,
+          ),
+          const SizedBox(height: 32),
 
-                      // Rating Section
-                      _buildRatingSection(),
-                      const SizedBox(height: 40),
+          // Description Input
+          _buildInputField(
+            context: context,
+            label: 'Description',
+            hintText: 'Share details of your experience',
+            isDescription: true,
+          ),
 
-                      // Headline Input
-                      _buildInputField(
-                        label: 'Headline',
-                        hintText: 'sanusimot@gmail.com',
-                        isEmailField: true,
-                      ),
-                      const SizedBox(height: 32),
-
-                      // Description Input
-                      _buildInputField(
-                        label: 'Description',
-                        hintText: 'Share details of your experience',
-                        isDescription: true,
-                      ),
-
-                      // Character requirement text
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Text(
-                            '100 characters required',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontFamily: 'Campton',
-                              color: const Color(
-                                0xFF595F63,
-                              ).withValues(alpha: 0.8),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 50),
-
-                      // Submit Button
-                      _buildSubmitButton(),
-                      const SizedBox(height: 100),
-                    ],
-                  ),
+          // Character requirement text
+          Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                '100 characters required',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'Campton',
+                  color: colors.textTertiary.withValues(alpha: 0.8),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 50),
+
+          // Submit Button
+          _buildSubmitButton(),
+          const SizedBox(height: 100),
+        ],
       ),
     );
   }
 
-  Widget _buildRatingSection() {
+  Widget _buildRatingSection(BuildContext context) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Rating label
-        const Text(
+        Text(
           'Rating',
           style: TextStyle(
             fontSize: 22,
             fontFamily: 'Campton',
             fontWeight: FontWeight.w600,
-            color: Color(0xFF3C4042),
+            color: colors.textPrimary,
           ),
         ),
         const SizedBox(height: 16),
@@ -121,12 +91,13 @@ class WriteReviewScreen extends StatelessWidget {
                 height: 32,
                 margin: EdgeInsets.only(right: i < 4 ? 12 : 0),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDEDEDE),
+                  color: colors.surfaceElevated,
+                  border: Border.all(color: colors.border),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.star_border_rounded,
-                  color: Colors.white,
+                  color: colors.accent,
                   size: 20,
                 ),
               ),
@@ -138,11 +109,13 @@ class WriteReviewScreen extends StatelessWidget {
   }
 
   Widget _buildInputField({
+    required BuildContext context,
     required String label,
     required String hintText,
     bool isEmailField = false,
     bool isDescription = false,
   }) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -152,7 +125,7 @@ class WriteReviewScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             fontFamily: 'Campton',
-            color: const Color(0xFF777F84),
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -161,7 +134,8 @@ class WriteReviewScreen extends StatelessWidget {
         Container(
           height: isDescription ? 111 : 49,
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFCCCCCC)),
+            color: colors.surfaceElevated,
+            border: Border.all(color: colors.border),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Padding(
@@ -169,26 +143,26 @@ class WriteReviewScreen extends StatelessWidget {
             child: Row(
               children: [
                 if (isEmailField)
-                  const Icon(
+                  Icon(
                     Icons.email_outlined,
-                    color: Color(0xFFCCCCCC),
+                    color: colors.textTertiary,
                     size: 20,
                   ),
                 if (isEmailField) const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontFamily: 'Campton',
-                      color: Color(0xFF241508),
+                      color: colors.textPrimary,
                       fontWeight: FontWeight.w400,
                     ),
                     decoration: InputDecoration(
                       hintText: hintText,
-                      hintStyle: const TextStyle(
+                      hintStyle: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Campton',
-                        color: Color(0xFFCCCCCC),
+                        color: colors.textTertiary,
                       ),
                       border: InputBorder.none,
                     ),

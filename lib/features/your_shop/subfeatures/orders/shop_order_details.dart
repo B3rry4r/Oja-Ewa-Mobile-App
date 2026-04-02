@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:intl/intl.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/your_shop/presentation/controllers/seller_orders_controller.dart';
@@ -15,45 +16,31 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final orderAsync = ref.watch(sellerOrderDetailsProvider(orderId));
     final isActing = ref.watch(sellerOrderActionsProvider).isLoading;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
-            ),
-            Expanded(
-              child: orderAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Failed to load order',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                      const SizedBox(height: 8),
-                      TextButton(
-                        onPressed: () =>
-                            ref.invalidate(sellerOrderDetailsProvider(orderId)),
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                ),
-                data: (order) =>
-                    _buildOrderDetails(context, ref, order, isActing),
+    return AppPageScaffold(
+      child: orderAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Failed to load order',
+                style: TextStyle(color: colors.textSecondary),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () =>
+                    ref.invalidate(sellerOrderDetailsProvider(orderId)),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
         ),
+        data: (order) => _buildOrderDetails(context, ref, order, isActing),
       ),
     );
   }
@@ -64,6 +51,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
     SellerOrder order,
     bool isActing,
   ) {
+    final colors = context.appColors;
     final dateFormat = DateFormat('MMM d, yyyy');
 
     return SingleChildScrollView(
@@ -74,10 +62,10 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
           // Order ID Heading
           Text(
             '#${order.orderNumber}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 33,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
+              color: colors.textPrimary,
               fontFamily: 'Campton',
             ),
           ),
@@ -87,15 +75,24 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
           const SizedBox(height: 30),
 
           // Details List
-          _buildDetailTile("Order Date", dateFormat.format(order.createdAt)),
+          _buildDetailTile(
+            context,
+            "Order Date",
+            dateFormat.format(order.createdAt),
+          ),
           if (order.shipmentId != 0)
-            _buildDetailTile("Shipment ID", order.shipmentId.toString()),
+            _buildDetailTile(
+              context,
+              "Shipment ID",
+              order.shipmentId.toString(),
+            ),
           if (order.customerName != null)
-            _buildDetailTile("Customer", order.customerName!),
+            _buildDetailTile(context, "Customer", order.customerName!),
           if (order.customerPhone != null)
-            _buildDetailTile("Phone", order.customerPhone!),
+            _buildDetailTile(context, "Phone", order.customerPhone!),
           if (order.provider != null || order.serviceName != null)
             _buildDetailTile(
+              context,
               "Shipping Service",
               [
                 if ((order.provider ?? '').isNotEmpty)
@@ -104,33 +101,38 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
               ].join(' • '),
             ),
           if (order.shippingFee != null)
-            _buildDetailTile("Shipping Fee", formatPrice(order.shippingFee!)),
+            _buildDetailTile(
+              context,
+              "Shipping Fee",
+              formatPrice(order.shippingFee!),
+            ),
           if ((order.paymentStatus ?? '').isNotEmpty)
-            _buildDetailTile("Payment Status", order.paymentStatus!),
+            _buildDetailTile(context, "Payment Status", order.paymentStatus!),
           if (order.shippingAddress != null)
             _buildDetailTile(
+              context,
               "Shipping Address",
               order.shippingAddress!.fullAddress,
             ),
 
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'Items',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               fontFamily: 'Campton',
-              color: Color(0xFF241508),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
-          ...order.items.map((item) => _buildItemTile(item)),
+          ...order.items.map((item) => _buildItemTile(context, item)),
 
           const SizedBox(height: 20),
-          _buildDetailTile("Total", formatPrice(order.totalPrice)),
+          _buildDetailTile(context, "Total", formatPrice(order.totalPrice)),
 
           if (order.trackingNumber != null)
-            _buildDetailTile("Tracking Number", order.trackingNumber!),
+            _buildDetailTile(context, "Tracking Number", order.trackingNumber!),
 
           const SizedBox(height: 40),
 
@@ -222,14 +224,15 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildItemTile(SellerOrderItem item) {
+  Widget _buildItemTile(BuildContext context, SellerOrderItem item) {
+    final colors = context.appColors;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFCCCCCC)),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.border),
       ),
       child: Row(
         children: [
@@ -257,29 +260,29 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
               children: [
                 Text(
                   item.productName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     fontFamily: 'Campton',
-                    color: Color(0xFF241508),
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'Qty: ${item.quantity}${item.size != null ? ' • Size: ${item.size}' : ''}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    color: Color(0xFF777F84),
+                    color: colors.textTertiary,
                     fontFamily: 'Campton',
                   ),
                 ),
                 Text(
                   formatPrice(item.price),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Campton',
-                    color: Color(0xFF241508),
+                    color: colors.textPrimary,
                   ),
                 ),
               ],
@@ -394,16 +397,18 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
     WidgetRef ref,
     int orderId,
   ) async {
+    final colors = context.appColors;
     final reasonController = TextEditingController();
     final result = await showGeneralDialog<bool>(
       context: context,
       barrierDismissible: true,
       barrierLabel: 'CancelOrderModal',
-      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+      barrierColor: colors.shadow.withValues(alpha: 0.82),
       transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (context, anim1, anim2) {
+        final colors = context.appColors;
         return Scaffold(
-          backgroundColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+          backgroundColor: colors.shadow.withValues(alpha: 0.82),
           body: Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -411,57 +416,58 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
                 width: 342,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFFBF5),
+                  color: colors.surfaceElevated,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       'Cancel Order',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 33,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF603814),
+                        color: colors.textPrimary,
                         fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Please provide a reason for cancellation',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF1E2021),
+                        color: colors.textSecondary,
                         fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 20),
                     Container(
                       decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFFCCCCCC)),
-                        borderRadius: BorderRadius.circular(8),
+                        color: colors.surface,
+                        border: Border.all(color: colors.border),
+                        borderRadius: BorderRadius.circular(18),
                       ),
                       child: TextField(
                         controller: reasonController,
                         maxLines: 3,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'Campton',
-                          color: Color(0xFF1E2021),
+                          color: colors.textPrimary,
                         ),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'e.g., Out of stock',
                           hintStyle: TextStyle(
                             fontSize: 16,
                             fontFamily: 'Campton',
-                            color: Color(0xFF777F84),
+                            color: colors.textTertiary,
                           ),
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.all(16),
+                          contentPadding: const EdgeInsets.all(16),
                         ),
                       ),
                     ),
@@ -474,18 +480,17 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
                             child: Container(
                               height: 57,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: const Color(0xFFCCCCCC),
-                                ),
+                                color: colors.surface,
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(color: colors.border),
                               ),
-                              child: const Center(
+                              child: Center(
                                 child: Text(
                                   'Back',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF595F63),
+                                    color: colors.textSecondary,
                                     fontFamily: 'Campton',
                                   ),
                                 ),
@@ -501,7 +506,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
                               height: 57,
                               decoration: BoxDecoration(
                                 color: const Color(0xFFC95353),
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(18),
                               ),
                               child: const Center(
                                 child: Text(
@@ -552,23 +557,26 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildPrimaryButton({required String label, VoidCallback? onTap}) {
+  Widget _buildPrimaryButton(
+    BuildContext context, {
+    required String label,
+    VoidCallback? onTap,
+  }) {
+    final colors = context.appColors;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
         height: 55,
         decoration: BoxDecoration(
-          color: onTap == null
-              ? const Color(0xFFCCCCCC)
-              : const Color(0xFFFDAF40),
-          borderRadius: BorderRadius.circular(8),
+          color: onTap == null ? colors.borderStrong : colors.accent,
+          borderRadius: BorderRadius.circular(18),
         ),
         child: Center(
           child: Text(
             label,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: onTap == null ? colors.textSecondary : colors.onAccent,
               fontSize: 16,
               fontWeight: FontWeight.w600,
               fontFamily: 'Campton',
@@ -587,7 +595,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
         height: 55,
         decoration: BoxDecoration(
           color: Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(color: const Color(0xFFC95353)),
         ),
         child: Center(
@@ -605,7 +613,8 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDetailTile(String label, String value) {
+  Widget _buildDetailTile(BuildContext context, String label, String value) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.only(bottom: 24.0),
       child: Column(
@@ -613,20 +622,20 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w400,
-              color: Color(0xFF777F84),
+              color: colors.textTertiary,
               fontFamily: 'Campton',
             ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              color: Color(0xFF3C4042),
+              color: colors.textPrimary,
               fontFamily: 'Campton',
             ),
           ),

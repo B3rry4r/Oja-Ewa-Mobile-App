@@ -7,7 +7,7 @@ import '../../../account/presentation/controllers/profile_controller.dart';
 import '../controllers/ai_personalization_controller.dart';
 
 /// Style DNA Quiz Screen
-/// 
+///
 /// A multi-step quiz that helps understand user's fashion preferences
 /// and creates a personalized style profile.
 class StyleDnaQuizScreen extends ConsumerStatefulWidget {
@@ -57,7 +57,7 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
   void _showCompletionDialog() {
     final stateAsync = ref.read(styleQuizControllerProvider);
     final state = stateAsync.value ?? const StyleQuizState();
-    
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -94,7 +94,8 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                state.profile?.styleProfile ?? 'Your personalized style profile is ready.',
+                state.profile?.styleProfile ??
+                    'Your personalized style profile is ready.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 14,
@@ -112,7 +113,9 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                     Navigator.of(dialogContext).pop();
                     // Pop the quiz screen and replace with recommendations
                     // Using popAndPushNamed to avoid double-back issue
-                    Navigator.of(context).popAndPushNamed(AppRoutes.personalizedRecommendations);
+                    Navigator.of(
+                      context,
+                    ).popAndPushNamed(AppRoutes.personalizedRecommendations);
                   },
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
@@ -221,7 +224,9 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                     child: LinearProgressIndicator(
                       value: (currentStep + 1) / totalSteps,
                       backgroundColor: _cardColor,
-                      valueColor: const AlwaysStoppedAnimation<Color>(_primaryColor),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        _primaryColor,
+                      ),
                       minHeight: 6,
                     ),
                   ),
@@ -241,13 +246,15 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                     if (index > currentStep) {
                       ref.read(styleQuizControllerProvider.notifier).nextStep();
                     } else {
-                      ref.read(styleQuizControllerProvider.notifier).previousStep();
+                      ref
+                          .read(styleQuizControllerProvider.notifier)
+                          .previousStep();
                     }
                   }
                 },
                 itemBuilder: (context, index) {
                   return _buildQuestionPage(
-                    styleQuizQuestions[index], 
+                    styleQuizQuestions[index],
                     stateAsync.value ?? const StyleQuizState(),
                   );
                 },
@@ -273,7 +280,9 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          ref.read(styleQuizControllerProvider.notifier).previousStep();
+                          ref
+                              .read(styleQuizControllerProvider.notifier)
+                              .previousStep();
                           _goToPage(currentStep - 1);
                         },
                         borderRadius: BorderRadius.circular(8),
@@ -321,7 +330,9 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                               }
 
                               if (currentStep < totalSteps - 1) {
-                                ref.read(styleQuizControllerProvider.notifier).nextStep();
+                                ref
+                                    .read(styleQuizControllerProvider.notifier)
+                                    .nextStep();
                                 _goToPage(currentStep + 1);
                               } else {
                                 _submitQuiz();
@@ -331,8 +342,8 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: state.isSubmitting 
-                              ? const Color(0xFFCCCCCC) 
+                          color: state.isSubmitting
+                              ? const Color(0xFFCCCCCC)
                               : _primaryColor,
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -345,7 +356,9 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                                     width: 18,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
                                     ),
                                   ),
                                   SizedBox(width: 8),
@@ -361,7 +374,9 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                                 ],
                               )
                             : Text(
-                                currentStep < totalSteps - 1 ? 'Next' : 'Complete',
+                                currentStep < totalSteps - 1
+                                    ? 'Next'
+                                    : 'Complete',
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   fontSize: 14,
@@ -415,12 +430,13 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
           // Options
           ...question.options.map((option) {
             final isSelected = selectedAnswer == option;
-            
+
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: InkWell(
                 onTap: () {
-                  ref.read(styleQuizControllerProvider.notifier)
+                  ref
+                      .read(styleQuizControllerProvider.notifier)
                       .answerQuestion(question.id, option);
                 },
                 borderRadius: BorderRadius.circular(8),
@@ -428,7 +444,9 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isSelected ? _primaryColor.withOpacity(0.1) : _cardColor,
+                    color: isSelected
+                        ? _primaryColor.withOpacity(0.1)
+                        : _cardColor,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: isSelected ? _primaryColor : Colors.transparent,
@@ -444,7 +462,9 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                           shape: BoxShape.circle,
                           color: isSelected ? _primaryColor : Colors.white,
                           border: Border.all(
-                            color: isSelected ? _primaryColor : const Color(0xFFCCCCCC),
+                            color: isSelected
+                                ? _primaryColor
+                                : const Color(0xFFCCCCCC),
                             width: 2,
                           ),
                         ),
@@ -463,7 +483,9 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontFamily: 'Campton',
-                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.w400,
                             color: _textDark,
                           ),
                         ),

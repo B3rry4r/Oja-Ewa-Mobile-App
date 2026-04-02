@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 
 import '../domain/address.dart';
@@ -14,101 +15,79 @@ class AddressesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final addresses = ref.watch(addressesProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
-              title: Text(
-                'Addresses',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
-                ),
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: addresses.when(
-                  loading: () => const Padding(
-                    padding: EdgeInsets.only(top: 48),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                  error: (e, st) => Padding(
-                    padding: const EdgeInsets.only(top: 48),
-                    child: Center(child: Text('Failed to load addresses.\n$e')),
-                  ),
-                  data: (items) {
-                    if (items.isEmpty) {
-                      return _buildEmptyState(context);
-                    }
-
-                    final defaultAddress = items.firstWhere(
-                      (a) => a.isDefault,
-                      orElse: () => items.first,
-                    );
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildAddressCard(context, defaultAddress),
-                        const SizedBox(height: 40),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 18),
-                          child: _buildAddAddressButton(context),
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Opacity(
-                            opacity: 0.03,
-                            child: const AppImagePlaceholder(
-                              width: 234,
-                              height: 347,
-                              borderRadius: 0,
-                              backgroundColor: Colors.transparent,
-                            ),
-                          ),
-                        ),
-                        // Keeping existing summary section (static)
-                        _buildSummarySection(),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
+    return AppPageScaffold(
+      title: 'Addresses',
+      scrollable: true,
+      child: addresses.when(
+        loading: () => const Padding(
+          padding: EdgeInsets.only(top: 48),
+          child: Center(child: CircularProgressIndicator()),
         ),
+        error: (e, st) => Padding(
+          padding: const EdgeInsets.only(top: 48),
+          child: Center(child: Text('Failed to load addresses.\n$e')),
+        ),
+        data: (items) {
+          if (items.isEmpty) {
+            return _buildEmptyState(context);
+          }
+
+          final defaultAddress = items.firstWhere(
+            (a) => a.isDefault,
+            orElse: () => items.first,
+          );
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildAddressCard(context, defaultAddress),
+              const SizedBox(height: 40),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: _buildAddAddressButton(context),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Opacity(
+                  opacity: 0.03,
+                  child: const AppImagePlaceholder(
+                    width: 234,
+                    height: 347,
+                    borderRadius: 0,
+                    backgroundColor: Colors.transparent,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
   Widget _buildAddressCard(BuildContext context, Address address) {
+    final colors = context.appColors;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
+        border: Border.all(color: colors.border),
         borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
+        color: colors.surface,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             address.fullName,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
               fontFamily: 'Campton',
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 28),
@@ -118,10 +97,10 @@ class AddressesScreen extends ConsumerWidget {
               Expanded(
                 child: Text(
                   '${address.phone}\n${address.addressLine}, ${address.city}, ${address.state},\n${address.country} ${address.postCode}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontFamily: 'Campton',
-                    color: Color(0xFF3C4042),
+                    color: colors.textSecondary,
                     height: 1.5,
                   ),
                 ),
@@ -136,13 +115,13 @@ class AddressesScreen extends ConsumerWidget {
                   height: 24,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xFFCCCCCC)),
+                    border: Border.all(color: colors.border),
                     color: address.isDefault
-                        ? const Color(0xFFFDAF40)
+                        ? colors.accent
                         : Colors.transparent,
                   ),
                   child: address.isDefault
-                      ? const Icon(Icons.check, size: 16, color: Colors.white)
+                      ? Icon(Icons.check, size: 16, color: colors.onAccent)
                       : const SizedBox.shrink(),
                 ),
               ),
@@ -155,15 +134,15 @@ class AddressesScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                 decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFCCCCCC)),
+                  border: Border.all(color: colors.border),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   address.isDefault ? 'Default Address' : 'Address',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontFamily: 'Campton',
-                    color: Color(0xFF3C4042),
+                    color: colors.textSecondary,
                   ),
                 ),
               ),
@@ -181,8 +160,9 @@ class AddressesScreen extends ConsumerWidget {
                     final args = ModalRoute.of(context)?.settings.arguments;
                     final returnToOrderConfirmation =
                         args is Map && args['returnTo'] == 'orderConfirmation';
-                    if (returnToOrderConfirmation)
+                    if (returnToOrderConfirmation) {
                       Navigator.of(context).pop(true);
+                    }
                   }
                 },
                 child: Container(
@@ -190,12 +170,12 @@ class AddressesScreen extends ConsumerWidget {
                     horizontal: 8,
                     vertical: 8,
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
                       Icon(
                         Icons.edit_outlined,
                         size: 20,
-                        color: Color(0xFF3C4042),
+                        color: colors.textSecondary,
                       ),
                       SizedBox(width: 9),
                       Text(
@@ -203,7 +183,7 @@ class AddressesScreen extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontFamily: 'Campton',
-                          color: Color(0xFF3C4042),
+                          color: colors.textSecondary,
                         ),
                       ),
                     ],
@@ -218,29 +198,30 @@ class AddressesScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'No saved address',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF241508),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Add an address to make checkout faster.',
             style: TextStyle(
               fontSize: 14,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
-              color: Color(0xFF777F84),
+              color: colors.textTertiary,
             ),
           ),
           const SizedBox(height: 24),
@@ -251,13 +232,14 @@ class AddressesScreen extends ConsumerWidget {
   }
 
   Widget _buildAddAddressButton(BuildContext context) {
+    final colors = context.appColors;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.accent,
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+            color: colors.shadow,
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -266,7 +248,7 @@ class AddressesScreen extends ConsumerWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(18),
           onTap: () async {
             final updated = await Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const AddEditAddressScreen()),
@@ -282,62 +264,17 @@ class AddressesScreen extends ConsumerWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 32),
             alignment: Alignment.center,
-            child: const Text(
+            child: Text(
               'Add New Address',
               style: TextStyle(
                 fontSize: 16,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: colors.onAccent,
               ),
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSummarySection() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      color: const Color(0xFF603814),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Delivery',
-            style: TextStyle(
-              fontSize: 14,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w500,
-              color: Color(0xFFFBFBFB),
-            ),
-          ),
-          const SizedBox(height: 60),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text(
-                'Total',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFFFBFBFB),
-                ),
-              ),
-              Text(
-                'N44,000',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFFFBFBFB),
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

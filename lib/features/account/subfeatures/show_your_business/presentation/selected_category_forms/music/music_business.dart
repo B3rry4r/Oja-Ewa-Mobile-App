@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 
@@ -48,83 +49,74 @@ class _MusicBusinessDetailsScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(104),
-        child: AppHeader(
-          backgroundColor: Color(0xFFFFF8F1),
-          iconColor: Color(0xFF241508),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            _buildStepper(),
-            const SizedBox(height: 32),
+    final colors = context.appColors;
+    return AppPageScaffold(
+      scrollable: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          _buildStepper(),
+          const SizedBox(height: 32),
 
-            const Text(
-              "About Business",
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF3C4042),
-              ),
+          Text(
+            "About Business",
+            style: TextStyle(
+              fontSize: 16,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w600,
+              color: colors.textPrimary,
             ),
-            const SizedBox(height: 16),
+          ),
+          const SizedBox(height: 16),
 
-            _buildInputField(
-              "Music School/Studio Name",
-              "Enter name",
-              controller: _businessNameController,
+          _buildInputField(
+            "Music School/Studio Name",
+            "Enter name",
+            controller: _businessNameController,
+          ),
+          const SizedBox(height: 24),
+
+          Text(
+            "Select Category",
+            style: TextStyle(
+              fontSize: 14,
+              fontFamily: 'Campton',
+              color: colors.textSecondary,
             ),
-            const SizedBox(height: 24),
+          ),
+          const SizedBox(height: 12),
+          _buildCategoryGrid(),
 
-            const Text(
-              "Select Category",
-              style: TextStyle(
-                fontSize: 14,
-                fontFamily: 'Campton',
-                color: Color(0xFF777F84),
-              ),
-            ),
-            const SizedBox(height: 12),
-            _buildCategoryGrid(),
+          const SizedBox(height: 24),
+          _buildInputField(
+            "Business Description",
+            "Describe your music services or school",
+            maxLines: 4,
+            helperText: "100 characters required",
+            controller: _businessDescriptionController,
+          ),
 
-            const SizedBox(height: 24),
-            _buildInputField(
-              "Business Description",
-              "Describe your music services or school",
-              maxLines: 4,
-              helperText: "100 characters required",
-              controller: _businessDescriptionController,
-            ),
+          const SizedBox(height: 24),
+          _buildInputField(
+            "YouTube",
+            "Paste your YouTube link",
+            controller: _youtubeController,
+          ),
+          const SizedBox(height: 24),
+          _buildInputField(
+            "Spotify",
+            "Paste your Spotify link",
+            controller: _spotifyController,
+          ),
 
-            const SizedBox(height: 24),
-            _buildInputField(
-              "YouTube",
-              "Paste your YouTube link",
-              controller: _youtubeController,
-            ),
-            const SizedBox(height: 24),
-            _buildInputField(
-              "Spotify",
-              "Paste your Spotify link",
-              controller: _spotifyController,
-            ),
+          const SizedBox(height: 24),
+          _buildLogoUploadSection(),
 
-            const SizedBox(height: 24),
-            _buildLogoUploadSection(),
-
-            const SizedBox(height: 40),
-            _buildContinueButton(context),
-            const SizedBox(height: 40),
-          ],
-        ),
+          const SizedBox(height: 40),
+          _buildContinueButton(context),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }
@@ -146,22 +138,25 @@ class _MusicBusinessDetailsScreenState
     bool isActive, {
     String? stepNum,
   }) {
+    final colors = context.appColors;
     return Row(
       children: [
         Container(
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: isActive ? const Color(0xFF603814) : const Color(0xFFE9E9E9),
-            borderRadius: BorderRadius.circular(4),
+            color: isActive ? colors.textPrimary : colors.surfaceSecondary,
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Center(
             child: icon != null
-                ? Icon(icon, color: Colors.white, size: 16)
+                ? Icon(icon, color: colors.background, size: 16)
                 : Text(
                     stepNum ?? "",
                     style: TextStyle(
-                      color: isActive ? Colors.white : const Color(0xFF777F84),
+                      color: isActive
+                          ? colors.background
+                          : colors.textSecondary,
                       fontSize: 10,
                     ),
                   ),
@@ -174,7 +169,7 @@ class _MusicBusinessDetailsScreenState
           style: TextStyle(
             fontSize: 10,
             fontFamily: 'Campton',
-            color: isActive ? const Color(0xFF603814) : const Color(0xFF777F84),
+            color: isActive ? colors.textPrimary : colors.textSecondary,
             fontWeight: isActive ? FontWeight.w500 : FontWeight.w400,
           ),
         ),
@@ -183,6 +178,7 @@ class _MusicBusinessDetailsScreenState
   }
 
   Widget _buildCategoryGrid() {
+    final colors = context.appColors;
     final categories = ["DJ", "Artiste", "Producer"];
 
     return Wrap(
@@ -196,10 +192,9 @@ class _MusicBusinessDetailsScreenState
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
+              color: isSelected ? colors.accent.withValues(alpha: 0.08) : null,
               border: Border.all(
-                color: isSelected
-                    ? const Color(0xFFA15E22)
-                    : const Color(0xFFCCCCCC),
+                color: isSelected ? colors.accent : colors.border,
                 width: 1.5,
               ),
               borderRadius: BorderRadius.circular(25),
@@ -210,15 +205,13 @@ class _MusicBusinessDetailsScreenState
                 Icon(
                   isSelected ? Icons.check_circle : Icons.add_circle_outline,
                   size: 18,
-                  color: isSelected
-                      ? const Color(0xFFA15E22)
-                      : const Color(0xFF777F84),
+                  color: isSelected ? colors.accent : colors.textSecondary,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   cat,
                   style: TextStyle(
-                    color: const Color(0xFF241508),
+                    color: colors.textPrimary,
                     fontSize: 15,
                     fontFamily: 'Campton',
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
@@ -233,6 +226,7 @@ class _MusicBusinessDetailsScreenState
   }
 
   Widget _buildLogoUploadSection() {
+    final colors = context.appColors;
     final hasFile = _businessLogoPath != null && _businessLogoPath!.isNotEmpty;
     return InkWell(
       onTap: () async {
@@ -242,20 +236,19 @@ class _MusicBusinessDetailsScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Business logo',
-            style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
+            style: TextStyle(color: colors.textSecondary, fontSize: 14),
           ),
           const SizedBox(height: 8),
           Container(
             width: double.infinity,
             height: 140,
             decoration: BoxDecoration(
+              color: colors.surface,
               borderRadius: BorderRadius.circular(11),
               border: Border.all(
-                color: hasFile
-                    ? const Color(0xFF4CAF50)
-                    : const Color(0xFF89858A),
+                color: hasFile ? const Color(0xFF4CAF50) : colors.borderStrong,
               ),
             ),
             child: Column(
@@ -266,20 +259,17 @@ class _MusicBusinessDetailsScreenState
                   size: 24,
                   color: hasFile
                       ? const Color(0xFF4CAF50)
-                      : const Color(0xFF777F84),
+                      : colors.textSecondary,
                 ),
                 const SizedBox(height: 12),
                 Text(
                   hasFile ? 'Logo selected' : 'Browse Document',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF1E2021),
-                  ),
+                  style: TextStyle(fontSize: 16, color: colors.textPrimary),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'PNG, JPG formats (200x200px recommended)',
-                  style: TextStyle(fontSize: 10, color: Color(0xFF777F84)),
+                  style: TextStyle(fontSize: 10, color: colors.textSecondary),
                 ),
               ],
             ),
@@ -296,33 +286,36 @@ class _MusicBusinessDetailsScreenState
     String? helperText,
     TextEditingController? controller,
   }) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
         ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Campton',
             fontSize: 16,
-            color: Color(0xFF1E2021),
+            color: colors.textPrimary,
           ),
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: Color(0xFFCCCCCC), fontSize: 15),
+            hintStyle: TextStyle(color: colors.textTertiary, fontSize: 15),
+            filled: true,
+            fillColor: colors.surface,
             contentPadding: const EdgeInsets.all(16),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.border),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFFDAF40)),
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.accent),
             ),
           ),
         ),
@@ -333,7 +326,7 @@ class _MusicBusinessDetailsScreenState
               padding: const EdgeInsets.only(top: 4),
               child: Text(
                 helperText,
-                style: const TextStyle(fontSize: 10, color: Color(0xFF595F63)),
+                style: TextStyle(fontSize: 10, color: colors.textTertiary),
               ),
             ),
           ),
@@ -413,6 +406,7 @@ class _MusicBusinessDetailsScreenState
   }
 
   Widget _buildContinueButton(BuildContext context) {
+    final colors = context.appColors;
     return InkWell(
       onTap: () {
         if (!_validateForm()) return;
@@ -434,26 +428,26 @@ class _MusicBusinessDetailsScreenState
           arguments: updated.toJson(),
         );
       },
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(18),
       child: Container(
         width: double.infinity,
         height: 56,
         decoration: BoxDecoration(
-          color: const Color(0xFFFDAF40),
-          borderRadius: BorderRadius.circular(8),
+          color: colors.accent,
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withValues(alpha: 0.35),
+              color: colors.accent.withValues(alpha: 0.35),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: const Center(
+        child: Center(
           child: Text(
             "Continue",
             style: TextStyle(
-              color: Colors.white,
+              color: colors.onAccent,
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.bold,

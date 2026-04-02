@@ -9,7 +9,7 @@ import '../../domain/ai_models.dart';
 import '../controllers/ai_chat_controller.dart';
 
 /// Cultural Context AI Chat Screen
-/// 
+///
 /// Provides an AI assistant that understands Nigerian fashion culture
 /// and can help buyers with fashion advice, cultural context, and
 /// product recommendations.
@@ -42,7 +42,9 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
     final user = ref.read(userProfileProvider).value;
     if (user != null && !_isInitialized) {
       _isInitialized = true;
-      await ref.read(aiChatControllerProvider.notifier).initialize(user.id.toString());
+      await ref
+          .read(aiChatControllerProvider.notifier)
+          .initialize(user.id.toString());
     }
   }
 
@@ -126,7 +128,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, color: _primaryColor, size: 18),
+                    const Icon(
+                      Icons.info_outline,
+                      color: _primaryColor,
+                      size: 18,
+                    ),
                     const SizedBox(width: 8),
                     const Expanded(
                       child: Text(
@@ -156,7 +162,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
       child: Column(
         children: [
           const SizedBox(height: 24),
-          
+
           // AI Icon
           Container(
             width: 72,
@@ -165,11 +171,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
               color: _cardColor,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.psychology,
-              size: 36,
-              color: _primaryColor,
-            ),
+            child: const Icon(Icons.psychology, size: 36, color: _primaryColor),
           ),
           const SizedBox(height: 20),
 
@@ -212,10 +214,12 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
           ),
           const SizedBox(height: 12),
 
-          ...defaultChatSuggestions.map((suggestion) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: _buildSuggestionChip(suggestion),
-          )),
+          ...defaultChatSuggestions.map(
+            (suggestion) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _buildSuggestionChip(suggestion),
+            ),
+          ),
         ],
       ),
     );
@@ -288,8 +292,9 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
@@ -313,8 +318,9 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
           ],
           Flexible(
             child: Column(
-              crossAxisAlignment:
-                  isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: isUser
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -339,7 +345,9 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 ),
 
                 // Suggestions
-                if (!isUser && message.suggestions != null && message.suggestions!.isNotEmpty) ...[
+                if (!isUser &&
+                    message.suggestions != null &&
+                    message.suggestions!.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -347,7 +355,8 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                     children: message.suggestions!.take(3).map((suggestion) {
                       return InkWell(
                         onTap: () {
-                          ref.read(aiChatControllerProvider.notifier)
+                          ref
+                              .read(aiChatControllerProvider.notifier)
                               .sendSuggestion(suggestion);
                         },
                         borderRadius: BorderRadius.circular(16),
@@ -378,7 +387,9 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 ],
 
                 // Products
-                if (!isUser && message.products != null && message.products!.isNotEmpty) ...[
+                if (!isUser &&
+                    message.products != null &&
+                    message.products!.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 100,
@@ -404,11 +415,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 color: _textDark,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.person,
-                size: 18,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.person, size: 18, color: Colors.white),
             ),
           ],
         ],
@@ -430,7 +437,9 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
           // Image placeholder
           Expanded(
             child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(8),
+              ),
               child: Container(
                 width: double.infinity,
                 color: _cardColor,

@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
 
@@ -15,103 +16,85 @@ class ConnectToUsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final info = ref.watch(connectInfoProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
-              title: Text(
-                'Connect to us',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Campton',
-                  color: Color(0xFF241508),
-                ),
-              ),
+    return AppPageScaffold(
+      title: 'Connect to us',
+      child: info.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, st) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            AppSnackbars.showError(context, UiErrorMessage.from(e));
+          });
+          return Center(
+            child: ElevatedButton(
+              onPressed: () => ref.invalidate(connectInfoProvider),
+              child: const Text('Retry'),
             ),
-            Expanded(
-              child: info.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, st) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    AppSnackbars.showError(context, UiErrorMessage.from(e));
-                  });
-                  return Center(
-                    child: ElevatedButton(
-                      onPressed: () => ref.invalidate(connectInfoProvider),
-                      child: const Text('Retry'),
-                    ),
-                  );
-                },
-                data: (data) {
-                  return ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      _buildContactCard(context, data),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+          );
+        },
+        data: (data) {
+          return ListView(
+            padding: const EdgeInsets.all(0),
+            children: [_buildContactCard(context, data)],
+          );
+        },
       ),
     );
   }
 
   Widget _buildContactCard(BuildContext context, ConnectInfo data) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFDEDEDE)),
+        border: Border.all(color: colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Contact Us',
             style: TextStyle(
               fontWeight: FontWeight.w700,
               fontFamily: 'Campton',
               fontSize: 18,
-              color: Color(0xFF241508),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Email
           if (data.email.isNotEmpty)
             _buildContactItem(
+              context: context,
               icon: Icons.email_outlined,
               label: 'Email',
               value: data.email,
               onTap: () => _launchEmail(context, data.email),
             ),
-          
+
           if (data.email.isNotEmpty) const SizedBox(height: 12),
-          
+
           // Phone
           if (data.phone.isNotEmpty)
             _buildContactItem(
+              context: context,
               icon: Icons.phone_outlined,
               label: 'Phone',
               value: data.phone,
               onTap: () => _launchPhone(context, data.phone),
             ),
-          
+
           if (data.phone.isNotEmpty) const SizedBox(height: 12),
-          
+
           // Instagram
           if (data.instagram.isNotEmpty)
             _buildContactItem(
+              context: context,
               icon: Icons.camera_alt_outlined,
               label: 'Instagram',
               value: '@ojaewa',
@@ -123,11 +106,13 @@ class ConnectToUsScreen extends ConsumerWidget {
   }
 
   Widget _buildContactItem({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required String value,
     required VoidCallback onTap,
   }) {
+    final colors = context.appColors;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
@@ -138,14 +123,10 @@ class ConnectToUsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF8F1),
-                borderRadius: BorderRadius.circular(8),
+                color: colors.surfaceSecondary,
+                shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                color: const Color(0xFF241508),
-                size: 24,
-              ),
+              child: Icon(icon, color: colors.textPrimary, size: 24),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -154,30 +135,26 @@ class ConnectToUsScreen extends ConsumerWidget {
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Campton',
                       fontSize: 12,
-                      color: Color(0xFF777F84),
+                      color: colors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Campton',
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF241508),
+                      color: colors.textPrimary,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: Color(0xFF777F84),
-            ),
+            Icon(Icons.arrow_forward_ios, size: 16, color: colors.textTertiary),
           ],
         ),
       ),

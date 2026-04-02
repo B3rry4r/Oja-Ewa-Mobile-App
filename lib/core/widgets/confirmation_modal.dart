@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+
 /// Reusable delete/confirm dialog using the ORIGINAL modal design.
 ///
 /// This keeps the exact styling/layout of the original Delete Shop modal,
@@ -28,11 +30,12 @@ class ConfirmationModal extends StatelessWidget {
     String cancelLabel = 'Cancel',
     required VoidCallback onConfirm,
   }) {
+    final colors = context.appColors;
     return showGeneralDialog<void>(
       context: context,
       barrierDismissible: true,
       barrierLabel: 'ConfirmationModal',
-      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+      barrierColor: colors.shadow.withValues(alpha: 0.8),
       transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (context, anim1, anim2) {
         return ConfirmationModal(
@@ -48,8 +51,9 @@ class ConfirmationModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Scaffold(
-      backgroundColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+      backgroundColor: colors.shadow.withValues(alpha: 0.8),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -57,7 +61,7 @@ class ConfirmationModal extends StatelessWidget {
             width: 342,
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFFBF5),
+              color: colors.surfaceElevated,
               borderRadius: BorderRadius.circular(30),
             ),
             child: Column(
@@ -67,10 +71,10 @@ class ConfirmationModal extends StatelessWidget {
                 Text(
                   title,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 33,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF603814),
+                    color: colors.textPrimary,
                     fontFamily: 'Campton',
                   ),
                 ),
@@ -78,10 +82,10 @@ class ConfirmationModal extends StatelessWidget {
                 Text(
                   message,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
-                    color: Color(0xFF1E2021),
+                    color: colors.textSecondary,
                     fontFamily: 'Campton',
                   ),
                 ),
@@ -94,16 +98,17 @@ class ConfirmationModal extends StatelessWidget {
                         child: Container(
                           height: 57,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFFCCCCCC)),
+                            color: colors.surface,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(color: colors.border),
                           ),
                           child: Center(
                             child: Text(
                               cancelLabel,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF595F63),
+                                color: colors.textSecondary,
                                 fontFamily: 'Campton',
                               ),
                             ),
@@ -121,13 +126,11 @@ class ConfirmationModal extends StatelessWidget {
                         child: Container(
                           height: 57,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFDAF40),
-                            borderRadius: BorderRadius.circular(8),
+                            color: colors.accent,
+                            borderRadius: BorderRadius.circular(18),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(
-                                  0xFFFDAF40,
-                                ).withValues(alpha: 0.4),
+                                color: colors.shadow,
                                 blurRadius: 16,
                                 offset: const Offset(0, 8),
                               ),
@@ -136,10 +139,10 @@ class ConfirmationModal extends StatelessWidget {
                           child: Center(
                             child: Text(
                               confirmLabel,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFFFFFBF5),
+                                color: colors.onAccent,
                                 fontFamily: 'Campton',
                               ),
                             ),

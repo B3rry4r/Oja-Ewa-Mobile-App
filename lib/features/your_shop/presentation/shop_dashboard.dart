@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/widgets/seller_badge.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/domain/seller_status.dart';
@@ -16,7 +17,9 @@ import '../subfeatures/orders/orders.dart';
 import '../../your_shop/data/seller_product_repository.dart';
 
 // Import seller products provider
-final sellerProductsProvider = FutureProvider.autoDispose<List<dynamic>>((ref) async {
+final sellerProductsProvider = FutureProvider.autoDispose<List<dynamic>>((
+  ref,
+) async {
   final repo = ref.watch(sellerProductRepositoryProvider);
   try {
     final products = await repo.getMyProducts(perPage: 100);
@@ -33,7 +36,8 @@ class ShopDashboardScreen extends ConsumerStatefulWidget {
   const ShopDashboardScreen({super.key});
 
   @override
-  ConsumerState<ShopDashboardScreen> createState() => _ShopDashboardScreenState();
+  ConsumerState<ShopDashboardScreen> createState() =>
+      _ShopDashboardScreenState();
 }
 
 class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
@@ -41,66 +45,48 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final sellerStatus = ref.watch(sellerStatusProvider);
     final processingOrders = ref.watch(sellerOrdersProvider('processing'));
     final allOrders = ref.watch(sellerOrdersProvider(null));
     final userId = ref.watch(userProfileProvider).value?.id.toString();
     final sellerProducts = ref.watch(sellerProductsProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // Main Brand Background
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const AppHeader(
-                backgroundColor: Color(0xFFFFF8F1),
-                iconColor: Color(0xFF241508),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                "Your Shop",
-                style: TextStyle(
-                  fontSize: 33,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
-                ),
-              ),
-              const SizedBox(height: 8),
-              _buildShopHeader(context, sellerStatus),
-              const SizedBox(height: 24),
-              _buildSearchBar(),
-              const SizedBox(height: 24),
-              _buildStatsRow(
-                context,
-                allOrders.maybeWhen(data: (o) => o.length, orElse: () => 0),
-                sellerProducts.maybeWhen(data: (p) => p.length, orElse: () => 0),
-              ),
-              const SizedBox(height: 16),
-              // AI Analytics Button
-              // _buildAiAnalyticsButton(context, ref, userId),
-              const SizedBox(height: 32),
-              const Text(
-                "Orders in Process",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1E2021),
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildOrdersTable(processingOrders),
-              const SizedBox(height: 40),
-            ],
+    return AppPageScaffold(
+      title: 'Your Shop',
+      scrollable: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildShopHeader(context, sellerStatus),
+          const SizedBox(height: 24),
+          _buildSearchBar(),
+          const SizedBox(height: 24),
+          _buildStatsRow(
+            context,
+            allOrders.maybeWhen(data: (o) => o.length, orElse: () => 0),
+            sellerProducts.maybeWhen(data: (p) => p.length, orElse: () => 0),
           ),
-        ),
+          const SizedBox(height: 16),
+          const SizedBox(height: 32),
+          Text(
+            "Orders in Process",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: colors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildOrdersTable(processingOrders),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }
 
   Widget _buildShopHeader(BuildContext context, SellerStatus? sellerStatus) {
+    final colors = context.appColors;
     final businessName = sellerStatus?.businessName ?? '';
     final badge = sellerStatus?.badge;
 
@@ -114,10 +100,10 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
               if (businessName.isNotEmpty) ...[
                 Text(
                   businessName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E2021),
+                    color: colors.textPrimary,
                     fontFamily: 'Campton',
                   ),
                 ),
@@ -126,12 +112,12 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
                   SellerBadge(badge: badge),
                 ],
               ] else
-                const Text(
+                Text(
                   'Your Shop',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E2021),
+                    color: colors.textPrimary,
                   ),
                 ),
             ],
@@ -144,11 +130,11 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFCCCCCC)),
+              border: Border.all(color: colors.border),
             ),
-            child: const Text(
+            child: Text(
               "Manage Shop",
-              style: TextStyle(fontSize: 14, color: Color(0xFF301C0A)),
+              style: TextStyle(fontSize: 14, color: colors.textPrimary),
             ),
           ),
         ),
@@ -157,26 +143,39 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
   }
 
   Widget _buildSearchBar() {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFCCCCCC)),
+        color: colors.surfaceElevated,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.border),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.18),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
-        children: const [
-          Icon(Icons.search, color: Color(0xFF777F84), size: 20),
-          SizedBox(width: 12),
+        children: [
+          Icon(Icons.search, color: colors.textTertiary, size: 20),
+          const SizedBox(width: 12),
           Text(
             "search Ojá-Ẹwà",
-            style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 16),
+            style: TextStyle(color: colors.textTertiary, fontSize: 16),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatsRow(BuildContext context, int ordersCount, int productsCount) {
+  Widget _buildStatsRow(
+    BuildContext context,
+    int ordersCount,
+    int productsCount,
+  ) {
     return Row(
       children: [
         _buildStatCard(
@@ -193,9 +192,9 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
           label: "Orders",
           count: ordersCount.toString(),
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ShopOrdersScreen()),
-            );
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const ShopOrdersScreen()));
           },
         ),
       ],
@@ -207,41 +206,54 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
     required String count,
     VoidCallback? onTap,
   }) {
+    final colors = context.appColors;
     return Expanded(
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(20),
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF5E0CE),
-            borderRadius: BorderRadius.circular(8),
+            color: colors.surfaceElevated,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: colors.border),
+            boxShadow: [
+              BoxShadow(
+                color: colors.shadow.withValues(alpha: 0.18),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 label,
-                style: const TextStyle(color: Color(0xFF777F84), fontSize: 12),
+                style: TextStyle(color: colors.textTertiary, fontSize: 12),
               ),
               const SizedBox(height: 4),
               Text(
                 count,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
+                  color: colors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               Row(
-                children: const [
+                children: [
                   Text(
                     "View",
-                    style: TextStyle(fontSize: 10, color: Color(0xFF1E2021)),
+                    style: TextStyle(fontSize: 10, color: colors.textPrimary),
                   ),
-                  SizedBox(width: 4),
-                  Icon(Icons.arrow_forward_ios, size: 10, color: Color(0xFF1E2021)),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 10,
+                    color: colors.textPrimary,
+                  ),
                 ],
               ),
             ],
@@ -252,6 +264,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
   }
 
   Widget _buildOrdersTable(AsyncValue<List<SellerOrder>> ordersAsync) {
+    final colors = context.appColors;
     return ordersAsync.when(
       loading: () => const Padding(
         padding: EdgeInsets.symmetric(vertical: 24),
@@ -259,65 +272,124 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
       ),
       error: (e, _) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: Text('Failed to load orders', style: TextStyle(color: Color(0xFF777F84)))),
+        child: Center(
+          child: Text(
+            'Failed to load orders',
+            style: TextStyle(color: colors.textTertiary),
+          ),
+        ),
       ),
       data: (orders) {
         if (orders.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 24),
-            child: Center(child: Text('No processing orders', style: TextStyle(color: Color(0xFF777F84)))),
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Center(
+              child: Text(
+                'No processing orders',
+                style: TextStyle(color: colors.textTertiary),
+              ),
+            ),
           );
         }
 
         final dateFormat = DateFormat('MMM d');
-        return Column(
-          children: [
-            // Table Header
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-              color: const Color(0xFFF5E0CE),
-              child: Row(
-                children: const [
-                  Expanded(flex: 3, child: Text("Order No", style: _headerStyle)),
-                  Expanded(flex: 3, child: Text("Order Date", style: _headerStyle)),
-                  Expanded(flex: 3, child: Text("Customer", style: _headerStyle)),
-                  Expanded(flex: 2, child: Text("Status", style: _headerStyle)),
-                ],
+        return Container(
+          decoration: BoxDecoration(
+            color: colors.surfaceElevated,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: colors.border),
+            boxShadow: [
+              BoxShadow(
+                color: colors.shadow.withValues(alpha: 0.18),
+                blurRadius: 24,
+                offset: const Offset(0, 10),
               ),
-            ),
-            // Table Rows
-            ...orders.map((o) {
-              return _buildOrderRow(
-                '#${o.orderNumber}',
-                dateFormat.format(o.createdAt),
-                o.customerName ?? '—',
-                o.status,
-              );
-            }).toList(),
-          ],
+            ],
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 14,
+                  horizontal: 14,
+                ),
+                decoration: BoxDecoration(
+                  color: colors.surfaceSecondary,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Text("Order No", style: _headerStyle(colors)),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: Text("Order Date", style: _headerStyle(colors)),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: Text("Customer", style: _headerStyle(colors)),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Text("Status", style: _headerStyle(colors)),
+                    ),
+                  ],
+                ),
+              ),
+              ...orders.asMap().entries.map((entry) {
+                final index = entry.key;
+                final order = entry.value;
+                return _buildOrderRow(
+                  context,
+                  '#${order.orderNumber}',
+                  dateFormat.format(order.createdAt),
+                  order.customerName ?? '—',
+                  order.status,
+                  showDivider: index != orders.length - 1,
+                );
+              }),
+            ],
+          ),
         );
       },
     );
   }
 
-  static const _headerStyle = TextStyle(fontSize: 10, color: Color(0xFF777F84));
+  TextStyle _headerStyle(AppThemeColors colors) =>
+      TextStyle(fontSize: 10, color: colors.textSecondary);
 
-  Widget _buildOrderRow(String no, String date, String customer, String status) {
+  Widget _buildOrderRow(
+    BuildContext context,
+    String no,
+    String date,
+    String customer,
+    String status, {
+    required bool showDivider,
+  }) {
+    final colors = context.appColors;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      color: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+      decoration: BoxDecoration(
+        border: showDivider
+            ? Border(bottom: BorderSide(color: colors.border))
+            : null,
+      ),
       child: Row(
         children: [
-          Expanded(flex: 3, child: Text(no, style: _cellStyle)),
-          Expanded(flex: 3, child: Text(date, style: _cellStyle)),
-          Expanded(flex: 3, child: Text(customer, style: _cellStyle)),
+          Expanded(flex: 3, child: Text(no, style: _cellStyle(colors))),
+          Expanded(flex: 3, child: Text(date, style: _cellStyle(colors))),
+          Expanded(flex: 3, child: Text(customer, style: _cellStyle(colors))),
           Expanded(
             flex: 2,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
               decoration: BoxDecoration(
                 color: _statusColor(status),
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(999),
               ),
               child: Text(
                 _statusLabel(status),
@@ -331,7 +403,11 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
     );
   }
 
-  Widget _buildAiAnalyticsButton(BuildContext context, WidgetRef ref, String? userId) {
+  Widget _buildAiAnalyticsButton(
+    BuildContext context,
+    WidgetRef ref,
+    String? userId,
+  ) {
     final isLoading = _isAnalyticsLoading;
     return InkWell(
       onTap: isLoading
@@ -366,7 +442,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withOpacity(0.3),
+              color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -377,14 +453,10 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
-                Icons.insights,
-                color: Colors.white,
-                size: 24,
-              ),
+              child: const Icon(Icons.insights, color: Colors.white, size: 24),
             ),
             const SizedBox(width: 16),
             const Expanded(
@@ -444,7 +516,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
         return const Color(0xFFC95353);
       case 'pending':
       default:
-        return const Color(0xFF777F84);
+        return context.appColors.textTertiary;
     }
   }
 
@@ -464,5 +536,6 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
     }
   }
 
-  static const _cellStyle = TextStyle(fontSize: 12, color: Colors.black);
+  TextStyle _cellStyle(AppThemeColors colors) =>
+      TextStyle(fontSize: 12, color: colors.textPrimary);
 }

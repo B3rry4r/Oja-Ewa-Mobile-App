@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/features/your_shop/data/seller_product_repository.dart';
 import '../add_edit_product/add_edit_product.dart';
 import '../add_edit_product/seller_category_selection.dart';
@@ -14,9 +15,13 @@ final sellerProductsProvider = FutureProvider<List<ShopProduct>>((ref) async {
   try {
     debugPrint('ProductListingScreen: Fetching seller products...');
     final productsJson = await repo.getMyProducts(perPage: 100);
-    debugPrint('ProductListingScreen: Received ${productsJson.length} products from API');
+    debugPrint(
+      'ProductListingScreen: Received ${productsJson.length} products from API',
+    );
     final products = productsJson.map(ShopProduct.fromJson).toList();
-    debugPrint('ProductListingScreen: Successfully parsed ${products.length} ShopProduct objects');
+    debugPrint(
+      'ProductListingScreen: Successfully parsed ${products.length} ShopProduct objects',
+    );
     return products;
   } catch (e, st) {
     debugPrint('ProductListingScreen: Error fetching products: $e');
@@ -29,7 +34,8 @@ class ProductListingsScreen extends ConsumerStatefulWidget {
   const ProductListingsScreen({super.key});
 
   @override
-  ConsumerState<ProductListingsScreen> createState() => _ProductListingsScreenState();
+  ConsumerState<ProductListingsScreen> createState() =>
+      _ProductListingsScreenState();
 }
 
 class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
@@ -40,19 +46,9 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
     final productsAsync = ref.watch(sellerProductsProvider);
 
     return productsAsync.when(
-      loading: () => Scaffold(
-        backgroundColor: const Color(0xFFFFF8F1),
-        body: SafeArea(
-          child: Column(
-            children: [
-              const AppHeader(
-                backgroundColor: Color(0xFFFFF8F1),
-                iconColor: Color(0xFF241508),
-              ),
-              const Expanded(child: Center(child: CircularProgressIndicator())),
-            ],
-          ),
-        ),
+      loading: () => const AppPageScaffold(
+        title: 'Products Listings',
+        child: Center(child: CircularProgressIndicator()),
       ),
       error: (error, _) => _buildErrorState(context, error),
       data: (products) => _buildContent(context, products),
@@ -60,62 +56,41 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
   }
 
   Widget _buildContent(BuildContext context, List<ShopProduct> products) {
+    final colors = context.appColors;
     final filteredProducts = _applyFilters(products);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Products Listings",
-                      style: TextStyle(
-                        fontSize: 33,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF241508),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "${filteredProducts.length} Products",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1E2021),
-                          ),
-                        ),
-                        _buildAddProductButton(context),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    _buildFilterTabs(context),
-                    const SizedBox(height: 24),
-                    _buildProductTable(context, filteredProducts),
-                    const SizedBox(height: 40),
-                  ],
+    return AppPageScaffold(
+      title: 'Products Listings',
+      scrollable: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "${filteredProducts.length} Products",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: colors.textPrimary,
                 ),
               ),
-            ),
-          ],
-        ),
+              _buildAddProductButton(context),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _buildFilterTabs(context),
+          const SizedBox(height: 24),
+          _buildProductTable(context, filteredProducts),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }
 
   Widget _buildAddProductButton(BuildContext context) {
+    final colors = context.appColors;
     return InkWell(
       onTap: () {
         // Navigate to category selection first, then to add product
@@ -125,23 +100,23 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
           ),
         );
       },
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(18),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFFFDAF40),
-          borderRadius: BorderRadius.circular(8),
+          color: colors.accent,
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+              color: colors.accent.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: const Text(
+        child: Text(
           "Add Product",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(color: colors.onAccent, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -165,20 +140,21 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
   }
 
   Widget _buildTab(String label, {bool isActive = false}) {
+    final colors = context.appColors;
     return InkWell(
       onTap: () => setState(() => _selectedStatus = label),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(18),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isActive ? const Color(0xFFA15E22) : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-          border: isActive ? null : Border.all(color: const Color(0xFFCCCCCC)),
+          color: isActive ? colors.accent : colors.surfaceElevated,
+          borderRadius: BorderRadius.circular(18),
+          border: isActive ? null : Border.all(color: colors.border),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isActive ? Colors.white : const Color(0xFF301C0A),
+            color: isActive ? colors.onAccent : colors.textPrimary,
             fontSize: 14,
           ),
         ),
@@ -189,17 +165,22 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
   List<ShopProduct> _applyFilters(List<ShopProduct> products) {
     return _selectedStatus == 'All'
         ? products
-        : products.where((p) => p.status.toLowerCase() == _selectedStatus.toLowerCase()).toList();
+        : products
+              .where(
+                (p) => p.status.toLowerCase() == _selectedStatus.toLowerCase(),
+              )
+              .toList();
   }
 
   Widget _buildProductTable(BuildContext context, List<ShopProduct> products) {
+    final colors = context.appColors;
     if (products.isEmpty) {
-      return const SizedBox(
+      return SizedBox(
         height: 200,
         child: Center(
           child: Text(
             'No products yet',
-            style: TextStyle(fontSize: 16, color: Color(0xFF777F84)),
+            style: TextStyle(fontSize: 16, color: colors.textTertiary),
           ),
         ),
       );
@@ -209,10 +190,10 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
       children: [
         // Header
         Container(
-          padding: const EdgeInsets.all(12),
-          decoration: const BoxDecoration(
-            color: Color(0xFFF5E0CE),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: colors.surfaceSecondary,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Row(
             children: const [
@@ -231,7 +212,9 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
             'In Process' => const Color(0xFF3095CE),
             _ => const Color(0xFF70B673),
           };
-          final textColor = p.status == 'Pending' ? Colors.black : Colors.white;
+          final textColor = p.status == 'Pending'
+              ? colors.onAccent
+              : Colors.white;
           final isAlt = p.id.hashCode.isEven;
           return _buildProductRow(
             context,
@@ -247,7 +230,6 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
 
   static const _headerStyle = TextStyle(
     fontSize: 10,
-    color: Color(0xFF777F84),
     fontWeight: FontWeight.bold,
   );
 
@@ -258,19 +240,20 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
     bool isAlt, {
     Color textColor = Colors.white,
   }) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      color: isAlt ? const Color(0xFFFBFBFB) : const Color(0xFFF4F4F4),
+      color: isAlt ? colors.surfaceElevated : colors.surfaceSecondary,
       child: Row(
         children: [
           Expanded(
             flex: 3,
             child: Text(
               product.name,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: Color(0xFF241508), // Dark text for readability
+                color: colors.textPrimary,
               ),
             ),
           ),
@@ -282,7 +265,7 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: statusColor,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
                   product.status,
@@ -332,15 +315,16 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
     required String label,
     required VoidCallback onTap,
   }) {
+    final colors = context.appColors;
     return InkWell(
       onTap: onTap,
       child: Row(
         children: [
-          Icon(icon, size: 16, color: const Color(0xFF3C4042)),
+          Icon(icon, size: 16, color: colors.textSecondary),
           const SizedBox(width: 4),
           Text(
             label,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF3C4042)),
+            style: TextStyle(fontSize: 12, color: colors.textSecondary),
           ),
         ],
       ),
@@ -351,7 +335,8 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
     ConfirmationModal.show(
       context,
       title: 'Delete product',
-      message: 'Are you sure you want to delete "${product.name}"? This action cannot be undone.',
+      message:
+          'Are you sure you want to delete "${product.name}"? This action cannot be undone.',
       confirmLabel: 'Delete',
       onConfirm: () => _performDelete(context, product),
     );
@@ -360,25 +345,25 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
   Future<void> _performDelete(BuildContext context, ShopProduct product) async {
     try {
       debugPrint('Deleting product: ${product.id} - ${product.name}');
-      
+
       final repo = ref.read(sellerProductRepositoryProvider);
       await repo.deleteProduct(int.parse(product.id));
-      
+
       debugPrint('Product deleted successfully');
-      
+
       // Refresh the product list
       ref.invalidate(sellerProductsProvider);
-      
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Product deleted successfully'),
-          backgroundColor: Color(0xFF70B673),
+          backgroundColor: Color(0xFF2E7D32),
         ),
       );
     } catch (e) {
       debugPrint('Error deleting product: $e');
-      
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -390,38 +375,27 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
   }
 
   Widget _buildErrorState(BuildContext context, Object error) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
-            ),
-            Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Failed to load products',
-                        style: TextStyle(fontSize: 16, color: Color(0xFF777F84)),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        error.toString(),
-                        style: const TextStyle(fontSize: 12, color: Color(0xFFCCCCCC)),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
+    final colors = context.appColors;
+    return AppPageScaffold(
+      title: 'Products Listings',
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Failed to load products',
+                style: TextStyle(fontSize: 16, color: colors.textSecondary),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                error.toString(),
+                style: TextStyle(fontSize: 12, color: colors.textTertiary),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );

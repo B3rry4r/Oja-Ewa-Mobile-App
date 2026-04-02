@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/account/presentation/controllers/profile_controller.dart';
 
@@ -30,6 +31,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final profile = ref.watch(userProfileProvider);
     final actions = ref.watch(profileActionsProvider);
 
@@ -45,89 +47,62 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       });
     });
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Decorative background image
-            Positioned(
-              right: -30,
-              bottom: -100,
-              child: Opacity(
-                opacity: 0.03,
-                child: Container(
-                  child: const AppImagePlaceholder(
-                    width: 234,
-                    height: 347,
-                    borderRadius: 0,
-                    backgroundColor: Colors.transparent,
-                  ),
-                ),
+    return AppPageScaffold(
+      title: 'Edit Profile',
+      child: Stack(
+        children: [
+          Positioned(
+            right: -30,
+            bottom: -100,
+            child: Opacity(
+              opacity: 0.03,
+              child: const AppImagePlaceholder(
+                width: 234,
+                height: 347,
+                borderRadius: 0,
+                backgroundColor: Colors.transparent,
               ),
             ),
-
-            // Main content
-            Column(
-              children: [
-                const AppHeader(
-                  backgroundColor: Color(0xFFFFF8F1),
-                  iconColor: Color(0xFF241508),
-                  title: Text(
-                    'Edit Profile',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF241508),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: profile.when(
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (e, st) => ErrorStateView(
-                      title: 'Could not load your profile',
-                      message: 'Please check your connection and try again.',
-                      details: e,
-                      onRetry: () => ref.invalidate(userProfileProvider),
-                    ),
-                    data: (_) {
-                      return SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 20),
-                            _buildTextField(
-                              label: 'Full Name',
-                              controller: _nameController,
-                            ),
-                            const SizedBox(height: 19),
-                            _buildTextField(
-                              label: 'Email',
-                              controller: _emailController,
-                              keyboardType: TextInputType.emailAddress,
-                            ),
-                            const SizedBox(height: 19),
-                            _buildTextField(
-                              label: 'Phone Number',
-                              controller: _phoneController,
-                              keyboardType: TextInputType.phone,
-                            ),
-                            const SizedBox(height: 60),
-                            _buildSaveButton(context, actions),
-                            const SizedBox(height: 100),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
+          ),
+          profile.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, st) => ErrorStateView(
+              title: 'Could not load your profile',
+              message: 'Please check your connection and try again.',
+              details: e,
+              onRetry: () => ref.invalidate(userProfileProvider),
             ),
-          ],
-        ),
+            data: (_) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 0),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    _buildTextField(
+                      label: 'Full Name',
+                      controller: _nameController,
+                    ),
+                    const SizedBox(height: 19),
+                    _buildTextField(
+                      label: 'Email',
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 19),
+                    _buildTextField(
+                      label: 'Phone Number',
+                      controller: _phoneController,
+                      keyboardType: TextInputType.phone,
+                    ),
+                    const SizedBox(height: 60),
+                    _buildSaveButton(context, actions),
+                    const SizedBox(height: 100),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -137,16 +112,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     required TextEditingController controller,
     TextInputType? keyboardType,
   }) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
-            color: Color(0xFF777F84),
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -157,20 +133,26 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             keyboardType: keyboardType,
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+              filled: true,
+              fillColor: colors.surface,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
+                borderRadius: BorderRadius.circular(18),
+                borderSide: BorderSide(color: colors.border),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
+                borderRadius: BorderRadius.circular(18),
+                borderSide: BorderSide(color: colors.border),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(18),
+                borderSide: BorderSide(color: colors.accent),
               ),
             ),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
-              color: Color(0xFF241508),
+              color: colors.textPrimary,
             ),
           ),
         ),
@@ -179,14 +161,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Widget _buildSaveButton(BuildContext context, AsyncValue<void> actions) {
+    final colors = context.appColors;
     return Container(
       height: 57,
       decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.accent,
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withValues(alpha: 0.5),
+            color: colors.accent.withValues(alpha: 0.5),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -214,34 +197,37 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         content: Text(
                           ref.read(profileActionsProvider).error.toString(),
                         ),
-                        backgroundColor: const Color(0xFFFDAF40),
+                        backgroundColor: colors.accent,
                       ),
                     );
                     return;
                   }
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Profile updated')),
+                    SnackBar(
+                      content: const Text('Profile updated'),
+                      backgroundColor: colors.surfaceElevated,
+                    ),
                   );
                 },
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(18),
           child: Center(
             child: actions.isLoading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Color(0xFFFFFBF5),
+                      color: colors.onAccent,
                     ),
                   )
-                : const Text(
+                : Text(
                     'Save Changes',
                     style: TextStyle(
                       fontSize: 16,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFFFFFBF5),
+                      color: colors.onAccent,
                     ),
                   ),
           ),

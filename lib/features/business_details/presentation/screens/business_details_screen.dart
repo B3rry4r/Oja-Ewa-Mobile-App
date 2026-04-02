@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import '../controllers/business_details_controller.dart';
 
@@ -20,28 +22,25 @@ class BusinessDetailsScreen extends ConsumerWidget {
     final async = ref.watch(businessDetailsProvider(businessId));
     final token = ref.watch(accessTokenProvider);
     final isLoggedIn = token != null && token.isNotEmpty;
+    final colors = context.appColors;
 
     if (!isLoggedIn) {
-      return Scaffold(
-        backgroundColor: const Color(0xFFFFF8F1),
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF603814),
-          foregroundColor: Colors.white,
-          title: const Text('Business'),
-        ),
-        body: Center(
+      return AppPageScaffold(
+        title: 'Business',
+        showActions: false,
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.lock_outline, size: 48, color: Color(0xFF777F84)),
+              Icon(Icons.lock_outline, size: 48, color: colors.textTertiary),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Sign in to view business profiles',
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
+                  color: colors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -50,15 +49,16 @@ class BusinessDetailsScreen extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontFamily: 'Campton',
-                  color: const Color(0xFF241508).withOpacity(0.6),
+                  color: colors.textSecondary,
                 ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () => Navigator.of(context).pushNamed(AppRoutes.signIn),
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.signIn),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFDAF40),
-                  foregroundColor: Colors.white,
+                  backgroundColor: colors.accent,
+                  foregroundColor: colors.onAccent,
                 ),
                 child: const Text('Sign In'),
               ),
@@ -68,14 +68,10 @@ class BusinessDetailsScreen extends ConsumerWidget {
       );
     }
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF603814),
-        foregroundColor: Colors.white,
-        title: const Text('Business'),
-      ),
-      body: async.when(
+    return AppPageScaffold(
+      title: 'Business',
+      showActions: false,
+      child: async.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => const Center(child: Text('Failed to load business')),
         data: (b) => Padding(
@@ -83,17 +79,30 @@ class BusinessDetailsScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(b.businessName, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              Text(
+                b.businessName,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: colors.textPrimary,
+                ),
+              ),
               const SizedBox(height: 8),
-              if ((b.businessDescription ?? '').trim().isNotEmpty) Text(b.businessDescription!),
+              if ((b.businessDescription ?? '').trim().isNotEmpty)
+                Text(b.businessDescription!),
               const SizedBox(height: 16),
               if (b.serviceList.isNotEmpty) ...[
-                const Text('Services', style: TextStyle(fontWeight: FontWeight.w600)),
+                const Text(
+                  'Services',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: b.serviceList.map((s) => Chip(label: Text(s.name))).toList(),
+                  children: b.serviceList
+                      .map((s) => Chip(label: Text(s.name)))
+                      .toList(),
                 ),
               ],
             ],

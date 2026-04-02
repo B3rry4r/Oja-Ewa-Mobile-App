@@ -4,6 +4,7 @@ import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/widgets/info_bottom_sheet.dart';
@@ -34,46 +35,48 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     // Do not change layout; only populate data.
     final detailsAsync = ref.watch(productDetailsProvider(widget.productId));
     final accessToken = ref.watch(accessTokenProvider);
     final isLoggedIn = accessToken != null && accessToken.isNotEmpty;
 
     if (detailsAsync.isLoading) {
-      return const Scaffold(
-        backgroundColor: Color(0xFFFFF8F1),
+      return Scaffold(
+        backgroundColor: colors.background,
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
     if (detailsAsync.hasError) {
       return Scaffold(
-        backgroundColor: const Color(0xFFFFF8F1),
+        backgroundColor: colors.background,
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, size: 48, color: Color(0xFF777F84)),
+                Icon(Icons.error_outline, size: 48, color: colors.textTertiary),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   'Unable to load product details',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF241508),
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Please check your connection and try again.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: Color(0xFF777F84)),
+                  style: TextStyle(fontSize: 14, color: colors.textTertiary),
                 ),
                 const SizedBox(height: 16),
                 TextButton(
-                  onPressed: () => ref.refresh(productDetailsProvider(widget.productId)),
+                  onPressed: () =>
+                      ref.refresh(productDetailsProvider(widget.productId)),
                   child: const Text('Retry'),
                 ),
               ],
@@ -116,9 +119,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     final priceLabel = totalPrice == null ? '' : formatPrice(totalPrice);
 
     // Processing cards should show unit price (not multiplied) to keep original meaning.
-    final unitPriceLabel = unitPrice == null
-        ? ''
-        : formatPrice(unitPrice);
+    final unitPriceLabel = unitPrice == null ? '' : formatPrice(unitPrice);
 
     final reviewCount = reviewsPage?.total ?? 0;
     final avgRating = reviewsPage?.entity.avgRating?.toString() ?? '';
@@ -131,7 +132,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     final reviewBody = (firstReview?.body ?? '').trim();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
+      backgroundColor: colors.background,
       body: Stack(
         children: [
           // Main scrollable content
@@ -160,10 +161,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                         children: [
                           Text(
                             productTitle,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF241508),
+                              color: colors.textPrimary,
                             ),
                           ),
                           GestureDetector(
@@ -179,17 +180,15 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                               width: 40,
                               height: 40,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: const Color(0xFFDEDEDE),
-                                ),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: colors.border),
                               ),
                               child: Icon(
                                 isWishlisted
                                     ? Icons.favorite
                                     : Icons.favorite_border,
                                 size: 20,
-                                color: const Color(0xFFA15E22),
+                                color: colors.accent,
                               ),
                             ),
                           ),
@@ -201,18 +200,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                       if (sellerName.isNotEmpty)
                         RichText(
                           text: TextSpan(
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               fontFamily: 'Campton',
-                              color: Color(0xFF595F63),
+                              color: colors.textSecondary,
                             ),
                             children: [
                               const TextSpan(text: 'by '),
                               TextSpan(
                                 text: sellerName,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF1E2021),
+                                  color: colors.textPrimary,
                                 ),
                               ),
                             ],
@@ -230,11 +229,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                       // Art and beauty products don't have sizes
                       if (details?.size != null &&
                           details!.size!.isNotEmpty) ...[
-                        const Text(
+                        Text(
                           'Size',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Color(0xFF1E2021),
+                            color: colors.textPrimary,
                           ),
                         ),
 
@@ -244,13 +243,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
                         const SizedBox(height: 8),
 
-                        const Align(
+                        Align(
                           alignment: Alignment.centerRight,
                           child: Text(
                             'View Size Chart',
                             style: TextStyle(
                               fontSize: 10,
-                              color: Color(0xFF777F84),
+                              color: colors.textSecondary,
                             ),
                           ),
                         ),
@@ -259,7 +258,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                       ],
 
                       // Processing time section
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
@@ -267,7 +266,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF1E2021),
+                              color: colors.textPrimary,
                             ),
                           ),
                           SizedBox(height: 8),
@@ -275,7 +274,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                             'Select your package type',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Color(0xFF777F84),
+                              color: colors.textSecondary,
                             ),
                           ),
                         ],
@@ -297,11 +296,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                             title: 'Description',
                             content: Text(
                               (details?.description ?? ''),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Campton',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
-                                color: Color(0xFF3C4042),
+                                color: colors.textSecondary,
                                 height: 1.6,
                               ),
                             ),
@@ -351,12 +350,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                       const SizedBox(height: 28),
 
                       // You may also like
-                      const Text(
+                      Text(
                         'You may also like',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF241508),
+                          color: colors.textPrimary,
                         ),
                       ),
 
@@ -383,31 +382,33 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
   }
 
   Widget _buildTopBar(BuildContext context) {
+    final colors = context.appColors;
     return Positioned(
       top: 0,
       left: 0,
       right: 0,
-      child: Container(
-        height: 104,
-        color: const Color(0xFFFFF8F1),
-        padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             HeaderIconButton(
               asset: AppIcons.back,
+              iconColor: colors.textPrimary,
               onTap: () => Navigator.of(context).maybePop(),
             ),
             Row(
               children: [
                 HeaderIconButton(
                   asset: AppIcons.notification,
+                  iconColor: colors.textPrimary,
                   onTap: () =>
                       Navigator.of(context).pushNamed(AppRoutes.notifications),
                 ),
                 const SizedBox(width: 8),
                 HeaderIconButton(
                   asset: AppIcons.bag,
+                  iconColor: colors.textPrimary,
                   onTap: () => Navigator.of(context).pushNamed(AppRoutes.cart),
                 ),
               ],
@@ -424,14 +425,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
       margin: const EdgeInsets.fromLTRB(16, 83, 16, 0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        color: const Color(0xFFD9D9D9),
+        color: context.appColors.surfaceSecondary,
         image: (imageUrl == null)
             ? null
             : DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover),
       ),
       child: imageUrl == null
-          ? const Center(
-              child: Icon(Icons.image, size: 80, color: Colors.white54),
+          ? Center(
+              child: Icon(
+                Icons.image,
+                size: 80,
+                color: context.appColors.textTertiary,
+              ),
             )
           : null,
     );
@@ -443,6 +448,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
   }
 
   Widget _buildSizeSelector(String? backendSizes) {
+    final colors = context.appColors;
     final parsed = (backendSizes ?? '')
         .split(',')
         .map((e) => e.trim())
@@ -465,12 +471,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
             height: 34,
             margin: const EdgeInsets.only(right: 12),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFFA15E22) : Colors.transparent,
+              color: isSelected ? colors.accent : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: isSelected
-                    ? const Color(0xFFA15E22)
-                    : const Color(0xFFCCCCCC),
+                color: isSelected ? colors.accent : colors.border,
               ),
             ),
             child: Center(
@@ -478,9 +482,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 size,
                 style: TextStyle(
                   fontSize: 14,
-                  color: isSelected
-                      ? const Color(0xFFFBFBFB)
-                      : const Color(0xFF1E2021),
+                  color: isSelected ? colors.onAccent : colors.textPrimary,
                 ),
               ),
             ),
@@ -491,10 +493,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
   }
 
   Widget _buildProcessingInfo(String priceLabel) {
+    final colors = context.appColors;
     final details = ref
         .read(productDetailsProvider(widget.productId))
         .maybeWhen(data: (d) => d, orElse: () => null);
-    
+
     final days = details?.processingDays;
     final type = details?.processingTimeType ?? 'normal';
     final duration = days == null ? 'Contact seller' : '$days days';
@@ -504,7 +507,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF603814)),
+        border: Border.all(color: colors.border),
+        color: colors.surface,
       ),
       child: Row(
         children: [
@@ -514,29 +518,26 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
               children: [
                 Text(
                   typeLabel,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E2021),
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   duration,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF777F84),
-                  ),
+                  style: TextStyle(fontSize: 12, color: colors.textTertiary),
                 ),
               ],
             ),
           ),
           Text(
             priceLabel,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF0F1011),
+              color: colors.textPrimary,
             ),
           ),
         ],
@@ -544,30 +545,30 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     );
   }
 
-
   Widget _buildExpandableSection(
     String title,
     IconData icon, {
     VoidCallback? onTap,
   }) {
+    final colors = context.appColors;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 1),
         padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE))),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: colors.border)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF1E2021),
+                color: colors.textPrimary,
               ),
             ),
             Icon(icon, size: 20),
@@ -586,11 +587,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
     required String body,
     required VoidCallback onMore,
   }) {
+    final colors = context.appColors;
     return Container(
       margin: const EdgeInsets.only(bottom: 1),
       padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE))),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: colors.border)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -603,10 +605,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 children: [
                   Text(
                     'Reviews ($reviewCount)',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1E2021),
+                      color: colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -614,10 +616,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                     children: [
                       Text(
                         avgRating,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF1E2021),
+                          color: colors.textPrimary,
                         ),
                       ),
                       const SizedBox(width: 4),
@@ -645,12 +647,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
+                  child: Text(
                     'More',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1E2021),
+                      color: colors.textPrimary,
                     ),
                   ),
                 ),
@@ -668,14 +670,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                   children: [
                     Text(
                       user,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF3C4042),
+                        color: colors.textSecondary,
                       ),
                     ),
                     Text(
                       date,
-                      style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: colors.textTertiary,
+                      ),
                     ),
                   ],
                 ),
@@ -692,19 +697,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 const SizedBox(height: 12),
                 Text(
                   headline,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF1E2021),
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   body,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF1E2021),
-                  ),
+                  style: TextStyle(fontSize: 14, color: colors.textPrimary),
                 ),
               ],
             ),
@@ -720,7 +722,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
       if (v is String) return num.tryParse(v);
       return null;
     }
-    
+
     final products = suggestions.take(2).map((s) {
       return Product(
         id: ((s['id'] as num?)?.toInt() ?? 0).toString(),
@@ -769,14 +771,15 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
   }
 
   Widget _buildBottomActionBar(BuildContext context, String priceLabel) {
+    final colors = context.appColors;
     return Positioned(
       bottom: 0,
       left: 0,
       right: 0,
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Color(0xFF603814),
+        decoration: BoxDecoration(
+          color: colors.surfaceElevated,
           borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
         ),
         child: SafeArea(
@@ -791,7 +794,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: const Color(0xFFFBFBFB)),
+                  border: Border.all(color: colors.border),
                 ),
                 child: Row(
                   children: [
@@ -799,27 +802,27 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                       onTap: () {
                         if (quantity > 1) setState(() => quantity--);
                       },
-                      child: const Icon(
+                      child: Icon(
                         Icons.remove,
-                        color: Color(0xFFFBFBFB),
+                        color: colors.textPrimary,
                         size: 20,
                       ),
                     ),
                     const SizedBox(width: 24),
                     Text(
                       '$quantity',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFFFBFBFB),
+                        color: colors.textPrimary,
                       ),
                     ),
                     const SizedBox(width: 24),
                     GestureDetector(
                       onTap: () => setState(() => quantity++),
-                      child: const Icon(
+                      child: Icon(
                         Icons.add,
-                        color: Color(0xFFFBFBFB),
+                        color: colors.textPrimary,
                         size: 20,
                       ),
                     ),
@@ -832,8 +835,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 child: GestureDetector(
                   onTap: () async {
                     // Use the processing time type from the product details
-                    final details = ref.read(productDetailsProvider(widget.productId)).value;
-                    final processingTimeType = details?.processingTimeType ?? 'normal';
+                    final details = ref
+                        .read(productDetailsProvider(widget.productId))
+                        .value;
+                    final processingTimeType =
+                        details?.processingTimeType ?? 'normal';
 
                     try {
                       await ref
@@ -860,23 +866,23 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFDAF40),
+                      color: colors.accent,
                       borderRadius: BorderRadius.circular(8),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+                          color: colors.accent.withValues(alpha: 0.3),
                           blurRadius: 16,
                           offset: const Offset(0, 8),
                         ),
                       ],
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Text(
                         'Add to Bag',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFFFFFBF5),
+                          color: colors.onAccent,
                         ),
                       ),
                     ),
@@ -891,18 +897,15 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 children: [
                   Text(
                     priceLabel,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFFFBFBFB),
+                      color: colors.textPrimary,
                     ),
                   ),
                   Text(
                     'Delivery calculated at checkout',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: const Color(0xFFE9E9E9).withValues(alpha: 0.8),
-                    ),
+                    style: TextStyle(fontSize: 10, color: colors.textTertiary),
                   ),
                 ],
               ),

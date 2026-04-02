@@ -4,7 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/widgets/error_state_widget.dart';
 import 'package:ojaewa/features/business_details/presentation/controllers/business_details_controller.dart';
@@ -34,6 +35,7 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
     WidgetRef ref,
     BusinessDetails business,
   ) {
+    final colors = context.appColors;
     final businessName = business.businessName;
     final description = business.businessDescription ?? '';
     final services = business.serviceList; // List<ServiceItem>
@@ -45,167 +47,143 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
     final website = business.websiteUrl;
     final imageUrl = business.imageUrl;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        bottom: false,
+    return AppPageScaffold(
+      bottomBar: _buildBottomActionBar(context, phone),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 180),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
+            // Hero image
+            Container(
+              height: 198,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: colors.surfaceSecondary,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: imageUrl != null && imageUrl.isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: 198,
+                        errorBuilder: (_, __, ___) =>
+                            const Center(child: _BeautyImagePlaceholder()),
+                      ),
+                    )
+                  : const Center(child: _BeautyImagePlaceholder()),
             ),
 
-            // Scrollable content
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Hero image
-                    Container(
-                      height: 198,
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5E0CE),
-                        borderRadius: BorderRadius.circular(8),
+            const SizedBox(height: 8),
+
+            // Business name and rating
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    businessName,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: colors.textPrimary,
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: colors.accentSoft,
+                          shape: BoxShape.circle,
+                        ),
                       ),
-                      child: imageUrl != null && imageUrl.isNotEmpty
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                imageUrl,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: 198,
-                                errorBuilder: (_, __, ___) => const Center(
-                                  child: Icon(
-                                    Icons.image,
-                                    size: 80,
-                                    color: Colors.white54,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : const Center(
-                              child: Icon(
-                                Icons.image,
-                                size: 80,
-                                color: Colors.white54,
-                              ),
-                            ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // Business name and rating
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            businessName,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF241508),
-                              height: 1.2,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Container(
-                                width: 12,
-                                height: 12,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFFFDB80),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Text(
-                                '4.0',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF241508),
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Text(
-                                '(8)',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Color(0xFF777F84),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                      const SizedBox(width: 4),
+                      Text(
+                        '4.0',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: colors.textPrimary,
+                        ),
                       ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Description section
-                    _buildSection(title: 'Description', content: description),
-
-                    // Products/Services section
-                    if (services.isNotEmpty) _buildServicesSection(services),
-
-                    // Contact Details section
-                    _buildContactDetailsSection(
-                      address: location,
-                      email: email,
-                      phone: phone,
-                      website: website,
-                      instagram: instagram,
-                      facebook: facebook,
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Reviews section
-                    _buildReviewsSection(context, ref),
-
-                    const SizedBox(height: 180), // Space for bottom action bar
-                  ],
-                ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '(8)',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: colors.textTertiary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
 
-            // Bottom action bar
-            _buildBottomActionBar(phone),
+            const SizedBox(height: 20),
+
+            // Description section
+            _buildSection(context, title: 'Description', content: description),
+
+            // Products/Services section
+            if (services.isNotEmpty) _buildServicesSection(context, services),
+
+            // Contact Details section
+            _buildContactDetailsSection(
+              context: context,
+              address: location,
+              email: email,
+              phone: phone,
+              website: website,
+              instagram: instagram,
+              facebook: facebook,
+            ),
+
+            const SizedBox(height: 20),
+
+            // Reviews section
+            _buildReviewsSection(context, ref),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSection({required String title, required String content}) {
+  Widget _buildSection(
+    BuildContext context, {
+    required String title,
+    required String content,
+  }) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFFCCCCCC))),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: colors.border)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             content,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: Color(0xFF1E2021),
+              color: colors.textSecondary,
               height: 1.5,
             ),
           ),
@@ -214,21 +192,25 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildServicesSection(List<ServiceItem> services) {
+  Widget _buildServicesSection(
+    BuildContext context,
+    List<ServiceItem> services,
+  ) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFFCCCCCC))),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: colors.border)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Products',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
@@ -242,9 +224,9 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                   Expanded(
                     child: Text(
                       service.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: Color(0xFF1E2021),
+                        color: colors.textSecondary,
                         height: 1.5,
                       ),
                     ),
@@ -253,10 +235,10 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                       service.priceRange!.isNotEmpty)
                     Text(
                       service.priceRange!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF603814),
+                        color: colors.accent,
                       ),
                     ),
                 ],
@@ -269,6 +251,7 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
   }
 
   Widget _buildContactDetailsSection({
+    required BuildContext context,
     required String address,
     required String email,
     required String phone,
@@ -276,26 +259,28 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
     String? instagram,
     String? facebook,
   }) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFFCCCCCC))),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: colors.border)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Contact Details',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 20),
 
           // Address
           _buildContactItem(
+            context: context,
             icon: Icons.location_on,
             title: 'Address',
             content: address,
@@ -307,6 +292,7 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
 
           // Email
           _buildContactItem(
+            context: context,
             icon: Icons.email_outlined,
             title: 'Email',
             content: email,
@@ -317,6 +303,7 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
             const SizedBox(height: 20),
             // Website
             _buildContactItem(
+              context: context,
               icon: Icons.language,
               title: 'Website',
               content: website,
@@ -334,16 +321,16 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF603814),
-                  borderRadius: BorderRadius.circular(4),
+                  color: colors.accent,
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 padding: const EdgeInsets.all(2),
                 child: SvgPicture.asset(
                   AppIcons.connectToUs,
                   width: 24,
                   height: 24,
-                  colorFilter: const ColorFilter.mode(
-                    Colors.white,
+                  colorFilter: ColorFilter.mode(
+                    colors.onAccent,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -352,12 +339,12 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Socials',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF1E2021),
+                      color: colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -368,15 +355,15 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                         height: 32,
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: const Color(0xFFCCCCCC)),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: colors.border),
                         ),
                         child: SvgPicture.asset(
                           AppIcons.whatsapp,
                           width: 24,
                           height: 24,
                           colorFilter: const ColorFilter.mode(
-                            Color(0xFF1E2021),
+                            Color(0xFFFDAF40),
                             BlendMode.srcIn,
                           ),
                         ),
@@ -387,15 +374,15 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                         height: 32,
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: const Color(0xFFCCCCCC)),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: colors.border),
                         ),
                         child: SvgPicture.asset(
                           AppIcons.phone,
                           width: 24,
                           height: 24,
                           colorFilter: const ColorFilter.mode(
-                            Color(0xFF1E2021),
+                            Color(0xFFFDAF40),
                             BlendMode.srcIn,
                           ),
                         ),
@@ -412,12 +399,14 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
   }
 
   Widget _buildContactItem({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String content,
     String? actionText,
     bool hasAction = false,
   }) {
+    final colors = context.appColors;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -425,11 +414,11 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
           width: 28,
           height: 28,
           decoration: BoxDecoration(
-            color: const Color(0xFF603814),
-            borderRadius: BorderRadius.circular(4),
+            color: colors.accent,
+            borderRadius: BorderRadius.circular(8),
           ),
           padding: const EdgeInsets.all(2),
-          child: Icon(icon, color: Colors.white, size: 24),
+          child: Icon(icon, color: colors.onAccent, size: 24),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -438,18 +427,18 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF1E2021),
+                  color: colors.textPrimary,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
                 content,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
-                  color: Color(0xFF000000),
+                  color: colors.textSecondary,
                   height: 1.5,
                 ),
               ),
@@ -459,28 +448,28 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                   children: [
                     Text(
                       actionText,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF3C4042),
+                        color: colors.textSecondary,
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Icon(
+                    Icon(
                       Icons.arrow_forward,
                       size: 16,
-                      color: Color(0xFF3C4042),
+                      color: colors.textSecondary,
                     ),
                   ],
                 ),
               ] else if (hasAction) ...[
                 const SizedBox(height: 6),
-                const Row(
+                Row(
                   children: [
                     Icon(
                       Icons.arrow_forward,
                       size: 16,
-                      color: Color(0xFF3C4042),
+                      color: colors.textSecondary,
                     ),
                   ],
                 ),
@@ -493,6 +482,7 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
   }
 
   Widget _buildReviewsSection(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final reviewsPage = ref
         .watch(reviewsProvider((type: 'business', id: businessId)))
         .maybeWhen(data: (d) => d, orElse: () => null);
@@ -512,8 +502,8 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
       ),
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0xFFDEDEDE))),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: colors.border)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -524,10 +514,10 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
               children: [
                 Text(
                   'Reviews ($reviewCount)',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E2021),
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 9),
@@ -535,18 +525,18 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                   children: [
                     Text(
                       avgRating,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF1E2021),
+                        color: colors.textPrimary,
                       ),
                     ),
                     const SizedBox(width: 4),
                     Container(
                       width: 12,
                       height: 12,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFFDB80),
+                      decoration: BoxDecoration(
+                        color: colors.accentSoft,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -567,16 +557,19 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                     children: [
                       Text(
                         firstReview.user?.displayName ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF3C4042),
+                          color: colors.textSecondary,
                         ),
                       ),
                       Text(
                         firstReview.createdAt != null
                             ? _formatDate(firstReview.createdAt!)
                             : '',
-                        style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: colors.textTertiary,
+                        ),
                       ),
                     ],
                   ),
@@ -587,8 +580,8 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                         Icons.star,
                         size: 11,
                         color: index < (firstReview.rating ?? 0)
-                            ? const Color(0xFFFFDB80)
-                            : const Color(0xFFDEDEDE),
+                            ? colors.accent
+                            : colors.border,
                       );
                     }),
                   ),
@@ -596,19 +589,19 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                   if ((firstReview.headline ?? '').isNotEmpty)
                     Text(
                       firstReview.headline,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF1E2021),
+                        color: colors.textPrimary,
                       ),
                     ),
                   if ((firstReview.body ?? '').isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(
                       firstReview.body,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Color(0xFF1E2021),
+                        color: colors.textSecondary,
                         height: 1.4,
                       ),
                     ),
@@ -656,11 +649,13 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
     return '$m ${dt.day}, ${dt.year}';
   }
 
-  Widget _buildBottomActionBar(String phone) {
+  Widget _buildBottomActionBar(BuildContext context, String phone) {
+    final colors = context.appColors;
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF603814),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      decoration: BoxDecoration(
+        color: colors.surfaceElevated,
+        border: Border(top: BorderSide(color: colors.border)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: SafeArea(
         top: false,
@@ -676,8 +671,9 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFFDAF40)),
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: colors.accent),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -692,12 +688,12 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(width: 4),
-                        const Text(
+                        Text(
                           'Call',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFFFDAF40),
+                            color: colors.accent,
                           ),
                         ),
                       ],
@@ -716,11 +712,11 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFDAF40),
-                      borderRadius: BorderRadius.circular(8),
+                      color: colors.accent,
+                      borderRadius: BorderRadius.circular(18),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+                          color: colors.accent.withValues(alpha: 0.3),
                           blurRadius: 16,
                           offset: const Offset(0, 8),
                         ),
@@ -739,12 +735,12 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(width: 4),
-                        const Text(
+                        Text(
                           'Whatsapp',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFFFFFBF5),
+                            color: colors.onAccent,
                           ),
                         ),
                       ],
@@ -780,5 +776,15 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
+  }
+}
+
+class _BeautyImagePlaceholder extends StatelessWidget {
+  const _BeautyImagePlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Icon(Icons.image, size: 80, color: colors.textTertiary);
   }
 }

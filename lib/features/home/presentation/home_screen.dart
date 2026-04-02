@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
@@ -20,53 +22,44 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        bottom: false,
-        child: Container(
-          decoration: const BoxDecoration(color: Color(0xFFFFF8F1)),
+      backgroundColor: Colors.transparent,
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colors.background,
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              isDark ? colors.surface : colors.surfaceSecondary,
+              colors.background,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          bottom: false,
           child: Column(
             children: [
+              const SizedBox(height: 10),
+              _buildHeader(context),
+              const SizedBox(height: 16),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 25),
-
-                      // Header
-                      _buildHeader(context),
-
-                      const SizedBox(height: 24),
-
-                      // Promo banner - full-width fade carousel via /api/adverts
                       _buildAdvertsOrFallback(context, ref),
-
                       const SizedBox(height: 24),
-
-                      // For You - AI Personalized Section
-                      // _buildForYouSection(context, ref),
                       const SizedBox(height: 12),
-
-                      // Hero Title
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18),
-                        child: _buildHeroTitle(),
+                        child: _buildHeroTitle(context),
                       ),
-
                       const SizedBox(height: 12),
-
-                      // Category Grid Section with light background
                       Container(
                         width: double.infinity,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFFFF8F1),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(25),
-                            topRight: Radius.circular(25),
-                          ),
-                        ),
                         padding: const EdgeInsets.only(
                           top: 12,
                           left: 16,
@@ -88,6 +81,7 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -96,8 +90,8 @@ class HomeScreen extends ConsumerWidget {
           // Brand Logo with text (PNG for correct colors)
           Image.asset(
             'assets/app_icon/logo2.png',
-            width: 120, // Wider to accommodate logo + text
-            height: 28,
+            width: 98,
+            height: 22,
             fit: BoxFit.contain,
           ),
 
@@ -155,8 +149,8 @@ class HomeScreen extends ConsumerWidget {
                           top: -4,
                           child: Container(
                             padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFFDAF40),
+                            decoration: BoxDecoration(
+                              color: colors.accent,
                               shape: BoxShape.circle,
                             ),
                             constraints: const BoxConstraints(
@@ -166,7 +160,7 @@ class HomeScreen extends ConsumerWidget {
                             child: Text(
                               unreadCount > 99 ? '99+' : unreadCount.toString(),
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: Color(0xFF111111),
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
                                 fontFamily: 'Campton',
@@ -199,9 +193,9 @@ class HomeScreen extends ConsumerWidget {
         height: 220,
         child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
       ),
-      error: (_, __) => _buildPromoCardsSection(),
+      error: (_, __) => _buildPromoCardsSection(context),
       data: (adverts) {
-        if (adverts.isEmpty) return _buildPromoCardsSection();
+        if (adverts.isEmpty) return _buildPromoCardsSection(context);
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -244,18 +238,19 @@ class HomeScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildPromoCardsSection() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
+  Widget _buildPromoCardsSection(BuildContext context) {
+    final colors = context.appColors;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: AspectRatio(
         aspectRatio: _AdvertFadeCarousel.aspectRatio,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: Color(0xFFFDAF40),
-            borderRadius: BorderRadius.all(Radius.circular(20)),
+            color: colors.accent,
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
           ),
           child: Padding(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
@@ -265,11 +260,11 @@ class HomeScreen extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF241508),
+                    color: colors.textPrimary,
                     fontFamily: 'Campton',
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   'Fashion, beauty, art, education, and hardware in one marketplace.',
                   maxLines: 3,
@@ -277,7 +272,7 @@ class HomeScreen extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.35,
-                    color: Color(0xFF241508),
+                    color: colors.textPrimary,
                     fontFamily: 'Campton',
                   ),
                 ),
@@ -289,13 +284,14 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeroTitle() {
-    return const Text(
+  Widget _buildHeroTitle(BuildContext context) {
+    final colors = context.appColors;
+    return Text(
       'Find What Speaks\nTo Your Soul',
       style: TextStyle(
         fontSize: 22,
         fontWeight: FontWeight.w600,
-        color: Color(0xFF603814),
+        color: colors.textPrimary,
         height: 1.2,
         letterSpacing: -0.3,
       ),
@@ -315,7 +311,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Textiles',
-          color: const Color(0xFFDD995C),
+          color: const Color(0xFFC7853D),
           iconAsset: AppIcons.market,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.market),
         ),
@@ -323,7 +319,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Afro Beauty',
-          color: const Color(0xFFA15E22),
+          color: const Color(0xFFAB6730),
           iconAsset: AppIcons.beauty,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.beauty),
         ),
@@ -331,7 +327,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Footwear/Bags',
-          color: const Color(0xFFA15E22),
+          color: const Color(0xFF9F5A35),
           iconAsset: AppIcons.brands,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.brands),
         ),
@@ -339,7 +335,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Art Market',
-          color: const Color(0xFFEBC29D),
+          color: const Color(0xFFCC8E5B),
           iconAsset: AppIcons.music,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.music),
         ),
@@ -347,7 +343,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Education',
-          color: const Color(0xFFFECF8C),
+          color: const Color(0xFFD39A54),
           iconAsset: AppIcons.schools,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.schools),
         ),
@@ -355,7 +351,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Hardware',
-          color: const Color(0xFFA15E22),
+          color: const Color(0xFF8C6A3A),
           iconAsset: AppIcons.hardware,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.hardware),
         ),
@@ -370,117 +366,64 @@ class HomeScreen extends ConsumerWidget {
     required String iconAsset,
     required VoidCallback onTap,
   }) {
+    final colors = context.appColors;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final tileColor = isDarkMode
+        ? colors.surfaceElevated
+        : Color.alphaBlend(
+            color.withValues(alpha: 0.12),
+            colors.surfaceElevated,
+          );
+    final iconTint = isDarkMode ? colors.accent : color.withValues(alpha: 0.95);
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Expanded(
-            child: Container(
-              clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Image.asset(iconAsset, fit: BoxFit.cover),
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: tileColor,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: colors.border),
+          boxShadow: [
+            BoxShadow(
+              color: colors.shadow.withValues(alpha: 0.16),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w400,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// For You - AI Personalized recommendations section
-  Widget _buildForYouSection(BuildContext context, WidgetRef ref) {
-    final token = ref.watch(accessTokenProvider);
-    final isLoggedIn = token != null && token.isNotEmpty;
-
-    // Only show for logged-in users
-    if (!isLoggedIn) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: InkWell(
-        onTap: () => Navigator.of(
-          context,
-        ).pushNamed(AppRoutes.personalizedRecommendations),
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFFDAF40), Color(0xFFFFCC80)],
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFFFDAF40).withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.auto_awesome,
-                  color: Colors.white,
-                  size: 28,
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 4,
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: SvgPicture.asset(
+                    iconAsset,
+                    fit: BoxFit.contain,
+                    colorFilter: ColorFilter.mode(iconTint, BlendMode.srcIn),
+                  ),
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'For You',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontFamily: 'Campton',
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'AI-curated picks based on your style',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: 'Campton',
-                        color: Colors.white.withOpacity(0.9),
-                      ),
-                    ),
-                  ],
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              flex: 5,
+              child: Text(
+                title,
+                maxLines: 2,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Campton',
+                  fontWeight: FontWeight.w600,
+                  color: colors.textPrimary,
+                  height: 1.2,
                 ),
               ),
-              const Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.white,
-                size: 18,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -538,6 +481,7 @@ class _AdvertFadeCarouselState extends State<_AdvertFadeCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final currentAdvert = widget.adverts[_currentIndex];
 
     return Column(
@@ -571,9 +515,7 @@ class _AdvertFadeCarouselState extends State<_AdvertFadeCarousel> {
                 width: isActive ? 18 : 6,
                 height: 6,
                 decoration: BoxDecoration(
-                  color: isActive
-                      ? const Color(0xFF603814)
-                      : const Color(0xFFD7C6B6),
+                  color: isActive ? colors.textPrimary : colors.borderStrong,
                   borderRadius: BorderRadius.circular(999),
                 ),
               );
@@ -592,6 +534,7 @@ class _AdvertBannerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final title = advert.title.trim();
     final description = (advert.description ?? '').trim();
     final imageUrl = (advert.imageUrl ?? '').trim();
@@ -600,7 +543,7 @@ class _AdvertBannerCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFFFDAF40),
+        color: colors.accent,
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
@@ -645,7 +588,7 @@ class _AdvertBannerCard extends StatelessWidget {
                     fontSize: 22,
                     height: 1.1,
                     fontWeight: FontWeight.w700,
-                    color: hasImage ? Colors.white : const Color(0xFF241508),
+                    color: hasImage ? colors.onAccent : colors.textPrimary,
                     fontFamily: 'Campton',
                   ),
                 ),
@@ -661,8 +604,8 @@ class _AdvertBannerCard extends StatelessWidget {
                         fontSize: 14,
                         height: 1.35,
                         color: hasImage
-                            ? Colors.white.withValues(alpha: 0.92)
-                            : const Color(0xFF241508),
+                            ? colors.onAccent.withValues(alpha: 0.92)
+                            : colors.textPrimary,
                         fontFamily: 'Campton',
                       ),
                     ),

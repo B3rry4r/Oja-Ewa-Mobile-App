@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 
 import '../../../../../app/router/app_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,71 +29,49 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ref = this.ref;
+    final colors = context.appColors;
     final args = ModalRoute.of(context)?.settings.arguments;
     final draft = sellerDraftFromArgs(args);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // Background from IR
-      body: Column(
-        children: [
-          const AppHeader(
-            backgroundColor: Color(0xFFFFF8F1),
-            iconColor: Color(0xFF241508),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 20),
-                  _buildStepper(), // Row-based stepper showing all steps complete
-
-                  const Spacer(flex: 2),
-
-                  // Success/Review Illustration Placeholder
-                  const Icon(
-                    Icons.access_time_filled_rounded,
-                    size: 80,
-                    color: Color(0xFFFDAF40),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // Status Message
-                  Text(
-                    _isSubmitted
-                        ? "Your seller application has been submitted\nThis takes 12-24 hours."
-                        : "Ready to submit your seller application?",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF000000),
-                      height: 1.5,
-                    ),
-                  ),
-
-                  const Spacer(flex: 3),
-
-                  // Quality Standards Section (only show before submission)
-                  if (!_isSubmitted) ...[
-                    _buildQualityStandards(),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // --- Primary Action Button ---
-                  _isSubmitted
-                      ? _buildDoneButton(context)
-                      : _buildSubmitButton(context, draft),
-                  const SizedBox(height: 40),
-                ],
+    return AppPageScaffold(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 20),
+            _buildStepper(),
+            const Spacer(flex: 2),
+            Icon(
+              Icons.access_time_filled_rounded,
+              size: 80,
+              color: colors.accent,
+            ),
+            const SizedBox(height: 32),
+            Text(
+              _isSubmitted
+                  ? "Your seller application has been submitted\nThis takes 12-24 hours."
+                  : "Ready to submit your seller application?",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w400,
+                color: colors.textPrimary,
+                height: 1.5,
               ),
             ),
-          ),
-        ],
+            const Spacer(flex: 3),
+            if (!_isSubmitted) ...[
+              _buildQualityStandards(),
+              const SizedBox(height: 24),
+            ],
+            _isSubmitted
+                ? _buildDoneButton(context)
+                : _buildSubmitButton(context, draft),
+            const SizedBox(height: 40),
+          ],
+        ),
       ),
     );
   }
@@ -110,7 +89,8 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
   }
 
   Widget _stepItem(int num, String label, {required bool isComplete}) {
-    final Color activeColor = const Color(0xFF603814);
+    final colors = context.appColors;
+    final Color activeColor = colors.textPrimary;
 
     return Row(
       children: [
@@ -119,15 +99,15 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
           height: 32,
           decoration: BoxDecoration(
             color: activeColor,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(10),
           ),
           alignment: Alignment.center,
           child: (num < 3)
-              ? const Icon(Icons.check, color: Colors.white, size: 16)
+              ? Icon(Icons.check, color: colors.background, size: 16)
               : Text(
                   num.toString(),
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: colors.background,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
@@ -153,6 +133,7 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
     SellerRegistrationDraft draft,
     bool isLoading,
   ) {
+    final colors = context.appColors;
     return InkWell(
       onTap: isLoading
           ? null
@@ -225,21 +206,21 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
         width: double.infinity,
         height: 57,
         decoration: BoxDecoration(
-          color: const Color(0xFFFDAF40),
+          color: colors.accent,
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
+              color: colors.accent.withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: const Center(
+        child: Center(
           child: Text(
             "Go Home",
             style: TextStyle(
-              color: Color(0xFFFFFBF5),
+              color: colors.onAccent,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -250,12 +231,13 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
   }
 
   Widget _buildQualityStandards() {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF8F1),
+        color: colors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
+        border: Border.all(color: colors.accent, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,31 +247,31 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFDAF40).withOpacity(0.1),
+                  color: colors.accent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.verified_user,
-                  color: Color(0xFFFDAF40),
+                  color: colors.accent,
                   size: 24,
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Our Quality Promise',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Campton',
-                    color: Color(0xFF241508),
+                    color: colors.textPrimary,
                   ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'At Ojá-Ẹwà your trust is our foundation. Every product on Ojá-Ẹwà must pass our verification for authenticity and craftsmanship.\n\n'
             'We guarantee: If a newly registered brand/product fails our review and does not meet our published Quality Standards, its registration fee will be fully refunded.\n\n'
             'We invest in your success by ensuring only excellence reaches our marketplace.\n\n'
@@ -298,7 +280,7 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
             style: TextStyle(
               fontSize: 13,
               fontFamily: 'Campton',
-              color: Color(0xFF1E2021),
+              color: colors.textSecondary,
               height: 1.5,
             ),
           ),
@@ -311,6 +293,7 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
     BuildContext context,
     SellerRegistrationDraft draft,
   ) {
+    final colors = context.appColors;
     return InkWell(
       onTap: _isSubmitting ? null : () => _submitSeller(context, draft),
       borderRadius: BorderRadius.circular(8),
@@ -319,12 +302,12 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
         height: 57,
         decoration: BoxDecoration(
           color: _isSubmitting
-              ? const Color(0xFFFDAF40).withAlpha(150)
-              : const Color(0xFFFDAF40),
-          borderRadius: BorderRadius.circular(8),
+              ? colors.accent.withValues(alpha: 0.6)
+              : colors.accent,
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withAlpha(102),
+              color: colors.accent.withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
@@ -332,20 +315,18 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
         ),
         child: Center(
           child: _isSubmitting
-              ? const SizedBox(
+              ? SizedBox(
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Color(0xFFFFFBF5),
-                    ),
+                    valueColor: AlwaysStoppedAnimation<Color>(colors.onAccent),
                   ),
                 )
-              : const Text(
+              : Text(
                   "Submit for Review",
                   style: TextStyle(
-                    color: Color(0xFFFFFBF5),
+                    color: colors.onAccent,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Campton',
@@ -357,6 +338,7 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
   }
 
   Widget _buildDoneButton(BuildContext context) {
+    final colors = context.appColors;
     return InkWell(
       onTap: () => Navigator.of(
         context,
@@ -366,21 +348,21 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
         width: double.infinity,
         height: 57,
         decoration: BoxDecoration(
-          color: const Color(0xFFFDAF40),
-          borderRadius: BorderRadius.circular(8),
+          color: colors.accent,
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withAlpha(102),
+              color: colors.accent.withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: const Center(
+        child: Center(
           child: Text(
             "Done",
             style: TextStyle(
-              color: Color(0xFFFFFBF5),
+              color: colors.onAccent,
               fontSize: 16,
               fontWeight: FontWeight.w600,
               fontFamily: 'Campton',

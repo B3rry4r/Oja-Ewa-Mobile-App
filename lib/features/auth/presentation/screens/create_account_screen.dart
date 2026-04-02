@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
@@ -71,7 +72,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
     try {
       final referralCode = _referralCodeController.text.trim();
-      
+
       await ref
           .read(authFlowControllerProvider.notifier)
           .register(
@@ -101,12 +102,14 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       final idToken = await google.signInAndGetIdToken();
       await authFlow.googleSignIn(idToken: idToken);
       if (!mounted) return;
-      
+
       // Show referral code sheet for new Google users
       await SetReferralCodeSheet.show(context);
-      
+
       if (!mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
     } on AppException catch (e) {
       // User cancelled - don't show error
       if (e.message.contains('cancelled')) return;
@@ -126,10 +129,10 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   @override
   Widget build(BuildContext context) {
     _auth = ref.watch(authFlowControllerProvider);
-    final auth = _auth;
+    final colors = context.appColors;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF603814), // #603814
+      backgroundColor: colors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -155,114 +158,104 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   Widget _buildBackButton() {
     return HeaderIconButton(
       asset: AppIcons.back,
-      iconColor: Colors.white,
+      iconColor: context.appColors.textPrimary,
       onTap: () => Navigator.of(context).maybePop(),
     );
   }
 
   Widget _buildContentCard() {
-    return Container(
-      margin: const EdgeInsets.only(top: 25),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFF8F1), // #fff8f1
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(28),
-          topRight: Radius.circular(28),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 40),
+    final colors = context.appColors;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 28),
 
-            // Welcome Icon
-            _buildWelcomeIcon(),
+          // Welcome Icon
+          _buildWelcomeIcon(),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            // Title
-            Text(
-              'Create Account',
-              style: TextStyle(
-                fontSize: 33,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Campton',
-                color: const Color(0xFF3C230C), // #3c230c
-              ),
+          // Title
+          Text(
+            'Create Account',
+            style: TextStyle(
+              fontSize: 33,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Campton',
+              color: colors.textPrimary,
             ),
+          ),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            // First/Last Name Inputs
-            _buildFirstNameInput(),
+          // First/Last Name Inputs
+          _buildFirstNameInput(),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            _buildLastNameInput(),
+          _buildLastNameInput(),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            // Email Input
-            _buildEmailInput(),
+          // Email Input
+          _buildEmailInput(),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            // Phone Number Input
-            _buildPhoneInput(),
+          // Phone Number Input
+          _buildPhoneInput(),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            // Password Input
-            _buildPasswordInput(),
+          // Password Input
+          _buildPasswordInput(),
 
-            const SizedBox(height: 8),
+          const SizedBox(height: 8),
 
-            // Password Requirement Text
-            Text(
-              'Minimum of 8 characters',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                fontFamily: 'Campton',
-                color: const Color(0xFF777F84), // #777f84
-              ),
+          // Password Requirement Text
+          Text(
+            'Minimum of 8 characters',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              fontFamily: 'Campton',
+              color: colors.textSecondary,
             ),
+          ),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            // Referral Code Input (Optional)
-            _buildReferralCodeInput(),
+          // Referral Code Input (Optional)
+          _buildReferralCodeInput(),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            // Terms Agreement
-            _buildTermsAgreement(),
+          // Terms Agreement
+          _buildTermsAgreement(),
 
-            const SizedBox(height: 40),
+          const SizedBox(height: 40),
 
-            // Create Account Button
-            _buildCreateAccountButton(),
+          // Create Account Button
+          _buildCreateAccountButton(),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            // Divider with "or"
-            _buildDivider(),
+          // Divider with "or"
+          _buildDivider(),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            // Google Sign In Button — temporarily disabled
-            // _buildGoogleSignInButton(),
+          // Google Sign In Button — temporarily disabled
+          // _buildGoogleSignInButton(),
+          const SizedBox(height: 20),
 
-            const SizedBox(height: 20),
+          // Sign In Link
+          _buildSignInLink(),
 
-            // Sign In Link
-            _buildSignInLink(),
-
-            const SizedBox(height: 40),
-          ],
-        ),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }
@@ -276,6 +269,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Widget _buildFirstNameInput() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -285,46 +279,24 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF777F84), // #777f84
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 49,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color(0xFFCCCCCC), // #cccccc
-              width: 1,
+        _buildInputShell(
+          icon: Icons.person_outline_rounded,
+          child: TextField(
+            controller: _firstNameController,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Campton',
+              color: colors.textPrimary,
             ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.person_outline_rounded,
-                  size: 20,
-                  color: Color(0xFFCCCCCC),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    controller: _firstNameController,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
-                      color: const Color(0xFF1E2021),
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Enter your first name',
-                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
-                    ),
-                  ),
-                ),
-              ],
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: 'Enter your first name',
+              hintStyle: TextStyle(color: colors.textTertiary),
             ),
           ),
         ),
@@ -333,6 +305,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Widget _buildLastNameInput() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -342,43 +315,24 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF777F84),
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 49,
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFCCCCCC), width: 1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.person_outline_rounded,
-                  size: 20,
-                  color: Color(0xFFCCCCCC),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    controller: _lastNameController,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
-                      color: const Color(0xFF1E2021),
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Enter your last name',
-                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
-                    ),
-                  ),
-                ),
-              ],
+        _buildInputShell(
+          icon: Icons.person_outline_rounded,
+          child: TextField(
+            controller: _lastNameController,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Campton',
+              color: colors.textPrimary,
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: 'Enter your last name',
+              hintStyle: TextStyle(color: colors.textTertiary),
             ),
           ),
         ),
@@ -387,6 +341,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Widget _buildEmailInput() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -396,47 +351,25 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF777F84), // #777f84
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 49,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color(0xFFCCCCCC), // #cccccc
-              width: 1,
+        _buildInputShell(
+          icon: Icons.email_outlined,
+          child: TextField(
+            controller: _emailController,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Campton',
+              color: colors.textPrimary,
             ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.email_outlined,
-                  size: 20,
-                  color: Color(0xFFCCCCCC),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
-                      color: const Color(0xFF1E2021),
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Enter your email',
-                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
-                    ),
-                  ),
-                ),
-              ],
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: 'Enter your email',
+              hintStyle: TextStyle(color: colors.textTertiary),
             ),
           ),
         ),
@@ -445,6 +378,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Widget _buildPhoneInput() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -454,95 +388,83 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF777F84), // #777f84
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 49,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color(0xFFCCCCCC), // #cccccc
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                // Country code selector
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () async {
-                    final country = await CountryCodePickerSheet.show(
-                      context,
-                      selectedDialCode: _selectedCountryCode,
-                    );
-                    if (country != null) {
-                      setState(() {
-                        _selectedCountryCode = country.dialCode;
-                        _selectedCountryFlag = country.flag;
-                      });
-                    }
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (_selectedCountryCode.isNotEmpty) ...[
-                        Text(
-                          _selectedCountryFlag,
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          _selectedCountryCode,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: 'Campton',
-                            color: const Color(0xFF241508),
-                          ),
-                        ),
-                      ] else
-                        Text(
-                          'Code',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Campton',
-                            color: const Color(0xFFCCCCCC),
-                          ),
-                        ),
-                      const SizedBox(width: 4),
-                      const Icon(
-                        Icons.keyboard_arrow_down,
-                        size: 18,
-                        color: Color(0xFF777F84),
+        _buildInputShell(
+          icon: Icons.phone_outlined,
+          child: Row(
+            children: [
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () async {
+                  final country = await CountryCodePickerSheet.show(
+                    context,
+                    selectedDialCode: _selectedCountryCode,
+                  );
+                  if (country != null) {
+                    setState(() {
+                      _selectedCountryCode = country.dialCode;
+                      _selectedCountryFlag = country.flag;
+                    });
+                  }
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_selectedCountryCode.isNotEmpty) ...[
+                      Text(
+                        _selectedCountryFlag,
+                        style: const TextStyle(fontSize: 18),
                       ),
-                    ],
+                      const SizedBox(width: 6),
+                      Text(
+                        _selectedCountryCode,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Campton',
+                          color: colors.textPrimary,
+                        ),
+                      ),
+                    ] else
+                      Text(
+                        'Code',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontFamily: 'Campton',
+                          color: colors.textTertiary,
+                        ),
+                      ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 18,
+                      color: colors.textSecondary,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Campton',
+                    color: colors.textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Phone number',
+                    hintStyle: TextStyle(color: colors.textTertiary),
                   ),
                 ),
-                const SizedBox(width: 12),
-                // Phone number input
-                Expanded(
-                  child: TextField(
-                    controller: _phoneController,
-                    keyboardType: TextInputType.phone,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
-                      color: const Color(0xFF1E2021),
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Phone number',
-                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],
@@ -550,6 +472,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Widget _buildPasswordInput() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -559,66 +482,44 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF777F84), // #777f84
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 49,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: _passwordController.text.isEmpty
-                  ? const Color(0xFFCCCCCC)
-                  : _passwordController.text.length >= 8
-                  ? const Color(0xFFFDAF40)
-                  : const Color(0xFFF44336),
-              width: 1.5,
+        _buildInputShell(
+          icon: Icons.lock_outline_rounded,
+          borderColor: _passwordController.text.isEmpty
+              ? colors.border
+              : _passwordController.text.length >= 8
+              ? colors.accent
+              : Colors.redAccent,
+          trailing: IconButton(
+            onPressed: () {
+              setState(() {
+                _obscurePassword = !_obscurePassword;
+              });
+            },
+            icon: Icon(
+              _obscurePassword
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
+              size: 20,
+              color: colors.textSecondary,
             ),
-            borderRadius: BorderRadius.circular(8),
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.lock_outline_rounded,
-                  size: 20,
-                  color: Color(0xFFCCCCCC),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
-                      color: const Color(0xFF1E2021),
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Type your password',
-                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                  icon: Icon(
-                    _obscurePassword
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                    size: 20,
-                    color: const Color(0xFF777F84),
-                  ),
-                ),
-              ],
+          child: TextField(
+            controller: _passwordController,
+            obscureText: _obscurePassword,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Campton',
+              color: colors.textPrimary,
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: 'Type your password',
+              hintStyle: TextStyle(color: colors.textTertiary),
             ),
           ),
         ),
@@ -627,6 +528,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Widget _buildTermsAgreement() {
+    final colors = context.appColors;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -644,18 +546,16 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
               height: 24,
               margin: const EdgeInsets.only(top: 8),
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: const Color(0xFF777F84), // #777f84
-                  width: 1.5,
-                ),
+                border: Border.all(color: colors.borderStrong, width: 1.5),
                 borderRadius: BorderRadius.circular(4),
+                color: colors.surface,
               ),
               child: _agreeToTerms
-                  ? const Center(
+                  ? Center(
                       child: Icon(
                         Icons.check_rounded,
                         size: 16,
-                        color: Color(0xFFFDAF40),
+                        color: colors.accent,
                       ),
                     )
                   : null,
@@ -673,20 +573,22 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
                     fontFamily: 'Campton',
-                    color: const Color(0xFF1E2021), // #1e2021
+                    color: colors.textPrimary,
                     height: 1.4,
                   ),
                 ),
                 WidgetSpan(
                   child: InkWell(
-                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.termsOfService),
-                    child: const Text(
+                    onTap: () => Navigator.of(
+                      context,
+                    ).pushNamed(AppRoutes.termsOfService),
+                    child: Text(
                       'terms of service',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         fontFamily: 'Campton',
-                        color: Color(0xFFFDAF40), // #fdaf40
+                        color: colors.accent,
                       ),
                     ),
                   ),
@@ -700,18 +602,19 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Widget _buildCreateAccountButton() {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
       height: 57,
       decoration: BoxDecoration(
         color: _isFormValid
-            ? const Color(0xFFFDAF40)
-            : const Color(0xFFFDAF40).withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(8),
+            ? colors.accent
+            : colors.accent.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: _isFormValid
             ? [
                 BoxShadow(
-                  color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+                  color: colors.shadow,
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),
@@ -721,16 +624,16 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(18),
           onTap: (_isFormValid && !_auth.isLoading) ? _createAccount : null,
           child: Center(
             child: _auth.isLoading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Color(0xFFFFFBF5),
+                      color: colors.onAccent,
                     ),
                   )
                 : Text(
@@ -740,8 +643,8 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                       fontWeight: FontWeight.w600,
                       fontFamily: 'Campton',
                       color: _isFormValid
-                          ? const Color(0xFFFFFBF5)
-                          : const Color(0xFFFFFBF5).withValues(alpha: 0.6),
+                          ? colors.onAccent
+                          : colors.onAccent.withValues(alpha: 0.6),
                     ),
                   ),
           ),
@@ -751,9 +654,10 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Widget _buildDivider() {
+    final colors = context.appColors;
     return Row(
       children: [
-        Expanded(child: Container(height: 1, color: const Color(0xFFB5B5B5))),
+        Expanded(child: Container(height: 1, color: colors.border)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
@@ -762,30 +666,36 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
               fontSize: 14,
               fontWeight: FontWeight.w400,
               fontFamily: 'Campton',
-              color: const Color(0xFF595F63), // #595f63
+              color: colors.textTertiary,
             ),
           ),
         ),
-        Expanded(child: Container(height: 1, color: const Color(0xFFB5B5B5))),
+        Expanded(child: Container(height: 1, color: colors.border)),
       ],
     );
   }
 
   Widget _buildGoogleSignInButton() {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
-      height: 49,
+      height: 57,
       decoration: BoxDecoration(
-        border: Border.all(
-          color: const Color(0xFFCCCCCC), // #cccccc
-          width: 1,
-        ),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.surfaceElevated,
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow,
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(18),
           onTap: _auth.isLoading ? null : _signInWithGoogle,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -798,7 +708,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   fontFamily: 'Campton',
-                  color: const Color(0xFF1E2021), // #1e2021
+                  color: colors.textPrimary,
                 ),
               ),
             ],
@@ -809,6 +719,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Widget _buildReferralCodeInput() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -818,47 +729,25 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF777F84), // #777f84
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 49,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color(0xFFCCCCCC), // #cccccc
-              width: 1,
+        _buildInputShell(
+          icon: Icons.card_giftcard_outlined,
+          child: TextField(
+            controller: _referralCodeController,
+            textCapitalization: TextCapitalization.characters,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Campton',
+              color: colors.textPrimary,
             ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.card_giftcard_outlined,
-                  size: 20,
-                  color: Color(0xFFCCCCCC),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    controller: _referralCodeController,
-                    textCapitalization: TextCapitalization.characters,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
-                      color: const Color(0xFF1E2021),
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Enter referral code',
-                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
-                    ),
-                  ),
-                ),
-              ],
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: 'Enter referral code',
+              hintStyle: TextStyle(color: colors.textTertiary),
             ),
           ),
         ),
@@ -867,6 +756,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Widget _buildSignInLink() {
+    final colors = context.appColors;
     return Center(
       child: Material(
         color: Colors.transparent,
@@ -884,7 +774,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       fontFamily: 'Campton',
-                      color: const Color(0xFF000000),
+                      color: colors.textTertiary,
                     ),
                   ),
                   TextSpan(
@@ -893,13 +783,56 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'Campton',
-                      color: const Color(0xFFFDAF40),
+                      color: colors.accent,
                     ),
                   ),
                 ],
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputShell({
+    required IconData icon,
+    required Widget child,
+    Widget? trailing,
+    Color? borderColor,
+  }) {
+    final colors = context.appColors;
+    return Container(
+      height: 58,
+      decoration: BoxDecoration(
+        color: colors.surfaceElevated,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: borderColor ?? colors.border, width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow,
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: colors.accentSoft,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 18, color: colors.accent),
+            ),
+            const SizedBox(width: 14),
+            Expanded(child: child),
+            if (trailing != null) ...[const SizedBox(width: 8), trailing],
+          ],
         ),
       ),
     );

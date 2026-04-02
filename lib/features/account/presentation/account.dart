@@ -4,8 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:ojaewa/app/widgets/header_icon_button.dart';
-import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/theme/theme_mode_controller.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
@@ -14,7 +15,6 @@ import 'package:ojaewa/features/account/presentation/controllers/profile_control
 import 'package:ojaewa/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_status_controller.dart';
-import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/connect/presentation/controllers/connect_controller.dart';
 import 'package:ojaewa/core/subscriptions/subscription_constants.dart';
 import 'package:ojaewa/core/subscriptions/subscription_controller.dart';
@@ -35,221 +35,113 @@ class AccountScreen extends ConsumerWidget {
 
     ref.listen(authFlowControllerProvider, (prev, next) {
       if (prev?.isLoading == true && next.hasValue) {
-        Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.onboarding, (r) => false);
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil(AppRoutes.onboarding, (r) => false);
       }
     });
-    return Scaffold(
-      backgroundColor: const Color(0xFF603814),
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            // Top bar (Account is a tab-root: no left/back icon)
-            Builder(
-              builder: (context) {
-                final unreadCount = isLoggedIn
-                    ? ref.watch(unreadCountProvider).maybeWhen(
-                          data: (count) => count,
-                          orElse: () => 0,
-                        )
-                    : 0;
-
-                return Container(
-                  height: 104,
-                  color: const Color(0xFF603814),
-                  padding: const EdgeInsets.only(top: 32),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: Row(
-                          children: [
-                            // Notification icon with badge
-                            Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                HeaderIconButton(
-                                  asset: AppIcons.notificationSmall,
-                                  iconColor: Colors.white,
-                                  onTap: () => Navigator.of(context).pushNamed(
-                                    AppRoutes.notifications,
-                                  ),
-                                ),
-                                if (unreadCount > 0)
-                                  Positioned(
-                                    right: -4,
-                                    top: -4,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(4),
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFFFDAF40),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      constraints: const BoxConstraints(
-                                        minWidth: 18,
-                                        minHeight: 18,
-                                      ),
-                                      child: Text(
-                                        unreadCount > 99 ? '99+' : unreadCount.toString(),
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w700,
-                                          fontFamily: 'Campton',
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(width: 8),
-                            HeaderIconButton(
-                              asset: AppIcons.bag,
-                              iconColor: Colors.white,
-                              onTap: () => Navigator.of(context).pushNamed(
-                                AppRoutes.cart,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-
-            // Main content card
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFF8F1),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
-                  ),
-                ),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.only(bottom: AppBottomNavBar.height),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // User greeting
-                        const SizedBox(height: 16), // 120 - 104
-                        profile.when(
-                          loading: () => const Text(
-                            'Hello',
-                            style: TextStyle(
-                              fontSize: 33,
-                              fontFamily: 'Campton',
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF241508),
-                            ),
-                          ),
-                          error: (e, st) => const Text(
-                            'Hello',
-                            style: TextStyle(
-                              fontSize: 33,
-                              fontFamily: 'Campton',
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF241508),
-                            ),
-                          ),
-                          data: (u) => Text(
-                           'Hello ${u?.fullName ?? 'Guest'}',
-                           style: const TextStyle(
-                             fontSize: 33,
-                             fontFamily: 'Campton',
-                             fontWeight: FontWeight.w600,
-                             color: Color(0xFF241508),
-                           ),
-                         ),
-                       ),
-
-                        // Profile section
-                        const SizedBox(height: 24),
-                        _buildSectionHeader('Profile'),
-                        _buildMenuItem(
-                          iconAsset: AppIcons.editYourProfile,
-                          label: 'Edit your profile',
-                          onTap: () => Navigator.of(context).pushNamed(AppRoutes.editProfile),
-                        ),
-
-                        // Orders section
-                        const SizedBox(height: 24),
-                        _buildSectionHeader('Orders'),
-                        _buildMenuItem(
-                          iconAsset: AppIcons.yourOrders,
-                          label: 'Your orders',
-                          onTap: () => Navigator.of(context).pushNamed(AppRoutes.orders),
-                        ),
-
-                        // Settings section
-                        const SizedBox(height: 24),
-                        _buildSectionHeader('Settings'),
-                        _buildSettingsList(context),
-
-                        if (isLoggedIn) ...[
-                          // Subscription status
-                          const SizedBox(height: 16),
-                          _buildSubscriptionStatusCard(ref),
-
-                          // AI Features section
-                          /*
-                          const SizedBox(height: 24),
-                          _buildSectionHeader('AI Features'),
-                          _buildAiFeaturesList(context),
-                          */
-                        ],
-
-                        // Business section
-                        const SizedBox(height: 24),
-                        _buildSectionHeader('Ojá-Ẹwà Business'),
-                        _buildBusinessList(context, ref),
-
-                        // Support section
-                        const SizedBox(height: 24),
-                        _buildSectionHeader('Support'),
-                        _buildSupportList(context, ref, isLoggedIn: isLoggedIn),
-
-                        // Bottom spacing
-                        const SizedBox(height: 32),
-                      ],
-                    ),
-                  ),
-                ),
+    return AppPageScaffold(
+      showBack: false,
+      includeBottomNavSpacing: true,
+      scrollable: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          profile.when(
+            loading: () => const Text(
+              'Hello',
+              style: TextStyle(
+                fontSize: 33,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w600,
               ),
             ),
+            error: (e, st) => const Text(
+              'Hello',
+              style: TextStyle(
+                fontSize: 33,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            data: (u) => Text(
+              'Hello ${u?.fullName ?? 'Guest'}',
+              style: const TextStyle(
+                fontSize: 33,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+          _buildSectionHeader(context, 'Profile'),
+          _buildMenuItem(
+            context: context,
+            iconAsset: AppIcons.editYourProfile,
+            label: 'Edit your profile',
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.editProfile),
+          ),
+
+          const SizedBox(height: 24),
+          _buildSectionHeader(context, 'Orders'),
+          _buildMenuItem(
+            context: context,
+            iconAsset: AppIcons.yourOrders,
+            label: 'Your orders',
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.orders),
+          ),
+
+          const SizedBox(height: 24),
+          _buildSectionHeader(context, 'Appearance'),
+          _buildThemeModePicker(context, ref),
+
+          const SizedBox(height: 24),
+          _buildSectionHeader(context, 'Settings'),
+          _buildSettingsList(context, ref),
+
+          if (isLoggedIn) ...[
+            const SizedBox(height: 16),
+            _buildSubscriptionStatusCard(context, ref),
           ],
-        ),
+
+          const SizedBox(height: 24),
+          _buildSectionHeader(context, 'Ojá-Ẹwà Business'),
+          _buildBusinessList(context, ref),
+
+          const SizedBox(height: 24),
+          _buildSectionHeader(context, 'Support'),
+          _buildSupportList(context, ref, isLoggedIn: isLoggedIn),
+
+          const SizedBox(height: 16),
+        ],
       ),
     );
   }
 
-  Widget _buildSectionHeader(String text) {
+  Widget _buildSectionHeader(BuildContext context, String text) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14,
           fontFamily: 'Campton',
           fontWeight: FontWeight.w400,
-          color: Color(0xFF777F84),
+          color: colors.textTertiary,
         ),
       ),
     );
   }
 
   Widget _buildMenuItem({
+    required BuildContext context,
     required String iconAsset,
     required String label,
     required VoidCallback onTap,
   }) {
+    final colors = context.appColors;
     return Container(
       height: 48,
       margin: const EdgeInsets.only(bottom: 8),
@@ -267,16 +159,16 @@ class AccountScreen extends ConsumerWidget {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF5E0CE),
-                      borderRadius: BorderRadius.circular(4),
+                      color: colors.accentSoft,
+                      shape: BoxShape.circle,
                     ),
                     alignment: Alignment.center,
                     child: SvgPicture.asset(
                       iconAsset,
                       width: 16,
                       height: 16,
-                      colorFilter: const ColorFilter.mode(
-                        Color(0xFF1E2021),
+                      colorFilter: ColorFilter.mode(
+                        colors.textPrimary,
                         BlendMode.srcIn,
                       ),
                     ),
@@ -284,20 +176,16 @@ class AccountScreen extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Text(
                     label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF1E2021),
+                      color: colors.textPrimary,
                     ),
                   ),
                 ],
               ),
-              const Icon(
-                Icons.chevron_right,
-                size: 20,
-                color: Color(0xFF1E2021),
-              ),
+              Icon(Icons.chevron_right, size: 20, color: colors.textPrimary),
             ],
           ),
         ),
@@ -305,122 +193,91 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSettingsList(BuildContext context) {
+  Widget _buildSettingsList(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
         _buildMenuItem(
+          context: context,
           iconAsset: AppIcons.yourAddress,
           label: 'Your Addresses',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.addresses),
         ),
         _buildMenuItem(
+          context: context,
           iconAsset: AppIcons.notification,
           label: 'Notifications',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.notificationsSettings),
+          onTap: () =>
+              Navigator.of(context).pushNamed(AppRoutes.notificationsSettings),
         ),
         _buildMenuItem(
+          context: context,
           iconAsset: AppIcons.password,
           label: 'Password',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.changePassword),
+          onTap: () =>
+              Navigator.of(context).pushNamed(AppRoutes.changePassword),
         ),
       ],
     );
   }
 
-  Widget _buildAiFeaturesList(BuildContext context) {
-    return Column(
-      children: [
-        _buildMenuItemWithIcon(
-          icon: Icons.psychology,
-          label: 'Cultural AI Assistant',
-          subtitle: 'Get fashion advice with Nigerian context',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.aiChat),
-        ),
-        _buildMenuItemWithIcon(
-          icon: Icons.auto_awesome,
-          label: 'Your Style Profile',
-          subtitle: 'Discover your personalized style DNA',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.styleDnaQuiz),
-        ),
-        _buildMenuItemWithIcon(
-          icon: Icons.recommend,
-          label: 'For You',
-          subtitle: 'AI-curated recommendations',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.personalizedRecommendations),
-        ),
-      ],
-    );
-  }
+  Widget _buildThemeModePicker(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
+    final themeMode = ref.watch(appThemeModeProvider);
 
-  Widget _buildMenuItemWithIcon({
-    required IconData icon,
-    required String label,
-    String? subtitle,
-    required VoidCallback onTap,
-  }) {
     return Container(
-      height: subtitle != null ? 64 : 48,
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(8),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFDAF40).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  size: 22,
-                  color: const Color(0xFFFDAF40),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'Campton',
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF241508),
-                      ),
-                    ),
-                    if (subtitle != null)
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontFamily: 'Campton',
-                          color: const Color(0xFF241508).withOpacity(0.6),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 14,
-                color: Color(0xFFCCCCCC),
-              ),
-            ],
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.border),
+      ),
+      child: SegmentedButton<ThemeMode>(
+        segments: const [
+          ButtonSegment(
+            value: ThemeMode.light,
+            icon: Icon(Icons.light_mode_outlined),
+            label: Text('Light'),
           ),
+          ButtonSegment(
+            value: ThemeMode.dark,
+            icon: Icon(Icons.dark_mode_outlined),
+            label: Text('Dark'),
+          ),
+          ButtonSegment(
+            value: ThemeMode.system,
+            icon: Icon(Icons.settings_suggest_outlined),
+            label: Text('System'),
+          ),
+        ],
+        selected: {themeMode},
+        multiSelectionEnabled: false,
+        emptySelectionAllowed: false,
+        showSelectedIcon: false,
+        style: ButtonStyle(
+          foregroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return colors.onAccent;
+            }
+            return colors.textSecondary;
+          }),
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return colors.accent;
+            }
+            return colors.surface;
+          }),
+          side: WidgetStatePropertyAll(BorderSide(color: colors.border)),
         ),
+        onSelectionChanged: (selection) {
+          final selected = selection.first;
+          ref.read(appThemeModeProvider.notifier).setMode(selected);
+        },
       ),
     );
   }
 
-  Widget _buildSubscriptionStatusCard(WidgetRef ref) {
+  Widget _buildSubscriptionStatusCard(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final subscriptionState = ref.watch(subscriptionControllerProvider).value;
     final subscription = subscriptionState?.subscription;
     final hasPro = subscription != null && subscription.status.isActive;
@@ -431,15 +288,16 @@ class AccountScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5E0CE),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.border),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: hasPro ? const Color(0xFF4CAF50) : const Color(0xFFCCCCCC),
+              color: hasPro ? const Color(0xFF4CAF50) : colors.borderStrong,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -455,20 +313,22 @@ class AccountScreen extends ConsumerWidget {
               children: [
                 Text(
                   hasPro ? 'Ojaewa Pro Active' : 'Ojaewa Pro Inactive',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF241508),
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  hasPro ? expiresText : 'Subscribe to sell and publish your business profile',
-                  style: const TextStyle(
+                  hasPro
+                      ? expiresText
+                      : 'Subscribe to sell and publish your business profile',
+                  style: TextStyle(
                     fontSize: 12,
                     fontFamily: 'Campton',
-                    color: Color(0xFF777F84),
+                    color: colors.textSecondary,
                   ),
                 ),
               ],
@@ -477,9 +337,9 @@ class AccountScreen extends ConsumerWidget {
           if (!hasPro)
             TextButton(
               onPressed: () async {
-                await ref.read(iapServiceProvider).purchaseSubscription(
-                      SubscriptionProducts.ojaewaProYearly,
-                    );
+                await ref
+                    .read(iapServiceProvider)
+                    .purchaseSubscription(SubscriptionProducts.ojaewaProYearly);
               },
               child: const Text(
                 'Subscribe',
@@ -503,59 +363,74 @@ class AccountScreen extends ConsumerWidget {
     return Column(
       children: [
         _buildMenuItem(
+          context: context,
           iconAsset: AppIcons.startSelling,
           label: 'Start selling',
           onTap: () => Navigator.of(context).pushNamed(
-            isSellerApproved ? AppRoutes.yourShopDashboard : AppRoutes.sellerOnboarding,
+            isSellerApproved
+                ? AppRoutes.yourShopDashboard
+                : AppRoutes.sellerOnboarding,
           ),
         ),
         _buildMenuItem(
+          context: context,
           iconAsset: AppIcons.showYourBusiness,
           label: 'Show your business',
           onTap: () => Navigator.of(context).pushNamed(
-            hasApprovedBusiness ? AppRoutes.businessSettings : AppRoutes.businessOnboarding,
+            hasApprovedBusiness
+                ? AppRoutes.businessSettings
+                : AppRoutes.businessOnboarding,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSupportList(BuildContext context, WidgetRef ref, {required bool isLoggedIn}) {
+  Widget _buildSupportList(
+    BuildContext context,
+    WidgetRef ref, {
+    required bool isLoggedIn,
+  }) {
+    final colors = context.appColors;
     return Column(
       children: [
         _buildMenuItem(
+          context: context,
           iconAsset: AppIcons.emailUs,
           label: 'Email Us',
           onTap: () => _handleEmailUs(context, ref),
         ),
         _buildMenuItem(
+          context: context,
           iconAsset: AppIcons.privacyPolicy,
           label: 'Privacy Policy',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.privacyPolicy),
         ),
         _buildMenuItem(
+          context: context,
           iconAsset: AppIcons.termsOfService,
           label: 'Terms of Service',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.termsOfService),
+          onTap: () =>
+              Navigator.of(context).pushNamed(AppRoutes.termsOfService),
         ),
         _buildMenuItem(
+          context: context,
           iconAsset: AppIcons.faq,
           label: 'FAQ',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.faq),
         ),
         _buildMenuItem(
+          context: context,
           iconAsset: AppIcons.connectToUs,
           label: 'Connect to us',
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.connectToUs),
         ),
-        
+
         // Test notification button (only for test users)
-        if (_isTestUser(ref))
-          _buildTestNotificationButton(context, ref),
-        
+        if (_isTestUser(ref)) _buildTestNotificationButton(context, ref),
+
         // Delete Account — only shown when logged in
-        if (isLoggedIn)
-          _buildDeleteAccountButton(context, ref),
+        if (isLoggedIn) _buildDeleteAccountButton(context, ref),
 
         // Sign Out or Sign In based on auth state
         Container(
@@ -570,13 +445,19 @@ class AccountScreen extends ConsumerWidget {
                   showDialog(
                     context: context,
                     barrierDismissible: false,
-                    builder: (_) => const Center(child: CircularProgressIndicator()),
+                    builder: (_) =>
+                        const Center(child: CircularProgressIndicator()),
                   );
                   try {
-                    await ref.read(authFlowControllerProvider.notifier).logout();
+                    await ref
+                        .read(authFlowControllerProvider.notifier)
+                        .logout();
                     if (!context.mounted) return;
                     Navigator.of(context).pop(); // close loader
-                    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.onboarding, (r) => false);
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      AppRoutes.onboarding,
+                      (r) => false,
+                    );
                   } catch (_) {
                     if (!context.mounted) return;
                     Navigator.of(context).pop();
@@ -596,16 +477,20 @@ class AccountScreen extends ConsumerWidget {
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: isLoggedIn ? const Color(0xFFF7E5E5) : const Color(0xFFE5F7E5),
-                          borderRadius: BorderRadius.circular(4),
+                          color: isLoggedIn
+                              ? const Color(0xFF8B1E1E).withValues(alpha: 0.18)
+                              : colors.accentSoft,
+                          shape: BoxShape.circle,
                         ),
                         alignment: Alignment.center,
                         child: SvgPicture.asset(
                           AppIcons.signOut,
                           width: 16,
                           height: 16,
-                          colorFilter: const ColorFilter.mode(
-                            Color(0xFF1E2021),
+                          colorFilter: ColorFilter.mode(
+                            isLoggedIn
+                                ? const Color(0xFFFF8A80)
+                                : colors.textPrimary,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -613,19 +498,23 @@ class AccountScreen extends ConsumerWidget {
                       const SizedBox(width: 8),
                       Text(
                         isLoggedIn ? 'Sign Out' : 'Sign In',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'Campton',
                           fontWeight: FontWeight.w400,
-                          color: Color(0xFF1E2021),
+                          color: isLoggedIn
+                              ? const Color(0xFFFF8A80)
+                              : colors.textPrimary,
                         ),
                       ),
                     ],
                   ),
-                  const Icon(
+                  Icon(
                     Icons.chevron_right,
                     size: 20,
-                    color: Color(0xFF1E2021),
+                    color: isLoggedIn
+                        ? const Color(0xFFFF8A80)
+                        : colors.textPrimary,
                   ),
                 ],
               ),
@@ -641,11 +530,13 @@ class AccountScreen extends ConsumerWidget {
     String email = 'support@ojaewa.com';
     try {
       final connectInfo = await ref.read(connectInfoProvider.future);
-      email = connectInfo.email.isNotEmpty ? connectInfo.email : 'support@ojaewa.com';
+      email = connectInfo.email.isNotEmpty
+          ? connectInfo.email
+          : 'support@ojaewa.com';
     } catch (_) {
       // Use fallback email if API fails
     }
-    
+
     final uri = Uri(scheme: 'mailto', path: email);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
@@ -657,6 +548,7 @@ class AccountScreen extends ConsumerWidget {
   }
 
   Widget _buildDeleteAccountButton(BuildContext context, WidgetRef ref) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Container(
       height: 48,
       margin: const EdgeInsets.only(bottom: 8),
@@ -686,32 +578,40 @@ class AccountScreen extends ConsumerWidget {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF7E5E5),
-                      borderRadius: BorderRadius.circular(4),
+                      color: isDarkMode
+                          ? const Color(0xFF8B1E1E).withValues(alpha: 0.18)
+                          : const Color(0xFFF7E5E5),
+                      shape: BoxShape.circle,
                     ),
                     alignment: Alignment.center,
-                    child: const Icon(
+                    child: Icon(
                       Icons.delete_forever_outlined,
                       size: 16,
-                      color: Color(0xFFD32F2F),
+                      color: isDarkMode
+                          ? const Color(0xFFFF8A80)
+                          : const Color(0xFFD32F2F),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Delete Account',
                     style: TextStyle(
                       fontSize: 16,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFFD32F2F),
+                      color: isDarkMode
+                          ? const Color(0xFFFF8A80)
+                          : const Color(0xFFD32F2F),
                     ),
                   ),
                 ],
               ),
-              const Icon(
+              Icon(
                 Icons.chevron_right,
                 size: 20,
-                color: Color(0xFFD32F2F),
+                color: isDarkMode
+                    ? const Color(0xFFFF8A80)
+                    : const Color(0xFFD32F2F),
               ),
             ],
           ),
@@ -730,14 +630,16 @@ class AccountScreen extends ConsumerWidget {
       await ref.read(authRepositoryProvider).deleteAccount();
       if (!context.mounted) return;
       Navigator.of(context).pop(); // close loader
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.onboarding,
-        (r) => false,
-      );
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.onboarding, (r) => false);
     } catch (e) {
       if (!context.mounted) return;
       Navigator.of(context).pop(); // close loader
-      AppSnackbars.showError(context, 'Failed to delete account. Please try again.');
+      AppSnackbars.showError(
+        context,
+        'Failed to delete account. Please try again.',
+      );
     }
   }
 
@@ -746,9 +648,9 @@ class AccountScreen extends ConsumerWidget {
     final profile = ref.watch(userProfileProvider).value;
     final email = profile?.email ?? '';
     // Show test button for these test emails
-    return email == 'test@user.com' || 
-           email == 'test@ojaewa.com' || 
-           email.startsWith('test+');
+    return email == 'test@user.com' ||
+        email == 'test@ojaewa.com' ||
+        email.startsWith('test+');
   }
 
   /// Build test notification button (only visible for test users)
@@ -757,7 +659,7 @@ class AccountScreen extends ConsumerWidget {
       height: 56,
       margin: const EdgeInsets.only(bottom: 8, top: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40).withOpacity(0.1),
+        color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
       ),
@@ -792,7 +694,10 @@ class AccountScreen extends ConsumerWidget {
   }
 
   /// Send test notification via backend
-  Future<void> _sendTestNotification(BuildContext context, WidgetRef ref) async {
+  Future<void> _sendTestNotification(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     try {
       // Show loading
       showDialog(
@@ -810,7 +715,10 @@ class AccountScreen extends ConsumerWidget {
       Navigator.of(context).pop();
 
       // Show success message
-      AppSnackbars.showSuccess(context, 'Test notification sent! Check your device.');
+      AppSnackbars.showSuccess(
+        context,
+        'Test notification sent! Check your device.',
+      );
     } catch (e) {
       // Hide loading
       if (!context.mounted) return;

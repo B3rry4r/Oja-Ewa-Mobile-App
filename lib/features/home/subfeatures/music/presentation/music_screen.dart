@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/features/categories/domain/category_node.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
 import 'package:ojaewa/features/categories/presentation/screens/category_screen.dart';
-import 'package:ojaewa/features/home/subfeatures/music/presentation/music_artist_profile.dart';
 import 'package:ojaewa/features/product/presentation/screens/product_listing_screen.dart';
 
 class MusicScreen extends ConsumerWidget {
@@ -14,17 +14,17 @@ class MusicScreen extends ConsumerWidget {
     final categoriesAsync = ref.watch(categoriesByTypeProvider('art'));
 
     return categoriesAsync.when(
-      loading: () => const Scaffold(
-        backgroundColor: Color(0xFF603814),
-        body: SafeArea(child: Center(child: CircularProgressIndicator())),
+      loading: () => Scaffold(
+        backgroundColor: context.appColors.background,
+        body: const SafeArea(child: Center(child: CircularProgressIndicator())),
       ),
       error: (e, _) => Scaffold(
-        backgroundColor: const Color(0xFF603814),
+        backgroundColor: context.appColors.background,
         body: SafeArea(
           child: Center(
             child: Text(
               'Failed to load categories',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: context.appColors.textPrimary),
             ),
           ),
         ),
@@ -61,7 +61,9 @@ class MusicScreen extends ConsumerWidget {
             final parent = findParentByTitle(section.title);
             if (parent == null) return;
 
-            final slug = item == 'View All' ? parent.slug : (findChildByName(parent, item)?.slug ?? parent.slug);
+            final slug = item == 'View All'
+                ? parent.slug
+                : (findChildByName(parent, item)?.slug ?? parent.slug);
 
             Navigator.of(context).push(
               MaterialPageRoute(

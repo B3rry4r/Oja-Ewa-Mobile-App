@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/core/widgets/info_bottom_sheet.dart';
 
 /// Simple reusable string picker shown as a modal bottom sheet.
@@ -10,6 +11,7 @@ class SelectionBottomSheet {
     required List<String> options,
     required String selected,
   }) {
+    final colors = context.appColors;
     return InfoBottomSheet.show<String>(
       context,
       title: title,
@@ -20,14 +22,14 @@ class SelectionBottomSheet {
               (o) => ListTile(
                 title: Text(
                   o,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Campton',
                     fontSize: 16,
-                    color: Color(0xFF1E2021),
+                    color: colors.textPrimary,
                   ),
                 ),
                 trailing: o == selected
-                    ? const Icon(Icons.check, color: Color(0xFFFDAF40))
+                    ? Icon(Icons.check, color: colors.accent)
                     : null,
                 onTap: () => Navigator.of(context).pop(o),
               ),

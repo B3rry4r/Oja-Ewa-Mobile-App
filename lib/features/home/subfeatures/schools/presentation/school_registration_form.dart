@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/auth/auth_controller.dart';
 import 'package:ojaewa/core/auth/auth_state.dart';
 import 'package:ojaewa/core/location/location_picker_sheets.dart';
@@ -49,138 +50,112 @@ class _SchoolRegistrationFormScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
+    final colors = context.appColors;
+    return AppPageScaffold(
+      title: 'Register',
+      showActions: false,
+      scrollable: true,
+      child: Form(
+        key: _formKey,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top App Bar
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
-              showActions: false,
-              title: Text(
-                'Register',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
-                ),
+            const SizedBox(height: 24),
+
+            // Subtitle
+            Text(
+              'Fill in your details to continue',
+              style: TextStyle(
+                fontSize: 16,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w400,
+                color: colors.textPrimary,
               ),
             ),
 
-            // Scrollable Form Content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-                      // Subtitle
-                      const Text(
-                        'Fill in your details to continue',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'Campton',
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xFF1E2021),
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Country Dropdown
-                      _buildLocationDropdown(
-                        label: 'Country',
-                        value: _selectedCountryName,
-                        flag: _selectedCountryFlag,
-                        onTap: () async {
-                          final country = await CountryPickerSheet.show(
-                            context,
-                            selectedCountry: _selectedCountryName,
-                          );
-                          if (country != null) {
-                            setState(() {
-                              _selectedCountryName = country.name;
-                              _selectedCountryFlag = country.flag;
-                              _selectedCountryCode = country.dialCode;
-                              _selectedStateName =
-                                  ''; // Reset state when country changes
-                            });
-                          }
-                        },
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Full Name Field
-                      _buildTextField(
-                        label: 'Full Name',
-                        controller: _nameController,
-                        placeholder: 'Your Name here',
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Phone Number Field
-                      _buildPhoneField(),
-
-                      const SizedBox(height: 24),
-
-                      // State Dropdown
-                      _buildLocationDropdown(
-                        label: 'State',
-                        value: _selectedStateName.isEmpty
-                            ? 'Select State'
-                            : _selectedStateName,
-                        onTap: () async {
-                          final state = await StatePickerSheet.show(
-                            context,
-                            countryName: _selectedCountryName,
-                            selectedState: _selectedStateName,
-                          );
-                          if (state != null) {
-                            setState(() {
-                              _selectedStateName = state.name;
-                            });
-                          }
-                        },
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // City Field
-                      _buildTextField(
-                        label: 'City',
-                        controller: _cityController,
-                        placeholder: 'Your City',
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Address Line Field
-                      _buildTextField(
-                        label: 'Address Line',
-                        controller: _addressController,
-                        placeholder: 'Street, house number etc',
-                      ),
-
-                      const SizedBox(height: 40),
-
-                      // Make Payment Button
-                      _buildPaymentButton(),
-
-                      const SizedBox(height: 32),
-                    ],
-                  ),
-                ),
-              ),
+            // Country Dropdown
+            _buildLocationDropdown(
+              label: 'Country',
+              value: _selectedCountryName,
+              flag: _selectedCountryFlag,
+              onTap: () async {
+                final country = await CountryPickerSheet.show(
+                  context,
+                  selectedCountry: _selectedCountryName,
+                );
+                if (country != null) {
+                  setState(() {
+                    _selectedCountryName = country.name;
+                    _selectedCountryFlag = country.flag;
+                    _selectedCountryCode = country.dialCode;
+                    _selectedStateName = ''; // Reset state when country changes
+                  });
+                }
+              },
             ),
+
+            const SizedBox(height: 24),
+
+            // Full Name Field
+            _buildTextField(
+              label: 'Full Name',
+              controller: _nameController,
+              placeholder: 'Your Name here',
+            ),
+
+            const SizedBox(height: 24),
+
+            // Phone Number Field
+            _buildPhoneField(),
+
+            const SizedBox(height: 24),
+
+            // State Dropdown
+            _buildLocationDropdown(
+              label: 'State',
+              value: _selectedStateName.isEmpty
+                  ? 'Select State'
+                  : _selectedStateName,
+              onTap: () async {
+                final state = await StatePickerSheet.show(
+                  context,
+                  countryName: _selectedCountryName,
+                  selectedState: _selectedStateName,
+                );
+                if (state != null) {
+                  setState(() {
+                    _selectedStateName = state.name;
+                  });
+                }
+              },
+            ),
+
+            const SizedBox(height: 24),
+
+            // City Field
+            _buildTextField(
+              label: 'City',
+              controller: _cityController,
+              placeholder: 'Your City',
+            ),
+
+            const SizedBox(height: 24),
+
+            // Address Line Field
+            _buildTextField(
+              label: 'Address Line',
+              controller: _addressController,
+              placeholder: 'Street, house number etc',
+            ),
+
+            const SizedBox(height: 40),
+
+            // Make Payment Button
+            _buildPaymentButton(),
+
+            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -193,16 +168,17 @@ class _SchoolRegistrationFormScreenState
     String? flag,
     required VoidCallback onTap,
   }) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
-            color: Color(0xFF777F84),
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -212,8 +188,16 @@ class _SchoolRegistrationFormScreenState
             height: 49,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFCCCCCC)),
-              borderRadius: BorderRadius.circular(8),
+              color: colors.surfaceElevated,
+              border: Border.all(color: colors.border),
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: colors.shadow.withValues(alpha: 0.18),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -224,18 +208,18 @@ class _SchoolRegistrationFormScreenState
                 Expanded(
                   child: Text(
                     value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF241508),
+                      color: colors.textPrimary,
                     ),
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.keyboard_arrow_down,
                   size: 20,
-                  color: Color(0xFF1E2021),
+                  color: colors.textPrimary,
                 ),
               ],
             ),
@@ -250,39 +234,48 @@ class _SchoolRegistrationFormScreenState
     required TextEditingController controller,
     required String placeholder,
   }) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
-            color: Color(0xFF777F84),
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-            borderRadius: BorderRadius.circular(8),
+            color: colors.surfaceElevated,
+            border: Border.all(color: colors.border),
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(
+                color: colors.shadow.withValues(alpha: 0.18),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: TextFormField(
             controller: controller,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
             decoration: InputDecoration(
               hintText: placeholder,
-              hintStyle: const TextStyle(
+              hintStyle: TextStyle(
                 fontSize: 16,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: Color(0xFFCCCCCC),
+                color: colors.textTertiary,
               ),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
@@ -303,23 +296,32 @@ class _SchoolRegistrationFormScreenState
   }
 
   Widget _buildPhoneField() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Phone Number',
           style: TextStyle(
             fontSize: 14,
             fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
-            color: Color(0xFF777F84),
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-            borderRadius: BorderRadius.circular(8),
+            color: colors.surfaceElevated,
+            border: Border.all(color: colors.border),
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(
+                color: colors.shadow.withValues(alpha: 0.18),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: Row(
             children: [
@@ -349,18 +351,18 @@ class _SchoolRegistrationFormScreenState
                       const SizedBox(width: 6),
                       Text(
                         _selectedCountryCode,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'Campton',
                           fontWeight: FontWeight.w400,
-                          color: Color(0xFF241508),
+                          color: colors.textPrimary,
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(
+                      Icon(
                         Icons.keyboard_arrow_down,
                         size: 20,
-                        color: Color(0xFF1E2021),
+                        color: colors.textPrimary,
                       ),
                     ],
                   ),
@@ -378,22 +380,22 @@ class _SchoolRegistrationFormScreenState
                     FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(10),
                   ],
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
-                    color: Color(0xFF1E2021),
+                    color: colors.textPrimary,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: '8167654354',
                     hintStyle: TextStyle(
                       fontSize: 16,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFFCCCCCC),
+                      color: colors.textTertiary,
                     ),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                       horizontal: 8,
                       vertical: 16,
                     ),
@@ -417,6 +419,7 @@ class _SchoolRegistrationFormScreenState
   }
 
   Widget _buildPaymentButton() {
+    final colors = context.appColors;
     final registrationState = ref.watch(schoolRegistrationProvider);
     final isLoading =
         registrationState.isSubmitting ||
@@ -434,28 +437,30 @@ class _SchoolRegistrationFormScreenState
                 }
               },
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFFDAF40),
-          disabledBackgroundColor: const Color(0xFFFDAF40).withAlpha(150),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          backgroundColor: colors.accent,
+          disabledBackgroundColor: colors.accent.withValues(alpha: 0.55),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           elevation: 8,
-          shadowColor: const Color(0xFFFDAF40).withAlpha(77),
+          shadowColor: colors.accent.withValues(alpha: 0.3),
         ),
         child: isLoading
-            ? const SizedBox(
+            ? SizedBox(
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFFBF5)),
+                  valueColor: AlwaysStoppedAnimation<Color>(colors.onAccent),
                 ),
               )
-            : const Text(
+            : Text(
                 'Make Payment',
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFFFFFBF5),
+                  color: colors.onAccent,
                 ),
               ),
       ),
@@ -521,8 +526,9 @@ class _SchoolRegistrationFormScreenState
       context: context,
       barrierDismissible: true,
       barrierLabel: 'EmailPrompt',
-      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+      barrierColor: context.appColors.shadow.withValues(alpha: 0.82),
       pageBuilder: (context, anim1, anim2) {
+        final colors = context.appColors;
         return Scaffold(
           backgroundColor: Colors.transparent,
           body: Center(
@@ -532,57 +538,58 @@ class _SchoolRegistrationFormScreenState
                 width: 342,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFFBF5),
+                  color: colors.surfaceElevated,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Enter Your Email',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF603814),
+                        color: colors.textPrimary,
                         fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'We need your email to send payment confirmation.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF1E2021),
+                        color: colors.textSecondary,
                         fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 24),
                     Container(
                       decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFFCCCCCC)),
-                        borderRadius: BorderRadius.circular(8),
+                        color: colors.surface,
+                        border: Border.all(color: colors.border),
+                        borderRadius: BorderRadius.circular(18),
                       ),
                       child: TextField(
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'Campton',
-                          color: Color(0xFF1E2021),
+                          color: colors.textPrimary,
                         ),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'email@example.com',
                           hintStyle: TextStyle(
                             fontSize: 16,
                             fontFamily: 'Campton',
-                            color: Color(0xFFCCCCCC),
+                            color: colors.textTertiary,
                           ),
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                             horizontal: 20,
                             vertical: 16,
                           ),
@@ -598,18 +605,17 @@ class _SchoolRegistrationFormScreenState
                             child: Container(
                               height: 57,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: const Color(0xFFCCCCCC),
-                                ),
+                                color: colors.surface,
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(color: colors.border),
                               ),
-                              child: const Center(
+                              child: Center(
                                 child: Text(
                                   'Cancel',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF595F63),
+                                    color: colors.textSecondary,
                                     fontFamily: 'Campton',
                                   ),
                                 ),
@@ -629,25 +635,23 @@ class _SchoolRegistrationFormScreenState
                             child: Container(
                               height: 57,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFDAF40),
-                                borderRadius: BorderRadius.circular(8),
+                                color: colors.accent,
+                                borderRadius: BorderRadius.circular(18),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(
-                                      0xFFFDAF40,
-                                    ).withValues(alpha: 0.4),
+                                    color: colors.accent.withValues(alpha: 0.4),
                                     blurRadius: 16,
                                     offset: const Offset(0, 8),
                                   ),
                                 ],
                               ),
-                              child: const Center(
+                              child: Center(
                                 child: Text(
                                   'Continue',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFFFFFBF5),
+                                    color: colors.onAccent,
                                     fontFamily: 'Campton',
                                   ),
                                 ),
@@ -679,8 +683,9 @@ class _SchoolRegistrationFormScreenState
       context: context,
       barrierDismissible: false,
       barrierLabel: 'RegistrationSubmitted',
-      barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+      barrierColor: context.appColors.shadow.withValues(alpha: 0.82),
       pageBuilder: (context, anim1, anim2) {
+        final colors = context.appColors;
         return Scaffold(
           backgroundColor: Colors.transparent,
           body: Center(
@@ -690,7 +695,7 @@ class _SchoolRegistrationFormScreenState
                 width: 342,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFFBF5),
+                  color: colors.surfaceElevated,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Column(
@@ -711,13 +716,13 @@ class _SchoolRegistrationFormScreenState
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       'Registration Submitted',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF603814),
+                        color: colors.textPrimary,
                         fontFamily: 'Campton',
                       ),
                     ),
@@ -727,10 +732,10 @@ class _SchoolRegistrationFormScreenState
                           ? 'Your registration has been submitted. Please log in to complete payment (₦500).'
                           : 'Your registration has been submitted successfully.',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF1E2021),
+                        color: colors.textSecondary,
                         fontFamily: 'Campton',
                       ),
                     ),
@@ -744,25 +749,23 @@ class _SchoolRegistrationFormScreenState
                         width: double.infinity,
                         height: 57,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40),
-                          borderRadius: BorderRadius.circular(8),
+                          color: colors.accent,
+                          borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(
-                                0xFFFDAF40,
-                              ).withValues(alpha: 0.4),
+                              color: colors.accent.withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                             ),
                           ],
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
                             'OK',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFFFFFBF5),
+                              color: colors.onAccent,
                               fontFamily: 'Campton',
                             ),
                           ),
@@ -790,8 +793,9 @@ class _SchoolRegistrationFormScreenState
         context: context,
         barrierDismissible: false,
         barrierLabel: 'PaymentInitiated',
-        barrierColor: const Color(0xFF1E2021).withValues(alpha: 0.8),
+        barrierColor: context.appColors.shadow.withValues(alpha: 0.82),
         pageBuilder: (context, anim1, anim2) {
+          final colors = context.appColors;
           return Scaffold(
             backgroundColor: Colors.transparent,
             body: Center(
@@ -801,7 +805,7 @@ class _SchoolRegistrationFormScreenState
                   width: 342,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFFBF5),
+                    color: colors.surfaceElevated,
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: Column(
@@ -822,24 +826,24 @@ class _SchoolRegistrationFormScreenState
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
+                      Text(
                         'Payment Initiated',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF603814),
+                          color: colors.textPrimary,
                           fontFamily: 'Campton',
                         ),
                       ),
                       const SizedBox(height: 12),
-                      const Text(
+                      Text(
                         'Complete the payment in your browser. The registration fee is ₦500.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
-                          color: Color(0xFF1E2021),
+                          color: colors.textSecondary,
                           fontFamily: 'Campton',
                         ),
                       ),
@@ -855,25 +859,23 @@ class _SchoolRegistrationFormScreenState
                           width: double.infinity,
                           height: 57,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFDAF40),
-                            borderRadius: BorderRadius.circular(8),
+                            color: colors.accent,
+                            borderRadius: BorderRadius.circular(18),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(
-                                  0xFFFDAF40,
-                                ).withValues(alpha: 0.4),
+                                color: colors.accent.withValues(alpha: 0.4),
                                 blurRadius: 16,
                                 offset: const Offset(0, 8),
                               ),
                             ],
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Text(
                               'Done',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFFFFFBF5),
+                                color: colors.onAccent,
                                 fontFamily: 'Campton',
                               ),
                             ),

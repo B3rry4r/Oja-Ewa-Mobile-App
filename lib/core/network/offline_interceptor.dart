@@ -24,10 +24,12 @@ class OfflineInterceptor extends Interceptor {
     }
 
     final connectivity = _ref.read(connectivityProvider).value;
+    // Match isOnlineProvider behavior: treat unresolved connectivity as online
+    // so startup requests on web are not blocked before the plugin resolves.
     final isOnline =
-        connectivity != null &&
-        connectivity.isNotEmpty &&
-        !connectivity.contains(ConnectivityResult.none);
+        connectivity == null ||
+        (connectivity.isNotEmpty &&
+            !connectivity.contains(ConnectivityResult.none));
 
     if (!isOnline) {
       handler.reject(

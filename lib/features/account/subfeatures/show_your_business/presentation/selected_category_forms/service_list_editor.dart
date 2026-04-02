@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 
 class ServiceListItem {
   ServiceListItem({this.name = '', this.priceRange = ''});
@@ -6,10 +7,7 @@ class ServiceListItem {
   String name;
   String priceRange;
 
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'price_range': priceRange,
-      };
+  Map<String, dynamic> toJson() => {'name': name, 'price_range': priceRange};
 }
 
 /// UI-only editor for service_list canonical JSON:
@@ -26,6 +24,7 @@ class ServiceListEditor extends StatefulWidget {
 class _ServiceListEditorState extends State<ServiceListEditor> {
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Column(
       children: [
         for (int i = 0; i < widget.items.length; i++) ...[
@@ -48,16 +47,16 @@ class _ServiceListEditorState extends State<ServiceListEditor> {
               height: 44,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFFFDAF40),
-                borderRadius: BorderRadius.circular(8),
+                color: colors.accent,
+                borderRadius: BorderRadius.circular(16),
               ),
               alignment: Alignment.center,
-              child: const Text(
+              child: Text(
                 'Add service',
                 style: TextStyle(
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFFFFFBF5),
+                  color: colors.onAccent,
                 ),
               ),
             ),
@@ -76,6 +75,7 @@ class _ServiceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Row(
       children: [
         Expanded(
@@ -97,7 +97,7 @@ class _ServiceRow extends StatelessWidget {
           const SizedBox(width: 8),
           IconButton(
             onPressed: onRemove,
-            icon: const Icon(Icons.close, size: 18, color: Color(0xFF777F84)),
+            icon: Icon(Icons.close, size: 18, color: colors.textSecondary),
           ),
         ],
       ],
@@ -118,29 +118,35 @@ class _TextBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+        Text(
+          label,
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
+        ),
         const SizedBox(height: 8),
         TextField(
           onChanged: onChanged,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Campton',
             fontSize: 16,
-            color: Color(0xFF1E2021),
+            color: colors.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: Color(0xFFCCCCCC)),
+            hintStyle: TextStyle(color: colors.textTertiary),
+            filled: true,
+            fillColor: colors.surfaceElevated,
             contentPadding: const EdgeInsets.all(16),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.border),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFFDAF40)),
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.accent),
             ),
           ),
         ),

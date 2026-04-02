@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+
 /// A Bottom Sheet for selecting product sizes.
 /// Package: ojaewa
 class SizeSelectionBottomSheet extends StatefulWidget {
@@ -38,10 +40,11 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFF8F1), // IR: #fff8f1
+      decoration: BoxDecoration(
+        color: colors.surfaceElevated,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
@@ -71,16 +74,17 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final colors = context.appColors;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
+        Text(
           'Change Size',
           style: TextStyle(
             fontFamily: 'Campton',
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF301C0A), // IR: #301c0a
+            color: colors.textPrimary,
           ),
         ),
         IconButton(
@@ -88,10 +92,10 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFDEDEDE)),
-              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: colors.border),
+              shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.close, size: 20, color: Color(0xFF301C0A)),
+            child: Icon(Icons.close, size: 20, color: colors.textPrimary),
           ),
         ),
       ],
@@ -99,26 +103,27 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
   }
 
   Widget _buildProductInfo() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Text(
           'Agbada in Vogue', // Corrected "Voue" typo from IR
           style: TextStyle(
             fontFamily: 'Campton',
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF595F63), // IR: #595f63
+            color: colors.textSecondary,
           ),
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           'by Jenny Stitches',
           style: TextStyle(
             fontFamily: 'Campton',
             fontSize: 12,
             fontWeight: FontWeight.w400,
-            color: Color(0xFF595F63),
+            color: colors.textSecondary,
           ),
         ),
       ],
@@ -126,29 +131,30 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
   }
 
   Widget _buildSizeLabelRow() {
+    final colors = context.appColors;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
+        Text(
           'Size',
           style: TextStyle(
             fontFamily: 'Campton',
             fontSize: 12,
             fontWeight: FontWeight.w400,
-            color: Color(0xFF1E2021),
+            color: colors.textPrimary,
           ),
         ),
         GestureDetector(
           onTap: () {
             /* Open Size Chart */
           },
-          child: const Text(
+          child: Text(
             'View Size Chart',
             style: TextStyle(
               fontFamily: 'Campton',
               fontSize: 10,
               fontWeight: FontWeight.w400,
-              color: Color(0xFF777F84),
+              color: colors.textTertiary,
               decoration: TextDecoration.underline,
             ),
           ),
@@ -158,6 +164,7 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
   }
 
   Widget _buildSizeSelector() {
+    final colors = context.appColors;
     return Wrap(
       spacing: 12,
       children: sizes.map((size) {
@@ -169,10 +176,8 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
             height: 44,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFFA15E22) : Colors.transparent,
-              border: isSelected
-                  ? null
-                  : Border.all(color: const Color(0xFFCCCCCC)),
+              color: isSelected ? colors.accent : Colors.transparent,
+              border: isSelected ? null : Border.all(color: colors.border),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -181,7 +186,7 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
                 fontFamily: 'Campton',
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
-                color: isSelected ? Colors.white : const Color(0xFF1E2021),
+                color: isSelected ? colors.onAccent : colors.textPrimary,
               ),
             ),
           ),
@@ -191,15 +196,16 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
   }
 
   Widget _buildUpdateButton() {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
       height: 57,
       decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40), // IR: #fdaf40
+        color: colors.accent,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
+            color: colors.accent.withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -210,14 +216,14 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
         child: InkWell(
           onTap: () => Navigator.pop(context, selectedSize),
           borderRadius: BorderRadius.circular(8),
-          child: const Center(
+          child: Center(
             child: Text(
               'Update Size',
               style: TextStyle(
                 fontFamily: 'Campton',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: colors.onAccent,
               ),
             ),
           ),

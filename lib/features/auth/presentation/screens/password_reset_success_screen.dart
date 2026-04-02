@@ -1,6 +1,7 @@
 // password_reset_success_screen.dart
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
@@ -11,8 +12,9 @@ class PasswordResetSuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // #fff8f1
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Stack(
           children: [
@@ -26,16 +28,16 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                   width: 234,
                   height: 347,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
+                    color: colors.accent.withValues(alpha: 0.1),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(150),
                     ),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Icon(
                       Icons.verified_user_rounded,
                       size: 120,
-                      color: Color(0xFFFDAF40),
+                      color: colors.accent,
                     ),
                   ),
                 ),
@@ -56,10 +58,10 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                     ),
 
                     // Success Illustration
-                    _buildSuccessIllustration(),
+                    _buildSuccessIllustration(context),
 
                     // Content Section
-                    _buildContentSection(),
+                    _buildContentSection(context),
 
                     const SizedBox(height: 40),
 
@@ -80,12 +82,13 @@ class PasswordResetSuccessScreen extends StatelessWidget {
   Widget _buildBackButton(BuildContext context) {
     return HeaderIconButton(
       asset: AppIcons.back,
-      iconColor: const Color(0xFF241508),
+      iconColor: context.appColors.textPrimary,
       onTap: () => Navigator.of(context).maybePop(),
     );
   }
 
-  Widget _buildSuccessIllustration() {
+  Widget _buildSuccessIllustration(BuildContext context) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 40.0),
       child: Stack(
@@ -96,7 +99,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
             height: 180,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
+              color: colors.accent.withValues(alpha: 0.1),
             ),
           ),
           Container(
@@ -104,7 +107,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
             height: 140,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFFDAF40).withValues(alpha: 0.2),
+              color: colors.accent.withValues(alpha: 0.2),
             ),
           ),
           Container(
@@ -112,10 +115,14 @@ class PasswordResetSuccessScreen extends StatelessWidget {
             height: 100,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFFDAF40),
+              color: colors.accent,
             ),
-            child: const Center(
-              child: Icon(Icons.check_rounded, size: 60, color: Colors.white),
+            child: Center(
+              child: Icon(
+                Icons.check_rounded,
+                size: 60,
+                color: colors.onAccent,
+              ),
             ),
           ),
         ],
@@ -123,7 +130,8 @@ class PasswordResetSuccessScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContentSection() {
+  Widget _buildContentSection(BuildContext context) {
+    final colors = context.appColors;
     return Column(
       children: [
         // Title
@@ -134,7 +142,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
             fontSize: 33,
             fontWeight: FontWeight.w600,
             fontFamily: 'Campton',
-            color: const Color(0xFF3C230C), // #3c230c
+            color: colors.textPrimary,
             height: 1.2,
           ),
         ),
@@ -151,7 +159,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
               fontSize: 14,
               fontWeight: FontWeight.w400,
               fontFamily: 'Campton',
-              color: const Color(0xFF1E2021), // #1e2021
+              color: colors.textSecondary,
               height: 1.5,
             ),
           ),
@@ -160,20 +168,21 @@ class PasswordResetSuccessScreen extends StatelessWidget {
         const SizedBox(height: 40),
 
         // Additional Tips (Added for better UX)
-        _buildTipsSection(),
+        _buildTipsSection(context),
       ],
     );
   }
 
-  Widget _buildTipsSection() {
+  Widget _buildTipsSection(BuildContext context) {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFDAF40).withValues(alpha: 0.2),
+          color: colors.accent.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
@@ -192,7 +201,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
               Icon(
                 Icons.lightbulb_outline_rounded,
                 size: 20,
-                color: const Color(0xFFFDAF40),
+                color: colors.accent,
               ),
               const SizedBox(width: 8),
               Text(
@@ -201,23 +210,26 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   fontFamily: 'Campton',
-                  color: const Color(0xFF3C230C),
+                  color: colors.textPrimary,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           _buildTipItem(
+            context,
             'Don\'t share your password with anyone',
             Icons.shield_outlined,
           ),
           const SizedBox(height: 12),
           _buildTipItem(
+            context,
             'Use a unique password for each account',
             Icons.vpn_key_outlined,
           ),
           const SizedBox(height: 12),
           _buildTipItem(
+            context,
             'Consider using a password manager',
             Icons.security_outlined,
           ),
@@ -226,11 +238,12 @@ class PasswordResetSuccessScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTipItem(String text, IconData icon) {
+  Widget _buildTipItem(BuildContext context, String text, IconData icon) {
+    final colors = context.appColors;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 16, color: const Color(0xFF777F84)),
+        Icon(icon, size: 16, color: colors.textTertiary),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
@@ -239,7 +252,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
               fontSize: 12,
               fontWeight: FontWeight.w400,
               fontFamily: 'Campton',
-              color: const Color(0xFF777F84),
+              color: colors.textTertiary,
               height: 1.4,
             ),
           ),
@@ -249,15 +262,16 @@ class PasswordResetSuccessScreen extends StatelessWidget {
   }
 
   Widget _buildSignInButton(BuildContext context) {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
       height: 57,
       decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40),
+        color: colors.accent,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+            color: colors.accent.withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -282,7 +296,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Campton',
-                color: const Color(0xFFFFFBF5), // #fffbf5
+                color: colors.onAccent,
               ),
             ),
           ),

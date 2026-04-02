@@ -3,7 +3,8 @@ import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
 import 'package:ojaewa/features/categories/domain/category_items.dart';
@@ -212,72 +213,52 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
           )
         : null;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF603814),
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            const AppHeader(
-              backgroundColor: Color(0xFF603814),
-              iconColor: Colors.white,
-            ),
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.only(top: 18),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFF8F1),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-                ),
-                child: Builder(
-                  builder: (context) {
-                    // Get loading/error state but don't block UI
-                    final isLoading = categoryItemsAsync.isLoading;
-                    final hasError = categoryItemsAsync.hasError;
-                    final categoryState = categoryItemsAsync.value;
+    return AppPageScaffold(
+      title: widget.pageTitle,
+      child: Builder(
+        builder: (context) {
+          // Get loading/error state but don't block UI
+          final isLoading = categoryItemsAsync.isLoading;
+          final hasError = categoryItemsAsync.hasError;
+          final categoryState = categoryItemsAsync.value;
 
-                    if (categoryState == null && _cachedCategoryState != null) {
-                      return _buildContent(
-                        _cachedCategoryState!,
-                        isLoading: isLoading,
-                        filteredAsync: filteredAsync,
-                      );
-                    }
+          if (categoryState == null && _cachedCategoryState != null) {
+            return _buildContent(
+              _cachedCategoryState!,
+              isLoading: isLoading,
+              filteredAsync: filteredAsync,
+            );
+          }
 
-                    // Only show full-page loader on first load (no cached data)
-                    if (categoryState == null && isLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+          // Only show full-page loader on first load (no cached data)
+          if (categoryState == null && isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                    if (categoryState == null && hasError) {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text(
-                            'Failed to load items',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ),
-                      );
-                    }
-
-                    if (categoryState == null) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    _cachedCategoryState = categoryState;
-                    _lastLoadedSlug = _activeSlug;
-                    return _buildContent(
-                      categoryState,
-                      isLoading: isLoading,
-                      filteredAsync: filteredAsync,
-                    );
-                  },
+          if (categoryState == null && hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'Failed to load items',
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
-            ),
-          ],
-        ),
+            );
+          }
+
+          if (categoryState == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          _cachedCategoryState = categoryState;
+          _lastLoadedSlug = _activeSlug;
+          return _buildContent(
+            categoryState,
+            isLoading: isLoading,
+            filteredAsync: filteredAsync,
+          );
+        },
       ),
     );
   }
@@ -287,6 +268,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
     required bool isLoading,
     AsyncValue<FilteredProductsState>? filteredAsync,
   }) {
+    final colors = context.appColors;
     final kind = ListingKindMapper.fromType(widget.type);
     final businessFilters = ref.watch(businessListingFiltersProvider);
     final hasBusinessFilters =
@@ -333,24 +315,11 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-            child: Text(
-              widget.pageTitle,
-              style: const TextStyle(
-                fontSize: 33,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF241508),
-                height: 1.2,
-              ),
-            ),
-          ),
-          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               widget.breadcrumb,
-              style: const TextStyle(
-                color: Color(0xFF777F84),
+              style: TextStyle(
+                color: colors.textSecondary,
                 fontSize: 14,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
@@ -503,7 +472,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
       ),
       data: (state) {
         if (state.items.isEmpty) {
-          return const Padding(
+          return Padding(
             padding: EdgeInsets.all(32),
             child: Center(
               child: Text(
@@ -511,7 +480,9 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Campton',
-                  color: Color(0xFF777F84),
+                  color: Theme.of(
+                    context,
+                  ).extension<AppThemeColors>()!.textSecondary,
                 ),
               ),
             ),
@@ -727,15 +698,14 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
-          color: isActive ? const Color(0xFFA15E22) : Colors.transparent,
-          border: Border.all(
-            color: isActive ? const Color(0xFFA15E22) : const Color(0xFFCCCCCC),
-          ),
+          color: isActive ? colors.accent : Colors.transparent,
+          border: Border.all(color: isActive ? colors.accent : colors.border),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -746,7 +716,7 @@ class _ActionButton extends StatelessWidget {
               width: 20,
               height: 20,
               colorFilter: ColorFilter.mode(
-                isActive ? Colors.white : const Color(0xFF241508),
+                isActive ? colors.onAccent : colors.textPrimary,
                 BlendMode.srcIn,
               ),
             ),
@@ -757,7 +727,7 @@ class _ActionButton extends StatelessWidget {
                 fontSize: 14,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: isActive ? Colors.white : Colors.black,
+                color: isActive ? colors.onAccent : colors.textPrimary,
               ),
             ),
           ],
@@ -780,6 +750,7 @@ class _CategoryPills extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return SizedBox(
       height: 42,
       child: ListView.separated(
@@ -798,12 +769,8 @@ class _CategoryPills extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected
-                    ? const Color(0xFFA15E22)
-                    : Colors.transparent,
-                border: isSelected
-                    ? null
-                    : Border.all(color: const Color(0xFFCCCCCC)),
+                color: isSelected ? colors.accent : Colors.transparent,
+                border: isSelected ? null : Border.all(color: colors.border),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
@@ -813,9 +780,7 @@ class _CategoryPills extends StatelessWidget {
                     fontSize: 14,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
-                    color: isSelected
-                        ? const Color(0xFFFBFBFB)
-                        : const Color(0xFF301C0A),
+                    color: isSelected ? colors.onAccent : colors.textPrimary,
                   ),
                 ),
               ),

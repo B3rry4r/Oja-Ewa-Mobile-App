@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
@@ -71,11 +72,12 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
   }
 
   Future<void> _savePassword() async {
+    final colors = context.appColors;
     if (!_isPasswordValid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Please fix password requirements'),
-          backgroundColor: Color(0xFFFDAF40),
+          backgroundColor: colors.accent,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -85,9 +87,9 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is! NewPasswordArgs) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Missing reset token'),
-          backgroundColor: Color(0xFFFDAF40),
+          backgroundColor: colors.accent,
         ),
       );
       return;
@@ -116,8 +118,9 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // #fff8f1
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Stack(
           children: [
@@ -131,16 +134,16 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
                   width: 234,
                   height: 347,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
+                    color: colors.accent.withValues(alpha: 0.1),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(150),
                     ),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Icon(
                       Icons.lock_reset_rounded,
                       size: 100,
-                      color: Color(0xFFFDAF40),
+                      color: colors.accent,
                     ),
                   ),
                 ),
@@ -202,12 +205,13 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
   Widget _buildBackButton() {
     return HeaderIconButton(
       asset: AppIcons.back,
-      iconColor: const Color(0xFF241508),
+      iconColor: context.appColors.textPrimary,
       onTap: () => Navigator.of(context).maybePop(),
     );
   }
 
   Widget _buildTitleSection() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -217,7 +221,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
             fontSize: 33,
             fontWeight: FontWeight.w600,
             fontFamily: 'Campton',
-            color: const Color(0xFF3C230C), // #3c230c
+            color: colors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -227,7 +231,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF1E2021), // #1e2021
+            color: colors.textSecondary,
           ),
         ),
       ],
@@ -235,6 +239,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
   }
 
   Widget _buildRequirements() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -244,7 +249,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
             fontSize: 14,
             fontWeight: FontWeight.w500,
             fontFamily: 'Campton',
-            color: const Color(0xFF3C230C),
+            color: colors.textPrimary,
           ),
         ),
         const SizedBox(height: 12),
@@ -265,13 +270,14 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
   }
 
   Widget _buildRequirementItem(String text, bool isMet) {
+    final colors = context.appColors;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(
           isMet ? Icons.check_circle_rounded : Icons.circle_outlined,
           size: 16,
-          color: isMet ? const Color(0xFF4CAF50) : const Color(0xFF777F84),
+          color: isMet ? const Color(0xFF4CAF50) : colors.textTertiary,
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -281,7 +287,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
               fontSize: 12,
               fontWeight: FontWeight.w400,
               fontFamily: 'Campton',
-              color: isMet ? const Color(0xFF4CAF50) : const Color(0xFF777F84),
+              color: isMet ? const Color(0xFF4CAF50) : colors.textTertiary,
             ),
           ),
         ),
@@ -290,6 +296,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
   }
 
   Widget _buildNewPasswordInput() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -299,7 +306,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF777F84), // #777f84
+            color: colors.textTertiary,
           ),
         ),
         const SizedBox(height: 8),
@@ -308,9 +315,9 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
           decoration: BoxDecoration(
             border: Border.all(
               color: _newPasswordController.text.isEmpty
-                  ? const Color(0xFFCCCCCC)
+                  ? colors.border
                   : _hasMinLength
-                  ? const Color(0xFFFDAF40)
+                  ? colors.accent
                   : const Color(0xFFF44336),
               width: 1.5,
             ),
@@ -320,10 +327,10 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.lock_outline_rounded,
                   size: 20,
-                  color: Color(0xFFCCCCCC),
+                  color: colors.textTertiary,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -334,12 +341,12 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
                       fontFamily: 'Campton',
-                      color: const Color(0xFF1E2021),
+                      color: colors.textPrimary,
                     ),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Type your password',
-                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
+                      hintStyle: TextStyle(color: colors.textTertiary),
                     ),
                   ),
                 ),
@@ -355,7 +362,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
                         ? Icons.visibility_outlined
                         : Icons.visibility_off_outlined,
                     size: 20,
-                    color: const Color(0xFF777F84),
+                    color: colors.textTertiary,
                   ),
                 ),
               ],
@@ -367,6 +374,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
   }
 
   Widget _buildConfirmPasswordInput() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -376,7 +384,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF777F84), // #777f84
+            color: colors.textTertiary,
           ),
         ),
         const SizedBox(height: 8),
@@ -385,7 +393,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
           decoration: BoxDecoration(
             border: Border.all(
               color: _confirmPasswordController.text.isEmpty
-                  ? const Color(0xFFCCCCCC)
+                  ? colors.border
                   : _passwordsMatch
                   ? const Color(0xFF4CAF50)
                   : const Color(0xFFF44336),
@@ -397,10 +405,10 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.lock_reset_rounded,
                   size: 20,
-                  color: Color(0xFFCCCCCC),
+                  color: colors.textTertiary,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -411,12 +419,12 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
                       fontFamily: 'Campton',
-                      color: const Color(0xFF1E2021),
+                      color: colors.textPrimary,
                     ),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Type your password',
-                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
+                      hintStyle: TextStyle(color: colors.textTertiary),
                     ),
                   ),
                 ),
@@ -432,7 +440,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
                         ? Icons.visibility_outlined
                         : Icons.visibility_off_outlined,
                     size: 20,
-                    color: const Color(0xFF777F84),
+                    color: colors.textTertiary,
                   ),
                 ),
               ],
@@ -474,18 +482,19 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
   }
 
   Widget _buildSaveButton() {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
       height: 57,
       decoration: BoxDecoration(
         color: _isPasswordValid
-            ? const Color(0xFFFDAF40)
-            : const Color(0xFFFDAF40).withValues(alpha: 0.3),
+            ? colors.accent
+            : colors.accent.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         boxShadow: _isPasswordValid
             ? [
                 BoxShadow(
-                  color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+                  color: colors.accent.withValues(alpha: 0.3),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),
@@ -505,8 +514,8 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Campton',
                 color: _isPasswordValid
-                    ? const Color(0xFFFFFBF5)
-                    : const Color(0xFFFFFBF5).withValues(alpha: 0.6),
+                    ? colors.onAccent
+                    : colors.onAccent.withValues(alpha: 0.6),
               ),
             ),
           ),

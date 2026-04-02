@@ -1,118 +1,101 @@
 import 'package:flutter/material.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 
 class EditBusinessScreen extends StatelessWidget {
   const EditBusinessScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Column(
-          children: [
-            AppHeader(
-              backgroundColor: const Color(0xFFFFF8F1),
-              iconColor: const Color(0xFF241508),
-              title: const Text(
-                "Edit Business",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
-                  fontFamily: 'Campton',
-                ),
-              ),
+    final colors = context.appColors;
+    return AppPageScaffold(
+      title: 'Edit Business',
+      scrollable: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 24),
+          _buildSectionHeader(context, "Business Location"),
+          _buildInputField(
+            context,
+            "Country",
+            hint: "Nigeria",
+            isDropdown: true,
+          ),
+          _buildInputField(context, "State", hint: "FCT", isDropdown: true),
+          _buildInputField(context, "City", hint: "Your City"),
+          _buildInputField(
+            context,
+            "Address Line",
+            hint: "Street, house number etc",
+          ),
+
+          const SizedBox(height: 32),
+          _buildSectionHeader(context, "Mobiles"),
+          _buildInputField(
+            context,
+            "Business Email",
+            hint: "sanusimot@gmail.com",
+          ),
+          _buildPhoneField(context, "Business Phone Number"),
+
+          const SizedBox(height: 32),
+          _buildSectionHeader(context, "Social handles"),
+          _buildInputField(context, "Instagram", hint: "Your Instagram URL"),
+          _buildInputField(context, "Facebook", hint: "Your Facebook URL"),
+
+          const SizedBox(height: 32),
+          _buildSectionHeader(context, "About Business"),
+          _buildInputField(
+            context,
+            "Business Name",
+            hint: "Your Business Name",
+          ),
+          _buildInputField(
+            context,
+            "Description",
+            hint: "Share details of your experience",
+            maxLines: 4,
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              "100 characters required",
+              style: TextStyle(fontSize: 10, color: colors.textTertiary),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 24),
-                    _buildSectionHeader("Business Location"),
-                    _buildInputField(
-                      "Country",
-                      hint: "Nigeria",
-                      isDropdown: true,
-                    ),
-                    _buildInputField("State", hint: "FCT", isDropdown: true),
-                    _buildInputField("City", hint: "Your City"),
-                    _buildInputField(
-                      "Address Line",
-                      hint: "Street, house number etc",
-                    ),
+          ),
 
-                    const SizedBox(height: 32),
-                    _buildSectionHeader("Mobiles"),
-                    _buildInputField(
-                      "Business Email",
-                      hint: "sanusimot@gmail.com",
-                    ),
-                    _buildPhoneField("Business Phone Number"),
+          const SizedBox(height: 32),
+          _buildLogoSection(context),
 
-                    const SizedBox(height: 32),
-                    _buildSectionHeader("Social handles"),
-                    _buildInputField("Instagram", hint: "Your Instagram URL"),
-                    _buildInputField("Facebook", hint: "Your Facebook URL"),
+          const SizedBox(height: 32),
+          _buildSectionHeader(context, "Account"),
+          _buildInputField(context, "Bank Name", hint: "Your Bank"),
+          _buildInputField(
+            context,
+            "Account Number",
+            hint: "Your Account Number",
+          ),
 
-                    const SizedBox(height: 32),
-                    _buildSectionHeader("About Business"),
-                    _buildInputField(
-                      "Business Name",
-                      hint: "Your Business Name",
-                    ),
-                    _buildInputField(
-                      "Description",
-                      hint: "Share details of your experience",
-                      maxLines: 4,
-                    ),
-                    const Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        "100 characters required",
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Color(0xFF595F63),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 32),
-                    _buildLogoSection(),
-
-                    const SizedBox(height: 32),
-                    _buildSectionHeader("Account"),
-                    _buildInputField("Bank Name", hint: "Your Bank"),
-                    _buildInputField(
-                      "Account Number",
-                      hint: "Your Account Number",
-                    ),
-
-                    const SizedBox(height: 40),
-                    _buildSaveButton(),
-                    const SizedBox(height: 40),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          const SizedBox(height: 40),
+          _buildSaveButton(context),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF3C4042),
+          color: colors.textPrimary,
           fontFamily: 'Campton',
         ),
       ),
@@ -120,11 +103,13 @@ class EditBusinessScreen extends StatelessWidget {
   }
 
   Widget _buildInputField(
+    BuildContext context,
     String label, {
     required String hint,
     bool isDropdown = false,
     int maxLines = 1,
   }) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: Column(
@@ -132,34 +117,39 @@ class EditBusinessScreen extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF777F84)),
+            style: TextStyle(fontSize: 14, color: colors.textSecondary),
           ),
           const SizedBox(height: 8),
-          TextField(
-            maxLines: maxLines,
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(
-                color: Color(0xFFCCCCCC),
-                fontSize: 16,
-              ),
-              suffixIcon: isDropdown
-                  ? const Icon(
-                      Icons.keyboard_arrow_down,
-                      color: Color(0xFF777F84),
-                    )
-                  : null,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 16,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFFDAF40)),
+          Container(
+            decoration: BoxDecoration(
+              color: colors.surfaceElevated,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: colors.border),
+              boxShadow: [
+                BoxShadow(
+                  color: colors.shadow.withValues(alpha: 0.18),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: TextField(
+              maxLines: maxLines,
+              style: TextStyle(color: colors.textPrimary, fontSize: 16),
+              decoration: InputDecoration(
+                hintText: hint,
+                hintStyle: TextStyle(color: colors.textTertiary, fontSize: 16),
+                suffixIcon: isDropdown
+                    ? Icon(
+                        Icons.keyboard_arrow_down,
+                        color: colors.textSecondary,
+                      )
+                    : null,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                border: InputBorder.none,
               ),
             ),
           ),
@@ -168,7 +158,8 @@ class EditBusinessScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPhoneField(String label) {
+  Widget _buildPhoneField(BuildContext context, String label) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: Column(
@@ -176,14 +167,22 @@ class EditBusinessScreen extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF777F84)),
+            style: TextStyle(fontSize: 14, color: colors.textSecondary),
           ),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFCCCCCC)),
+              color: colors.surfaceElevated,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: colors.border),
+              boxShadow: [
+                BoxShadow(
+                  color: colors.shadow.withValues(alpha: 0.18),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -192,16 +191,16 @@ class EditBusinessScreen extends StatelessWidget {
                   size: 20,
                 ), // Placeholder for country asset
                 const SizedBox(width: 8),
-                const Text(
+                Text(
                   "+234",
-                  style: TextStyle(fontSize: 16, color: Color(0xFF241508)),
+                  style: TextStyle(fontSize: 16, color: colors.textPrimary),
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: "8167654354",
-                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
+                      hintStyle: TextStyle(color: colors.textTertiary),
                       border: InputBorder.none,
                     ),
                   ),
@@ -214,13 +213,14 @@ class EditBusinessScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoSection() {
+  Widget _buildLogoSection(BuildContext context) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Business Logo",
-          style: TextStyle(fontSize: 14, color: Color(0xFF777F84)),
+          style: TextStyle(fontSize: 14, color: colors.textSecondary),
         ),
         const SizedBox(height: 8),
         Row(
@@ -229,25 +229,25 @@ class EditBusinessScreen extends StatelessWidget {
               width: 80,
               height: 74,
               decoration: BoxDecoration(
-                color: const Color(0xFFF5E0CE), // Color from IR
-                borderRadius: BorderRadius.circular(4),
+                color: colors.surfaceSecondary,
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(Icons.business, color: Colors.white, size: 32),
+              child: Icon(Icons.business, color: colors.accent, size: 32),
             ),
             const SizedBox(width: 16),
             ElevatedButton(
               onPressed: () {},
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                foregroundColor: const Color(0xFFFDAF40),
+                backgroundColor: colors.surfaceElevated,
+                foregroundColor: colors.accent,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 20,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  side: const BorderSide(color: Color(0xFFFDAF40)),
+                  borderRadius: BorderRadius.circular(18),
+                  side: BorderSide(color: colors.accent),
                 ),
               ),
               child: const Text(
@@ -261,26 +261,27 @@ class EditBusinessScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildSaveButton(BuildContext context) {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
       height: 57,
       decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.accent,
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
+            color: colors.accent.withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: const Center(
+      child: Center(
         child: Text(
           "Save and Continue",
           style: TextStyle(
-            color: Colors.white,
+            color: colors.onAccent,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),

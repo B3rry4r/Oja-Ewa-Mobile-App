@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
+import '../../app/theme/app_theme_colors.dart';
 import '../../app/router/app_router.dart';
 import '../../features/cart/presentation/controllers/cart_controller.dart';
 import '../../features/cart/domain/cart.dart';
@@ -358,7 +359,7 @@ class PusherListeners {
       title: 'Order Update',
       message: message,
       icon: icon,
-      backgroundColor: const Color(0xFF603814),
+      backgroundColor: context.appColors.accent,
       onTap: () {
         Navigator.of(context).pushNamed(AppRoutes.orders);
       },
@@ -476,7 +477,7 @@ class PusherListeners {
       title: '📰 New Blog Post',
       message: title,
       icon: Icons.article,
-      backgroundColor: const Color(0xFF603814),
+      backgroundColor: context.appColors.accent,
       onTap: () {
         Navigator.of(context).popUntil((route) => route.isFirst);
       },

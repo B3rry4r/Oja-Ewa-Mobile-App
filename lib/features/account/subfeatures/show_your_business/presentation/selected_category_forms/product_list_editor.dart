@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 
 /// UI-only editor for product_list canonical JSON:
 /// [ "Product 1", "Product 2", ... ]
@@ -14,6 +15,7 @@ class ProductListEditor extends StatefulWidget {
 class _ProductListEditorState extends State<ProductListEditor> {
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -39,16 +41,16 @@ class _ProductListEditorState extends State<ProductListEditor> {
               height: 44,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFFFDAF40),
-                borderRadius: BorderRadius.circular(8),
+                color: colors.accent,
+                borderRadius: BorderRadius.circular(16),
               ),
               alignment: Alignment.center,
-              child: const Text(
+              child: Text(
                 'Add product',
                 style: TextStyle(
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFFFFFBF5),
+                  color: colors.onAccent,
                 ),
               ),
             ),
@@ -74,6 +76,7 @@ class _ProductRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Row(
       children: [
         Expanded(
@@ -81,22 +84,24 @@ class _ProductRow extends StatelessWidget {
             key: ValueKey(index),
             initialValue: value,
             onChanged: onChanged,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Campton',
               fontSize: 16,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
             decoration: InputDecoration(
               hintText: 'e.g. Ankara Fabric',
-              hintStyle: const TextStyle(color: Color(0xFFCCCCCC)),
+              hintStyle: TextStyle(color: colors.textTertiary),
+              filled: true,
+              fillColor: colors.surfaceElevated,
               contentPadding: const EdgeInsets.all(16),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
+                borderRadius: BorderRadius.circular(18),
+                borderSide: BorderSide(color: colors.border),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFFDAF40)),
+                borderRadius: BorderRadius.circular(18),
+                borderSide: BorderSide(color: colors.accent),
               ),
             ),
           ),
@@ -105,7 +110,7 @@ class _ProductRow extends StatelessWidget {
           const SizedBox(width: 8),
           IconButton(
             onPressed: onRemove,
-            icon: const Icon(Icons.close, size: 18, color: Color(0xFF777F84)),
+            icon: Icon(Icons.close, size: 18, color: colors.textSecondary),
           ),
         ],
       ],

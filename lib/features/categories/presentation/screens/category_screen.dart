@@ -1,7 +1,8 @@
 // category_screen.dart
 import 'package:flutter/material.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 
 typedef CategoryItemTap = void Function(CategorySection section, String item);
 
@@ -74,6 +75,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   final Map<String, bool> _expandedSections = {};
 
   Widget _buildEmptyState() {
+    final colors = context.appColors;
     final retry = widget.onRetry;
 
     return Container(
@@ -86,30 +88,34 @@ class _CategoryScreenState extends State<CategoryScreen> {
             width: 140,
             height: 140,
             decoration: BoxDecoration(
-              color: const Color(0xFFDEDEDE),
+              color: colors.surfaceSecondary,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(Icons.category_outlined, size: 64, color: Color(0xFF777F84)),
+            child: Icon(
+              Icons.category_outlined,
+              size: 64,
+              color: colors.textSecondary,
+            ),
           ),
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'Nothing here yet',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
               fontFamily: 'Campton',
-              color: Color(0xFF241508),
+              color: colors.textPrimary,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'No categories were found for this section.',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
               fontFamily: 'Campton',
-              color: Color(0xFF777F84),
+              color: colors.textSecondary,
               height: 1.4,
             ),
             textAlign: TextAlign.center,
@@ -121,9 +127,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
               child: ElevatedButton(
                 onPressed: retry,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFA15E22),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  backgroundColor: colors.accent,
+                  foregroundColor: colors.onAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
                 ),
                 child: const Text('Retry'),
               ),
@@ -140,48 +148,23 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   void _toggleSectionExpansion(String sectionTitle) {
     setState(() {
-      _expandedSections[sectionTitle] = !(_expandedSections[sectionTitle] ?? false);
+      _expandedSections[sectionTitle] =
+          !(_expandedSections[sectionTitle] ?? false);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF603814),
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            // Header with buttons
-            if (widget.showHeaderButtons) _buildHeader(context),
-            
-            // Main Content
-            Expanded(
-              child: Container(
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFF8F1),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
-                  ),
-                ),
-                child: _buildContent(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return const AppHeader(
-      iconColor: Colors.white,
+    return AppPageScaffold(
+      title: widget.categoryTitle,
+      showBack: widget.showHeaderButtons,
+      showActions: widget.showHeaderButtons,
+      child: _buildContent(),
     );
   }
 
   Widget _buildContent() {
+    final colors = context.appColors;
     final hasSections = widget.sections.isNotEmpty;
 
     return SingleChildScrollView(
@@ -191,29 +174,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 16),
-
-            // Category Title
-            Text(
-              widget.categoryTitle,
-              style: const TextStyle(
-                fontSize: 33,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Campton',
-                color: Color(0xFF241508),
-              ),
-            ),
-
-            const SizedBox(height: 4),
-
             // Category Description
             Text(
               widget.categoryDescription,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
                 fontFamily: 'Campton',
-                color: Color(0xFF777F84),
+                color: colors.textSecondary,
               ),
             ),
 
@@ -223,9 +191,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
             if (hasSections) ...[
               // Sections
-              ...widget.sections.map((section) {
-                return _buildCategorySection(section);
-              }).expand((w) => [w, const SizedBox(height: 0)]),
+              ...widget.sections
+                  .map((section) {
+                    return _buildCategorySection(section);
+                  })
+                  .expand((w) => [w, const SizedBox(height: 0)]),
             ],
 
             const SizedBox(height: 40),
@@ -236,6 +206,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   }
 
   Widget _buildCategorySection(CategorySection section) {
+    final colors = context.appColors;
     final isExpanded = _expandedSections[section.title] ?? false;
 
     return Column(
@@ -252,10 +223,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
               height: 64,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: section.hasBorder
-                  ? const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Color(0xFFDEDEDE)),
-                      ),
+                  ? BoxDecoration(
+                      border: Border(bottom: BorderSide(color: colors.border)),
                     )
                   : null,
               child: Row(
@@ -263,11 +232,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 children: [
                   Text(
                     section.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'Campton',
-                      color: Color(0xFF1E2021),
+                      color: colors.textPrimary,
                     ),
                   ),
                   if (section.hasTrailingIcon)
@@ -276,7 +245,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           ? Icons.keyboard_arrow_up_rounded
                           : Icons.keyboard_arrow_down_rounded,
                       size: 24,
-                      color: const Color(0xFF1E2021),
+                      color: colors.textPrimary,
                     ),
                 ],
               ),
@@ -292,6 +261,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   }
 
   Widget _buildSectionItems(CategorySection section) {
+    final colors = context.appColors;
     final items = section.items;
 
     return Column(
@@ -325,11 +295,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
               ),
               child: Text(
                 item,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                   fontFamily: 'Campton',
-                  color: Color(0xFF1E2021),
+                  color: colors.textPrimary,
                 ),
               ),
             ),
@@ -338,5 +308,4 @@ class _CategoryScreenState extends State<CategoryScreen> {
       }),
     );
   }
-
 }

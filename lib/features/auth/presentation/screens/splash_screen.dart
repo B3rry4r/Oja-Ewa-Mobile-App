@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import '../../../../core/auth/auth_controller.dart';
 import '../../../../core/auth/auth_state.dart';
@@ -50,23 +51,25 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     if (!mounted || _navigated) return;
     _navigated = true;
 
-    final nextRoute =
-        authState is AuthAuthenticated ? AppRoutes.home : AppRoutes.onboarding;
+    final nextRoute = authState is AuthAuthenticated
+        ? AppRoutes.home
+        : AppRoutes.onboarding;
 
     Navigator.of(context).pushReplacementNamed(nextRoute);
   }
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
+      backgroundColor: colors.background,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildBrandLogo(),
             const SizedBox(height: 48),
-            _buildLoadingIndicator(),
+            _buildLoadingIndicator(context),
           ],
         ),
       ),
@@ -98,7 +101,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     );
   }
 
-  Widget _buildLoadingIndicator() {
+  Widget _buildLoadingIndicator(BuildContext context) {
+    final colors = context.appColors;
     return Column(
       children: [
         SizedBox(
@@ -106,18 +110,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           height: 40,
           child: CircularProgressIndicator(
             strokeWidth: 2,
-            valueColor:
-                const AlwaysStoppedAnimation<Color>(Color(0xFFFDAF40)),
+            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFDAF40)),
           ),
         ),
         const SizedBox(height: 20),
-        const Text(
+        Text(
           'Loading...',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: Color(0xFF777F84),
+            color: colors.textSecondary,
           ),
         ),
       ],

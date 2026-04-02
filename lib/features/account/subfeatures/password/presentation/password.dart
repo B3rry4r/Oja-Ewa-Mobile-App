@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
@@ -74,75 +75,50 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final state = ref.watch(passwordControllerProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const AppHeader(
-                backgroundColor: Color(0xFFFFF8F1),
-                iconColor: Color(0xFF241508),
-                title: Text(
-                  'Change Password',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Campton',
-                    color: Color(0xFF241508),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 32),
-                    _buildPasswordField(
-                      label: 'Old Password',
-                      controller: _currentController,
-                      obscure: _obscureCurrent,
-                      onToggle: () =>
-                          setState(() => _obscureCurrent = !_obscureCurrent),
-                    ),
-                    const SizedBox(height: 24),
-                    _buildPasswordField(
-                      label: 'New Password',
-                      controller: _newController,
-                      obscure: _obscureNew,
-                      onToggle: () =>
-                          setState(() => _obscureNew = !_obscureNew),
-                    ),
-                    const SizedBox(height: 24),
-                    _buildPasswordField(
-                      label: 'Confirm New Password',
-                      controller: _confirmController,
-                      obscure: _obscureConfirm,
-                      onToggle: () =>
-                          setState(() => _obscureConfirm = !_obscureConfirm),
-                    ),
-                    const SizedBox(height: 80),
-                    _buildSaveButton(isLoading: state.isLoading),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Opacity(
-                        opacity: 0.03,
-                        child: Image.asset(
-                          AppImages.logoOutline,
-                          width: 234,
-                          height: 347,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+    return AppPageScaffold(
+      title: 'Change Password',
+      scrollable: true,
+      child: Column(
+        children: [
+          const SizedBox(height: 32),
+          _buildPasswordField(
+            label: 'Old Password',
+            controller: _currentController,
+            obscure: _obscureCurrent,
+            onToggle: () => setState(() => _obscureCurrent = !_obscureCurrent),
           ),
-        ),
+          const SizedBox(height: 24),
+          _buildPasswordField(
+            label: 'New Password',
+            controller: _newController,
+            obscure: _obscureNew,
+            onToggle: () => setState(() => _obscureNew = !_obscureNew),
+          ),
+          const SizedBox(height: 24),
+          _buildPasswordField(
+            label: 'Confirm New Password',
+            controller: _confirmController,
+            obscure: _obscureConfirm,
+            onToggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
+          ),
+          const SizedBox(height: 80),
+          _buildSaveButton(isLoading: state.isLoading),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Opacity(
+              opacity: 0.03,
+              child: Image.asset(
+                AppImages.logoOutline,
+                width: 234,
+                height: 347,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -153,23 +129,25 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     required bool obscure,
     required VoidCallback onToggle,
   }) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontFamily: 'Campton',
-            color: Color(0xFF777F84),
+            color: colors.textTertiary,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           height: 49,
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-            borderRadius: BorderRadius.circular(8),
+            color: colors.surfaceElevated,
+            border: Border.all(color: colors.border),
+            borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
             children: [
@@ -179,13 +157,14 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   child: TextField(
                     controller: controller,
                     obscureText: obscure,
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: colors.textPrimary),
+                    decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Type your password',
                       hintStyle: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Campton',
-                        color: Color(0xFFCCCCCC),
+                        color: colors.textTertiary,
                       ),
                     ),
                   ),
@@ -195,7 +174,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 icon: Icon(
                   obscure ? Icons.visibility_off : Icons.visibility,
                   size: 20,
-                  color: const Color(0xFF777F84),
+                  color: colors.textTertiary,
                 ),
                 onPressed: onToggle,
                 padding: const EdgeInsets.only(right: 20),
@@ -208,13 +187,14 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   }
 
   Widget _buildSaveButton({required bool isLoading}) {
+    final colors = context.appColors;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40),
+        color: colors.accent,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+            color: colors.accent.withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),

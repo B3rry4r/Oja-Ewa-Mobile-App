@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 
 class ClassOfferedItem {
   ClassOfferedItem({this.name = '', this.duration = ''});
@@ -6,10 +7,7 @@ class ClassOfferedItem {
   String name;
   String duration;
 
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'duration': duration,
-      };
+  Map<String, dynamic> toJson() => {'name': name, 'duration': duration};
 }
 
 /// UI-only editor for classes_offered canonical JSON:
@@ -26,10 +24,16 @@ class ClassesOfferedEditor extends StatefulWidget {
 class _ClassesOfferedEditorState extends State<ClassesOfferedEditor> {
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Column(
       children: [
         for (int i = 0; i < widget.items.length; i++) ...[
-          _Row(item: widget.items[i], onRemove: widget.items.length <= 1 ? null : () => setState(() => widget.items.removeAt(i))),
+          _Row(
+            item: widget.items[i],
+            onRemove: widget.items.length <= 1
+                ? null
+                : () => setState(() => widget.items.removeAt(i)),
+          ),
           const SizedBox(height: 12),
         ],
         Align(
@@ -41,16 +45,16 @@ class _ClassesOfferedEditorState extends State<ClassesOfferedEditor> {
               height: 44,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFFFDAF40),
-                borderRadius: BorderRadius.circular(8),
+                color: colors.accent,
+                borderRadius: BorderRadius.circular(16),
               ),
               alignment: Alignment.center,
-              child: const Text(
+              child: Text(
                 'Add class',
                 style: TextStyle(
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFFFFFBF5),
+                  color: colors.onAccent,
                 ),
               ),
             ),
@@ -69,20 +73,29 @@ class _Row extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Row(
       children: [
         Expanded(
-          child: _TextBox(label: 'Class name', hint: 'e.g. Beginner Makeup', onChanged: (v) => item.name = v),
+          child: _TextBox(
+            label: 'Class name',
+            hint: 'e.g. Beginner Makeup',
+            onChanged: (v) => item.name = v,
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _TextBox(label: 'Duration', hint: 'e.g. 4 weeks', onChanged: (v) => item.duration = v),
+          child: _TextBox(
+            label: 'Duration',
+            hint: 'e.g. 4 weeks',
+            onChanged: (v) => item.duration = v,
+          ),
         ),
         if (onRemove != null) ...[
           const SizedBox(width: 8),
           IconButton(
             onPressed: onRemove,
-            icon: const Icon(Icons.close, size: 18, color: Color(0xFF777F84)),
+            icon: Icon(Icons.close, size: 18, color: colors.textSecondary),
           ),
         ],
       ],
@@ -91,7 +104,11 @@ class _Row extends StatelessWidget {
 }
 
 class _TextBox extends StatelessWidget {
-  const _TextBox({required this.label, required this.hint, required this.onChanged});
+  const _TextBox({
+    required this.label,
+    required this.hint,
+    required this.onChanged,
+  });
 
   final String label;
   final String hint;
@@ -99,29 +116,35 @@ class _TextBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFF777F84), fontSize: 14)),
+        Text(
+          label,
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
+        ),
         const SizedBox(height: 8),
         TextField(
           onChanged: onChanged,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Campton',
             fontSize: 16,
-            color: Color(0xFF1E2021),
+            color: colors.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: Color(0xFFCCCCCC)),
+            hintStyle: TextStyle(color: colors.textTertiary),
+            filled: true,
+            fillColor: colors.surfaceElevated,
             contentPadding: const EdgeInsets.all(16),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.border),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFFDAF40)),
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.accent),
             ),
           ),
         ),

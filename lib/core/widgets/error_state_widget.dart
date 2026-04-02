@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_header.dart';
 
 /// A reusable error state widget that matches the app's UI design.
@@ -23,15 +24,16 @@ class ErrorStateWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Column(
           children: [
             if (showHeader)
-              const AppHeader(
-                backgroundColor: Color(0xFFFFF8F1),
-                iconColor: Color(0xFF241508),
+              AppHeader(
+                backgroundColor: colors.background,
+                iconColor: colors.textPrimary,
               ),
             Expanded(
               child: Center(
@@ -45,13 +47,13 @@ class ErrorStateWidget extends StatelessWidget {
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40).withAlpha(26),
+                          color: colors.accent.withValues(alpha: 0.12),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.error_outline,
                           size: 40,
-                          color: Color(0xFFFDAF40),
+                          color: colors.accent,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -60,11 +62,11 @@ class ErrorStateWidget extends StatelessWidget {
                       Text(
                         message,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'Campton',
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF1E2021),
+                          color: colors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -76,8 +78,8 @@ class ErrorStateWidget extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: onRetry,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFDAF40),
-                            foregroundColor: const Color(0xFFFFFBF5),
+                            backgroundColor: colors.accent,
+                            foregroundColor: colors.onAccent,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -107,25 +109,23 @@ class ErrorStateWidget extends StatelessWidget {
 
 /// A loading state widget that matches the app's UI design.
 class LoadingStateWidget extends StatelessWidget {
-  const LoadingStateWidget({
-    super.key,
-    this.showHeader = true,
-  });
+  const LoadingStateWidget({super.key, this.showHeader = true});
 
   /// Whether to show the app header
   final bool showHeader;
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Column(
           children: [
             if (showHeader)
-              const AppHeader(
-                backgroundColor: Color(0xFFFFF8F1),
-                iconColor: Color(0xFF241508),
+              AppHeader(
+                backgroundColor: colors.background,
+                iconColor: colors.textPrimary,
               ),
             const Expanded(
               child: Center(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 
 class SellerBadge extends StatelessWidget {
   final String? badge;
@@ -13,34 +14,52 @@ class SellerBadge extends StatelessWidget {
 
     switch (badge) {
       case "certified_authentic":
-        return _buildBadge("Certified Authentic", const Color(0xFF2B2B2B), Colors.white);
+        return _buildBadge(
+          context,
+          "Certified Authentic",
+          const Color(0xFF2B2B2B),
+          Colors.white,
+        );
       case "heritage_artisan":
-        return _buildBadge("Heritage Artisan", const Color(0xFFD4AF37), Colors.white);
+        return _buildBadge(
+          context,
+          "Heritage Artisan",
+          const Color(0xFFD4AF37),
+          Colors.white,
+        );
       case "sustainable_innovator":
-        return _buildBadge("Sustainable Innovator", const Color(0xFF2E7D32), Colors.white);
+        return _buildBadge(
+          context,
+          "Sustainable Innovator",
+          const Color(0xFF2E7D32),
+          Colors.white,
+        );
       case "design_excellence":
-        return _buildBadge("Design Excellence", const Color(0xFF2F80ED), Colors.white);
+        return _buildBadge(
+          context,
+          "Design Excellence",
+          const Color(0xFF2F80ED),
+          Colors.white,
+        );
       default:
         return const SizedBox.shrink();
     }
   }
 
-  Widget _buildBadge(String text, Color bg, Color fg) {
+  Widget _buildBadge(BuildContext context, String text, Color bg, Color fg) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: bg,
-        border: Border.all(color: const Color(0xFF603814).withOpacity(0.2)),
+        border: Border.all(
+          color: context.appColors.accent.withValues(alpha: 0.2),
+        ),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.verified,
-            size: 14,
-            color: fg,
-          ),
+          Icon(Icons.verified, size: 14, color: fg),
           const SizedBox(width: 4),
           Text(
             text,

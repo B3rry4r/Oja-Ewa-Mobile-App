@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import '../../core/audio/audio_controller.dart';
 import '../../core/audio/audio_controls.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -42,8 +43,12 @@ class _AppShellState extends ConsumerState<AppShell> {
       ref.read(allCategoriesProvider);
 
       // Wire up foreground FCM message display as in-app banner
-      ref.read(fcmServiceProvider).setOnMessageCallback(_handleForegroundMessage);
-      ref.read(fcmServiceProvider).setOnNotificationTapCallback(_handleNotificationTap);
+      ref
+          .read(fcmServiceProvider)
+          .setOnMessageCallback(_handleForegroundMessage);
+      ref
+          .read(fcmServiceProvider)
+          .setOnNotificationTapCallback(_handleNotificationTap);
     });
   }
 
@@ -51,15 +56,18 @@ class _AppShellState extends ConsumerState<AppShell> {
     if (!mounted) return;
     final title = message.notification?.title ?? 'Notification';
     final body = message.notification?.body ?? '';
-    
+
     // Use the navigator overlay safely
     BuildContext? targetContext;
     try {
-      targetContext = Navigator.of(context, rootNavigator: true).overlay?.context;
+      targetContext = Navigator.of(
+        context,
+        rootNavigator: true,
+      ).overlay?.context;
     } catch (_) {
       // Navigator not ready
     }
-    
+
     if (targetContext != null && mounted) {
       InAppNotification.show(
         targetContext,
@@ -104,9 +112,7 @@ class _AppShellState extends ConsumerState<AppShell> {
       case 'product':
       case 'product_approval':
         if (productId != null) {
-          Navigator.of(context).pushNamed(
-            AppRoutes.yourShopDashboard,
-          );
+          Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
         }
         break;
       case 'blog':
@@ -137,7 +143,7 @@ class _AppShellState extends ConsumerState<AppShell> {
 
     return Scaffold(
       extendBody: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: context.appColors.background,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 10),
@@ -170,32 +176,12 @@ class _AppShellState extends ConsumerState<AppShell> {
       children: [
         const AudioControlsButton(),
         const SizedBox(height: 10),
-        /*
-        if (isLoggedIn) ...[
-          const SizedBox(height: 10),
-          FloatingActionButton.extended(
-            heroTag: 'ai-chat-fab',
-            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.aiChat),
-            backgroundColor: const Color(0xFF603814),
-            foregroundColor: Colors.white,
-            icon: const Icon(Icons.auto_awesome, size: 24),
-            label: const Text(
-              'Ask AI',
-              style: TextStyle(
-                fontSize: 14,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-        */
         const SizedBox(height: 10),
         FloatingActionButton.extended(
           heroTag: 'start-selling-fab',
           onPressed: () => _navigateToStartSelling(context, ref),
-          backgroundColor: const Color(0xFFFDAF40),
-          foregroundColor: Colors.white,
+          backgroundColor: context.appColors.accent,
+          foregroundColor: context.appColors.onAccent,
           icon: const Icon(Icons.storefront, size: 24),
           label: const Text(
             'Start Selling',
@@ -206,18 +192,19 @@ class _AppShellState extends ConsumerState<AppShell> {
             ),
           ),
         ),
-        
       ],
     );
   }
 
   void _navigateToStartSelling(BuildContext context, WidgetRef ref) {
     final isSellerApproved = ref.read(isSellerApprovedProvider);
-    
+
     // Check seller status and navigate accordingly
     // This mirrors the logic in account.dart to prevent navigation loops
     Navigator.of(context).pushNamed(
-      isSellerApproved ? AppRoutes.yourShopDashboard : AppRoutes.sellerOnboarding,
+      isSellerApproved
+          ? AppRoutes.yourShopDashboard
+          : AppRoutes.sellerOnboarding,
     );
   }
 }

@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/orders/domain/order_models.dart';
@@ -15,181 +16,97 @@ class OrderDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final args = ModalRoute.of(context)?.settings.arguments;
     final orderId = (args is Map && args['orderId'] is int)
         ? args['orderId'] as int
         : null;
 
     if (orderId == null) {
-      return const Scaffold(
-        backgroundColor: Color(0xFFFFF8F1),
-        body: SafeArea(child: Center(child: Text('Missing order id'))),
+      return AppPageScaffold(
+        title: 'Order Details',
+        child: const Center(child: Text('Missing order id')),
       );
     }
 
     final orderAsync = ref.watch(orderDetailsProvider(orderId));
     final statusOverrides = ref.watch(orderStatusOverridesProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: orderAsync.when(
-          loading: () => const Column(
-            children: [
-              AppHeader(
-                backgroundColor: Color(0xFFFFF8F1),
-                iconColor: Color(0xFF241508),
-                title: Text(
-                  'Order Details',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontFamily: 'Campton',
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF241508),
-                  ),
-                ),
-              ),
-              Expanded(child: Center(child: CircularProgressIndicator())),
-            ],
-          ),
-          error: (e, st) => Column(
-            children: [
-              const AppHeader(
-                backgroundColor: Color(0xFFFFF8F1),
-                iconColor: Color(0xFF241508),
-                title: Text(
-                  'Order Details',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontFamily: 'Campton',
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF241508),
-                  ),
-                ),
-              ),
-              Expanded(child: Center(child: Text('Failed to load order: $e'))),
-            ],
-          ),
-          data: (data) {
-            if (data.isEmpty) {
-              return const Column(
-                children: [
-                  AppHeader(
-                    backgroundColor: Color(0xFFFFF8F1),
-                    iconColor: Color(0xFF241508),
-                    title: Text(
-                      'Order Details',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontFamily: 'Campton',
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF241508),
-                      ),
-                    ),
-                  ),
-                  Expanded(child: Center(child: Text('Order not found'))),
-                ],
-              );
-            }
+    return AppPageScaffold(
+      title: 'Order Details',
+      child: orderAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, st) => Center(child: Text('Failed to load order: $e')),
+        data: (data) {
+          if (data.isEmpty) {
+            return const Center(child: Text('Order not found'));
+          }
 
-            final order = OrderSummary.fromJson(data);
-            final overrideStatus = statusOverrides[order.id];
-            final effectiveOrder = overrideStatus == null
-                ? order
-                : OrderSummary(
-                    id: order.id,
-                    orderNumber: order.orderNumber,
-                    totalPrice: order.totalPrice,
-                    deliveryFee: order.deliveryFee,
-                    status: overrideStatus,
-                    paymentStatus: order.paymentStatus,
-                    paymentReference: order.paymentReference,
-                    trackingNumber: order.trackingNumber,
-                    createdAt: order.createdAt,
-                    items: order.items,
-                    shipments: order.shipments,
-                  );
+          final order = OrderSummary.fromJson(data);
+          final overrideStatus = statusOverrides[order.id];
+          final effectiveOrder = overrideStatus == null
+              ? order
+              : OrderSummary(
+                  id: order.id,
+                  orderNumber: order.orderNumber,
+                  totalPrice: order.totalPrice,
+                  deliveryFee: order.deliveryFee,
+                  status: overrideStatus,
+                  paymentStatus: order.paymentStatus,
+                  paymentReference: order.paymentReference,
+                  trackingNumber: order.trackingNumber,
+                  createdAt: order.createdAt,
+                  items: order.items,
+                  shipments: order.shipments,
+                );
 
-            // Build shipping address from available fields
-            final shippingAddress =
-                data['shipping_address'] as String? ??
-                data['address'] as String?;
-            final shippingCity = data['shipping_city'] as String?;
-            final shippingState = data['shipping_state'] as String?;
-            final shippingCountry = data['shipping_country'] as String?;
-            final shippingToParts =
-                [shippingAddress, shippingCity, shippingState, shippingCountry]
-                    .whereType<String>()
-                    .where((part) => part.trim().isNotEmpty)
-                    .toList();
-            final shippingTo = shippingToParts.isEmpty
-                ? null
-                : shippingToParts.join(', ');
+          // Build shipping address from available fields
+          final shippingAddress =
+              data['shipping_address'] as String? ?? data['address'] as String?;
+          final shippingCity = data['shipping_city'] as String?;
+          final shippingState = data['shipping_state'] as String?;
+          final shippingCountry = data['shipping_country'] as String?;
+          final shippingToParts =
+              [shippingAddress, shippingCity, shippingState, shippingCountry]
+                  .whereType<String>()
+                  .where((part) => part.trim().isNotEmpty)
+                  .toList();
+          final shippingTo = shippingToParts.isEmpty
+              ? null
+              : shippingToParts.join(', ');
 
-            return Column(
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 0),
+            child: Column(
               children: [
-                const AppHeader(
-                  backgroundColor: Color(0xFFFFF8F1),
-                  iconColor: Color(0xFF241508),
-                  title: Text(
-                    'Order Details',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF241508),
-                    ),
-                  ),
+                _buildOrderInformation(context, effectiveOrder),
+                const SizedBox(height: 16),
+                _buildShippingAddress(context, shippingTo),
+                const SizedBox(height: 16),
+                _buildItemsInOrder(context, order.items),
+                const SizedBox(height: 16),
+                if (effectiveOrder.shipments.isNotEmpty) ...[
+                  _buildShipments(context, effectiveOrder.shipments),
+                  const SizedBox(height: 16),
+                ],
+                _buildPaymentDetails(
+                  context,
+                  effectiveOrder.totalPrice ?? 0,
+                  effectiveOrder.deliveryFee,
+                  effectiveOrder.paymentStatus,
+                  effectiveOrder.paymentReference,
                 ),
-
-                // Main content
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      children: [
-                        // Order Information section
-                        _buildOrderInformation(context, effectiveOrder),
-
-                        const SizedBox(height: 16),
-
-                        // Shipping Address section
-                        _buildShippingAddress(shippingTo),
-
-                        const SizedBox(height: 16),
-
-                        // Items in Order section
-                        _buildItemsInOrder(order.items),
-
-                        const SizedBox(height: 16),
-
-                        if (effectiveOrder.shipments.isNotEmpty) ...[
-                          _buildShipments(effectiveOrder.shipments),
-                          const SizedBox(height: 16),
-                        ],
-
-                        // Payment section
-                        _buildPaymentDetails(
-                          effectiveOrder.totalPrice ?? 0,
-                          effectiveOrder.deliveryFee,
-                          effectiveOrder.paymentStatus,
-                          effectiveOrder.paymentReference,
-                        ),
-
-                        const SizedBox(height: 16),
-                      ],
-                    ),
-                  ),
-                ),
+                const SizedBox(height: 16),
               ],
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
   Widget _buildOrderInformation(BuildContext context, OrderSummary order) {
+    final colors = context.appColors;
     final orderedOn = order.createdAt != null
         ? '${order.createdAt!.day.toString().padLeft(2, '0')}/'
               '${order.createdAt!.month.toString().padLeft(2, '0')}/'
@@ -201,19 +118,20 @@ class OrderDetailsScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(18),
+        color: colors.surfaceElevated,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Order Information',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF3C4042),
+              color: colors.textPrimary,
             ),
           ),
 
@@ -223,23 +141,23 @@ class OrderDetailsScreen extends ConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Ordered on',
                 style: TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF777F84),
+                  color: colors.textSecondary,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 orderedOn,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF3C4042),
+                  color: colors.textPrimary,
                 ),
               ),
             ],
@@ -254,23 +172,23 @@ class OrderDetailsScreen extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Order Number',
                     style: TextStyle(
                       fontSize: 10,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF777F84),
+                      color: colors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     orderNumber,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF3C4042),
+                      color: colors.textPrimary,
                     ),
                   ),
                 ],
@@ -291,16 +209,17 @@ class OrderDetailsScreen extends ConsumerWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFCCCCCC)),
-                    borderRadius: BorderRadius.circular(4),
+                    color: colors.surface,
+                    border: Border.all(color: colors.border),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Copy',
                     style: TextStyle(
                       fontSize: 10,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF777F84),
+                      color: colors.textSecondary,
                     ),
                   ),
                 ),
@@ -313,23 +232,23 @@ class OrderDetailsScreen extends ConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Status',
                 style: TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF777F84),
+                  color: colors.textSecondary,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 statusLabel,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF3C4042),
+                  color: colors.textPrimary,
                 ),
               ),
             ],
@@ -339,24 +258,26 @@ class OrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildShippingAddress(String? shippingTo) {
+  Widget _buildShippingAddress(BuildContext context, String? shippingTo) {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(18),
+        color: colors.surfaceElevated,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Shipping to',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF3C4042),
+              color: colors.textPrimary,
             ),
           ),
 
@@ -366,11 +287,11 @@ class OrderDetailsScreen extends ConsumerWidget {
             (shippingTo == null || shippingTo.trim().isEmpty)
                 ? 'Not provided'
                 : shippingTo,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
-              color: Color(0xFF3C4042),
+              color: colors.textPrimary,
               height: 1.5,
             ),
           ),
@@ -379,31 +300,33 @@ class OrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildItemsInOrder(List<OrderItem> items) {
+  Widget _buildItemsInOrder(BuildContext context, List<OrderItem> items) {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(18),
+        color: colors.surfaceElevated,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Items in Order',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF3C4042),
+              color: colors.textPrimary,
             ),
           ),
 
           const SizedBox(height: 16),
 
           for (int i = 0; i < items.length; i++) ...[
-            _buildOrderItem(item: items[i]),
+            _buildOrderItem(context: context, item: items[i]),
             if (i < items.length - 1) const SizedBox(height: 20),
           ],
         ],
@@ -411,7 +334,11 @@ class OrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildOrderItem({required OrderItem item}) {
+  Widget _buildOrderItem({
+    required BuildContext context,
+    required OrderItem item,
+  }) {
+    final colors = context.appColors;
     final img = item.product.image;
     final price = item.unitPrice ?? item.product.price ?? 0;
 
@@ -448,11 +375,11 @@ class OrderDetailsScreen extends ConsumerWidget {
             children: [
               Text(
                 item.product.name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF0F1011),
+                  color: colors.textPrimary,
                 ),
               ),
 
@@ -460,11 +387,11 @@ class OrderDetailsScreen extends ConsumerWidget {
 
               Text(
                 formatPrice(price),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
+                  color: colors.textPrimary,
                 ),
               ),
             ],
@@ -474,13 +401,13 @@ class OrderDetailsScreen extends ConsumerWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            const Text(
+            Text(
               '-',
               style: TextStyle(
                 fontSize: 10,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: Color(0xFF3C4042),
+                color: colors.textSecondary,
               ),
             ),
 
@@ -488,11 +415,11 @@ class OrderDetailsScreen extends ConsumerWidget {
 
             Text(
               'X${item.quantity}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
-                color: Color(0xFF3C4042),
+                color: colors.textSecondary,
               ),
             ),
           ],
@@ -501,29 +428,34 @@ class OrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildShipments(List<ShipmentSummary> shipments) {
+  Widget _buildShipments(
+    BuildContext context,
+    List<ShipmentSummary> shipments,
+  ) {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(18),
+        color: colors.surfaceElevated,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Shipments',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF3C4042),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
           for (int i = 0; i < shipments.length; i++) ...[
-            _buildShipmentRow(shipments[i]),
+            _buildShipmentRow(context, shipments[i]),
             if (i < shipments.length - 1) const Divider(height: 24),
           ],
         ],
@@ -531,7 +463,8 @@ class OrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildShipmentRow(ShipmentSummary shipment) {
+  Widget _buildShipmentRow(BuildContext context, ShipmentSummary shipment) {
+    final colors = context.appColors;
     final provider = shipment.provider?.toUpperCase() ?? 'PROVIDER';
     final serviceName = shipment.serviceName ?? 'Shipping service';
     final status = OrderStatusUi.label(shipment.status);
@@ -541,39 +474,39 @@ class OrderDetailsScreen extends ConsumerWidget {
       children: [
         Text(
           '$provider • $serviceName',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontFamily: 'Campton',
             fontWeight: FontWeight.w600,
-            color: Color(0xFF241508),
+            color: colors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           'Status: $status',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontFamily: 'Campton',
-            color: Color(0xFF3C4042),
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           'Shipping Fee: ${formatPrice(shipment.shippingFee ?? 0)}',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontFamily: 'Campton',
-            color: Color(0xFF3C4042),
+            color: colors.textSecondary,
           ),
         ),
         if ((shipment.trackingNumber ?? '').isNotEmpty) ...[
           const SizedBox(height: 4),
           Text(
             'Tracking Number: ${shipment.trackingNumber}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontFamily: 'Campton',
-              color: Color(0xFF3C4042),
+              color: colors.textSecondary,
             ),
           ),
         ],
@@ -582,30 +515,33 @@ class OrderDetailsScreen extends ConsumerWidget {
   }
 
   Widget _buildPaymentDetails(
+    BuildContext context,
     num total,
     num? deliveryFee,
     String? paymentStatus,
     String? paymentReference,
   ) {
+    final colors = context.appColors;
     final subtotal = deliveryFee == null ? total : (total - deliveryFee);
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
-        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(18),
+        color: colors.surfaceElevated,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Payment Details',
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF3C4042),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
@@ -613,24 +549,24 @@ class OrderDetailsScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Payment Reference',
                   style: TextStyle(
                     fontSize: 10,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
-                    color: Color(0xFF3C4042),
+                    color: colors.textSecondary,
                   ),
                 ),
                 Flexible(
                   child: Text(
                     paymentReference,
                     textAlign: TextAlign.right,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF3C4042),
+                      color: colors.textPrimary,
                     ),
                   ),
                 ),
@@ -641,22 +577,22 @@ class OrderDetailsScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Subtotal',
                 style: TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF3C4042),
+                  color: colors.textSecondary,
                 ),
               ),
               Text(
                 formatPrice(subtotal < 0 ? 0 : subtotal),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF3C4042),
+                  color: colors.textPrimary,
                 ),
               ),
             ],
@@ -665,22 +601,22 @@ class OrderDetailsScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Shipping',
                 style: TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF3C4042),
+                  color: colors.textSecondary,
                 ),
               ),
               Text(
                 formatPrice(deliveryFee ?? 0),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF3C4042),
+                  color: colors.textPrimary,
                 ),
               ),
             ],
@@ -690,22 +626,22 @@ class OrderDetailsScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Payment Status',
                   style: TextStyle(
                     fontSize: 10,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
-                    color: Color(0xFF3C4042),
+                    color: colors.textSecondary,
                   ),
                 ),
                 Text(
                   paymentStatus,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 10,
                     fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF3C4042),
+                    color: colors.textPrimary,
                   ),
                 ),
               ],
@@ -715,22 +651,22 @@ class OrderDetailsScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Total Price',
                 style: TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF3C4042),
+                  color: colors.textSecondary,
                 ),
               ),
               Text(
                 formatPrice(total),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF3C4042),
+                  color: colors.textPrimary,
                 ),
               ),
             ],

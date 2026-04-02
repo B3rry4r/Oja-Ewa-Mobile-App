@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
@@ -36,10 +37,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final auth = ref.watch(authFlowControllerProvider);
+    ref.watch(authFlowControllerProvider);
+    final colors = context.appColors;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF603814), // #603814
+      backgroundColor: colors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -63,7 +65,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         alignment: Alignment.centerLeft,
         child: HeaderIconButton(
           asset: AppIcons.back,
-          iconColor: Colors.white,
+          iconColor: context.appColors.textPrimary,
           onTap: () => Navigator.of(context).maybePop(),
         ),
       ),
@@ -71,80 +73,62 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Widget _buildSignInCard() {
-    return Container(
-      margin: const EdgeInsets.only(top: 25),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF8F1), // #fff8f1
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(28),
-          topRight: Radius.circular(28),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
-          ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 28),
+
+          // Welcome Image/Icon
+          _buildWelcomeIcon(),
+
+          const SizedBox(height: 30),
+
+          // Welcome Text
+          _buildWelcomeText(),
+
+          const SizedBox(height: 20),
+
+          // Email Input
+          _buildEmailInput(),
+
+          const SizedBox(height: 20),
+
+          // Password Input
+          _buildPasswordInput(),
+
+          const SizedBox(height: 20),
+
+          // Forgot Password
+          _buildForgotPassword(),
+
+          const SizedBox(height: 20),
+
+          // Remember Me Checkbox
+          _buildRememberMe(),
+
+          const SizedBox(height: 40),
+
+          // Sign In Button
+          _buildSignInButton(),
+
+          const SizedBox(height: 20),
+
+          // Divider with "or" text
+          _buildDivider(),
+
+          const SizedBox(height: 20),
+
+          // Google Sign In Button — temporarily disabled
+          // _buildGoogleSignIn(),
+          const SizedBox(height: 20),
+
+          // Sign Up Link
+          _buildSignUpLink(),
+
+          const SizedBox(height: 40),
         ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 40),
-
-            // Welcome Image/Icon
-            _buildWelcomeIcon(),
-
-            const SizedBox(height: 30),
-
-            // Welcome Text
-            _buildWelcomeText(),
-
-            const SizedBox(height: 20),
-
-            // Email Input
-            _buildEmailInput(),
-
-            const SizedBox(height: 20),
-
-            // Password Input
-            _buildPasswordInput(),
-
-            const SizedBox(height: 20),
-
-            // Forgot Password
-            _buildForgotPassword(),
-
-            const SizedBox(height: 20),
-
-            // Remember Me Checkbox
-            _buildRememberMe(),
-
-            const SizedBox(height: 40),
-
-            // Sign In Button
-            _buildSignInButton(),
-
-            const SizedBox(height: 20),
-
-            // Divider with "or" text
-            _buildDivider(),
-
-            const SizedBox(height: 20),
-
-            // Google Sign In Button — temporarily disabled
-            // _buildGoogleSignIn(),
-
-            const SizedBox(height: 20),
-
-            // Sign Up Link
-            _buildSignUpLink(),
-
-            const SizedBox(height: 40), // Bottom spacing
-          ],
-        ),
       ),
     );
   }
@@ -167,7 +151,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             fontSize: 33,
             fontWeight: FontWeight.w600,
             fontFamily: 'Campton',
-            color: const Color(0xFF3C230C), // #3c230c
+            color: context.appColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -177,7 +161,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             fontSize: 16,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF301C0A), // #301c0a
+            color: context.appColors.textSecondary,
           ),
         ),
       ],
@@ -185,6 +169,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Widget _buildEmailInput() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -194,46 +179,25 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF777F84), // #777f84
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 49,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color(0xFFCCCCCC), // #cccccc
-              width: 1,
+        _buildInputShell(
+          icon: Icons.email_outlined,
+          child: TextField(
+            controller: _emailController,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Campton',
+              color: colors.textPrimary,
             ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.email_outlined,
-                  size: 20,
-                  color: Color(0xFFCCCCCC),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    controller: _emailController,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
-                      color: const Color(0xFF1E2021),
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Enter your email',
-                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
-                    ),
-                  ),
-                ),
-              ],
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: 'Enter your email',
+              hintStyle: TextStyle(color: colors.textTertiary),
             ),
           ),
         ),
@@ -242,6 +206,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Widget _buildPasswordInput() {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -251,62 +216,39 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF777F84), // #777f84
+            color: colors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 49,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color(0xFFCCCCCC), // #cccccc
-              width: 1,
+        _buildInputShell(
+          icon: Icons.lock_outline_rounded,
+          trailing: IconButton(
+            onPressed: () {
+              setState(() {
+                _obscurePassword = !_obscurePassword;
+              });
+            },
+            icon: Icon(
+              _obscurePassword
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
+              size: 20,
+              color: colors.textSecondary,
             ),
-            borderRadius: BorderRadius.circular(8),
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.lock_outline_rounded,
-                  size: 20,
-                  color: Color(0xFFCCCCCC),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
-                      color: const Color(0xFF1E2021),
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Type your password',
-                      hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                  icon: Icon(
-                    _obscurePassword
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                    size: 20,
-                    color: const Color(0xFF777F84),
-                  ),
-                ),
-              ],
+          child: TextField(
+            controller: _passwordController,
+            obscureText: _obscurePassword,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Campton',
+              color: colors.textPrimary,
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: 'Type your password',
+              hintStyle: TextStyle(color: colors.textTertiary),
             ),
           ),
         ),
@@ -315,6 +257,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Widget _buildForgotPassword() {
+    final colors = context.appColors;
     return Align(
       alignment: Alignment.centerRight,
       child: Material(
@@ -332,7 +275,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 fontFamily: 'Campton',
-                color: const Color(0xFF000000),
+                color: colors.textSecondary,
               ),
             ),
           ),
@@ -342,6 +285,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Widget _buildRememberMe() {
+    final colors = context.appColors;
     return Row(
       children: [
         Material(
@@ -357,18 +301,16 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: const Color(0xFF777F84), // #777f84
-                  width: 1.5,
-                ),
+                border: Border.all(color: colors.borderStrong, width: 1.5),
                 borderRadius: BorderRadius.circular(4),
+                color: colors.surface,
               ),
               child: _rememberMe
-                  ? const Center(
+                  ? Center(
                       child: Icon(
                         Icons.check_rounded,
                         size: 16,
-                        color: Color(0xFFFDAF40),
+                        color: colors.accent,
                       ),
                     )
                   : null,
@@ -382,7 +324,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             fontSize: 14,
             fontWeight: FontWeight.w400,
             fontFamily: 'Campton',
-            color: const Color(0xFF1E2021), // #1e2021
+            color: colors.textPrimary,
           ),
         ),
       ],
@@ -390,17 +332,18 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Widget _buildSignInButton() {
+    final colors = context.appColors;
     final auth = ref.watch(authFlowControllerProvider);
 
     return Container(
       width: double.infinity,
       height: 57,
       decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.accent,
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+            color: colors.shadow,
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -409,28 +352,28 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(18),
           onTap: () {
             // Handle sign in
             _handleSignIn();
           },
           child: Center(
             child: auth.isLoading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Color(0xFFFFFBF5),
+                      color: colors.onAccent,
                     ),
                   )
-                : const Text(
+                : Text(
                     'Sign in',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'Campton',
-                      color: Color(0xFFFFFBF5), // #fffbf5
+                      color: colors.onAccent,
                     ),
                   ),
           ),
@@ -440,9 +383,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Widget _buildDivider() {
+    final colors = context.appColors;
     return Row(
       children: [
-        Expanded(child: Container(height: 1, color: const Color(0xFFB5B5B5))),
+        Expanded(child: Container(height: 1, color: colors.border)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
@@ -451,30 +395,36 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               fontSize: 14,
               fontWeight: FontWeight.w400,
               fontFamily: 'Campton',
-              color: const Color(0xFF595F63), // #595f63
+              color: colors.textTertiary,
             ),
           ),
         ),
-        Expanded(child: Container(height: 1, color: const Color(0xFFB5B5B5))),
+        Expanded(child: Container(height: 1, color: colors.border)),
       ],
     );
   }
 
   Widget _buildGoogleSignIn() {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
-      height: 49,
+      height: 57,
       decoration: BoxDecoration(
-        border: Border.all(
-          color: const Color(0xFFCCCCCC), // #cccccc
-          width: 1,
-        ),
-        borderRadius: BorderRadius.circular(8),
+        color: colors.surfaceElevated,
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow,
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(18),
           onTap: () async {
             final auth = ref.read(authFlowControllerProvider);
             if (auth.isLoading) return;
@@ -486,10 +436,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               final idToken = await google.signInAndGetIdToken();
               await authFlow.googleSignIn(idToken: idToken);
               if (!mounted) return;
-              
+
               // Show referral code sheet for Google users
               await SetReferralCodeSheet.show(context);
-              
+
               if (!mounted) return;
               Navigator.of(
                 context,
@@ -515,7 +465,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   fontFamily: 'Campton',
-                  color: const Color(0xFF1E2021), // #1e2021
+                  color: colors.textPrimary,
                 ),
               ),
             ],
@@ -526,6 +476,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Widget _buildSignUpLink() {
+    final colors = context.appColors;
     return Center(
       child: Material(
         color: Colors.transparent,
@@ -545,7 +496,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       fontFamily: 'Campton',
-                      color: const Color(0xFF000000),
+                      color: colors.textTertiary,
                     ),
                   ),
                   TextSpan(
@@ -554,7 +505,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'Campton',
-                      color: const Color(0xFFFDAF40),
+                      color: colors.accent,
                     ),
                   ),
                 ],
@@ -593,5 +544,47 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       if (!mounted) return;
       AppSnackbars.showError(context, UiErrorMessage.from(e));
     }
+  }
+
+  Widget _buildInputShell({
+    required IconData icon,
+    required Widget child,
+    Widget? trailing,
+  }) {
+    final colors = context.appColors;
+    return Container(
+      height: 58,
+      decoration: BoxDecoration(
+        color: colors.surfaceElevated,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.border),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow,
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: colors.accentSoft,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 18, color: colors.accent),
+            ),
+            const SizedBox(width: 14),
+            Expanded(child: child),
+            if (trailing != null) ...[const SizedBox(width: 8), trailing],
+          ],
+        ),
+      ),
+    );
   }
 }

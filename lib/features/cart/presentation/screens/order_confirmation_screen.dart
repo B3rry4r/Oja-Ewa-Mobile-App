@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/features/account/subfeatures/your_address/domain/address.dart';
 import 'package:ojaewa/features/account/subfeatures/your_address/presentation/controllers/address_controller.dart';
@@ -60,209 +61,184 @@ class _OrderConfirmationScreenState
         ? const AsyncData<List<SellerShippingQuotes>>([])
         : ref.watch(logisticsQuotesProvider(logisticsRequest));
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            AppHeader(
-              backgroundColor: const Color(0xFFFFF8F1),
-              iconColor: const Color(0xFF241508),
-              showActions: false,
-              title: const Text(
-                'Order confirmation',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Campton',
-                  color: Color(0xFF241508),
-                ),
-              ),
-              onBack: () => Navigator.of(context).maybePop(),
-            ),
+    return AppPageScaffold(
+      title: 'Order confirmation',
+      showActions: false,
+      onBack: () => Navigator.of(context).maybePop(),
+      bottomBar: _buildOrderSummary(
+        context: context,
+        cart: cart,
+        quotesAsync: shippingQuotesAsync,
+        isBusy: isBusy,
+        onPlaceOrder: isBusy
+            ? null
+            : () async {
+                if (selectedAddress == null) {
+                  AppSnackbars.showError(
+                    context,
+                    'Please add a delivery address',
+                  );
+                  return;
+                }
 
-            Expanded(
-              child: isCartLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : hasCartError
-                  ? const Center(child: Text('Failed to load cart'))
-                  : cart == null || cart.items.isEmpty
-                  ? const Center(child: Text('Cart is empty'))
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 24),
-                          _buildAddressSection(context, selectedAddress),
-                          const SizedBox(height: 32),
-                          _buildShippingSection(
-                            cart: cart,
-                            quotesAsync: shippingQuotesAsync,
-                          ),
-                          const SizedBox(height: 32),
-                          _buildItemsSection(cart.items.length),
-                          const SizedBox(height: 32),
-                        ],
+                if (checkoutItems.isEmpty) {
+                  AppSnackbars.showError(context, 'Your cart is empty');
+                  return;
+                }
+                final quoteGroups = shippingQuotesAsync.asData?.value;
+                if (shippingQuotesAsync.isLoading) {
+                  AppSnackbars.showError(
+                    context,
+                    'Shipping options are still loading',
+                  );
+                  return;
+                }
+                if (shippingQuotesAsync.hasError || quoteGroups == null) {
+                  AppSnackbars.showError(
+                    context,
+                    'Failed to load shipping options',
+                  );
+                  return;
+                }
+                if (quoteGroups.isEmpty) {
+                  AppSnackbars.showError(
+                    context,
+                    'No shipping options available for this cart',
+                  );
+                  return;
+                }
+                final missingQuotes = quoteGroups
+                    .where(
+                      (group) =>
+                          (_selectedQuotesBySeller[group.sellerProfileId] ?? '')
+                              .isEmpty,
+                    )
+                    .toList();
+                if (missingQuotes.isNotEmpty) {
+                  AppSnackbars.showError(
+                    context,
+                    'Choose one shipping option for each seller',
+                  );
+                  return;
+                }
+                final selectedQuotes = quoteGroups
+                    .map(
+                      (group) => SelectedShippingQuote(
+                        sellerProfileId: group.sellerProfileId,
+                        quoteReference:
+                            _selectedQuotesBySeller[group.sellerProfileId]!,
                       ),
-                    ),
-            ),
+                    )
+                    .toList();
 
-            _buildOrderSummary(
-              cart: cart,
-              quotesAsync: shippingQuotesAsync,
-              isBusy: isBusy,
-              onPlaceOrder: isBusy
-                  ? null
-                  : () async {
-                      if (selectedAddress == null) {
-                        AppSnackbars.showError(
-                          context,
-                          'Please add a delivery address',
-                        );
-                        return;
-                      }
+                // Show payment method selection
+                final paymentMethod = await PaymentMethodSheet.show(context);
+                if (paymentMethod == null) return;
 
-                      if (checkoutItems.isEmpty) {
-                        AppSnackbars.showError(context, 'Your cart is empty');
-                        return;
-                      }
-                      final quoteGroups = shippingQuotesAsync.asData?.value;
-                      if (shippingQuotesAsync.isLoading) {
-                        AppSnackbars.showError(
-                          context,
-                          'Shipping options are still loading',
-                        );
-                        return;
-                      }
-                      if (shippingQuotesAsync.hasError || quoteGroups == null) {
-                        AppSnackbars.showError(
-                          context,
-                          'Failed to load shipping options',
-                        );
-                        return;
-                      }
-                      if (quoteGroups.isEmpty) {
-                        AppSnackbars.showError(
-                          context,
-                          'No shipping options available for this cart',
-                        );
-                        return;
-                      }
-                      final missingQuotes = quoteGroups
-                          .where(
-                            (group) =>
-                                (_selectedQuotesBySeller[group
-                                            .sellerProfileId] ??
-                                        '')
-                                    .isEmpty,
-                          )
-                          .toList();
-                      if (missingQuotes.isNotEmpty) {
-                        AppSnackbars.showError(
-                          context,
-                          'Choose one shipping option for each seller',
-                        );
-                        return;
-                      }
-                      final selectedQuotes = quoteGroups
-                          .map(
-                            (group) => SelectedShippingQuote(
-                              sellerProfileId: group.sellerProfileId,
-                              quoteReference:
-                                  _selectedQuotesBySeller[group
-                                      .sellerProfileId]!,
-                            ),
-                          )
-                          .toList();
+                if (!context.mounted) return;
 
-                      // Show payment method selection
-                      final paymentMethod = await PaymentMethodSheet.show(
-                        context,
+                try {
+                  // Create order first (common for both payment methods)
+                  final order = await ref
+                      .read(ordersRepositoryProvider)
+                      .createOrder(
+                        items: checkoutItems,
+                        addressId: selectedAddress.id,
+                        shippingName: selectedAddress.fullName,
+                        shippingPhone: selectedAddress.phone,
+                        shippingAddress: selectedAddress.addressLine,
+                        shippingCity: selectedAddress.city,
+                        shippingState: selectedAddress.state,
+                        shippingCountry: selectedAddress.country,
+                        shippingZipCode: selectedAddress.postCode,
+                        selectedQuotes: selectedQuotes,
                       );
-                      if (paymentMethod == null) return;
 
-                      if (!context.mounted) return;
+                  if (!context.mounted) return;
 
-                      try {
-                        // Create order first (common for both payment methods)
-                        final order = await ref
-                            .read(ordersRepositoryProvider)
-                            .createOrder(
-                              items: checkoutItems,
-                              addressId: selectedAddress.id,
-                              shippingName: selectedAddress.fullName,
-                              shippingPhone: selectedAddress.phone,
-                              shippingAddress: selectedAddress.addressLine,
-                              shippingCity: selectedAddress.city,
-                              shippingState: selectedAddress.state,
-                              shippingCountry: selectedAddress.country,
-                              shippingZipCode: selectedAddress.postCode,
-                              selectedQuotes: selectedQuotes,
-                            );
-
-                        if (!context.mounted) return;
-
-                        if (paymentMethod == 'momo') {
-                          // MoMo payment flow
-                          await _handleMoMoPayment(
-                            context,
-                            ref,
-                            order.id,
-                            selectedAddress.phone,
-                          );
-                        } else {
-                          // Paystack payment flow (original)
-                          await _handlePaystackPayment(context, ref, order.id);
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          AppSnackbars.showError(
-                            context,
-                            'Failed to create order: ${e.toString()}',
-                          );
-                        }
-                      }
-                    },
-            ),
-          ],
-        ),
+                  if (paymentMethod == 'momo') {
+                    // MoMo payment flow
+                    await _handleMoMoPayment(
+                      context,
+                      ref,
+                      order.id,
+                      selectedAddress.phone,
+                    );
+                  } else {
+                    // Paystack payment flow (original)
+                    await _handlePaystackPayment(context, ref, order.id);
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    AppSnackbars.showError(
+                      context,
+                      'Failed to create order: ${e.toString()}',
+                    );
+                  }
+                }
+              },
       ),
+      child: isCartLoading
+          ? const Center(child: CircularProgressIndicator())
+          : hasCartError
+          ? const Center(child: Text('Failed to load cart'))
+          : cart == null || cart.items.isEmpty
+          ? const Center(child: Text('Cart is empty'))
+          : SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+                  _buildAddressSection(context, selectedAddress),
+                  const SizedBox(height: 32),
+                  _buildShippingSection(
+                    context: context,
+                    cart: cart,
+                    quotesAsync: shippingQuotesAsync,
+                  ),
+                  const SizedBox(height: 32),
+                  _buildItemsSection(context, cart.items.length),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            ),
     );
   }
 
   Widget _buildShippingSection({
+    required BuildContext context,
     required Cart cart,
     required AsyncValue<List<SellerShippingQuotes>> quotesAsync,
   }) {
+    final colors = context.appColors;
     final sellerNames = _sellerNamesById(cart);
 
     return quotesAsync.when(
       loading: () => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Text(
             'Shipping Options',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
-          SizedBox(height: 12),
-          LinearProgressIndicator(),
+          const SizedBox(height: 12),
+          LinearProgressIndicator(color: colors.accent),
         ],
       ),
       error: (error, _) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Shipping Options',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF1E2021),
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -278,27 +254,28 @@ class _OrderConfirmationScreenState
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Shipping Options',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF1E2021),
+                color: colors.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
             if (groups.isEmpty)
-              const Text(
+              Text(
                 'No shipping options available yet for this address.',
-                style: TextStyle(color: Color(0xFF777F84)),
+                style: TextStyle(color: colors.textSecondary),
               ),
             for (final group in groups) ...[
               Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
+                  color: colors.surfaceElevated,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFCCCCCC)),
+                  border: Border.all(color: colors.border),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,10 +283,10 @@ class _OrderConfirmationScreenState
                     Text(
                       sellerNames[group.sellerProfileId] ??
                           'Seller #${group.sellerProfileId}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF241508),
+                        color: colors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -322,9 +299,9 @@ class _OrderConfirmationScreenState
                         activeColor: const Color(0xFFFDAF40),
                         title: Text(
                           quote.serviceName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF241508),
+                            color: colors.textPrimary,
                           ),
                         ),
                         subtitle: Text(
@@ -333,13 +310,13 @@ class _OrderConfirmationScreenState
                             if (quote.estimatedDays != null)
                               '${quote.estimatedDays} day(s)',
                           ].join(' • '),
-                          style: const TextStyle(color: Color(0xFF4A4036)),
+                          style: TextStyle(color: colors.textSecondary),
                         ),
                         secondary: Text(
                           formatPrice(quote.amount),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF241508),
+                            color: colors.textPrimary,
                           ),
                         ),
                         onChanged: (value) {
@@ -404,17 +381,18 @@ class _OrderConfirmationScreenState
   }
 
   Widget _buildAddressSection(BuildContext context, Address? address) {
+    final colors = context.appColors;
     final hasAddress = address != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Shipping Address',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF1E2021),
+            color: colors.textPrimary,
           ),
         ),
         const SizedBox(height: 12),
@@ -422,15 +400,16 @@ class _OrderConfirmationScreenState
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
+              color: colors.surfaceElevated,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFCCCCCC)),
+              border: Border.all(color: colors.border),
             ),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
                     'No address selected yet',
-                    style: TextStyle(fontSize: 14, color: Color(0xFF777F84)),
+                    style: TextStyle(fontSize: 14, color: colors.textSecondary),
                   ),
                 ),
                 TextButton(
@@ -457,8 +436,9 @@ class _OrderConfirmationScreenState
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
+                color: colors.surfaceElevated,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFCCCCCC)),
+                border: Border.all(color: colors.border),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -466,17 +446,14 @@ class _OrderConfirmationScreenState
                   Expanded(
                     child: Text(
                       '${address.fullName} ${address.phone}\n${address.addressLine}, ${address.city}, ${address.state}, \n${address.country} ${address.postCode}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: Color(0xFF3C4042),
+                        color: colors.textPrimary,
                         height: 1.5,
                       ),
                     ),
                   ),
-                  const Icon(
-                    Icons.keyboard_arrow_right,
-                    color: Color(0xFF777F84),
-                  ),
+                  Icon(Icons.keyboard_arrow_right, color: colors.textTertiary),
                 ],
               ),
             ),
@@ -485,33 +462,33 @@ class _OrderConfirmationScreenState
     );
   }
 
-  Widget _buildItemsSection(int count) {
+  Widget _buildItemsSection(BuildContext context, int count) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Items',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF1E2021),
+            color: colors.textPrimary,
           ),
         ),
         const SizedBox(height: 12),
-        Text(
-          '$count item(s)',
-          style: const TextStyle(color: Color(0xFF777F84)),
-        ),
+        Text('$count item(s)', style: TextStyle(color: colors.textSecondary)),
       ],
     );
   }
 
   Widget _buildOrderSummary({
+    required BuildContext context,
     required Cart? cart,
     required AsyncValue<List<SellerShippingQuotes>> quotesAsync,
     required bool isBusy,
     required VoidCallback? onPlaceOrder,
   }) {
+    final colors = context.appColors;
     final subtotal = cart?.total ?? 0;
     final deliveryFee =
         quotesAsync.asData?.value.fold<num>(0, (sum, group) {
@@ -536,9 +513,9 @@ class _OrderConfirmationScreenState
     final total = subtotal + deliveryFee;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF603814),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+      decoration: BoxDecoration(
+        color: colors.surfaceElevated,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
       ),
       child: SafeArea(
         top: false,
@@ -548,14 +525,14 @@ class _OrderConfirmationScreenState
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 8),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Order Summary',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFFFBFBFB),
+                    color: colors.textPrimary,
                   ),
                 ),
               ),
@@ -564,16 +541,13 @@ class _OrderConfirmationScreenState
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Subtotal',
-                    style: TextStyle(fontSize: 14, color: Color(0xFFFBFBFB)),
+                    style: TextStyle(fontSize: 14, color: colors.textSecondary),
                   ),
                   Text(
                     formatPrice(subtotal),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFFFBFBFB),
-                    ),
+                    style: TextStyle(fontSize: 14, color: colors.textPrimary),
                   ),
                 ],
               ),
@@ -582,32 +556,29 @@ class _OrderConfirmationScreenState
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Delivery Fee',
-                    style: TextStyle(fontSize: 14, color: Color(0xFFFBFBFB)),
+                    style: TextStyle(fontSize: 14, color: colors.textSecondary),
                   ),
                   Text(
                     formatPrice(deliveryFee),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFFFBFBFB),
-                    ),
+                    style: TextStyle(fontSize: 14, color: colors.textPrimary),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
-              const Divider(color: Color(0xFF8B6B4F), height: 1),
+              Divider(color: colors.border, height: 1),
               const SizedBox(height: 12),
               // Total
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Total',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFFFBFBFB),
+                      color: colors.textPrimary,
                     ),
                   ),
                   Text(

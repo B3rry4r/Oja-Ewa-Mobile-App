@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/features/product/domain/product_filters.dart';
@@ -75,10 +76,11 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
   }
 
   Widget _buildSortOverlay(List<SortOption> sortOptions) {
+    final colors = context.appColors;
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFF8F1),
+      decoration: BoxDecoration(
+        color: colors.surfaceElevated,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(28),
           topRight: Radius.circular(28),
@@ -106,26 +108,27 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
   }
 
   Widget _buildHeader() {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Title
-          const Text(
+          Text(
             'Sort By',
             style: TextStyle(
               fontSize: 20,
               fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
-              color: Color(0xFF301C0A),
+              color: colors.textPrimary,
             ),
           ),
 
           // Close button
           HeaderIconButton(
             asset: AppIcons.back,
-            iconColor: const Color(0xFF301C0A),
+            iconColor: colors.textPrimary,
             onTap: () => Navigator.of(context).pop(),
           ),
         ],
@@ -134,6 +137,7 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
   }
 
   Widget _buildSortOptions(List<SortOption> sortOptions) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -156,7 +160,7 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
                 ),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? const Color(0xFFFDF3E7)
+                      ? colors.accent.withValues(alpha: 0.12)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -169,9 +173,7 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isSelected
-                              ? const Color(0xFFA15E22)
-                              : const Color(0xFFCCCCCC),
+                          color: isSelected ? colors.accent : colors.border,
                           width: 2,
                         ),
                       ),
@@ -180,9 +182,9 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
                               child: Container(
                                 width: 10,
                                 height: 10,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Color(0xFFA15E22),
+                                  color: colors.accent,
                                 ),
                               ),
                             )
@@ -198,7 +200,7 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
                         fontWeight: isSelected
                             ? FontWeight.w600
                             : FontWeight.w400,
-                        color: const Color(0xFF1E2021),
+                        color: colors.textPrimary,
                       ),
                     ),
                   ],
@@ -212,6 +214,7 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
   }
 
   Widget _buildActionButtons() {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -222,18 +225,18 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
               onPressed: _onClearPressed,
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                side: const BorderSide(color: Color(0xFFFDAF40)),
+                side: BorderSide(color: colors.accent),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'Clear Filters',
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFFFDAF40),
+                  color: colors.accent,
                 ),
               ),
             ),
@@ -248,20 +251,20 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
               onPressed: _onApplyPressed,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                backgroundColor: const Color(0xFFFDAF40),
+                backgroundColor: colors.accent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 elevation: 4,
-                shadowColor: const Color(0xFFFDAF40).withValues(alpha: 0.5),
+                shadowColor: colors.accent.withValues(alpha: 0.5),
               ),
-              child: const Text(
+              child: Text(
                 'Show Results',
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFFFFFBF5),
+                  color: colors.onAccent,
                 ),
               ),
             ),

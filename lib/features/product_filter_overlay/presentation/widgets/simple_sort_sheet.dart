@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/listing_filters_controller.dart';
 
 class SimpleSortSheet extends ConsumerWidget {
@@ -10,6 +11,7 @@ class SimpleSortSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
     final selected = isBusiness
         ? ref.watch(businessListingFiltersProvider).sort
         : ref.watch(sustainabilityListingFiltersProvider).sort;
@@ -20,32 +22,43 @@ class SimpleSortSheet extends ConsumerWidget {
     ];
 
     return SafeArea(
-      child: Padding(
+      child: Container(
+        color: colors.surface,
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'Sort',
               style: TextStyle(
                 fontSize: 20,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF1E2021),
+                color: colors.textPrimary,
               ),
             ),
             const SizedBox(height: 16),
             for (final opt in options)
               ListTile(
-                title: Text(opt.label, style: const TextStyle(fontFamily: 'Campton')),
+                title: Text(
+                  opt.label,
+                  style: TextStyle(
+                    fontFamily: 'Campton',
+                    color: colors.textPrimary,
+                  ),
+                ),
                 trailing: selected == opt.value
-                    ? const Icon(Icons.radio_button_checked, color: Color(0xFFFDAF40))
-                    : const Icon(Icons.radio_button_off, color: Color(0xFFCCCCCC)),
+                    ? Icon(Icons.radio_button_checked, color: colors.accent)
+                    : Icon(Icons.radio_button_off, color: colors.borderStrong),
                 onTap: () {
                   if (isBusiness) {
-                    ref.read(businessListingFiltersProvider.notifier).setSort(opt.value);
+                    ref
+                        .read(businessListingFiltersProvider.notifier)
+                        .setSort(opt.value);
                   } else {
-                    ref.read(sustainabilityListingFiltersProvider.notifier).setSort(opt.value);
+                    ref
+                        .read(sustainabilityListingFiltersProvider.notifier)
+                        .setSort(opt.value);
                   }
                   Navigator.of(context).pop(true);
                 },

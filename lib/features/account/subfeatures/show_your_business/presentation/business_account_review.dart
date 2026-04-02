@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 
 /// Step 3 for the "Show your business" flow.
 ///
@@ -22,65 +23,59 @@ class BusinessAccountReviewScreen extends ConsumerStatefulWidget {
   const BusinessAccountReviewScreen({super.key});
 
   @override
-  ConsumerState<BusinessAccountReviewScreen> createState() => _BusinessAccountReviewScreenState();
+  ConsumerState<BusinessAccountReviewScreen> createState() =>
+      _BusinessAccountReviewScreenState();
 }
 
-class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountReviewScreen> {
+class _BusinessAccountReviewScreenState
+    extends ConsumerState<BusinessAccountReviewScreen> {
   bool _isSubmitted = false;
   bool _isSubmitting = false;
 
   @override
-  Widget build(BuildContext context) { 
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
     final args = ModalRoute.of(context)?.settings.arguments;
     final draft = draftFromArgs(args, categoryLabelFallback: 'Beauty');
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: Column(
-        children: [
-          AppHeader(
-            backgroundColor: const Color(0xFFFFF8F1),
-            iconColor: const Color(0xFF241508),
-            showBack: !_isSubmitted, // Don't allow back after submission
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 20),
-                  _buildStepper(),
-                  const Spacer(flex: 2),
-                  Icon(
-                    _isSubmitted ? Icons.check_circle : Icons.access_time_filled_rounded,
-                    size: 80,
-                    color: const Color(0xFFFDAF40),
-                  ),
-                  const SizedBox(height: 32),
-                  Text(
-                    _isSubmitted
-                        ? 'Your business has been submitted!\nWe will review it within 12-24 hours.'
-                        : 'Ready to submit your business profile?',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF000000),
-                      height: 1.5,
-                    ),
-                  ),
-                  const Spacer(flex: 3),
-                  _isSubmitted
-                      ? _buildDoneButton(context)
-                      : _buildSubmitButton(context, draft),
-                  const SizedBox(height: 40),
-                ],
+    return AppPageScaffold(
+      showBack: !_isSubmitted,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 20),
+            _buildStepper(),
+            const Spacer(flex: 2),
+            Icon(
+              _isSubmitted
+                  ? Icons.check_circle
+                  : Icons.access_time_filled_rounded,
+              size: 80,
+              color: colors.accent,
+            ),
+            const SizedBox(height: 32),
+            Text(
+              _isSubmitted
+                  ? 'Your business has been submitted!\nWe will review it within 12-24 hours.'
+                  : 'Ready to submit your business profile?',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w400,
+                color: colors.textPrimary,
+                height: 1.5,
               ),
             ),
-          ),
-        ],
+            const Spacer(flex: 3),
+            _isSubmitted
+                ? _buildDoneButton(context)
+                : _buildSubmitButton(context, draft),
+            const SizedBox(height: 40),
+          ],
+        ),
       ),
     );
   }
@@ -97,7 +92,7 @@ class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountRev
   }
 
   static Widget _stepItem(int num, String label, {required bool isComplete}) {
-    final activeColor = const Color(0xFF603814);
+    const activeColor = Color(0xFFFDAF40);
 
     return Row(
       children: [
@@ -106,7 +101,7 @@ class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountRev
           height: 32,
           decoration: BoxDecoration(
             color: activeColor,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(10),
           ),
           alignment: Alignment.center,
           child: (num < 3)
@@ -134,7 +129,11 @@ class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountRev
     );
   }
 
-  Widget _buildSubmitButton(BuildContext context, BusinessRegistrationDraft draft) {
+  Widget _buildSubmitButton(
+    BuildContext context,
+    BusinessRegistrationDraft draft,
+  ) {
+    final colors = context.appColors;
     return InkWell(
       onTap: _isSubmitting ? null : () => _submitForReview(context, draft),
       borderRadius: BorderRadius.circular(8),
@@ -142,30 +141,30 @@ class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountRev
         width: double.infinity,
         height: 57,
         decoration: BoxDecoration(
-          color: _isSubmitting ? const Color(0xFFFDAF40).withAlpha(150) : const Color(0xFFFDAF40),
-          borderRadius: BorderRadius.circular(8),
+          color: _isSubmitting ? colors.accent.withAlpha(150) : colors.accent,
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withAlpha(102),
+              color: colors.shadow,
               blurRadius: 16,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         child: Center(
           child: _isSubmitting
-              ? const SizedBox(
+              ? SizedBox(
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFFBF5)),
+                    valueColor: AlwaysStoppedAnimation<Color>(colors.onAccent),
                   ),
                 )
-              : const Text(
+              : Text(
                   'Submit for Review',
                   style: TextStyle(
-                    color: Color(0xFFFFFBF5),
+                    color: colors.onAccent,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Campton',
@@ -177,28 +176,31 @@ class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountRev
   }
 
   Widget _buildDoneButton(BuildContext context) {
+    final colors = context.appColors;
     return InkWell(
-      onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false),
+      onTap: () => Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false),
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,
         height: 57,
         decoration: BoxDecoration(
-          color: const Color(0xFFFDAF40),
-          borderRadius: BorderRadius.circular(8),
+          color: colors.accent,
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withAlpha(102),
+              color: colors.shadow,
               blurRadius: 16,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
-        child: const Center(
+        child: Center(
           child: Text(
             'Done',
             style: TextStyle(
-              color: Color(0xFFFFFBF5),
+              color: colors.onAccent,
               fontSize: 16,
               fontWeight: FontWeight.w600,
               fontFamily: 'Campton',
@@ -209,7 +211,10 @@ class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountRev
     );
   }
 
-  Future<void> _submitForReview(BuildContext context, BusinessRegistrationDraft draft) async {
+  Future<void> _submitForReview(
+    BuildContext context,
+    BusinessRegistrationDraft draft,
+  ) async {
     setState(() => _isSubmitting = true);
 
     // Map draft -> API payload
@@ -230,12 +235,18 @@ class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountRev
     if (offering == 'providing_service') {
       if ((draft.professionalTitle ?? '').trim().isEmpty) {
         setState(() => _isSubmitting = false);
-        AppSnackbars.showError(context, UiErrorMessage.from('Professional title is required'));
+        AppSnackbars.showError(
+          context,
+          UiErrorMessage.from('Professional title is required'),
+        );
         return;
       }
       if (cleanedServiceList.isEmpty) {
         setState(() => _isSubmitting = false);
-        AppSnackbars.showError(context, UiErrorMessage.from('Please add at least one service'));
+        AppSnackbars.showError(
+          context,
+          UiErrorMessage.from('Please add at least one service'),
+        );
         return;
       }
     }
@@ -243,19 +254,28 @@ class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountRev
     if (mapCategoryLabelToEnum(draft.categoryLabel) == 'school') {
       if ((draft.schoolBiography ?? '').trim().isEmpty) {
         setState(() => _isSubmitting = false);
-        AppSnackbars.showError(context, UiErrorMessage.from('School biography is required'));
+        AppSnackbars.showError(
+          context,
+          UiErrorMessage.from('School biography is required'),
+        );
         return;
       }
       if (cleanedClasses.isEmpty) {
         setState(() => _isSubmitting = false);
-        AppSnackbars.showError(context, UiErrorMessage.from('Please add at least one class'));
+        AppSnackbars.showError(
+          context,
+          UiErrorMessage.from('Please add at least one class'),
+        );
         return;
       }
     }
 
     if (draft.categoryId == null || draft.subcategoryId == null) {
       setState(() => _isSubmitting = false);
-      AppSnackbars.showError(context, UiErrorMessage.from('Please select a category'));
+      AppSnackbars.showError(
+        context,
+        UiErrorMessage.from('Please select a category'),
+      );
       return;
     }
 
@@ -289,7 +309,9 @@ class _BusinessAccountReviewScreenState extends ConsumerState<BusinessAccountRev
     );
 
     try {
-      final res = await ref.read(businessProfileControllerProvider.notifier).submit(payload);
+      final res = await ref
+          .read(businessProfileControllerProvider.notifier)
+          .submit(payload);
 
       // Extract business id if present
       final data = res['data'];

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 
 import '../../../../../app/router/app_router.dart';
 
@@ -47,131 +48,113 @@ class _SellerRegistrationScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // Main background from IR
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  _buildStepper(),
-                  const SizedBox(height: 32),
+    return AppPageScaffold(
+      scrollable: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          _buildStepper(),
+          const SizedBox(height: 32),
 
-                  // --- Location Section ---
-                  _buildSectionHeader("Location"),
-                  const SizedBox(height: 16),
-                  _buildLocationDropdown(
-                    label: 'Country',
-                    value: _selectedCountryName.isEmpty
-                        ? 'Select Country'
-                        : _selectedCountryName,
-                    flag: _selectedCountryFlag.isEmpty
-                        ? null
-                        : _selectedCountryFlag,
-                    onTap: () async {
-                      final country = await CountryPickerSheet.show(
-                        context,
-                        selectedCountry: _selectedCountryName,
-                      );
-                      if (country != null) {
-                        setState(() {
-                          _selectedCountryName = country.name;
-                          _selectedCountryFlag = country.flag;
-                          _selectedCountryCode = country.dialCode;
-                          _selectedStateName = '';
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  _buildLocationDropdown(
-                    label: 'State',
-                    value: _selectedStateName.isEmpty
-                        ? 'Select State'
-                        : _selectedStateName,
-                    onTap: () async {
-                      if (_selectedCountryName.isEmpty)
-                        return; // Must select country first
-                      final state = await StatePickerSheet.show(
-                        context,
-                        countryName: _selectedCountryName,
-                        selectedState: _selectedStateName,
-                      );
-                      if (state != null)
-                        setState(() => _selectedStateName = state.name);
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  _buildTextInput(
-                    "City",
-                    "Your City",
-                    controller: _cityController,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildTextInput(
-                    "Address Line",
-                    "Street, house number etc",
-                    controller: _addressController,
-                  ),
+          // --- Location Section ---
+          _buildSectionHeader("Location"),
+          const SizedBox(height: 16),
+          _buildLocationDropdown(
+            label: 'Country',
+            value: _selectedCountryName.isEmpty
+                ? 'Select Country'
+                : _selectedCountryName,
+            flag: _selectedCountryFlag.isEmpty ? null : _selectedCountryFlag,
+            onTap: () async {
+              final country = await CountryPickerSheet.show(
+                context,
+                selectedCountry: _selectedCountryName,
+              );
+              if (country != null) {
+                setState(() {
+                  _selectedCountryName = country.name;
+                  _selectedCountryFlag = country.flag;
+                  _selectedCountryCode = country.dialCode;
+                  _selectedStateName = '';
+                });
+              }
+            },
+          ),
+          const SizedBox(height: 20),
+          _buildLocationDropdown(
+            label: 'State',
+            value: _selectedStateName.isEmpty
+                ? 'Select State'
+                : _selectedStateName,
+            onTap: () async {
+              if (_selectedCountryName.isEmpty) {
+                return;
+              }
+              final state = await StatePickerSheet.show(
+                context,
+                countryName: _selectedCountryName,
+                selectedState: _selectedStateName,
+              );
+              if (state != null) {
+                setState(() => _selectedStateName = state.name);
+              }
+            },
+          ),
+          const SizedBox(height: 20),
+          _buildTextInput("City", "Your City", controller: _cityController),
+          const SizedBox(height: 20),
+          _buildTextInput(
+            "Address Line",
+            "Street, house number etc",
+            controller: _addressController,
+          ),
 
-                  const SizedBox(height: 40),
+          const SizedBox(height: 40),
 
-                  // --- Contacts Section ---
-                  _buildSectionHeader("Contacts"),
-                  const SizedBox(height: 16),
-                  _buildTextInput(
-                    "Business Email",
-                    "you@example.com",
-                    controller: _emailController,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildPhoneInputWithPicker(
-                    "Business Phone Number",
-                    controller: _phoneController,
-                  ),
+          // --- Contacts Section ---
+          _buildSectionHeader("Contacts"),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            "Business Email",
+            "you@example.com",
+            controller: _emailController,
+          ),
+          const SizedBox(height: 20),
+          _buildPhoneInputWithPicker(
+            "Business Phone Number",
+            controller: _phoneController,
+          ),
 
-                  const SizedBox(height: 40),
+          const SizedBox(height: 40),
 
-                  // --- Social handles Section ---
-                  _buildSectionHeader("Social handles"),
-                  const SizedBox(height: 16),
-                  _buildTextInput(
-                    "Instagram",
-                    "Your Instagram URL",
-                    controller: _instagramController,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildTextInput(
-                    "Facebook",
-                    "Your Facebook URL",
-                    controller: _facebookController,
-                  ),
+          // --- Social handles Section ---
+          _buildSectionHeader("Social handles"),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            "Instagram",
+            "Your Instagram URL",
+            controller: _instagramController,
+          ),
+          const SizedBox(height: 20),
+          _buildTextInput(
+            "Facebook",
+            "Your Facebook URL",
+            controller: _facebookController,
+          ),
 
-                  const SizedBox(height: 40),
+          const SizedBox(height: 40),
 
-                  // --- Means Identification Section ---
-                  _buildSectionHeader("Means Identification"),
-                  const SizedBox(height: 16),
-                  _buildFileUploadSection(),
+          // --- Means Identification Section ---
+          _buildSectionHeader("Means Identification"),
+          const SizedBox(height: 16),
+          _buildFileUploadSection(),
 
-                  const SizedBox(height: 40),
+          const SizedBox(height: 40),
 
-                  // --- Save Button ---
-                  _buildSubmitButton(context),
-                  const SizedBox(height: 40),
-                ],
-              ),
-            ),
-          ],
-        ),
+          _buildSubmitButton(context),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }
@@ -189,20 +172,21 @@ class _SellerRegistrationScreenState
   }
 
   Widget _stepCircle(String num, String label, bool isActive) {
+    final colors = context.appColors;
     return Row(
       children: [
         Container(
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: isActive ? const Color(0xFF603814) : const Color(0xFFE9E9E9),
-            borderRadius: BorderRadius.circular(4),
+            color: isActive ? colors.textPrimary : colors.surfaceSecondary,
+            borderRadius: BorderRadius.circular(10),
           ),
           alignment: Alignment.center,
           child: Text(
             num,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: isActive ? colors.background : colors.textTertiary,
               fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
@@ -215,7 +199,7 @@ class _SellerRegistrationScreenState
           style: TextStyle(
             fontSize: 12,
             height: 1.2,
-            color: isActive ? const Color(0xFF603814) : const Color(0xFF777F84),
+            color: isActive ? colors.textPrimary : colors.textSecondary,
             fontWeight: isActive ? FontWeight.w500 : FontWeight.w400,
           ),
         ),
@@ -224,12 +208,13 @@ class _SellerRegistrationScreenState
   }
 
   Widget _buildSectionHeader(String title) {
+    final colors = context.appColors;
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: Color(0xFF3C4042),
+        color: colors.textPrimary,
       ),
     );
   }
@@ -239,33 +224,38 @@ class _SellerRegistrationScreenState
     String hint, {
     TextEditingController? controller,
   }) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Campton',
             fontSize: 16,
-            color: Color(0xFF1E2021),
+            color: colors.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: Color(0xFFCCCCCC)),
+            hintStyle: TextStyle(color: colors.textTertiary),
             filled: true,
-            fillColor: Colors.transparent,
+            fillColor: colors.surface,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 20,
               vertical: 16,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.border),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.accent),
             ),
           ),
         ),
@@ -279,12 +269,13 @@ class _SellerRegistrationScreenState
     String? flag,
     required VoidCallback onTap,
   }) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
         ),
         const SizedBox(height: 8),
         GestureDetector(
@@ -292,8 +283,9 @@ class _SellerRegistrationScreenState
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFCCCCCC)),
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: colors.border),
             ),
             child: Row(
               children: [
@@ -304,13 +296,10 @@ class _SellerRegistrationScreenState
                 Expanded(
                   child: Text(
                     value,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFF1E2021),
-                    ),
+                    style: TextStyle(fontSize: 16, color: colors.textPrimary),
                   ),
                 ),
-                const Icon(Icons.keyboard_arrow_down, color: Color(0xFF777F84)),
+                Icon(Icons.keyboard_arrow_down, color: colors.textSecondary),
               ],
             ),
           ),
@@ -323,21 +312,23 @@ class _SellerRegistrationScreenState
     String label, {
     required TextEditingController controller,
   }) {
+    final colors = context.appColors;
     final hasCountryCode = _selectedCountryCode.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
         ),
         const SizedBox(height: 8),
         Container(
           height: 49,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFCCCCCC)),
+            color: colors.surface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: colors.border),
           ),
           child: Row(
             children: [
@@ -347,11 +338,12 @@ class _SellerRegistrationScreenState
                     context,
                     selectedDialCode: _selectedCountryCode,
                   );
-                  if (country != null)
+                  if (country != null) {
                     setState(() {
                       _selectedCountryCode = country.dialCode;
                       _selectedCountryFlag = country.flag;
                     });
+                  }
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -364,25 +356,25 @@ class _SellerRegistrationScreenState
                       const SizedBox(width: 6),
                       Text(
                         _selectedCountryCode,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF241508),
+                          color: colors.textPrimary,
                         ),
                       ),
                     ] else
-                      const Text(
+                      Text(
                         'Code',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Color(0xFFCCCCCC),
+                          color: colors.textTertiary,
                         ),
                       ),
                     const SizedBox(width: 4),
-                    const Icon(
+                    Icon(
                       Icons.keyboard_arrow_down,
                       size: 18,
-                      color: Color(0xFF777F84),
+                      color: colors.textSecondary,
                     ),
                   ],
                 ),
@@ -392,72 +384,13 @@ class _SellerRegistrationScreenState
                 child: TextFormField(
                   controller: controller,
                   keyboardType: TextInputType.phone,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF1E2021),
-                  ),
-                  decoration: const InputDecoration(
+                  style: TextStyle(fontSize: 16, color: colors.textPrimary),
+                  decoration: InputDecoration(
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                     hintText: 'Enter phone number',
-                    hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPhoneInput(
-    String label,
-    String code, {
-    required TextEditingController controller,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          height: 49,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-          ),
-          alignment: Alignment.center,
-          child: Row(
-            children: [
-              Text(
-                code,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF241508),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextFormField(
-                  controller: controller,
-                  keyboardType: TextInputType.phone,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF1E2021),
-                  ),
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                    hintText: 'Enter phone number',
-                    hintStyle: TextStyle(color: Color(0xFFCCCCCC)),
+                    hintStyle: TextStyle(color: colors.textTertiary),
                   ),
                 ),
               ),
@@ -469,6 +402,7 @@ class _SellerRegistrationScreenState
   }
 
   Widget _buildFileUploadSection() {
+    final colors = context.appColors;
     return InkWell(
       onTap: () async {
         final path = await pickSingleFilePath();
@@ -478,50 +412,54 @@ class _SellerRegistrationScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Upload Document',
-            style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
+            style: TextStyle(color: colors.textSecondary, fontSize: 14),
           ),
           const SizedBox(height: 8),
           Container(
             width: double.infinity,
             height: 140,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(11),
-              border: Border.all(color: const Color(0xFF89858A)),
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: colors.borderStrong),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.cloud_upload_outlined,
                   size: 24,
-                  color: Color(0xFF777F84),
+                  color: colors.textSecondary,
                 ),
                 const SizedBox(height: 12),
                 Text(
                   _identityDocumentLocalPath == null
                       ? 'Browse Document'
                       : 'Document selected',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF1E2021),
-                  ),
+                  style: TextStyle(fontSize: 16, color: colors.textPrimary),
                 ),
                 const SizedBox(height: 8),
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       'High resolution image\nPDF, JPG, PNG formats',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 10, color: Color(0xFF777F84)),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: colors.textSecondary,
+                      ),
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     Text(
                       '200 x 200px\n20kb max',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 10, color: Color(0xFF777F84)),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: colors.textSecondary,
+                      ),
                     ),
                   ],
                 ),
@@ -534,6 +472,7 @@ class _SellerRegistrationScreenState
   }
 
   Widget _buildSubmitButton(BuildContext context) {
+    final colors = context.appColors;
     return InkWell(
       onTap: () {
         final draft =
@@ -552,26 +491,26 @@ class _SellerRegistrationScreenState
           context,
         ).pushNamed(AppRoutes.businessDetails, arguments: draft.toJson());
       },
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(18),
       child: Container(
         width: double.infinity,
         height: 56,
         decoration: BoxDecoration(
-          color: const Color(0xFFFDAF40),
-          borderRadius: BorderRadius.circular(8),
+          color: colors.accent,
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
+              color: colors.shadow,
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: const Center(
+        child: Center(
           child: Text(
             'Save and Continue',
             style: TextStyle(
-              color: Colors.white,
+              color: colors.onAccent,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),

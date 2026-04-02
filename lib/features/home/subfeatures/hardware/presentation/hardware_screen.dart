@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/features/categories/domain/category_node.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
 import 'package:ojaewa/features/categories/presentation/screens/category_screen.dart';
@@ -83,6 +84,7 @@ class HardwareScreen extends ConsumerWidget {
     required CategoryNode node,
     required String breadcrumb,
   }) {
+    final colors = context.appColors;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -95,8 +97,8 @@ class HardwareScreen extends ConsumerWidget {
           expand: false,
           builder: (context, scrollController) {
             return Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFF8F1),
+              decoration: BoxDecoration(
+                color: colors.surfaceElevated,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: SafeArea(
@@ -108,7 +110,7 @@ class HardwareScreen extends ConsumerWidget {
                         width: 40,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.2),
+                          color: colors.borderStrong,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -117,15 +119,15 @@ class HardwareScreen extends ConsumerWidget {
                       padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
                       child: Text(
                         node.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Campton',
-                          color: Color(0xFF241508),
+                          color: colors.textPrimary,
                         ),
                       ),
                     ),
-                    const Divider(height: 1, color: Color(0xFFDEDEDE)),
+                    Divider(height: 1, color: colors.border),
                     Expanded(
                       child: ListView.builder(
                         controller: scrollController,
@@ -166,10 +168,10 @@ class HardwareScreen extends ConsumerWidget {
                                   vertical: 16,
                                   horizontal: 20,
                                 ),
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   border: Border(
                                     bottom: BorderSide(
-                                      color: Color(0xFFDEDEDE),
+                                      color: colors.border,
                                       width: 1,
                                     ),
                                   ),
@@ -181,18 +183,18 @@ class HardwareScreen extends ConsumerWidget {
                                     Expanded(
                                       child: Text(
                                         child.name,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 15,
                                           fontFamily: 'Campton',
-                                          color: Color(0xFF1E2021),
+                                          color: colors.textPrimary,
                                         ),
                                       ),
                                     ),
                                     if (hasChildren)
-                                      const Icon(
+                                      Icon(
                                         Icons.arrow_forward_ios,
                                         size: 16,
-                                        color: Color(0xFF777F84),
+                                        color: colors.textSecondary,
                                       ),
                                   ],
                                 ),
@@ -245,17 +247,17 @@ class HardwareScreen extends ConsumerWidget {
     final categoriesAsync = ref.watch(categoriesByTypeProvider('hardware'));
 
     return categoriesAsync.when(
-      loading: () => const Scaffold(
-        backgroundColor: Color(0xFF603814),
-        body: SafeArea(child: Center(child: CircularProgressIndicator())),
+      loading: () => Scaffold(
+        backgroundColor: context.appColors.background,
+        body: const SafeArea(child: Center(child: CircularProgressIndicator())),
       ),
       error: (error, _) => Scaffold(
-        backgroundColor: const Color(0xFF603814),
+        backgroundColor: context.appColors.background,
         body: SafeArea(
           child: Center(
             child: Text(
               'Failed to load hardware categories',
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: context.appColors.textPrimary),
             ),
           ),
         ),

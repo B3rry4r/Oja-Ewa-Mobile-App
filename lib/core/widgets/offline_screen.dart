@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 
 /// Full-screen offline state that blocks interaction when there is no network.
 class OfflineScreen extends StatelessWidget {
@@ -8,8 +9,9 @@ class OfflineScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -17,29 +19,29 @@ class OfflineScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.wifi_off_rounded,
                   size: 72,
-                  color: Color(0xFF603814),
+                  color: colors.textPrimary,
                 ),
                 const SizedBox(height: 24),
-                const Text(
+                Text(
                   'You\'re offline',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Campton',
-                    color: Color(0xFF241508),
+                    color: colors.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   'Connect to the internet to continue. We\'ll refresh automatically when you\'re back online.',
                   style: TextStyle(
                     fontSize: 14,
                     fontFamily: 'Campton',
-                    color: Color(0xFF777F84),
+                    color: colors.textTertiary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -47,10 +49,15 @@ class OfflineScreen extends StatelessWidget {
                 ElevatedButton(
                   onPressed: onRetry,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFDAF40),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    backgroundColor: colors.accent,
+                    foregroundColor: colors.onAccent,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: const Text(
                     'Retry',

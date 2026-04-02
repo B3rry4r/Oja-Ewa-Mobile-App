@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 
@@ -58,62 +59,28 @@ class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Standard App Header
-            const AppHeader(
-              backgroundColor: Color(0xFFFFF8F1),
-              iconColor: Color(0xFF241508),
+    return AppPageScaffold(
+      title: 'Why are you leaving',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: reasons.length,
+              itemBuilder: (context, index) {
+                return _buildReasonRow(reasons[index]);
+              },
             ),
-
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 16),
-
-                    // Title: Why are you leaving
-                    const Text(
-                      "Why are you leaving",
-                      style: TextStyle(
-                        fontSize: 33,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF241508),
-                        fontFamily: 'Campton',
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Reasons List
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: reasons.length,
-                        itemBuilder: (context, index) {
-                          return _buildReasonRow(reasons[index]);
-                        },
-                      ),
-                    ),
-
-                    // Action Button
-                    _buildDeleteButton(context),
-                    const SizedBox(height: 40),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+          _buildDeleteButton(context),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }
 
   Widget _buildReasonRow(String reason) {
+    final colors = context.appColors;
     final bool isSelected = selectedReason == reason;
 
     return GestureDetector(
@@ -130,27 +97,23 @@ class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
-                  color: isSelected
-                      ? const Color(0xFFFDAF40)
-                      : const Color(0xFF777F84),
+                  color: isSelected ? colors.accent : colors.textSecondary,
                   width: 2,
                 ),
-                color: isSelected
-                    ? const Color(0xFFFDAF40)
-                    : Colors.transparent,
+                color: isSelected ? colors.accent : Colors.transparent,
               ),
               child: isSelected
-                  ? const Icon(Icons.check, size: 16, color: Colors.white)
+                  ? Icon(Icons.check, size: 16, color: colors.onAccent)
                   : null,
             ),
             const SizedBox(width: 12),
             // Reason Text
             Text(
               reason,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
-                color: Color(0xFF1E2021),
+                color: colors.textPrimary,
                 fontFamily: 'Campton',
               ),
             ),
@@ -161,6 +124,7 @@ class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
   }
 
   Widget _buildDeleteButton(BuildContext context) {
+    final colors = context.appColors;
     final isDisabled = selectedReason == null || _isDeleting;
 
     return InkWell(
@@ -182,14 +146,14 @@ class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
         height: 57,
         decoration: BoxDecoration(
           color: isDisabled
-              ? const Color(0xFFFDAF40).withValues(alpha: 0.5)
-              : const Color(0xFFFDAF40),
-          borderRadius: BorderRadius.circular(8),
+              ? colors.accent.withValues(alpha: 0.5)
+              : colors.accent,
+          borderRadius: BorderRadius.circular(18),
           boxShadow: isDisabled
               ? null
               : [
                   BoxShadow(
-                    color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
+                    color: colors.shadow,
                     blurRadius: 16,
                     offset: const Offset(0, 8),
                   ),
@@ -197,18 +161,18 @@ class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
         ),
         child: Center(
           child: _isDeleting
-              ? const SizedBox(
+              ? SizedBox(
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation(Color(0xFFFFFBF5)),
+                    valueColor: AlwaysStoppedAnimation(colors.onAccent),
                   ),
                 )
-              : const Text(
+              : Text(
                   "Continue to delete",
                   style: TextStyle(
-                    color: Color(0xFFFFFBF5),
+                    color: colors.onAccent,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Campton',

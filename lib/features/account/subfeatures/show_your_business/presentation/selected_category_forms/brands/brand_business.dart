@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:ojaewa/app/widgets/app_header.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 
@@ -42,124 +43,113 @@ class _BrandBusinessDetailsScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // Background from IR
-      appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(104),
-        child: AppHeader(
-          backgroundColor: Color(0xFFFFF8F1),
-          iconColor: Color(0xFF241508),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            _buildProgressStepper(),
-            const SizedBox(height: 32),
+    final colors = context.appColors;
+    return AppPageScaffold(
+      scrollable: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          _buildProgressStepper(),
+          const SizedBox(height: 32),
 
-            // About Business Header
-            const Text(
-              "About Business",
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF3C4042),
-              ),
+          // About Business Header
+          Text(
+            "About Business",
+            style: TextStyle(
+              fontSize: 16,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w600,
+              color: colors.textPrimary,
             ),
-            const SizedBox(height: 20),
+          ),
+          const SizedBox(height: 20),
 
-            // Form Fields
+          // Form Fields
+          _buildInputField(
+            "Business Name",
+            "Enter business name",
+            controller: _businessNameController,
+          ),
+          const SizedBox(height: 24),
+          _buildInputField(
+            "Business Description",
+            "Share short description of your business",
+            maxLines: 4,
+            helperText: "100 characters required",
+            controller: _businessDescriptionController,
+          ),
+          const SizedBox(height: 24),
+
+          // Offering type
+          Text(
+            "Select type of offering",
+            style: TextStyle(color: colors.textSecondary, fontSize: 14),
+          ),
+          const SizedBox(height: 12),
+          _buildOfferingOption("Selling Product", Icons.shopping_bag_outlined),
+          const SizedBox(height: 8),
+          _buildOfferingOption(
+            "Providing Service",
+            Icons.build_circle_outlined,
+          ),
+          const SizedBox(height: 24),
+
+          if (_selectedOffering == 'Providing Service') ...[
             _buildInputField(
-              "Business Name",
-              "Enter business name",
-              controller: _businessNameController,
+              "Professional Title",
+              "e.g. Fashion Designer",
+              controller: _professionalTitleController,
             ),
             const SizedBox(height: 24),
-            _buildInputField(
-              "Business Description",
-              "Share short description of your business",
-              maxLines: 4,
-              helperText: "100 characters required",
-              controller: _businessDescriptionController,
-            ),
-            const SizedBox(height: 24),
-
-            // Offering type
-            const Text(
-              "Select type of offering",
-              style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
-            ),
-            const SizedBox(height: 12),
-            _buildOfferingOption(
-              "Selling Product",
-              Icons.shopping_bag_outlined,
+            Text(
+              "Service List",
+              style: TextStyle(color: colors.textSecondary, fontSize: 14),
             ),
             const SizedBox(height: 8),
-            _buildOfferingOption(
-              "Providing Service",
-              Icons.build_circle_outlined,
-            ),
+            ServiceListEditor(items: _services),
             const SizedBox(height: 24),
-
-            if (_selectedOffering == 'Providing Service') ...[
-              _buildInputField(
-                "Professional Title",
-                "e.g. Fashion Designer",
-                controller: _professionalTitleController,
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                "Service List",
-                style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
-              ),
-              const SizedBox(height: 8),
-              ServiceListEditor(items: _services),
-              const SizedBox(height: 24),
-            ] else ...[
-              const Text(
-                "What do you sell?",
-                style: TextStyle(color: Color(0xFF777F84), fontSize: 14),
-              ),
-              const SizedBox(height: 8),
-              ProductListEditor(items: _products),
-              const SizedBox(height: 24),
-            ],
-
-            const SizedBox(height: 32),
-
-            // Upload Sections
-            _buildUploadCard(
-              title: "Business Certificate",
-              hintLeft: "High resolution image\nPDF, JPEG, PNG formats",
-              hintRight: "200 x 200px\n20kb Max",
-              selectedPath: _businessCertificatePath,
-              onTap: () async {
-                final path = await pickSingleFilePath();
-                if (path != null)
-                  setState(() => _businessCertificatePath = path);
-              },
+          ] else ...[
+            Text(
+              "What do you sell?",
+              style: TextStyle(color: colors.textSecondary, fontSize: 14),
             ),
+            const SizedBox(height: 8),
+            ProductListEditor(items: _products),
             const SizedBox(height: 24),
-            _buildUploadCard(
-              title: "Business logo",
-              hintLeft: "High resolution image\nPNG formats",
-              hintRight: "200 x 200px\nMust be in Black",
-              selectedPath: _businessLogoPath,
-              onTap: () async {
-                final path = await pickSingleFilePath();
-                if (path != null) setState(() => _businessLogoPath = path);
-              },
-            ),
-
-            const SizedBox(height: 40),
-            _buildSubmitButton(context),
-            const SizedBox(height: 40),
           ],
-        ),
+
+          const SizedBox(height: 32),
+
+          // Upload Sections
+          _buildUploadCard(
+            title: "Business Certificate",
+            hintLeft: "High resolution image\nPDF, JPEG, PNG formats",
+            hintRight: "200 x 200px\n20kb Max",
+            selectedPath: _businessCertificatePath,
+            onTap: () async {
+              final path = await pickSingleFilePath();
+              if (path != null) {
+                setState(() => _businessCertificatePath = path);
+              }
+            },
+          ),
+          const SizedBox(height: 24),
+          _buildUploadCard(
+            title: "Business logo",
+            hintLeft: "High resolution image\nPNG formats",
+            hintRight: "200 x 200px\nMust be in Black",
+            selectedPath: _businessLogoPath,
+            onTap: () async {
+              final path = await pickSingleFilePath();
+              if (path != null) setState(() => _businessLogoPath = path);
+            },
+          ),
+
+          const SizedBox(height: 40),
+          _buildSubmitButton(context),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }
@@ -182,22 +172,25 @@ class _BrandBusinessDetailsScreenState
     bool isCompleted = false,
     String? stepNum,
   }) {
+    final colors = context.appColors;
     return Row(
       children: [
         Container(
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: isActive ? const Color(0xFF603814) : const Color(0xFFE9E9E9),
-            borderRadius: BorderRadius.circular(4),
+            color: isActive ? colors.textPrimary : colors.surfaceSecondary,
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Center(
             child: icon != null
-                ? Icon(icon, color: Colors.white, size: 16)
+                ? Icon(icon, color: colors.background, size: 16)
                 : Text(
                     stepNum ?? "",
                     style: TextStyle(
-                      color: isActive ? Colors.white : const Color(0xFF777F84),
+                      color: isActive
+                          ? colors.background
+                          : colors.textSecondary,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -211,7 +204,7 @@ class _BrandBusinessDetailsScreenState
           style: TextStyle(
             fontSize: 10,
             fontFamily: 'Campton',
-            color: isActive ? const Color(0xFF603814) : const Color(0xFF777F84),
+            color: isActive ? colors.textPrimary : colors.textSecondary,
             fontWeight: isActive ? FontWeight.w500 : FontWeight.w400,
           ),
         ),
@@ -226,36 +219,39 @@ class _BrandBusinessDetailsScreenState
     String? helperText,
     TextEditingController? controller,
   }) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
         ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Campton',
             fontSize: 16,
-            color: Color(0xFF1E2021),
+            color: colors.textPrimary,
           ),
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: Color(0xFFCCCCCC), fontSize: 16),
+            hintStyle: TextStyle(color: colors.textTertiary, fontSize: 16),
+            filled: true,
+            fillColor: colors.surface,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 20,
               vertical: 16,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.border),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFFDAF40)),
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.accent),
             ),
           ),
         ),
@@ -265,7 +261,7 @@ class _BrandBusinessDetailsScreenState
             alignment: Alignment.centerRight,
             child: Text(
               helperText,
-              style: const TextStyle(color: Color(0xFF595F63), fontSize: 10),
+              style: TextStyle(color: colors.textTertiary, fontSize: 10),
             ),
           ),
         ],
@@ -274,32 +270,28 @@ class _BrandBusinessDetailsScreenState
   }
 
   Widget _buildOfferingOption(String title, IconData icon) {
+    final colors = context.appColors;
     final isSelected = _selectedOffering == title;
     return InkWell(
       onTap: () => setState(() => _selectedOffering = title),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: isSelected
-                ? const Color(0xFFA15E22)
-                : const Color(0xFFCCCCCC),
-          ),
+          color: isSelected ? colors.accent.withValues(alpha: 0.08) : null,
+          border: Border.all(color: isSelected ? colors.accent : colors.border),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           children: [
             Icon(
               isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: isSelected
-                  ? const Color(0xFFA15E22)
-                  : const Color(0xFF777F84),
+              color: isSelected ? colors.accent : colors.textSecondary,
               size: 20,
             ),
             const SizedBox(width: 12),
             Text(
               title,
-              style: const TextStyle(fontSize: 16, color: Color(0xFF241508)),
+              style: TextStyle(fontSize: 16, color: colors.textPrimary),
             ),
           ],
         ),
@@ -308,28 +300,30 @@ class _BrandBusinessDetailsScreenState
   }
 
   Widget _buildDropdownField(String label, String value) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
         ),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFCCCCCC)),
-            borderRadius: BorderRadius.circular(8),
+            color: colors.surface,
+            border: Border.all(color: colors.border),
+            borderRadius: BorderRadius.circular(18),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 value,
-                style: const TextStyle(color: Color(0xFFCCCCCC), fontSize: 16),
+                style: TextStyle(color: colors.textTertiary, fontSize: 16),
               ),
-              const Icon(Icons.keyboard_arrow_down, color: Color(0xFF777F84)),
+              Icon(Icons.keyboard_arrow_down, color: colors.textSecondary),
             ],
           ),
         ),
@@ -344,13 +338,14 @@ class _BrandBusinessDetailsScreenState
     required String? selectedPath,
     required VoidCallback onTap,
   }) {
+    final colors = context.appColors;
     final hasFile = selectedPath != null && selectedPath.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(color: Color(0xFF777F84), fontSize: 14),
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
         ),
         const SizedBox(height: 8),
         GestureDetector(
@@ -359,10 +354,9 @@ class _BrandBusinessDetailsScreenState
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 24),
             decoration: BoxDecoration(
+              color: colors.surface,
               border: Border.all(
-                color: hasFile
-                    ? const Color(0xFF4CAF50)
-                    : const Color(0xFF89858A),
+                color: hasFile ? const Color(0xFF4CAF50) : colors.borderStrong,
               ),
               borderRadius: BorderRadius.circular(11),
             ),
@@ -370,9 +364,7 @@ class _BrandBusinessDetailsScreenState
               children: [
                 Icon(
                   hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
-                  color: hasFile
-                      ? const Color(0xFF4CAF50)
-                      : const Color(0xFF603814),
+                  color: hasFile ? const Color(0xFF4CAF50) : colors.textPrimary,
                   size: 30,
                 ),
                 const SizedBox(height: 8),
@@ -382,7 +374,7 @@ class _BrandBusinessDetailsScreenState
                     fontSize: 16,
                     color: hasFile
                         ? const Color(0xFF4CAF50)
-                        : const Color(0xFF1E2021),
+                        : colors.textPrimary,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -394,16 +386,16 @@ class _BrandBusinessDetailsScreenState
                     children: [
                       Text(
                         hintLeft,
-                        style: const TextStyle(
-                          color: Color(0xFF777F84),
+                        style: TextStyle(
+                          color: colors.textSecondary,
                           fontSize: 10,
                         ),
                       ),
                       Text(
                         hintRight,
                         textAlign: TextAlign.right,
-                        style: const TextStyle(
-                          color: Color(0xFF777F84),
+                        style: TextStyle(
+                          color: colors.textSecondary,
                           fontSize: 10,
                         ),
                       ),

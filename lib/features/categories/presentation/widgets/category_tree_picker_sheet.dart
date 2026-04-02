@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/features/categories/domain/category_node.dart';
 
 /// Bottom-sheet drill-down picker for CategoryNode trees.
@@ -11,12 +12,14 @@ Future<CategoryNode?> showCategoryTreePickerSheet({
   required String title,
   required List<CategoryNode> roots,
 }) {
+  final colors = context.appColors;
   return showModalBottomSheet<CategoryNode>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: const Color(0xFFFFFBF5),
-    shape: const RoundedRectangleBorder(
+    backgroundColor: colors.surfaceElevated,
+    shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      side: BorderSide(color: colors.border),
     ),
     builder: (_) => _CategoryTreePickerContent(title: title, roots: roots),
   );
@@ -29,13 +32,16 @@ class _CategoryTreePickerContent extends StatefulWidget {
   final List<CategoryNode> roots;
 
   @override
-  State<_CategoryTreePickerContent> createState() => _CategoryTreePickerContentState();
+  State<_CategoryTreePickerContent> createState() =>
+      _CategoryTreePickerContentState();
 }
 
-class _CategoryTreePickerContentState extends State<_CategoryTreePickerContent> {
+class _CategoryTreePickerContentState
+    extends State<_CategoryTreePickerContent> {
   final List<CategoryNode> _stack = [];
 
-  List<CategoryNode> get _currentList => _stack.isEmpty ? widget.roots : _stack.last.children;
+  List<CategoryNode> get _currentList =>
+      _stack.isEmpty ? widget.roots : _stack.last.children;
 
   String get _breadcrumb {
     if (_stack.isEmpty) return widget.title;
@@ -44,6 +50,7 @@ class _CategoryTreePickerContentState extends State<_CategoryTreePickerContent> 
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final list = _currentList;
     return SafeArea(
       child: Padding(
@@ -57,7 +64,7 @@ class _CategoryTreePickerContentState extends State<_CategoryTreePickerContent> 
                   onPressed: _stack.isEmpty
                       ? () => Navigator.of(context).pop()
                       : () => setState(() => _stack.removeLast()),
-                  icon: const Icon(Icons.arrow_back, color: Color(0xFF241508)),
+                  icon: Icon(Icons.arrow_back, color: colors.textPrimary),
                 ),
                 const SizedBox(width: 4),
                 Expanded(
@@ -65,11 +72,11 @@ class _CategoryTreePickerContentState extends State<_CategoryTreePickerContent> 
                     _breadcrumb,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF241508),
+                      color: colors.textPrimary,
                     ),
                   ),
                 ),
@@ -80,22 +87,26 @@ class _CategoryTreePickerContentState extends State<_CategoryTreePickerContent> 
               child: ListView.separated(
                 shrinkWrap: true,
                 itemCount: list.length,
-                separatorBuilder: (context, index) => const Divider(color: Color(0xFFDEDEDE)),
+                separatorBuilder: (context, index) =>
+                    Divider(color: colors.border),
                 itemBuilder: (context, index) {
                   final node = list[index];
                   final hasChildren = node.children.isNotEmpty;
                   return ListTile(
                     title: Text(
                       node.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Campton',
-                        color: Color(0xFF1E2021),
+                        color: colors.textPrimary,
                       ),
                     ),
                     trailing: hasChildren
-                        ? const Icon(Icons.chevron_right, color: Color(0xFF777F84))
-                        : const Icon(Icons.check_circle_outline, color: Color(0xFFFDAF40)),
+                        ? Icon(Icons.chevron_right, color: colors.textTertiary)
+                        : Icon(
+                            Icons.check_circle_outline,
+                            color: colors.accent,
+                          ),
                     onTap: () {
                       if (hasChildren) {
                         setState(() => _stack.add(node));
