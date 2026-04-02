@@ -88,14 +88,23 @@ class HomeScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Brand Logo with text (PNG for correct colors)
-          SvgPicture.asset(
-            Theme.of(context).brightness == Brightness.dark
-                ? AppIcons.brandMarkWhite
-                : AppIcons.brandMarkBlack,
-            width: 98,
-            height: 22,
-            fit: BoxFit.contain,
-          ),
+          Theme.of(context).brightness == Brightness.dark
+              ? SvgPicture.asset(
+                  AppIcons.brandMarkWhite,
+                  width: 98,
+                  height: 22,
+                  fit: BoxFit.contain,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                )
+              : Image.asset(
+                  'assets/app_icon/logo2.png',
+                  width: 98,
+                  height: 22,
+                  fit: BoxFit.contain,
+                ),
 
           // Header Icons
           Row(
