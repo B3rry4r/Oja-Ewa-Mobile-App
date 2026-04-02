@@ -368,18 +368,8 @@ class HomeScreen extends ConsumerWidget {
   }) {
     final colors = context.appColors;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final tileColor = isDarkMode
-        ? colors.surfaceElevated
-        : Color.alphaBlend(
-            color.withValues(alpha: 0.12),
-            colors.surfaceElevated,
-          );
+    final tileColor = isDarkMode ? colors.surfaceElevated : colors.surface;
     final iconTint = isDarkMode ? colors.accent : color.withValues(alpha: 0.95);
-    final shadow = BoxShadow(
-      color: colors.shadow.withValues(alpha: isDarkMode ? 0.16 : 0.07),
-      blurRadius: isDarkMode ? 18 : 10,
-      offset: Offset(0, isDarkMode ? 8 : 4),
-    );
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
@@ -389,7 +379,15 @@ class HomeScreen extends ConsumerWidget {
           color: tileColor,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: colors.border),
-          boxShadow: [shadow],
+          boxShadow: isDarkMode
+              ? [
+                  BoxShadow(
+                    color: colors.shadow.withValues(alpha: 0.16),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ]
+              : null,
         ),
         child: Row(
           children: [
