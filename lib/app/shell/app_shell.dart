@@ -181,7 +181,7 @@ class _AppShellState extends ConsumerState<AppShell> {
           heroTag: 'start-selling-fab',
           onPressed: () => _navigateToStartSelling(context, ref),
           backgroundColor: context.appColors.accent,
-          foregroundColor: context.appColors.onAccent,
+          foregroundColor: Colors.white,
           icon: const Icon(Icons.storefront, size: 24),
           label: const Text(
             'Start Selling',

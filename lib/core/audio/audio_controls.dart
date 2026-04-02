@@ -31,7 +31,7 @@ class AudioControlsButton extends ConsumerWidget {
         ),
         child: Icon(
           isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-          color: colors.onAccent,
+          color: Colors.white,
           size: 24,
         ),
       ),
