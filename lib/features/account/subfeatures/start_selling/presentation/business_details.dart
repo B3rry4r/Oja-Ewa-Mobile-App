@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
+import 'package:ojaewa/core/files/pick_file.dart';
 
 import '../../../../../app/router/app_router.dart';
 import 'draft_utils.dart';
@@ -15,10 +16,13 @@ class BusinessDetailsScreen extends StatefulWidget {
 }
 
 class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
+  bool _initializedFromDraft = false;
   final _businessNameController = TextEditingController();
   final _registrationNumberController = TextEditingController();
   final _bankNameController = TextEditingController();
   final _accountNumberController = TextEditingController();
+  String? _businessCertificatePath;
+  String? _businessLogoPath;
 
   @override
   void dispose() {
@@ -31,6 +35,19 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final draft = sellerDraftFromArgs(
+      ModalRoute.of(context)?.settings.arguments,
+    );
+    if (!_initializedFromDraft) {
+      _initializedFromDraft = true;
+      _businessNameController.text = draft.businessName ?? '';
+      _registrationNumberController.text =
+          draft.businessRegistrationNumber ?? '';
+      _bankNameController.text = draft.bankName ?? '';
+      _accountNumberController.text = draft.accountNumber ?? '';
+      _businessCertificatePath = draft.businessCertificatePath;
+      _businessLogoPath = draft.businessLogoPath;
+    }
     return AppPageScaffold(
       scrollable: true,
       child: Column(
@@ -68,6 +85,32 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
             "Account Number",
             "Your Account Number",
             controller: _accountNumberController,
+          ),
+
+          const SizedBox(height: 40),
+
+          _buildSectionHeader("Business Documents"),
+          const SizedBox(height: 16),
+          _buildUploadCard(
+            label: 'Business Certificate',
+            selectedPath: _businessCertificatePath,
+            onTap: () async {
+              final path = await pickSingleFilePath();
+              if (path != null) {
+                setState(() => _businessCertificatePath = path);
+              }
+            },
+          ),
+          const SizedBox(height: 20),
+          _buildUploadCard(
+            label: 'Business Logo',
+            selectedPath: _businessLogoPath,
+            onTap: () async {
+              final path = await pickSingleFilePath();
+              if (path != null) {
+                setState(() => _businessLogoPath = path);
+              }
+            },
           ),
 
           const SizedBox(height: 48),
@@ -202,6 +245,59 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
     );
   }
 
+  Widget _buildUploadCard({
+    required String label,
+    required String? selectedPath,
+    required VoidCallback onTap,
+  }) {
+    final colors = context.appColors;
+    final hasFile = (selectedPath ?? '').isNotEmpty;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w400,
+              color: colors.textTertiary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            height: 120,
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: hasFile ? colors.accent : colors.border,
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
+                  color: hasFile ? colors.accent : colors.textSecondary,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  hasFile ? 'File selected' : 'Browse Document',
+                  style: TextStyle(fontSize: 15, color: colors.textPrimary),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSubmitButton(BuildContext context) {
     final colors = context.appColors;
     return InkWell(
@@ -212,7 +308,9 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
               ..businessRegistrationNumber = _registrationNumberController.text
                   .trim()
               ..bankName = _bankNameController.text.trim()
-              ..accountNumber = _accountNumberController.text.trim();
+              ..accountNumber = _accountNumberController.text.trim()
+              ..businessCertificatePath = _businessCertificatePath
+              ..businessLogoPath = _businessLogoPath;
 
         Navigator.of(
           context,

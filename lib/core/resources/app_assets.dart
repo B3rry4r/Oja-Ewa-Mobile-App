@@ -46,6 +46,7 @@ abstract class AppImages {
   static const String comingSoon = 'assets/icons/coming_soon_i.png';
   // assets/icons/*.png
   static const String onboarding = 'assets/icons/l.png';
+  static const String onboardingHero = 'assets/icons/oja-ewa-onboard.PNG';
   static const String logoOutline = 'assets/icons/logo_outline.png';
 
   // assets/app_icon/*

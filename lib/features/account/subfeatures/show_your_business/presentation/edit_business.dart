@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/files/pick_file.dart';
+import 'package:ojaewa/core/files/multipart_utils.dart';
 import 'package:ojaewa/core/location/location_picker_sheets.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/domain/business_profile_payload.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_management_controller.dart';
+import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_status_controller.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
 
@@ -36,6 +39,8 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
   String _selectedCountryCode = '';
 
   // File upload
+  String? _identityDocumentPath;
+  String? _businessCertificatesPath;
   String? _businessLogoPath;
 
   @override
@@ -70,6 +75,18 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
             (data['business_description'] as String?) ?? '';
         _professionalTitleController.text =
             (data['professional_title'] as String?) ?? '';
+        _identityDocumentPath = data['identity_document'] as String?;
+        _businessLogoPath = data['business_logo'] as String?;
+        final certificates = data['business_certificates'];
+        if (certificates is List && certificates.isNotEmpty) {
+          final first = certificates.first;
+          if (first is Map<String, dynamic>) {
+            _businessCertificatesPath =
+                (first['file_path'] ?? first['url']) as String?;
+          } else if (first is String) {
+            _businessCertificatesPath = first;
+          }
+        }
         _initialized = true;
       },
     );
@@ -183,6 +200,26 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
           ),
           const SizedBox(height: 32),
           _buildLogoSection(),
+          const SizedBox(height: 24),
+          _buildDocumentSection(
+            title: 'Identity Document',
+            selectedPath: _identityDocumentPath,
+            onTap: () async {
+              final path = await pickSingleFilePath();
+              if (path != null) setState(() => _identityDocumentPath = path);
+            },
+          ),
+          const SizedBox(height: 24),
+          _buildDocumentSection(
+            title: 'Business Certificate',
+            selectedPath: _businessCertificatesPath,
+            onTap: () async {
+              final path = await pickSingleFilePath();
+              if (path != null) {
+                setState(() => _businessCertificatesPath = path);
+              }
+            },
+          ),
           const SizedBox(height: 40),
           _buildSubmitButton(),
           const SizedBox(height: 24),
@@ -337,11 +374,12 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
                     context,
                     selectedDialCode: _selectedCountryCode,
                   );
-                  if (country != null)
+                  if (country != null) {
                     setState(() {
                       _selectedCountryCode = country.dialCode;
                       _selectedCountryFlag = country.flag;
                     });
+                  }
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -389,26 +427,38 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
   }
 
   Widget _buildLogoSection() {
-    final hasFile = _businessLogoPath != null && _businessLogoPath!.isNotEmpty;
+    return _buildDocumentSection(
+      title: 'Business Logo',
+      selectedPath: _businessLogoPath,
+      onTap: () async {
+        final path = await pickSingleFilePath();
+        if (path != null) setState(() => _businessLogoPath = path);
+      },
+    );
+  }
+
+  Widget _buildDocumentSection({
+    required String title,
+    required String? selectedPath,
+    required VoidCallback onTap,
+  }) {
+    final colors = context.appColors;
+    final hasFile = (selectedPath ?? '').isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('Business Logo'),
+        _buildSectionHeader(title),
         const SizedBox(height: 16),
         GestureDetector(
-          onTap: () async {
-            final path = await pickSingleFilePath();
-            if (path != null) setState(() => _businessLogoPath = path);
-          },
+          onTap: onTap,
           child: Container(
             width: double.infinity,
             height: 140,
             decoration: BoxDecoration(
+              color: colors.surfaceElevated,
               borderRadius: BorderRadius.circular(11),
               border: Border.all(
-                color: hasFile
-                    ? const Color(0xFF4CAF50)
-                    : const Color(0xFF89858A),
+                color: hasFile ? colors.accent : colors.border,
               ),
             ),
             child: Column(
@@ -417,19 +467,12 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
                 Icon(
                   hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
                   size: 24,
-                  color: hasFile
-                      ? const Color(0xFF4CAF50)
-                      : context.appColors.textTertiary,
+                  color: hasFile ? colors.accent : colors.textTertiary,
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  hasFile ? 'Logo selected' : 'Browse Document',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: hasFile
-                        ? const Color(0xFF4CAF50)
-                        : context.appColors.textPrimary,
-                  ),
+                  hasFile ? 'File selected' : 'Browse Document',
+                  style: TextStyle(fontSize: 16, color: colors.textPrimary),
                 ),
               ],
             ),
@@ -440,6 +483,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
   }
 
   Widget _buildSubmitButton() {
+    final navigator = Navigator.of(context);
     return GestureDetector(
       onTap: () async {
         final args = ModalRoute.of(context)?.settings.arguments;
@@ -492,14 +536,34 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
         );
 
         try {
-          await ref
-              .read(businessManagementActionsProvider.notifier)
-              .updateBusiness(businessId, payload);
-          if (!context.mounted) return;
-          AppSnackbars.showSuccess(context, 'Business updated');
-          Navigator.of(context).pop();
+          final api = ref.read(businessProfileApiProvider);
+          final updateRes = await api.updateBusiness(businessId, payload);
+          if ((_businessLogoPath ?? '').isNotEmpty &&
+              !_businessLogoPath!.startsWith('http')) {
+            await api.uploadFile(
+              businessId: businessId,
+              fileType: 'business_logo',
+              file: multipartFromPath(_businessLogoPath!),
+            );
+          }
+          ref.invalidate(myBusinessStatusesProvider);
+          ref.invalidate(businessByIdProvider(businessId));
+          if (!mounted) return;
+          final data = updateRes['data'] is Map<String, dynamic>
+              ? updateRes['data'] as Map<String, dynamic>
+              : updateRes;
+          final storeStatus = data['store_status'] as String?;
+          final successMessage = storeStatus == 'pending'
+              ? 'Business profile resubmitted for review'
+              : 'Business updated';
+          AppSnackbars.showSuccess(context, successMessage);
+          if (storeStatus == 'pending') {
+            navigator.pushReplacementNamed(AppRoutes.businessApprovalStatus);
+          } else {
+            navigator.pop();
+          }
         } catch (e) {
-          if (!context.mounted) return;
+          if (!mounted) return;
           AppSnackbars.showError(context, UiErrorMessage.from(e));
         }
       },

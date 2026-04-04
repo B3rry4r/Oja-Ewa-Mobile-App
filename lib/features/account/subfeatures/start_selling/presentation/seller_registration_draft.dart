@@ -1,5 +1,6 @@
 class SellerRegistrationDraft {
   SellerRegistrationDraft({
+    this.isResubmission = false,
     this.country,
     this.state,
     this.city,
@@ -17,6 +18,7 @@ class SellerRegistrationDraft {
     this.accountNumber,
   });
 
+  bool isResubmission;
   String? country;
   String? state;
   String? city;
@@ -39,25 +41,27 @@ class SellerRegistrationDraft {
   String? accountNumber;
 
   Map<String, dynamic> toJson() => {
-        'country': country,
-        'state': state,
-        'city': city,
-        'address': address,
-        'businessEmail': businessEmail,
-        'businessPhoneNumber': businessPhoneNumber,
-        'instagram': instagram,
-        'facebook': facebook,
-        'identityDocumentPath': identityDocumentPath,
-        'businessName': businessName,
-        'businessRegistrationNumber': businessRegistrationNumber,
-        'businessCertificatePath': businessCertificatePath,
-        'businessLogoPath': businessLogoPath,
-        'bankName': bankName,
-        'accountNumber': accountNumber,
-      };
+    'isResubmission': isResubmission,
+    'country': country,
+    'state': state,
+    'city': city,
+    'address': address,
+    'businessEmail': businessEmail,
+    'businessPhoneNumber': businessPhoneNumber,
+    'instagram': instagram,
+    'facebook': facebook,
+    'identityDocumentPath': identityDocumentPath,
+    'businessName': businessName,
+    'businessRegistrationNumber': businessRegistrationNumber,
+    'businessCertificatePath': businessCertificatePath,
+    'businessLogoPath': businessLogoPath,
+    'bankName': bankName,
+    'accountNumber': accountNumber,
+  };
 
   static SellerRegistrationDraft fromJson(Map<String, dynamic> json) {
     return SellerRegistrationDraft(
+      isResubmission: json['isResubmission'] as bool? ?? false,
       country: json['country'] as String?,
       state: json['state'] as String?,
       city: json['city'] as String?,

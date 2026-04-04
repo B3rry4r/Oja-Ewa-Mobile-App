@@ -108,6 +108,22 @@ class BusinessApprovalStatusScreen extends ConsumerWidget {
                       child: const Text('Manage Business'),
                     ),
                   )
+                else if (b.isRejected)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pushNamed(
+                        AppRoutes.editBusiness,
+                        arguments: {'businessId': b.id},
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colors.accent,
+                        foregroundColor: colors.onAccent,
+                      ),
+                      child: const Text('Edit and Resubmit'),
+                    ),
+                  )
                 else
                   SizedBox(
                     width: double.infinity,

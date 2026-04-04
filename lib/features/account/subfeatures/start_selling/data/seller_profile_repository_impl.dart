@@ -11,8 +11,17 @@ class SellerProfileRepositoryImpl implements SellerProfileRepository {
   final SellerProfileApi _api;
 
   @override
-  Future<Map<String, dynamic>> createSellerProfile(SellerProfilePayload payload) {
+  Future<Map<String, dynamic>> createSellerProfile(
+    SellerProfilePayload payload,
+  ) {
     return _api.createSellerProfile(payload);
+  }
+
+  @override
+  Future<Map<String, dynamic>> updateSellerProfile(
+    SellerProfilePayload payload,
+  ) {
+    return _api.updateSellerProfile(payload);
   }
 }
 
@@ -20,6 +29,8 @@ final sellerProfileApiProvider = Provider<SellerProfileApi>((ref) {
   return SellerProfileApi(ref.watch(laravelDioProvider));
 });
 
-final sellerProfileRepositoryProvider = Provider<SellerProfileRepository>((ref) {
+final sellerProfileRepositoryProvider = Provider<SellerProfileRepository>((
+  ref,
+) {
   return SellerProfileRepositoryImpl(ref.watch(sellerProfileApiProvider));
 });

@@ -42,7 +42,7 @@ class SellerProfilePayload {
   final String bankName;
   final String accountNumber;
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson({bool includeFileFields = true}) {
     return {
       'country': country,
       'state': state,
@@ -52,11 +52,18 @@ class SellerProfilePayload {
       'business_phone_number': businessPhoneNumber,
       if (instagram != null && instagram!.isNotEmpty) 'instagram': instagram,
       if (facebook != null && facebook!.isNotEmpty) 'facebook': facebook,
-      if (identityDocument != null && identityDocument!.isNotEmpty) 'identity_document': identityDocument,
+      if (includeFileFields &&
+          identityDocument != null &&
+          identityDocument!.isNotEmpty)
+        'identity_document': identityDocument,
       'business_name': businessName,
       'business_registration_number': businessRegistrationNumber,
-      if (businessCertificate != null && businessCertificate!.isNotEmpty) 'business_certificate': businessCertificate,
-      if (businessLogo != null && businessLogo!.isNotEmpty) 'business_logo': businessLogo,
+      if (includeFileFields &&
+          businessCertificate != null &&
+          businessCertificate!.isNotEmpty)
+        'business_certificate': businessCertificate,
+      if (includeFileFields && businessLogo != null && businessLogo!.isNotEmpty)
+        'business_logo': businessLogo,
       'bank_name': bankName,
       'account_number': accountNumber,
     };

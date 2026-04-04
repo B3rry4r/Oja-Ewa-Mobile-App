@@ -5,6 +5,7 @@ import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
+import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/draft_utils.dart';
 
 class SellerApprovalStatusScreen extends ConsumerWidget {
   const SellerApprovalStatusScreen({super.key});
@@ -105,6 +106,22 @@ class SellerApprovalStatusScreen extends ConsumerWidget {
                         foregroundColor: colors.onAccent,
                       ),
                       child: const Text('Go to Your Shop'),
+                    ),
+                  )
+                else if (status.isRejected)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pushNamed(
+                        AppRoutes.sellerRegistration,
+                        arguments: sellerDraftFromStatus(status).toJson(),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colors.accent,
+                        foregroundColor: colors.onAccent,
+                      ),
+                      child: const Text('Edit and Resubmit'),
                     ),
                   )
                 else

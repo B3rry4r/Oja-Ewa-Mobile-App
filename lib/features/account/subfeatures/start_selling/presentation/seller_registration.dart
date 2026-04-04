@@ -20,6 +20,7 @@ class SellerRegistrationScreen extends ConsumerStatefulWidget {
 
 class _SellerRegistrationScreenState
     extends ConsumerState<SellerRegistrationScreen> {
+  bool _initializedFromDraft = false;
   final _cityController = TextEditingController();
   String? _identityDocumentLocalPath;
   final _addressController = TextEditingController();
@@ -48,6 +49,22 @@ class _SellerRegistrationScreenState
 
   @override
   Widget build(BuildContext context) {
+    final draft = sellerDraftFromArgs(
+      ModalRoute.of(context)?.settings.arguments,
+    );
+    if (!_initializedFromDraft) {
+      _initializedFromDraft = true;
+      _selectedCountryName = draft.country ?? '';
+      _selectedCountryFlag = '';
+      _selectedStateName = draft.state ?? '';
+      _cityController.text = draft.city ?? '';
+      _addressController.text = draft.address ?? '';
+      _emailController.text = draft.businessEmail ?? '';
+      _phoneController.text = draft.businessPhoneNumber ?? '';
+      _instagramController.text = draft.instagram ?? '';
+      _facebookController.text = draft.facebook ?? '';
+      _identityDocumentLocalPath = draft.identityDocumentPath;
+    }
     return AppPageScaffold(
       scrollable: true,
       child: Column(
@@ -477,8 +494,8 @@ class _SellerRegistrationScreenState
       onTap: () {
         final draft =
             sellerDraftFromArgs(ModalRoute.of(context)?.settings.arguments)
-              ..country = 'Nigeria'
-              ..state = 'FCT'
+              ..country = _selectedCountryName
+              ..state = _selectedStateName
               ..city = _cityController.text.trim()
               ..address = _addressController.text.trim()
               ..businessEmail = _emailController.text.trim()

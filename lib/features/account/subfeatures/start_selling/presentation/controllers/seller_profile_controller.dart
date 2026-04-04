@@ -11,10 +11,16 @@ class SellerProfileController extends AsyncNotifier<Map<String, dynamic>?> {
     return null;
   }
 
-  Future<Map<String, dynamic>> submit(SellerProfilePayload payload) async {
+  Future<Map<String, dynamic>> submit(
+    SellerProfilePayload payload, {
+    bool isUpdate = false,
+  }) async {
     state = const AsyncLoading();
     try {
-      final res = await ref.read(sellerProfileRepositoryProvider).createSellerProfile(payload);
+      final repo = ref.read(sellerProfileRepositoryProvider);
+      final res = isUpdate
+          ? await repo.updateSellerProfile(payload)
+          : await repo.createSellerProfile(payload);
       state = AsyncData(res);
       return res;
     } catch (e, st) {
@@ -24,6 +30,7 @@ class SellerProfileController extends AsyncNotifier<Map<String, dynamic>?> {
   }
 }
 
-final sellerProfileControllerProvider = AsyncNotifierProvider<SellerProfileController, Map<String, dynamic>?>(
-  SellerProfileController.new,
-);
+final sellerProfileControllerProvider =
+    AsyncNotifierProvider<SellerProfileController, Map<String, dynamic>?>(
+      SellerProfileController.new,
+    );

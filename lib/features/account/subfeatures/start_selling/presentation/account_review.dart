@@ -10,6 +10,7 @@ import 'package:ojaewa/core/ui/ui_error_message.dart';
 
 import '../domain/seller_profile_payload.dart';
 import 'controllers/seller_profile_controller.dart';
+import 'controllers/seller_status_controller.dart';
 import '../data/seller_profile_upload_repository_impl.dart';
 import 'package:ojaewa/core/files/multipart_utils.dart';
 import 'draft_utils.dart';
@@ -26,6 +27,9 @@ class AccountReviewScreen extends ConsumerStatefulWidget {
 class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
   bool _isSubmitted = false;
   bool _isSubmitting = false;
+
+  bool _isLocalFilePath(String? path) =>
+      path != null && path.isNotEmpty && !path.startsWith('http');
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +72,7 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
             ],
             _isSubmitted
                 ? _buildDoneButton(context)
-                : _buildSubmitButton(context, draft),
+                : _buildSubmitButton(draft),
             const SizedBox(height: 40),
           ],
         ),
@@ -124,109 +128,6 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildGoHomeButton(
-    BuildContext context,
-    WidgetRef ref,
-    SellerRegistrationDraft draft,
-    bool isLoading,
-  ) {
-    final colors = context.appColors;
-    return InkWell(
-      onTap: isLoading
-          ? null
-          : () async {
-              final payload = SellerProfilePayload(
-                country: draft.country ?? '',
-                state: draft.state ?? '',
-                city: draft.city ?? '',
-                address: draft.address ?? '',
-                businessEmail: draft.businessEmail ?? '',
-                businessPhoneNumber: draft.businessPhoneNumber ?? '',
-                instagram: draft.instagram,
-                facebook: draft.facebook,
-                identityDocument: draft.identityDocumentPath,
-                businessName: draft.businessName ?? '',
-                businessRegistrationNumber:
-                    draft.businessRegistrationNumber ?? '',
-                businessCertificate: draft.businessCertificatePath,
-                businessLogo: draft.businessLogoPath,
-                bankName: draft.bankName ?? '',
-                accountNumber: draft.accountNumber ?? '',
-              );
-
-              try {
-                // 1) Create profile
-                await ref
-                    .read(sellerProfileControllerProvider.notifier)
-                    .submit(payload);
-
-                // 2) Upload files (best effort; these endpoints also update profile fields)
-                final uploadRepo = ref.read(
-                  sellerProfileUploadRepositoryProvider,
-                );
-                if ((draft.identityDocumentPath ?? '').isNotEmpty) {
-                  await uploadRepo.upload(
-                    type: 'identity_document',
-                    file: multipartFromPath(draft.identityDocumentPath!),
-                  );
-                }
-
-                if ((draft.businessCertificatePath ?? '').isNotEmpty) {
-                  await uploadRepo.upload(
-                    type: 'business_certificate',
-                    file: multipartFromPath(draft.businessCertificatePath!),
-                  );
-                }
-
-                if ((draft.businessLogoPath ?? '').isNotEmpty) {
-                  await uploadRepo.upload(
-                    type: 'business_logo',
-                    file: multipartFromPath(draft.businessLogoPath!),
-                  );
-                }
-
-                if (!context.mounted) return;
-                AppSnackbars.showSuccess(
-                  context,
-                  'Seller application submitted',
-                );
-                Navigator.of(
-                  context,
-                ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
-              } catch (e) {
-                if (!context.mounted) return;
-                AppSnackbars.showError(context, UiErrorMessage.from(e));
-              }
-            },
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: double.infinity,
-        height: 57,
-        decoration: BoxDecoration(
-          color: colors.accent,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: colors.accent.withValues(alpha: 0.4),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            "Go Home",
-            style: TextStyle(
-              color: colors.onAccent,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -289,13 +190,10 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
     );
   }
 
-  Widget _buildSubmitButton(
-    BuildContext context,
-    SellerRegistrationDraft draft,
-  ) {
+  Widget _buildSubmitButton(SellerRegistrationDraft draft) {
     final colors = context.appColors;
     return InkWell(
-      onTap: _isSubmitting ? null : () => _submitSeller(context, draft),
+      onTap: _isSubmitting ? null : () => _submitSeller(draft),
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,
@@ -373,10 +271,7 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
     );
   }
 
-  Future<void> _submitSeller(
-    BuildContext context,
-    SellerRegistrationDraft draft,
-  ) async {
+  Future<void> _submitSeller(SellerRegistrationDraft draft) async {
     setState(() => _isSubmitting = true);
 
     final payload = SellerProfilePayload(
@@ -399,32 +294,43 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
     );
 
     try {
-      await ref.read(sellerProfileControllerProvider.notifier).submit(payload);
+      final res = await ref
+          .read(sellerProfileControllerProvider.notifier)
+          .submit(payload, isUpdate: draft.isResubmission);
 
       final uploadRepo = ref.read(sellerProfileUploadRepositoryProvider);
-      if ((draft.identityDocumentPath ?? '').isNotEmpty) {
+      if (_isLocalFilePath(draft.identityDocumentPath)) {
         await uploadRepo.upload(
           type: 'identity_document',
           file: multipartFromPath(draft.identityDocumentPath!),
         );
       }
 
-      if ((draft.businessCertificatePath ?? '').isNotEmpty) {
+      if (_isLocalFilePath(draft.businessCertificatePath)) {
         await uploadRepo.upload(
           type: 'business_certificate',
           file: multipartFromPath(draft.businessCertificatePath!),
         );
       }
 
-      if ((draft.businessLogoPath ?? '').isNotEmpty) {
+      if (_isLocalFilePath(draft.businessLogoPath)) {
         await uploadRepo.upload(
           type: 'business_logo',
           file: multipartFromPath(draft.businessLogoPath!),
         );
       }
 
+      ref.invalidate(mySellerStatusProvider);
+
       if (!mounted) return;
-      AppSnackbars.showSuccess(context, 'Seller application submitted');
+      final pendingAfterSubmit =
+          (res['registration_status'] as String?) == 'pending';
+      AppSnackbars.showSuccess(
+        context,
+        draft.isResubmission && pendingAfterSubmit
+            ? 'Seller profile resubmitted for review'
+            : 'Seller application submitted',
+      );
       setState(() {
         _isSubmitting = false;
         _isSubmitted = true;

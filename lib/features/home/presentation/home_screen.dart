@@ -116,7 +116,7 @@ class HomeScreen extends ConsumerWidget {
 
                   return sellerStatusAsync.when(
                     loading: () => const SizedBox.shrink(),
-                    error: (_, __) => const SizedBox.shrink(),
+                    error: (error, stackTrace) => const SizedBox.shrink(),
                     data: (status) {
                       final isApproved = status?.isApprovedAndActive ?? false;
                       if (!isApproved) {
@@ -204,7 +204,7 @@ class HomeScreen extends ConsumerWidget {
         height: 220,
         child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
       ),
-      error: (_, __) => _buildPromoCardsSection(context),
+      error: (error, stackTrace) => _buildPromoCardsSection(context),
       data: (adverts) {
         if (adverts.isEmpty) return _buildPromoCardsSection(context);
 
@@ -379,56 +379,40 @@ class HomeScreen extends ConsumerWidget {
   }) {
     final colors = context.appColors;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final tileColor = isDarkMode ? colors.surfaceElevated : colors.surface;
-    final iconTint = isDarkMode ? colors.accent : color.withValues(alpha: 0.95);
+    final iconTint = isDarkMode ? Colors.white : color.withValues(alpha: 0.95);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        decoration: BoxDecoration(
-          color: tileColor,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: colors.border),
-          boxShadow: isDarkMode
-              ? [
-                  BoxShadow(
-                    color: colors.shadow.withValues(alpha: 0.16),
-                    blurRadius: 18,
-                    offset: const Offset(0, 8),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(24)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              flex: 4,
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: SvgPicture.asset(
-                    iconAsset,
-                    fit: BoxFit.contain,
-                    colorFilter: ColorFilter.mode(iconTint, BlendMode.srcIn),
-                  ),
+            SizedBox(
+              width: 54,
+              height: 54,
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: SvgPicture.asset(
+                  iconAsset,
+                  fit: BoxFit.contain,
+                  colorFilter: ColorFilter.mode(iconTint, BlendMode.srcIn),
                 ),
               ),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              flex: 5,
-              child: Text(
-                title,
-                maxLines: 2,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Campton',
-                  fontWeight: FontWeight.w600,
-                  color: colors.textPrimary,
-                  height: 1.2,
-                ),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12.6,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w600,
+                color: colors.textPrimary,
+                height: 1.15,
               ),
             ),
           ],
@@ -542,88 +526,23 @@ class _AdvertBannerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
-    final title = advert.title.trim();
-    final description = (advert.description ?? '').trim();
     final imageUrl = (advert.imageUrl ?? '').trim();
     final hasImage = imageUrl.isNotEmpty;
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: colors.accent,
+        color: context.appColors.surfaceSecondary,
       ),
       clipBehavior: Clip.antiAlias,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          if (hasImage)
-            Image.network(
+      child: hasImage
+          ? Image.network(
               imageUrl,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-            ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: hasImage
-                  ? const LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Color(0xD9241508),
-                        Color(0x99241508),
-                        Color(0x33241508),
-                      ],
-                    )
-                  : const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFFFDAF40), Color(0xFFDD995C)],
-                    ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 22,
-                    height: 1.1,
-                    fontWeight: FontWeight.w700,
-                    color: hasImage ? colors.onAccent : colors.textPrimary,
-                    fontFamily: 'Campton',
-                  ),
-                ),
-                if (description.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 280),
-                    child: Text(
-                      description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 14,
-                        height: 1.35,
-                        color: hasImage
-                            ? colors.onAccent.withValues(alpha: 0.92)
-                            : colors.textPrimary,
-                        fontFamily: 'Campton',
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
+              errorBuilder: (context, error, stackTrace) =>
+                  const SizedBox.shrink(),
+            )
+          : const SizedBox.shrink(),
     );
   }
 }

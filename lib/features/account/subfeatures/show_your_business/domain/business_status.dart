@@ -16,6 +16,9 @@ class BusinessStatus {
   final String storeStatus; // pending|approved|deactivated
   final String? rejectionReason;
 
+  bool get isRejected =>
+      storeStatus == 'deactivated' && (rejectionReason ?? '').trim().isNotEmpty;
+
   static BusinessStatus fromJson(Map<String, dynamic> json) {
     return BusinessStatus(
       id: (json['id'] as num?)?.toInt() ?? 0,

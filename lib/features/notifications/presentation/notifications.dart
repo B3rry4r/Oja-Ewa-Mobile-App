@@ -7,6 +7,8 @@ import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
+import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
+import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/draft_utils.dart';
 import 'package:ojaewa/features/notifications/domain/app_notification.dart';
 import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 import 'package:ojaewa/features/notifications/presentation/notification_detail.dart';
@@ -149,19 +151,7 @@ class NotificationsScreen extends ConsumerWidget {
               });
         }
 
-        final deepLink = notification.deepLink;
-        if (deepLink != null && deepLink.isNotEmpty) {
-          _handleDeepLinkNavigation(context, deepLink);
-          return;
-        }
-
-        // Fallback: open detail
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) =>
-                NotificationDetailScreen(notification: notification),
-          ),
-        );
+        _handleNotificationTap(context, ref, notification);
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 6),
@@ -255,6 +245,49 @@ class NotificationsScreen extends ConsumerWidget {
     );
   }
 
+  Future<void> _handleNotificationTap(
+    BuildContext context,
+    WidgetRef ref,
+    AppNotification notification,
+  ) async {
+    final payloadStatus = notification.payloadStatus;
+
+    if (payloadStatus == 'rejected' &&
+        notification.deepLink == '/seller/profile') {
+      final status = await ref.read(mySellerStatusProvider.future);
+      if (!context.mounted) return;
+      if (status != null) {
+        Navigator.of(context).pushNamed(
+          AppRoutes.sellerRegistration,
+          arguments: sellerDraftFromStatus(status).toJson(),
+        );
+        return;
+      }
+    }
+
+    if ((payloadStatus == 'deactivated' || payloadStatus == 'rejected') &&
+        notification.businessId != null) {
+      Navigator.of(context).pushNamed(
+        AppRoutes.editBusiness,
+        arguments: {'businessId': notification.businessId},
+      );
+      return;
+    }
+
+    final deepLink = notification.deepLink;
+    if (deepLink != null && deepLink.isNotEmpty) {
+      _handleDeepLinkNavigation(context, deepLink);
+      return;
+    }
+
+    if (!context.mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => NotificationDetailScreen(notification: notification),
+      ),
+    );
+  }
+
   void _handleDeepLinkNavigation(BuildContext context, String deepLink) {
     // Expected formats:
     // /business/{id}
@@ -300,7 +333,7 @@ class NotificationsScreen extends ConsumerWidget {
 
       if (segments.length >= 2 && segments[0] == 'seller') {
         if (segments[1] == 'profile') {
-          Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
+          Navigator.of(context).pushNamed(AppRoutes.sellerApprovalStatus);
           return;
         }
         // Handle /seller/orders/{id}

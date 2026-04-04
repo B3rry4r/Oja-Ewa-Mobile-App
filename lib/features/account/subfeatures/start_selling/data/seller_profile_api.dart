@@ -8,10 +8,32 @@ class SellerProfileApi {
 
   final Dio _dio;
 
-  Future<Map<String, dynamic>> createSellerProfile(SellerProfilePayload payload) async {
+  Future<Map<String, dynamic>> createSellerProfile(
+    SellerProfilePayload payload,
+  ) async {
     try {
-      final res = await _dio.post('/api/seller/profile', data: payload.toJson());
-      if (res.data is Map<String, dynamic>) return res.data as Map<String, dynamic>;
+      final res = await _dio.post(
+        '/api/seller/profile',
+        data: payload.toJson(),
+      );
+      if (res.data is Map<String, dynamic>)
+        return res.data as Map<String, dynamic>;
+      throw const FormatException('Unexpected seller profile response');
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> updateSellerProfile(
+    SellerProfilePayload payload,
+  ) async {
+    try {
+      final res = await _dio.put(
+        '/api/seller/profile',
+        data: payload.toJson(includeFileFields: false),
+      );
+      if (res.data is Map<String, dynamic>)
+        return res.data as Map<String, dynamic>;
       throw const FormatException('Unexpected seller profile response');
     } catch (e) {
       throw mapDioError(e);
