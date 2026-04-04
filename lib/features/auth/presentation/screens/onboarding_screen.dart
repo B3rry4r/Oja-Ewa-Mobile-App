@@ -18,50 +18,34 @@ class OnboardingScreen extends StatelessWidget {
         bottom: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [colors.surfaceSecondary, colors.background],
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Image.asset(
-                                AppImages.logoOutline,
-                                height: 34,
-                                color: colors.textPrimary,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const SizedBox.shrink(),
-                              ),
-                            ),
-                          ),
-                          Image.asset(
-                            AppImages.onboardingHero,
-                            width: double.infinity,
-                            fit: BoxFit.fitWidth,
-                            alignment: Alignment.topCenter,
-                          ),
-                        ],
+            final heroHeight = (constraints.maxHeight * 0.54).clamp(
+              280.0,
+              430.0,
+            );
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  height: heroHeight,
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [colors.surfaceSecondary, colors.background],
                       ),
                     ),
-                    _buildBottomPanel(context),
-                  ],
+                    child: Image.asset(
+                      AppImages.onboardingHero,
+                      width: double.infinity,
+                      fit: BoxFit.fitWidth,
+                      alignment: Alignment.topCenter,
+                    ),
+                  ),
                 ),
-              ),
+                Expanded(child: _buildBottomPanel(context)),
+              ],
             );
           },
         ),
@@ -73,7 +57,7 @@ class OnboardingScreen extends StatelessWidget {
     final colors = context.appColors;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 28, 20, 32),
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
@@ -84,9 +68,9 @@ class OnboardingScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildHeadline(context),
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
           _buildActionButtons(context),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           _buildTermsAndPrivacy(context),
         ],
       ),
@@ -98,7 +82,7 @@ class OnboardingScreen extends StatelessWidget {
     return Text(
       'The Pan-African\nBeauty Market',
       style: TextStyle(
-        fontSize: 28,
+        fontSize: 23.5,
         fontWeight: FontWeight.w700,
         fontFamily: 'Campton',
         color: colors.textPrimary,
@@ -113,7 +97,7 @@ class OnboardingScreen extends StatelessWidget {
       children: [
         SizedBox(
           width: double.infinity,
-          height: 57,
+          height: 54,
           child: ElevatedButton(
             onPressed: () =>
                 Navigator.of(context).pushNamed(AppRoutes.createAccount),
@@ -125,7 +109,7 @@ class OnboardingScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(18),
               ),
               textStyle: const TextStyle(
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Campton',
               ),
@@ -134,22 +118,28 @@ class OnboardingScreen extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
 
-        _secondaryButton(
-          context: context,
-          label: 'Sign in',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.signIn),
-        ),
-
-        const SizedBox(height: 12),
-
-        _secondaryButton(
-          context: context,
-          label: 'Continue as guest',
-          onTap: () => Navigator.of(
-            context,
-          ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false),
+        Row(
+          children: [
+            Expanded(
+              child: _secondaryButton(
+                context: context,
+                label: 'Sign in',
+                onTap: () => Navigator.of(context).pushNamed(AppRoutes.signIn),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _secondaryButton(
+                context: context,
+                label: 'Guest',
+                onTap: () => Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -163,7 +153,7 @@ class OnboardingScreen extends StatelessWidget {
     final colors = context.appColors;
     return SizedBox(
       width: double.infinity,
-      height: 57,
+      height: 50,
       child: OutlinedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
@@ -174,7 +164,7 @@ class OnboardingScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(18),
           ),
           textStyle: const TextStyle(
-            fontSize: 14,
+            fontSize: 12.5,
             fontWeight: FontWeight.w600,
             fontFamily: 'Campton',
           ),
@@ -191,7 +181,7 @@ class OnboardingScreen extends StatelessWidget {
         textAlign: TextAlign.center,
         text: TextSpan(
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 11,
             fontFamily: 'Campton',
             color: colors.textSecondary,
             height: 1.4,
