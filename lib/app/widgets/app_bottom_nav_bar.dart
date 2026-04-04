@@ -18,8 +18,9 @@ class AppBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final bottomInset = MediaQuery.of(context).viewPadding.bottom;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+      padding: EdgeInsets.fromLTRB(14, 0, 14, bottomInset > 0 ? 8 : 14),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(34),
         child: Container(
@@ -35,45 +36,42 @@ class AppBottomNavBar extends StatelessWidget {
               ),
             ],
           ),
-          child: SafeArea(
-            top: false,
-            child: SizedBox(
-              height: AppBottomNavBar.height,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _NavItem(
-                    iconAsset: AppIcons.home,
-                    label: 'Home',
-                    isActive: currentIndex == 0,
-                    onTap: () => onTap(0),
-                  ),
-                  _NavItem(
-                    iconAsset: AppIcons.search,
-                    label: 'Search',
-                    isActive: currentIndex == 1,
-                    onTap: () => onTap(1),
-                  ),
-                  _NavItem(
-                    iconAsset: AppIcons.wishlist,
-                    label: 'Wishlist',
-                    isActive: currentIndex == 2,
-                    onTap: () => onTap(2),
-                  ),
-                  _NavItem(
-                    iconAsset: AppIcons.blog,
-                    label: 'Blog',
-                    isActive: currentIndex == 3,
-                    onTap: () => onTap(3),
-                  ),
-                  _NavItem(
-                    iconAsset: AppIcons.account,
-                    label: 'Account',
-                    isActive: currentIndex == 4,
-                    onTap: () => onTap(4),
-                  ),
-                ],
-              ),
+          child: SizedBox(
+            height: AppBottomNavBar.height,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _NavItem(
+                  iconAsset: AppIcons.home,
+                  label: 'Home',
+                  isActive: currentIndex == 0,
+                  onTap: () => onTap(0),
+                ),
+                _NavItem(
+                  iconAsset: AppIcons.search,
+                  label: 'Search',
+                  isActive: currentIndex == 1,
+                  onTap: () => onTap(1),
+                ),
+                _NavItem(
+                  iconAsset: AppIcons.wishlist,
+                  label: 'Wishlist',
+                  isActive: currentIndex == 2,
+                  onTap: () => onTap(2),
+                ),
+                _NavItem(
+                  iconAsset: AppIcons.blog,
+                  label: 'Blog',
+                  isActive: currentIndex == 3,
+                  onTap: () => onTap(3),
+                ),
+                _NavItem(
+                  iconAsset: AppIcons.account,
+                  label: 'Account',
+                  isActive: currentIndex == 4,
+                  onTap: () => onTap(4),
+                ),
+              ],
             ),
           ),
         ),

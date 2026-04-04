@@ -298,7 +298,7 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildHeroTitle(BuildContext context) {
     final colors = context.appColors;
     return Text(
-      'Find What Speaks\nTo Your Soul',
+      'Based on\nWho You Be',
       style: TextStyle(
         fontSize: 22,
         fontWeight: FontWeight.w600,
@@ -378,8 +378,7 @@ class HomeScreen extends ConsumerWidget {
     required VoidCallback onTap,
   }) {
     final colors = context.appColors;
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final iconTint = isDarkMode ? Colors.white : color.withValues(alpha: 0.95);
+    final iconTint = colors.accent;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
@@ -391,10 +390,10 @@ class HomeScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-              width: 54,
-              height: 54,
+              width: 64,
+              height: 64,
               child: Padding(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(2),
                 child: SvgPicture.asset(
                   iconAsset,
                   fit: BoxFit.contain,
@@ -408,7 +407,7 @@ class HomeScreen extends ConsumerWidget {
               maxLines: 2,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 12.6,
+                fontSize: 12.8,
                 fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
                 color: colors.textPrimary,
