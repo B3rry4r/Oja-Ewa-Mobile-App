@@ -390,10 +390,10 @@ class HomeScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-              width: 64,
-              height: 64,
+              width: 80,
+              height: 80,
               child: Padding(
-                padding: const EdgeInsets.all(2),
+                padding: EdgeInsets.zero,
                 child: SvgPicture.asset(
                   iconAsset,
                   fit: BoxFit.contain,
