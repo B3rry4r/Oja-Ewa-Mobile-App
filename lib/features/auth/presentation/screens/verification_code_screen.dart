@@ -176,7 +176,17 @@ class _VerificationCodeScreenState
     return HeaderIconButton(
       asset: AppIcons.back,
       iconColor: context.appColors.textPrimary,
-      onTap: () => Navigator.of(context).maybePop(),
+      onTap: () {
+        final navigator = Navigator.of(context);
+        if (navigator.canPop()) {
+          navigator.pop();
+          return;
+        }
+        navigator.pushNamedAndRemoveUntil(
+          AppRoutes.resetPassword,
+          (route) => false,
+        );
+      },
     );
   }
 

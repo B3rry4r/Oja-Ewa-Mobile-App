@@ -298,9 +298,9 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildHeroTitle(BuildContext context) {
     final colors = context.appColors;
     return Text(
-      'Based on\nWho You Be',
+      'Based on who you be',
       style: TextStyle(
-        fontSize: 22,
+        fontSize: 20,
         fontWeight: FontWeight.w600,
         color: colors.textPrimary,
         height: 1.2,
@@ -316,12 +316,13 @@ class HomeScreen extends ConsumerWidget {
       crossAxisCount: 2,
       mainAxisSpacing: 12,
       crossAxisSpacing: 12,
-      childAspectRatio: 1.4,
+      childAspectRatio: 1.02,
       children: [
         // Market
         _buildCategoryItem(
           context: context,
           title: 'Textiles',
+          description: 'Fabrics, prints & timeless styles',
           color: const Color(0xFFC7853D),
           iconAsset: AppIcons.market,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.market),
@@ -330,6 +331,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Afro Beauty',
+          description: 'Skincare, makeup, cosmetics & hairs.',
           color: const Color(0xFFAB6730),
           iconAsset: AppIcons.beauty,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.beauty),
@@ -338,6 +340,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Footwear/Bags',
+          description: 'Step out in style',
           color: const Color(0xFF9F5A35),
           iconAsset: AppIcons.brands,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.brands),
@@ -346,6 +349,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Art Market',
+          description: 'Art for every vision',
           color: const Color(0xFFCC8E5B),
           iconAsset: AppIcons.music,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.music),
@@ -354,6 +358,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Education',
+          description: 'Learn, grow & build your future',
           color: const Color(0xFFD39A54),
           iconAsset: AppIcons.schools,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.schools),
@@ -362,6 +367,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Hardware',
+          description: 'Tools for builders and innovators',
           color: const Color(0xFF8C6A3A),
           iconAsset: AppIcons.hardware,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.hardware),
@@ -373,6 +379,7 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildCategoryItem({
     required BuildContext context,
     required String title,
+    required String description,
     required Color color,
     required String iconAsset,
     required VoidCallback onTap,
@@ -383,7 +390,7 @@ class HomeScreen extends ConsumerWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(24)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -404,7 +411,7 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 10),
             Text(
               title,
-              maxLines: 2,
+              maxLines: 1,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12.8,
@@ -412,6 +419,20 @@ class HomeScreen extends ConsumerWidget {
                 fontWeight: FontWeight.w600,
                 color: colors.textPrimary,
                 height: 1.15,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              description,
+              maxLines: 3,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10.6,
+                fontFamily: 'Campton',
+                fontWeight: FontWeight.w400,
+                color: colors.textSecondary,
+                height: 1.28,
               ),
             ),
           ],

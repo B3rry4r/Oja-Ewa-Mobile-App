@@ -383,6 +383,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
   Widget _buildTopBar(BuildContext context) {
     final colors = context.appColors;
+    final navigator = Navigator.of(context);
     return Positioned(
       top: 0,
       left: 0,
@@ -395,7 +396,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
             HeaderIconButton(
               asset: AppIcons.back,
               iconColor: colors.textPrimary,
-              onTap: () => Navigator.of(context).maybePop(),
+              onTap: () {
+                if (navigator.canPop()) {
+                  navigator.pop();
+                  return;
+                }
+                navigator.pushNamedAndRemoveUntil(
+                  AppRoutes.home,
+                  (route) => false,
+                );
+              },
             ),
             Row(
               children: [

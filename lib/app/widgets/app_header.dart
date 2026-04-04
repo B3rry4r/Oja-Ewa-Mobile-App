@@ -60,7 +60,19 @@ class AppHeader extends ConsumerWidget {
         ? HeaderIconButton(
             asset: AppIcons.back,
             iconColor: resolvedIconColor,
-            onTap: onBack ?? () => Navigator.of(context).maybePop(),
+            onTap:
+                onBack ??
+                () {
+                  final navigator = Navigator.of(context);
+                  if (navigator.canPop()) {
+                    navigator.pop();
+                    return;
+                  }
+                  navigator.pushNamedAndRemoveUntil(
+                    AppRoutes.home,
+                    (route) => false,
+                  );
+                },
           )
         : null;
 

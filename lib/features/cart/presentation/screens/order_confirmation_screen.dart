@@ -64,7 +64,14 @@ class _OrderConfirmationScreenState
     return AppPageScaffold(
       title: 'Order confirmation',
       showActions: false,
-      onBack: () => Navigator.of(context).maybePop(),
+      onBack: () {
+        final navigator = Navigator.of(context);
+        if (navigator.canPop()) {
+          navigator.pop();
+          return;
+        }
+        navigator.pushNamedAndRemoveUntil(AppRoutes.cart, (route) => false);
+      },
       bottomBar: _buildOrderSummary(
         context: context,
         cart: cart,
