@@ -42,7 +42,7 @@ class OnboardingScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Flexible(flex: 4, child: _buildBottomPanel(context)),
+            _buildBottomPanel(context),
           ],
         ),
       ),
