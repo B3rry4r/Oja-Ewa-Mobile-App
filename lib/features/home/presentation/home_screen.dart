@@ -378,7 +378,7 @@ class HomeScreen extends ConsumerWidget {
     required VoidCallback onTap,
   }) {
     final colors = context.appColors;
-    final iconTint = colors.accent;
+    final iconTint = color.withValues(alpha: 0.95);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
