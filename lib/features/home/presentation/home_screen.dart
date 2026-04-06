@@ -401,10 +401,11 @@ class HomeScreen extends ConsumerWidget {
               height: 80,
               child: Padding(
                 padding: EdgeInsets.zero,
-                child: SvgPicture.asset(
+                child: Image.asset(
                   iconAsset,
                   fit: BoxFit.contain,
-                  colorFilter: ColorFilter.mode(iconTint, BlendMode.srcIn),
+                  color: iconTint,
+                  colorBlendMode: BlendMode.srcIn,
                 ),
               ),
             ),

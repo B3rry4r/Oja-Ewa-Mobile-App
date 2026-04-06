@@ -5,7 +5,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
-import 'package:ojaewa/app/theme/theme_mode_controller.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
@@ -91,10 +90,6 @@ class AccountScreen extends ConsumerWidget {
             label: 'Your orders',
             onTap: () => Navigator.of(context).pushNamed(AppRoutes.orders),
           ),
-
-          const SizedBox(height: 24),
-          _buildSectionHeader(context, 'Appearance'),
-          _buildThemeModePicker(context, ref),
 
           const SizedBox(height: 24),
           _buildSectionHeader(context, 'Settings'),
@@ -217,62 +212,6 @@ class AccountScreen extends ConsumerWidget {
               Navigator.of(context).pushNamed(AppRoutes.changePassword),
         ),
       ],
-    );
-  }
-
-  Widget _buildThemeModePicker(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
-    final themeMode = ref.watch(appThemeModeProvider);
-
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colors.border),
-      ),
-      child: SegmentedButton<ThemeMode>(
-        segments: const [
-          ButtonSegment(
-            value: ThemeMode.light,
-            icon: Icon(Icons.light_mode_outlined),
-            label: Text('Light'),
-          ),
-          ButtonSegment(
-            value: ThemeMode.dark,
-            icon: Icon(Icons.dark_mode_outlined),
-            label: Text('Dark'),
-          ),
-          ButtonSegment(
-            value: ThemeMode.system,
-            icon: Icon(Icons.settings_suggest_outlined),
-            label: Text('System'),
-          ),
-        ],
-        selected: {themeMode},
-        multiSelectionEnabled: false,
-        emptySelectionAllowed: false,
-        showSelectedIcon: false,
-        style: ButtonStyle(
-          foregroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return colors.onAccent;
-            }
-            return colors.textSecondary;
-          }),
-          backgroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return colors.accent;
-            }
-            return colors.surface;
-          }),
-          side: WidgetStatePropertyAll(BorderSide(color: colors.border)),
-        ),
-        onSelectionChanged: (selection) {
-          final selected = selection.first;
-          ref.read(appThemeModeProvider.notifier).setMode(selected);
-        },
-      ),
     );
   }
 

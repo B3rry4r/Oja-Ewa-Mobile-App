@@ -272,9 +272,13 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
   Widget _buildWelcomeIcon() {
     return SizedBox(
-      width: 41.6,
-      height: 63.58,
-      child: SvgPicture.asset(AppImages.appLogoAlt, fit: BoxFit.contain),
+      width: 118,
+      height: 28,
+      child: SvgPicture.asset(
+        AppIcons.brandMarkWhite,
+        fit: BoxFit.contain,
+        colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+      ),
     );
   }
 

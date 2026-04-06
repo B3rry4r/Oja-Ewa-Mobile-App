@@ -1,5 +1,6 @@
 // splash_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
@@ -90,12 +91,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             fit: BoxFit.contain,
           ),
         ),
-        // Complete logo with text (PNG for correct colors)
-        Image.asset(
-          'assets/app_icon/logo2.png',
+        SvgPicture.asset(
+          AppIcons.brandMarkWhite,
           width: 200,
-          height: 60,
+          height: 46,
           fit: BoxFit.contain,
+          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
         ),
       ],
     );

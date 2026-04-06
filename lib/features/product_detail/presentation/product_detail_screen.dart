@@ -388,42 +388,47 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
       top: 0,
       left: 0,
       right: 0,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            HeaderIconButton(
-              asset: AppIcons.back,
-              iconColor: colors.textPrimary,
-              onTap: () {
-                if (navigator.canPop()) {
-                  navigator.pop();
-                  return;
-                }
-                navigator.pushNamedAndRemoveUntil(
-                  AppRoutes.home,
-                  (route) => false,
-                );
-              },
-            ),
-            Row(
-              children: [
-                HeaderIconButton(
-                  asset: AppIcons.notification,
-                  iconColor: colors.textPrimary,
-                  onTap: () =>
-                      Navigator.of(context).pushNamed(AppRoutes.notifications),
-                ),
-                const SizedBox(width: 8),
-                HeaderIconButton(
-                  asset: AppIcons.bag,
-                  iconColor: colors.textPrimary,
-                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.cart),
-                ),
-              ],
-            ),
-          ],
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              HeaderIconButton(
+                asset: AppIcons.back,
+                iconColor: colors.textPrimary,
+                onTap: () {
+                  if (navigator.canPop()) {
+                    navigator.pop();
+                    return;
+                  }
+                  navigator.pushNamedAndRemoveUntil(
+                    AppRoutes.home,
+                    (route) => false,
+                  );
+                },
+              ),
+              Row(
+                children: [
+                  HeaderIconButton(
+                    asset: AppIcons.notification,
+                    iconColor: colors.textPrimary,
+                    onTap: () => Navigator.of(
+                      context,
+                    ).pushNamed(AppRoutes.notifications),
+                  ),
+                  const SizedBox(width: 8),
+                  HeaderIconButton(
+                    asset: AppIcons.bag,
+                    iconColor: colors.textPrimary,
+                    onTap: () =>
+                        Navigator.of(context).pushNamed(AppRoutes.cart),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

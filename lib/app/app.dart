@@ -102,14 +102,14 @@ class _AppState extends ConsumerState<App> {
 
   @override
   Widget build(BuildContext context) {
-    final themeMode = ref.watch(appThemeModeProvider);
+    ref.watch(appThemeModeProvider);
 
     return MaterialApp(
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
+      theme: AppTheme.dark(),
       darkTheme: AppTheme.dark(),
-      themeMode: themeMode,
+      themeMode: ThemeMode.dark,
       builder: (context, child) {
         return Consumer(
           builder: (context, ref, _) {
