@@ -385,7 +385,6 @@ class HomeScreen extends ConsumerWidget {
     required VoidCallback onTap,
   }) {
     final colors = context.appColors;
-    final iconTint = color.withValues(alpha: 0.95);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
@@ -401,12 +400,7 @@ class HomeScreen extends ConsumerWidget {
               height: 80,
               child: Padding(
                 padding: EdgeInsets.zero,
-                child: Image.asset(
-                  iconAsset,
-                  fit: BoxFit.contain,
-                  color: iconTint,
-                  colorBlendMode: BlendMode.srcIn,
-                ),
+                child: Image.asset(iconAsset, fit: BoxFit.contain),
               ),
             ),
             const SizedBox(height: 10),
