@@ -77,6 +77,7 @@ flutter:
     - assets/docs/
     - assets/icons/
     - assets/icons/Icons/
+    - assets/icons/new_icons/
     - assets/app_icon/
 
   fonts:
