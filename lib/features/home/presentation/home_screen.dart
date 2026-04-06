@@ -322,7 +322,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Textiles',
-          description: 'Fabrics, prints & timeless styles',
+          description: 'Fabrics & prints',
           color: const Color(0xFFC7853D),
           iconAsset: AppIcons.market,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.market),
@@ -331,7 +331,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Afro Beauty',
-          description: 'Skincare, makeup, cosmetics & hairs.',
+          description: 'General beauty',
           color: const Color(0xFFAB6730),
           iconAsset: AppIcons.beauty,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.beauty),
@@ -349,7 +349,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Art Market',
-          description: 'Art for every vision',
+          description: 'Creative tools',
           color: const Color(0xFFCC8E5B),
           iconAsset: AppIcons.music,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.music),
@@ -358,7 +358,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Education',
-          description: 'Learn, grow & build your future',
+          description: 'Schools',
           color: const Color(0xFFD39A54),
           iconAsset: AppIcons.schools,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.schools),
@@ -425,7 +425,7 @@ class HomeScreen extends ConsumerWidget {
             Text(
               description,
               maxLines: 3,
-              textAlign: TextAlign.left,
+              textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 10.6,
