@@ -396,12 +396,9 @@ class HomeScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-              width: 80,
-              height: 80,
-              child: Padding(
-                padding: EdgeInsets.zero,
-                child: Image.asset(iconAsset, fit: BoxFit.contain),
-              ),
+              width: 88,
+              height: 88,
+              child: Image.asset(iconAsset, fit: BoxFit.contain),
             ),
             const SizedBox(height: 10),
             Text(
