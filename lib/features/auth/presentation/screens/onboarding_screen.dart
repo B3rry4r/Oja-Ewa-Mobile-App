@@ -1,6 +1,7 @@
 // onboarding_screen.dart
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
@@ -30,15 +31,36 @@ class OnboardingScreen extends StatelessWidget {
                     colors: [colors.surfaceSecondary, colors.surfaceSecondary],
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Image.asset(
-                    AppImages.onboardingHero,
-                    width: double.infinity,
-                    height: double.infinity,
-                    fit: BoxFit.fitWidth,
-                    alignment: Alignment.topCenter,
-                  ),
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Image.asset(
+                        AppImages.onboardingHero,
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.fitWidth,
+                        alignment: Alignment.topCenter,
+                      ),
+                    ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 18,
+                      child: Center(
+                        child: SvgPicture.asset(
+                          AppIcons.brandMarkWhite,
+                          width: 132,
+                          height: 30,
+                          fit: BoxFit.contain,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -56,7 +78,6 @@ class OnboardingScreen extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
       decoration: BoxDecoration(
         color: colors.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         border: Border(top: BorderSide(color: colors.border)),
       ),
       child: Column(
@@ -113,9 +134,7 @@ class OnboardingScreen extends StatelessWidget {
             child: const Text('Create account'),
           ),
         ),
-
         const SizedBox(height: 8),
-
         Row(
           children: [
             Expanded(
