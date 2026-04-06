@@ -200,10 +200,7 @@ class HomeScreen extends ConsumerWidget {
     final advertsAsync = ref.watch(advertsByPositionProvider('banner'));
 
     return advertsAsync.when(
-      loading: () => const SizedBox(
-        height: 220,
-        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-      ),
+      loading: () => const _AdvertLoadingSkeleton(),
       error: (error, stackTrace) => _buildPromoCardsSection(context),
       data: (adverts) {
         if (adverts.isEmpty) return _buildPromoCardsSection(context);
@@ -527,6 +524,64 @@ class _AdvertFadeCarouselState extends State<_AdvertFadeCarousel> {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _AdvertLoadingSkeleton extends StatefulWidget {
+  const _AdvertLoadingSkeleton();
+
+  @override
+  State<_AdvertLoadingSkeleton> createState() => _AdvertLoadingSkeletonState();
+}
+
+class _AdvertLoadingSkeletonState extends State<_AdvertLoadingSkeleton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final base = colors.surfaceSecondary;
+    final highlight = colors.surfaceElevated;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          final slide = (_controller.value * 2) - 1;
+          return AspectRatio(
+            aspectRatio: _AdvertFadeCarousel.aspectRatio,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  begin: Alignment(-1.8 + slide, -0.3),
+                  end: Alignment(0.2 + slide, 0.3),
+                  colors: [base, highlight, base],
+                  stops: const [0.2, 0.5, 0.8],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
