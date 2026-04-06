@@ -425,7 +425,7 @@ class HomeScreen extends ConsumerWidget {
             Text(
               description,
               maxLines: 3,
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.left,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 10.6,
