@@ -346,7 +346,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Art Market',
-          description: 'Creative tools',
+          description: 'Creatives',
           color: const Color(0xFFCC8E5B),
           iconAsset: AppIcons.music,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.music),
@@ -364,7 +364,7 @@ class HomeScreen extends ConsumerWidget {
         _buildCategoryItem(
           context: context,
           title: 'Hardware',
-          description: 'Tools for builders and innovators',
+          description: 'Creative tools',
           color: const Color(0xFF8C6A3A),
           iconAsset: AppIcons.hardware,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.hardware),
