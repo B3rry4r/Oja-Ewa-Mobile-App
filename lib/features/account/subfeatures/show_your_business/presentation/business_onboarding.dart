@@ -4,9 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_status_controller.dart';
-import 'package:ojaewa/core/subscriptions/subscription_constants.dart';
-import 'package:ojaewa/core/subscriptions/subscription_controller.dart';
-import 'package:ojaewa/core/subscriptions/iap_service.dart';
 
 import '../../../../../app/router/app_router.dart';
 
@@ -17,9 +14,6 @@ class BusinessOnboardingScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final businessesAsync = ref.watch(myBusinessStatusesProvider);
-    final subscriptionAsync = ref.watch(subscriptionControllerProvider);
-    final subscription = subscriptionAsync.value?.subscription;
-    final hasPro = subscription != null && subscription.status.isActive;
 
     businessesAsync.whenOrNull(
       data: (items) {
@@ -109,98 +103,8 @@ class BusinessOnboardingScreen extends ConsumerWidget {
 
           const SizedBox(height: 32),
 
-          hasPro
-              ? _buildPrimaryButton(context, "Get Started")
-              : _buildSubscriptionGate(context, ref),
+          _buildPrimaryButton(context, "Get Started"),
           const SizedBox(height: 100),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSubscriptionGate(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
-    final subscriptionState = ref.watch(subscriptionControllerProvider);
-    final isLoading = subscriptionState.value?.isLoading ?? false;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colors.surfaceSecondary,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Ojaewa Pro Required',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
-              color: colors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Subscribe to Ojaewa Pro to publish your business profile and sell on the platform. AI tools are included.',
-            style: TextStyle(
-              fontSize: 13,
-              fontFamily: 'Campton',
-              color: colors.textSecondary,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: InkWell(
-                  onTap: () =>
-                      Navigator.of(context).pushNamed(AppRoutes.termsOfService),
-                  child: Text(
-                    'View Terms of Service',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w600,
-                      color: colors.accent,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              ElevatedButton(
-                onPressed: isLoading
-                    ? null
-                    : () async {
-                        await ref
-                            .read(iapServiceProvider)
-                            .purchaseSubscription(
-                              SubscriptionProducts.ojaewaProYearly,
-                            );
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colors.accent,
-                  foregroundColor: colors.onAccent,
-                  disabledBackgroundColor: colors.borderStrong,
-                ),
-                child: isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        ),
-                      )
-                    : const Text('Subscribe'),
-              ),
-            ],
-          ),
         ],
       ),
     );

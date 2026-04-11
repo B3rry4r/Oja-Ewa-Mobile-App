@@ -52,10 +52,9 @@ class HomeScreen extends ConsumerWidget {
                     children: [
                       _buildAdvertsOrFallback(context, ref),
                       const SizedBox(height: 24),
-                      const SizedBox(height: 12),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18),
-                        child: _buildHeroTitle(context),
+                        child: _buildServicesRow(context),
                       ),
                       const SizedBox(height: 12),
                       Container(
@@ -292,16 +291,80 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeroTitle(BuildContext context) {
+  Widget _buildServicesRow(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildServiceShortcut(
+            context: context,
+            iconAsset: AppIcons.cacRegistration,
+            label: 'CAC',
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.cacServices),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildServiceShortcut(
+            context: context,
+            iconAsset: AppIcons.adsPlacement,
+            label: 'Adverts',
+            onTap: () =>
+                Navigator.of(context).pushNamed(AppRoutes.advertPlacements),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildServiceShortcut(
+            context: context,
+            iconAsset: AppIcons.verifiedBadges,
+            label: 'Badges',
+            onTap: () =>
+                Navigator.of(context).pushNamed(AppRoutes.badgeVerifications),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildServiceShortcut({
+    required BuildContext context,
+    required String iconAsset,
+    required String label,
+    required VoidCallback onTap,
+  }) {
     final colors = context.appColors;
-    return Text(
-      'Based on who you be',
-      style: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: colors.textPrimary,
-        height: 1.2,
-        letterSpacing: -0.3,
+    return Material(
+      color: colors.surface,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 55,
+                height: 55,
+                child: Image.asset(iconAsset, fit: BoxFit.contain),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.normal,
+                  color: colors.textPrimary,
+                  height: 1.1,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -557,8 +620,11 @@ class _AdvertLoadingSkeletonState extends State<_AdvertLoadingSkeleton>
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final base = colors.surfaceSecondary;
-    final highlight = colors.surfaceElevated;
+    final base = colors.surfaceSecondary.withValues(alpha: 0.9);
+    final highlight = colors.surfaceElevated.withValues(alpha: 1);
+    final shimmerBand = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white.withValues(alpha: 0.14)
+        : Colors.white.withValues(alpha: 0.72);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -571,11 +637,47 @@ class _AdvertLoadingSkeletonState extends State<_AdvertLoadingSkeleton>
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: colors.border),
                 gradient: LinearGradient(
                   begin: Alignment(-1.8 + slide, -0.3),
                   end: Alignment(0.2 + slide, 0.3),
-                  colors: [base, highlight, base],
-                  stops: const [0.2, 0.5, 0.8],
+                  colors: [base, shimmerBand, highlight, shimmerBand, base],
+                  stops: const [0.0, 0.24, 0.5, 0.76, 1.0],
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      width: 110,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: colors.surfaceElevated.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: 180,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: colors.surfaceElevated.withValues(alpha: 0.72),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 140,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: colors.surfaceElevated.withValues(alpha: 0.58),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

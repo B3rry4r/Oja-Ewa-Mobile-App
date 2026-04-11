@@ -5,9 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
-import 'package:ojaewa/core/subscriptions/subscription_constants.dart';
-import 'package:ojaewa/core/subscriptions/subscription_controller.dart';
-import 'package:ojaewa/core/subscriptions/iap_service.dart';
 
 import '../../../../../app/router/app_router.dart';
 
@@ -18,9 +15,6 @@ class SellerOnboardingScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final sellerStatusAsync = ref.watch(mySellerStatusProvider);
-    final subscriptionAsync = ref.watch(subscriptionControllerProvider);
-    final subscription = subscriptionAsync.value?.subscription;
-    final hasPro = subscription != null && subscription.status.isActive;
 
     // If seller profile exists, redirect to appropriate screen
     return sellerStatusAsync.when(
@@ -28,7 +22,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
         backgroundColor: colors.background,
         body: Center(child: CircularProgressIndicator()),
       ),
-      error: (_, __) => _buildOnboardingContent(context, ref, hasPro),
+      error: (error, stackTrace) => _buildOnboardingContent(context),
       data: (status) {
         // If seller status exists (pending, approved, or rejected), redirect
         if (status != null) {
@@ -54,16 +48,12 @@ class SellerOnboardingScreen extends ConsumerWidget {
         }
 
         // No seller profile yet - show onboarding
-        return _buildOnboardingContent(context, ref, hasPro);
+        return _buildOnboardingContent(context);
       },
     );
   }
 
-  Widget _buildOnboardingContent(
-    BuildContext context,
-    WidgetRef ref,
-    bool hasPro,
-  ) {
+  Widget _buildOnboardingContent(BuildContext context) {
     final colors = context.appColors;
     return AppPageScaffold(
       scrollable: true,
@@ -104,13 +94,8 @@ class SellerOnboardingScreen extends ConsumerWidget {
 
           const SizedBox(height: 40),
 
-          if (hasPro) ...[
-            _buildStartSellingButton(context),
-            const SizedBox(height: 40),
-          ] else ...[
-            _buildSubscriptionGate(context, ref),
-            const SizedBox(height: 24),
-          ],
+          _buildStartSellingButton(context),
+          const SizedBox(height: 40),
         ],
       ),
     );
@@ -169,93 +154,6 @@ class SellerOnboardingScreen extends ConsumerWidget {
               color: colors.textSecondary,
               height: 1.5,
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSubscriptionGate(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
-    final subscriptionState = ref.watch(subscriptionControllerProvider);
-    final isLoading = subscriptionState.value?.isLoading ?? false;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colors.surfaceSecondary,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Ojaewa Pro Required',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
-              color: colors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Subscribe to Ojaewa Pro to sell on the platform and publish your seller profile. AI tools are included.',
-            style: TextStyle(
-              fontSize: 13,
-              fontFamily: 'Campton',
-              color: colors.textTertiary,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: InkWell(
-                  onTap: () =>
-                      Navigator.of(context).pushNamed(AppRoutes.termsOfService),
-                  child: Text(
-                    'View Terms of Service',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'Campton',
-                      fontWeight: FontWeight.w600,
-                      color: colors.accent,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              ElevatedButton(
-                onPressed: isLoading
-                    ? null
-                    : () async {
-                        await ref
-                            .read(iapServiceProvider)
-                            .purchaseSubscription(
-                              SubscriptionProducts.ojaewaProYearly,
-                            );
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colors.accent,
-                  foregroundColor: colors.onAccent,
-                  disabledBackgroundColor: colors.border,
-                ),
-                child: isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        ),
-                      )
-                    : const Text('Subscribe'),
-              ),
-            ],
           ),
         ],
       ),

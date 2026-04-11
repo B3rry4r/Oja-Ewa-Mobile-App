@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme/app_theme_colors.dart';
+import '../../features/app_services/cac/presentation/controllers/cac_payment_controller.dart';
 import '../../features/home/subfeatures/schools/presentation/controllers/school_registration_controller.dart';
 import '../../features/orders/presentation/controllers/orders_controller.dart';
 import '../ui/snackbars.dart';
@@ -64,6 +65,16 @@ class DeepLinkHandler {
           pathSegments[0] == 'payment' &&
           pathSegments[1] == 'callback') {
         _handleSchoolPaymentCallback(uri);
+      }
+    }
+
+    // Handle CAC payment callback: ojaewa://cac/payment/callback?reference=xxx
+    if (uri.host == 'cac') {
+      final pathSegments = uri.pathSegments;
+      if (pathSegments.length >= 2 &&
+          pathSegments[0] == 'payment' &&
+          pathSegments[1] == 'callback') {
+        _handleCacPaymentCallback(uri);
       }
     }
   }
@@ -185,6 +196,47 @@ class DeepLinkHandler {
       if (!context.mounted) return;
       Navigator.of(context).pop();
       _showError('Failed to verify school payment: $e');
+    }
+  }
+
+  Future<void> _handleCacPaymentCallback(Uri uri) async {
+    final reference = uri.queryParameters['reference'];
+    final status = uri.queryParameters['status'];
+
+    if (reference == null || reference.isEmpty) {
+      _showError('Invalid CAC payment callback: missing reference');
+      return;
+    }
+
+    final context = _navigatorKey?.currentContext;
+    if (context == null) {
+      debugPrint('No context available for CAC payment callback');
+      return;
+    }
+
+    _showLoading(context, 'Verifying CAC payment...');
+
+    try {
+      final request = await _ref
+          .read(cacPaymentControllerProvider.notifier)
+          .finalizePayment(reference: reference);
+
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+
+      if (request != null || status == 'success') {
+        _showCacPaymentSuccess(context);
+      } else {
+        final error = _ref.read(cacPaymentControllerProvider).error;
+        _showPaymentFailed(
+          context,
+          error ?? 'CAC payment verification failed.',
+        );
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+      _showError('Failed to verify CAC payment: $e');
     }
   }
 
@@ -433,6 +485,114 @@ class DeepLinkHandler {
                     const SizedBox(height: 12),
                     Text(
                       'Your school registration payment was successful!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: colors.textSecondary,
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        _navigatorKey?.currentState?.pushNamedAndRemoveUntil(
+                          '/',
+                          (route) => false,
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 57,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFDAF40),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(
+                                0xFFFDAF40,
+                              ).withValues(alpha: 0.4),
+                              blurRadius: 16,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Done',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFFFFBF5),
+                              fontFamily: 'Campton',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCacPaymentSuccess(BuildContext context) {
+    final colors = context.appColors;
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: 'CacPaymentSuccess',
+      barrierColor: colors.shadow.withValues(alpha: 0.82),
+      pageBuilder: (context, anim1, anim2) {
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                width: 342,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.check_circle,
+                        color: Color(0xFF4CAF50),
+                        size: 40,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'CAC Request Submitted',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: colors.textPrimary,
+                        fontFamily: 'Campton',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Your CAC payment was confirmed and your request has been submitted for review.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,

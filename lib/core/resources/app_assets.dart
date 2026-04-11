@@ -17,6 +17,9 @@ abstract class AppIcons {
   static const String music = 'assets/icons/new_icons/arts.PNG';
   static const String hardware = 'assets/icons/new_icons/hardware.PNG';
   static const String schools = 'assets/icons/new_icons/education.PNG';
+  static const String cacRegistration = 'assets/icons/new_icons/cac_reg.PNG';
+  static const String adsPlacement = 'assets/icons/new_icons/ads_placement.PNG';
+  static const String verifiedBadges = 'assets/icons/new_icons/verified_badges.PNG';
   static const String connectToUs = 'assets/icons/connect_to_us.svg';
   static const String editYourProfile = 'assets/icons/edit_your_profile.svg';
   static const String emailUs = 'assets/icons/email_us.svg';

@@ -1,5 +1,5 @@
 // Subscription Constants
-// 
+//
 // Product IDs and tier definitions for IAP subscriptions.
 // These IDs must match exactly what's configured in App Store Connect
 // and Google Play Console.
@@ -18,9 +18,71 @@ class SubscriptionProducts {
   static const String ojaewaProYearlyMtn = 'ojaewa_pro_mtn';
 
   /// All available product IDs
+  static const List<String> allProducts = [ojaewaProYearly, ojaewaProYearlyMtn];
+}
+
+class ServiceProducts {
+  ServiceProducts._();
+
+  static const String cacBusinessName = 'cac_business_name';
+  static const String advertDaily1 = 'advert_daily_1';
+  static const String advertDaily3 = 'advert_daily_3';
+  static const String advertDaily7 = 'advert_daily_7';
+  static const String advertDaily14 = 'advert_daily_14';
+  static const String advertDaily30 = 'advert_daily_30';
+  static const String badgeBlackYearly = 'badge_black_yearly';
+  static const String badgeGoldYearly = 'badge_gold_yearly';
+  static const String badgeGreenYearly = 'badge_green_yearly';
+
   static const List<String> allProducts = [
-    ojaewaProYearly,
-    ojaewaProYearlyMtn,
+    cacBusinessName,
+    advertDaily1,
+    advertDaily3,
+    advertDaily7,
+    advertDaily14,
+    advertDaily30,
+    badgeBlackYearly,
+    badgeGoldYearly,
+    badgeGreenYearly,
+  ];
+
+  static String? advertProductForDuration(int days) {
+    switch (days) {
+      case 1:
+        return advertDaily1;
+      case 3:
+        return advertDaily3;
+      case 7:
+        return advertDaily7;
+      case 14:
+        return advertDaily14;
+      case 30:
+        return advertDaily30;
+      default:
+        return null;
+    }
+  }
+
+  static String? badgeProductForKey(String badgeKey) {
+    switch (badgeKey) {
+      case 'certified_authentic':
+        return badgeBlackYearly;
+      case 'heritage_artisan':
+        return badgeGoldYearly;
+      case 'sustainable_innovator':
+        return badgeGreenYearly;
+      default:
+        return null;
+    }
+  }
+}
+
+class StoreProductCatalog {
+  StoreProductCatalog._();
+
+  static const List<String> allProducts = [
+    ...SubscriptionProducts.allProducts,
+    ...ServiceProducts.allProducts,
   ];
 }
 
@@ -75,7 +137,9 @@ enum SubscriptionStatus {
     );
   }
 
-  bool get isActive => this == SubscriptionStatus.active || this == SubscriptionStatus.gracePeriod;
+  bool get isActive =>
+      this == SubscriptionStatus.active ||
+      this == SubscriptionStatus.gracePeriod;
 }
 
 /// Feature flags by subscription tier

@@ -8,25 +8,29 @@ import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 
+import 'package:ojaewa/features/app_services/shared/domain/app_service_purchase.dart';
+
 import 'subscription_constants.dart';
 import 'subscription_controller.dart';
 import 'subscription_models.dart';
 
 /// IAP Service
-/// 
+///
 /// Handles all In-App Purchase operations with Apple App Store and Google Play Store.
 /// Communicates purchase results to the backend for verification and storage.
 class IapService {
   IapService(this._ref);
 
   final Ref _ref;
-  
+
   final InAppPurchase _iap = InAppPurchase.instance;
   StreamSubscription<List<PurchaseDetails>>? _purchaseSubscription;
-  
+
   List<ProductDetails> _products = [];
   bool _isAvailable = false;
   bool _isInitialized = false;
+  Completer<AppServicePurchase?>? _servicePurchaseCompleter;
+  String? _pendingServiceProductId;
 
   /// Whether IAP is available on this device
   bool get isAvailable => _isAvailable;
@@ -39,7 +43,7 @@ class IapService {
     if (_isInitialized) return;
 
     _isAvailable = await _iap.isAvailable();
-    
+
     if (!_isAvailable) {
       debugPrint('IAP: Store not available on this device');
       return;
@@ -47,8 +51,7 @@ class IapService {
 
     // Enable pending purchases for Android
     if (Platform.isAndroid) {
-      final InAppPurchaseAndroidPlatformAddition androidPlatform = 
-          _iap.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+      _iap.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
       // Pending purchases are enabled by default in newer versions
       // No explicit call needed
     }
@@ -72,7 +75,7 @@ class IapService {
     if (!_isAvailable) return;
 
     final response = await _iap.queryProductDetails(
-      SubscriptionProducts.allProducts.toSet(),
+      StoreProductCatalog.allProducts.toSet(),
     );
 
     if (response.notFoundIDs.isNotEmpty) {
@@ -114,7 +117,7 @@ class IapService {
       // For subscriptions, use buyNonConsumable
       final success = await _iap.buyNonConsumable(purchaseParam: purchaseParam);
       debugPrint('IAP: Purchase initiated: $success');
-      
+
       // If purchase initiation failed, clear loading state
       if (!success) {
         _ref.read(subscriptionControllerProvider.notifier).setLoading(false);
@@ -123,8 +126,52 @@ class IapService {
     } catch (e) {
       debugPrint('IAP: Purchase error: $e');
       // Clear loading state on error
-      _ref.read(subscriptionControllerProvider.notifier).setLoading(false, error: e.toString());
+      _ref
+          .read(subscriptionControllerProvider.notifier)
+          .setLoading(false, error: e.toString());
       return false;
+    }
+  }
+
+  Future<AppServicePurchase?> purchaseService(String productId) async {
+    if (!_isAvailable) {
+      debugPrint('IAP: Store not available');
+      return null;
+    }
+
+    final product = getProduct(productId);
+    if (product == null) {
+      debugPrint('IAP: Service product not found: $productId');
+      return null;
+    }
+
+    if (_servicePurchaseCompleter != null) {
+      debugPrint('IAP: Service purchase already in progress');
+      return null;
+    }
+
+    final completer = Completer<AppServicePurchase?>();
+    _servicePurchaseCompleter = completer;
+    _pendingServiceProductId = productId;
+
+    try {
+      final purchaseParam = PurchaseParam(productDetails: product);
+      final success = await _iap.buyConsumable(purchaseParam: purchaseParam);
+      if (!success) {
+        _clearPendingServicePurchase();
+        return null;
+      }
+      return completer.future.timeout(
+        const Duration(minutes: 2),
+        onTimeout: () {
+          _clearPendingServicePurchase();
+          return null;
+        },
+      );
+    } catch (e) {
+      _clearPendingServicePurchase();
+      debugPrint('IAP: Service purchase error: $e');
+      return null;
     }
   }
 
@@ -138,7 +185,9 @@ class IapService {
   /// Handle purchase updates from the store
   Future<void> _handlePurchaseUpdates(List<PurchaseDetails> purchases) async {
     for (final purchase in purchases) {
-      debugPrint('IAP: Purchase update - ${purchase.productID}: ${purchase.status}');
+      debugPrint(
+        'IAP: Purchase update - ${purchase.productID}: ${purchase.status}',
+      );
 
       switch (purchase.status) {
         case PurchaseStatus.pending:
@@ -148,8 +197,14 @@ class IapService {
 
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
-          // Verify with backend and deliver content
-          await _verifyAndDeliverPurchase(purchase);
+          if (_isPendingServicePurchase(purchase.productID)) {
+            final result = await _buildAppServicePurchase(purchase);
+            _servicePurchaseCompleter?.complete(result);
+            _clearPendingServicePurchase();
+          } else {
+            // Verify with backend and deliver content
+            await _verifyAndDeliverPurchase(purchase);
+          }
           break;
 
         case PurchaseStatus.error:
@@ -180,12 +235,14 @@ class IapService {
         final skPurchase = purchase as AppStorePurchaseDetails;
         receiptData = skPurchase.verificationData.localVerificationData;
         transactionId = skPurchase.purchaseID ?? purchase.purchaseID ?? '';
-        
+
         // Check if sandbox
         final transactions = await SKPaymentQueueWrapper().transactions();
-        isSandbox = transactions.any((t) => 
-            t.transactionIdentifier == transactionId && 
-            t.payment.simulatesAskToBuyInSandbox);
+        isSandbox = transactions.any(
+          (t) =>
+              t.transactionIdentifier == transactionId &&
+              t.payment.simulatesAskToBuyInSandbox,
+        );
       } else {
         // Android: Get purchase token
         final googlePurchase = purchase as GooglePlayPurchaseDetails;
@@ -194,12 +251,14 @@ class IapService {
       }
 
       // Verify with backend
-      final response = await _ref.read(subscriptionControllerProvider.notifier).verifyPurchase(
-        productId: purchase.productID,
-        transactionId: transactionId,
-        receiptData: receiptData,
-        isSandbox: isSandbox,
-      );
+      final response = await _ref
+          .read(subscriptionControllerProvider.notifier)
+          .verifyPurchase(
+            productId: purchase.productID,
+            transactionId: transactionId,
+            receiptData: receiptData,
+            isSandbox: isSandbox,
+          );
 
       if (response?.success == true) {
         debugPrint('IAP: Purchase verified successfully');
@@ -220,25 +279,43 @@ class IapService {
     _ref.read(subscriptionControllerProvider.notifier).setLoading(true);
   }
 
-  void _onPurchaseSuccess(PurchaseDetails purchase, VerifyPurchaseResponse response) {
+  void _onPurchaseSuccess(
+    PurchaseDetails purchase,
+    VerifyPurchaseResponse response,
+  ) {
     debugPrint('IAP: Purchase success for ${purchase.productID}');
     // Subscription status is refreshed by the controller
     // UI will update automatically via Riverpod
   }
 
   void _onPurchaseError(PurchaseDetails purchase) {
-    debugPrint('IAP: Purchase error for ${purchase.productID}: ${purchase.error}');
+    debugPrint(
+      'IAP: Purchase error for ${purchase.productID}: ${purchase.error}',
+    );
+    if (_isPendingServicePurchase(purchase.productID)) {
+      _servicePurchaseCompleter?.complete(null);
+      _clearPendingServicePurchase();
+    }
     // Clear loading state and show error
-    _ref.read(subscriptionControllerProvider.notifier).setLoading(false, error: purchase.error?.message);
+    _ref
+        .read(subscriptionControllerProvider.notifier)
+        .setLoading(false, error: purchase.error?.message);
   }
 
   void _onPurchaseCanceled(PurchaseDetails purchase) {
     debugPrint('IAP: Purchase canceled for ${purchase.productID}');
+    if (_isPendingServicePurchase(purchase.productID)) {
+      _servicePurchaseCompleter?.complete(null);
+      _clearPendingServicePurchase();
+    }
     // Clear loading state - user canceled
     _ref.read(subscriptionControllerProvider.notifier).setLoading(false);
   }
 
-  void _onVerificationFailed(PurchaseDetails purchase, VerifyPurchaseResponse? response) {
+  void _onVerificationFailed(
+    PurchaseDetails purchase,
+    VerifyPurchaseResponse? response,
+  ) {
     debugPrint('IAP: Verification failed for ${purchase.productID}');
     // Error should be shown to user - handled by subscription controller
   }
@@ -249,12 +326,69 @@ class IapService {
     _purchaseSubscription = null;
     _isInitialized = false;
   }
+
+  bool _isPendingServicePurchase(String productId) {
+    return _pendingServiceProductId != null &&
+        _pendingServiceProductId == productId &&
+        _servicePurchaseCompleter != null;
+  }
+
+  void _clearPendingServicePurchase() {
+    _pendingServiceProductId = null;
+    _servicePurchaseCompleter = null;
+  }
+
+  Future<AppServicePurchase> _buildAppServicePurchase(
+    PurchaseDetails purchase,
+  ) async {
+    final product = getProduct(purchase.productID);
+    String transactionId = purchase.purchaseID ?? '';
+    String? receiptData;
+    String? purchaseToken;
+    String environment = 'production';
+
+    if (Platform.isIOS) {
+      final skPurchase = purchase as AppStorePurchaseDetails;
+      receiptData = skPurchase.verificationData.localVerificationData;
+      transactionId = skPurchase.purchaseID ?? purchase.purchaseID ?? '';
+      final transactions = await SKPaymentQueueWrapper().transactions();
+      final isSandbox = transactions.any(
+        (t) =>
+            t.transactionIdentifier == transactionId &&
+            t.payment.simulatesAskToBuyInSandbox,
+      );
+      environment = isSandbox ? 'sandbox' : 'production';
+    } else if (Platform.isAndroid) {
+      final googlePurchase = purchase as GooglePlayPurchaseDetails;
+      receiptData = googlePurchase.verificationData.serverVerificationData;
+      transactionId = googlePurchase.purchaseID ?? purchase.purchaseID ?? '';
+      purchaseToken = googlePurchase.verificationData.serverVerificationData;
+    }
+
+    return AppServicePurchase(
+      platform: Platform.isIOS ? 'ios' : 'android',
+      storeProductId: purchase.productID,
+      storeTransactionId: transactionId,
+      purchaseToken: purchaseToken,
+      receiptData: receiptData,
+      environment: environment,
+      currency: product?.currencyCode,
+      amount: product?.rawPrice,
+      rawData: {
+        'local_verification_data':
+            purchase.verificationData.localVerificationData,
+        'server_verification_data':
+            purchase.verificationData.serverVerificationData,
+        'source': purchase.verificationData.source,
+      },
+    );
+  }
 }
 
 /// Provider for IAP Service
 final iapServiceProvider = Provider<IapService>((ref) {
   final service = IapService(ref);
-  
+
   // Initialize on first access
   service.initialize();
 
@@ -277,7 +411,10 @@ final iapProductsProvider = Provider<List<ProductDetails>>((ref) {
 });
 
 /// Get a specific product by ID
-final iapProductProvider = Provider.family<ProductDetails?, String>((ref, productId) {
+final iapProductProvider = Provider.family<ProductDetails?, String>((
+  ref,
+  productId,
+) {
   final iap = ref.watch(iapServiceProvider);
   return iap.getProduct(productId);
 });

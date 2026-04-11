@@ -39,8 +39,8 @@ class UserSubscription {
       expiresAt: DateTime.parse(json['expires_at'] as String),
       isAutoRenewing: json['is_auto_renewing'] as bool? ?? false,
       willRenew: json['will_renew'] as bool? ?? false,
-      cancelledAt: json['cancelled_at'] != null 
-          ? DateTime.parse(json['cancelled_at'] as String) 
+      cancelledAt: json['cancelled_at'] != null
+          ? DateTime.parse(json['cancelled_at'] as String)
           : null,
       daysRemaining: json['days_remaining'] as int?,
     );
@@ -68,7 +68,9 @@ class SubscriptionStatusResponse {
     return SubscriptionStatusResponse(
       hasSubscription: data['has_subscription'] as bool? ?? false,
       subscription: data['subscription'] != null
-          ? UserSubscription.fromJson(data['subscription'] as Map<String, dynamic>)
+          ? UserSubscription.fromJson(
+              data['subscription'] as Map<String, dynamic>,
+            )
           : null,
     );
   }
@@ -135,10 +137,7 @@ class SubscriptionPrice {
 
 /// Plans response from API
 class SubscriptionPlansResponse {
-  const SubscriptionPlansResponse({
-    required this.plans,
-    this.freeTier,
-  });
+  const SubscriptionPlansResponse({required this.plans, this.freeTier});
 
   final List<SubscriptionPlan> plans;
   final FreeTierInfo? freeTier;
@@ -146,9 +145,11 @@ class SubscriptionPlansResponse {
   factory SubscriptionPlansResponse.fromJson(Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>? ?? json;
     return SubscriptionPlansResponse(
-      plans: (data['plans'] as List<dynamic>?)
-          ?.map((p) => SubscriptionPlan.fromJson(p as Map<String, dynamic>))
-          .toList() ?? [],
+      plans:
+          (data['plans'] as List<dynamic>?)
+              ?.map((p) => SubscriptionPlan.fromJson(p as Map<String, dynamic>))
+              .toList() ??
+          [],
       freeTier: data['free_tier'] != null
           ? FreeTierInfo.fromJson(data['free_tier'] as Map<String, dynamic>)
           : null,
@@ -158,10 +159,7 @@ class SubscriptionPlansResponse {
 
 /// Free tier info
 class FreeTierInfo {
-  const FreeTierInfo({
-    required this.name,
-    required this.features,
-  });
+  const FreeTierInfo({required this.name, required this.features});
 
   final String name;
   final List<String> features;
@@ -221,10 +219,14 @@ class VerifyPurchaseResponse {
       success: json['success'] as bool? ?? false,
       message: json['message'] as String? ?? '',
       subscription: data?['subscription'] != null
-          ? UserSubscription.fromJson(data!['subscription'] as Map<String, dynamic>)
+          ? UserSubscription.fromJson(
+              data!['subscription'] as Map<String, dynamic>,
+            )
           : null,
       features: data?['features'] != null
-          ? SubscriptionFeatureSet.fromJson(data!['features'] as Map<String, dynamic>)
+          ? SubscriptionFeatureSet.fromJson(
+              data!['features'] as Map<String, dynamic>,
+            )
           : null,
       error: json['error'] != null
           ? PurchaseError.fromJson(json['error'] as Map<String, dynamic>)
@@ -235,10 +237,7 @@ class VerifyPurchaseResponse {
 
 /// Purchase error
 class PurchaseError {
-  const PurchaseError({
-    required this.code,
-    this.details,
-  });
+  const PurchaseError({required this.code, this.details});
 
   final String code;
   final String? details;
@@ -344,10 +343,14 @@ class CancelInfoResponse {
     final data = json['data'] as Map<String, dynamic>? ?? json;
     final urls = data['cancellation_url'] as Map<String, dynamic>? ?? {};
     final subscription = data['current_subscription'] as Map<String, dynamic>?;
-    
+
     return CancelInfoResponse(
-      iosCancellationUrl: urls['ios'] as String? ?? 'https://apps.apple.com/account/subscriptions',
-      androidCancellationUrl: urls['android'] as String? ?? 'https://play.google.com/store/account/subscriptions',
+      iosCancellationUrl:
+          urls['ios'] as String? ??
+          'https://apps.apple.com/account/subscriptions',
+      androidCancellationUrl:
+          urls['android'] as String? ??
+          'https://play.google.com/store/account/subscriptions',
       message: data['message'] as String? ?? '',
       expiresAt: subscription?['expires_at'] != null
           ? DateTime.parse(subscription!['expires_at'] as String)

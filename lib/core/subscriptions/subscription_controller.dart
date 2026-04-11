@@ -11,11 +11,7 @@ import 'subscription_repository.dart';
 
 /// Subscription state
 class SubscriptionState {
-  const SubscriptionState({
-    this.isLoading = false,
-    this.status,
-    this.error,
-  });
+  const SubscriptionState({this.isLoading = false, this.status, this.error});
 
   final bool isLoading;
   final SubscriptionStatusResponse? status;
@@ -37,7 +33,7 @@ class SubscriptionState {
   SubscriptionTier get tier => status?.tier ?? SubscriptionTier.free;
 
   /// Current features
-  SubscriptionFeatureSet get features => 
+  SubscriptionFeatureSet get features =>
       SubscriptionFeatures.forTier(status?.tier ?? SubscriptionTier.free);
 
   /// Whether user has an active subscription
@@ -78,12 +74,16 @@ class SubscriptionController extends AsyncNotifier<SubscriptionState> {
     try {
       final repository = ref.read(subscriptionRepositoryProvider);
       final status = await repository.getStatus();
-      state = AsyncData(currentState.copyWith(isLoading: false, status: status));
+      state = AsyncData(
+        currentState.copyWith(isLoading: false, status: status),
+      );
     } catch (e) {
-      state = AsyncData(currentState.copyWith(
-        isLoading: false,
-        error: 'Failed to refresh subscription status',
-      ));
+      state = AsyncData(
+        currentState.copyWith(
+          isLoading: false,
+          error: 'Failed to refresh subscription status',
+        ),
+      );
     }
   }
 
@@ -113,18 +113,22 @@ class SubscriptionController extends AsyncNotifier<SubscriptionState> {
         // Refresh status to get updated features
         await refreshStatus();
       } else {
-        state = AsyncData(currentState.copyWith(
-          isLoading: false,
-          error: response.error?.toString() ?? response.message,
-        ));
+        state = AsyncData(
+          currentState.copyWith(
+            isLoading: false,
+            error: response.error?.toString() ?? response.message,
+          ),
+        );
       }
 
       return response;
     } catch (e) {
-      state = AsyncData(currentState.copyWith(
-        isLoading: false,
-        error: 'Failed to verify purchase: ${e.toString()}',
-      ));
+      state = AsyncData(
+        currentState.copyWith(
+          isLoading: false,
+          error: 'Failed to verify purchase: ${e.toString()}',
+        ),
+      );
       return null;
     }
   }
@@ -140,14 +144,17 @@ class SubscriptionController extends AsyncNotifier<SubscriptionState> {
   /// Set loading state (called by IAP service during purchase flow)
   void setLoading(bool isLoading, {String? error}) {
     final currentState = state.value ?? const SubscriptionState();
-    state = AsyncData(currentState.copyWith(isLoading: isLoading, error: error));
+    state = AsyncData(
+      currentState.copyWith(isLoading: isLoading, error: error),
+    );
   }
 }
 
 /// Provider for Subscription Controller
 final subscriptionControllerProvider =
     AsyncNotifierProvider<SubscriptionController, SubscriptionState>(
-        SubscriptionController.new);
+      SubscriptionController.new,
+    );
 
 // ============================================================
 // CONVENIENCE PROVIDERS
@@ -162,7 +169,8 @@ final currentTierProvider = Provider<SubscriptionTier>((ref) {
 /// Current subscription features
 final subscriptionFeaturesProvider = Provider<SubscriptionFeatureSet>((ref) {
   final subState = ref.watch(subscriptionControllerProvider).value;
-  return subState?.features ?? SubscriptionFeatures.forTier(SubscriptionTier.free);
+  return subState?.features ??
+      SubscriptionFeatures.forTier(SubscriptionTier.free);
 });
 
 /// Whether user has active subscription
@@ -174,7 +182,7 @@ final hasActiveSubscriptionProvider = Provider<bool>((ref) {
 /// Check if user can access a specific feature
 final canAccessFeatureProvider = Provider.family<bool, String>((ref, feature) {
   final features = ref.watch(subscriptionFeaturesProvider);
-  
+
   switch (feature) {
     case 'ai_descriptions':
       return features.aiDescriptions;
@@ -198,4 +206,3 @@ final canAccessFeatureProvider = Provider.family<bool, String>((ref, feature) {
       return false;
   }
 });
-

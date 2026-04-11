@@ -7,13 +7,15 @@ import 'subscription_constants.dart';
 final subscriptionProductIdProvider = Provider<String>((ref) {
   // Watch the user profile to check MTN eligibility
   final profileAsync = ref.watch(userProfileProvider);
-  
-  final isMtnEligible = profileAsync.whenOrNull(
-    data: (profile) => profile?.isEligibleForMtnDiscount ?? false,
-  ) ?? false;
-  
+
+  final isMtnEligible =
+      profileAsync.whenOrNull(
+        data: (profile) => profile?.isEligibleForMtnDiscount ?? false,
+      ) ??
+      false;
+
   // Return MTN product if eligible, otherwise standard product
-  return isMtnEligible 
-      ? SubscriptionProducts.ojaewaProYearlyMtn 
+  return isMtnEligible
+      ? SubscriptionProducts.ojaewaProYearlyMtn
       : SubscriptionProducts.ojaewaProYearly;
 });
