@@ -3,12 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
-
-import '../../../../../app/router/app_router.dart';
-
-import 'draft_utils.dart';
 import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/location/location_picker_sheets.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/features/account/subfeatures/shared/widgets/compliance_progress_banner.dart';
+
+import '../../../../../app/router/app_router.dart';
+import 'draft_utils.dart';
 
 class SellerRegistrationScreen extends ConsumerStatefulWidget {
   const SellerRegistrationScreen({super.key});
@@ -21,29 +22,72 @@ class SellerRegistrationScreen extends ConsumerStatefulWidget {
 class _SellerRegistrationScreenState
     extends ConsumerState<SellerRegistrationScreen> {
   bool _initializedFromDraft = false;
-  final _cityController = TextEditingController();
-  String? _identityDocumentLocalPath;
-  final _addressController = TextEditingController();
+
+  final _businessNameController = TextEditingController();
+  final _legalBusinessNameController = TextEditingController();
+  final _tradingNameController = TextEditingController();
+  final _registrationNumberController = TextEditingController();
+  final _tinController = TextEditingController();
+  final _dateOfIncorporationController = TextEditingController();
+  final _countryOfIncorporationController = TextEditingController();
+  final _websiteController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _instagramController = TextEditingController();
-  final _facebookController = TextEditingController();
+  final _industryController = TextEditingController();
+  final _employeesController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _postalCodeController = TextEditingController();
+  final _signatoryNameController = TextEditingController();
+  final _signatoryJobTitleController = TextEditingController();
+  final _signatoryEmailController = TextEditingController();
+  final _signatoryPhoneController = TextEditingController();
+  final _signatoryIdController = TextEditingController();
+  final _signatoryDobController = TextEditingController();
 
-  // Location selections
-  // Location selections - empty by default
   String _selectedCountryName = '';
   String _selectedCountryFlag = '';
   String _selectedStateName = '';
   String _selectedCountryCode = '';
+  String _businessType = 'limited_liability_company';
+  String _turnoverRange = '50000_to_250000';
+  String _otherBusinessType = '';
+  String? _identityDocumentLocalPath;
+
+  static const _sections = [
+    'Business Information',
+    'Business Type & Industry',
+    'Registered Office',
+    'Authorized Signatory',
+    'Beneficial Owners',
+    'Banking & Settlement',
+    'Declarations',
+    'Signature',
+  ];
 
   @override
   void dispose() {
-    _cityController.dispose();
-    _addressController.dispose();
+    _businessNameController.dispose();
+    _legalBusinessNameController.dispose();
+    _tradingNameController.dispose();
+    _registrationNumberController.dispose();
+    _tinController.dispose();
+    _dateOfIncorporationController.dispose();
+    _countryOfIncorporationController.dispose();
+    _websiteController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _instagramController.dispose();
-    _facebookController.dispose();
+    _industryController.dispose();
+    _employeesController.dispose();
+    _cityController.dispose();
+    _addressController.dispose();
+    _postalCodeController.dispose();
+    _signatoryNameController.dispose();
+    _signatoryJobTitleController.dispose();
+    _signatoryEmailController.dispose();
+    _signatoryPhoneController.dispose();
+    _signatoryIdController.dispose();
+    _signatoryDobController.dispose();
     super.dispose();
   }
 
@@ -54,28 +98,167 @@ class _SellerRegistrationScreenState
     );
     if (!_initializedFromDraft) {
       _initializedFromDraft = true;
+      _businessNameController.text = draft.businessName ?? '';
+      _legalBusinessNameController.text = draft.legalBusinessName ?? '';
+      _tradingNameController.text = draft.tradingName ?? '';
+      _registrationNumberController.text =
+          draft.businessRegistrationNumber ?? '';
+      _tinController.text = draft.taxIdentificationNumber ?? '';
+      _dateOfIncorporationController.text = draft.dateOfIncorporation ?? '';
+      _countryOfIncorporationController.text =
+          draft.countryOfIncorporation ?? '';
+      _websiteController.text = draft.websiteUrl ?? '';
+      _emailController.text = draft.businessEmail ?? '';
+      _phoneController.text = draft.businessPhoneNumber ?? '';
+      _industryController.text = draft.industrySector ?? '';
+      _employeesController.text = draft.numberOfEmployees?.toString() ?? '';
       _selectedCountryName = draft.country ?? '';
-      _selectedCountryFlag = '';
       _selectedStateName = draft.state ?? '';
       _cityController.text = draft.city ?? '';
       _addressController.text = draft.address ?? '';
-      _emailController.text = draft.businessEmail ?? '';
-      _phoneController.text = draft.businessPhoneNumber ?? '';
-      _instagramController.text = draft.instagram ?? '';
-      _facebookController.text = draft.facebook ?? '';
+      _postalCodeController.text = draft.postalCode ?? '';
+      _signatoryNameController.text = draft.authorizedSignatoryFullName ?? '';
+      _signatoryJobTitleController.text =
+          draft.authorizedSignatoryJobTitle ?? '';
+      _signatoryEmailController.text = draft.authorizedSignatoryEmail ?? '';
+      _signatoryPhoneController.text =
+          draft.authorizedSignatoryPhoneNumber ?? '';
+      _signatoryIdController.text = draft.authorizedSignatoryIdNumber ?? '';
+      _signatoryDobController.text = draft.authorizedSignatoryDateOfBirth ?? '';
+      _businessType = draft.businessType ?? _businessType;
+      _turnoverRange = draft.annualTurnoverRange ?? _turnoverRange;
+      _otherBusinessType = draft.otherBusinessType ?? '';
       _identityDocumentLocalPath = draft.identityDocumentPath;
     }
+
     return AppPageScaffold(
       scrollable: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          _buildStepper(),
-          const SizedBox(height: 32),
-
-          // --- Location Section ---
-          _buildSectionHeader("Location"),
+          const ComplianceProgressBanner(
+            title: 'Seller compliance onboarding',
+            subtitle:
+                'Complete your legal business profile. This first page covers identity, business registration, registered address, and signatory details.',
+            currentSection: 'Business Information',
+            sectionLabels: _sections,
+          ),
+          const SizedBox(height: 28),
+          _buildSectionHeader('Section 1: Business Information'),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Business Name on Ojaewa',
+            'Oja Ewa Studio',
+            controller: _businessNameController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Legal Business Name',
+            'Oja Ewa Studio Limited',
+            controller: _legalBusinessNameController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Trading Name',
+            'Oja Ewa',
+            controller: _tradingNameController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Business Registration Number',
+            'RC1234567',
+            controller: _registrationNumberController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Tax Identification Number',
+            '12345678-0001',
+            controller: _tinController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Date of Incorporation',
+            '2023-03-01',
+            controller: _dateOfIncorporationController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Country of Incorporation',
+            'Nigeria',
+            controller: _countryOfIncorporationController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Business Website',
+            'https://example.com',
+            controller: _websiteController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Business Email',
+            'hello@example.com',
+            controller: _emailController,
+          ),
+          const SizedBox(height: 16),
+          _buildPhoneInputWithPicker(
+            'Business Phone Number',
+            controller: _phoneController,
+          ),
+          const SizedBox(height: 28),
+          _buildSectionHeader('Section 2: Business Type & Industry'),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Industry / Sector',
+            'Retail',
+            controller: _industryController,
+          ),
+          const SizedBox(height: 16),
+          _buildDropdown(
+            label: 'Business Type',
+            value: _businessType,
+            items: const {
+              'limited_liability_company': 'Limited Liability Company',
+              'partnership': 'Partnership',
+              'sole_proprietorship_corporate':
+                  'Sole Proprietorship (Corporate)',
+              'non_profit_ngo': 'Non-Profit / NGO',
+              'other': 'Other',
+            },
+            onChanged: (value) => setState(() => _businessType = value),
+          ),
+          if (_businessType == 'other') ...[
+            const SizedBox(height: 16),
+            _buildTextInput(
+              'Other Business Type',
+              'Describe business type',
+              initialValue: _otherBusinessType,
+              onChanged: (value) => _otherBusinessType = value,
+            ),
+          ],
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Number of Employees',
+            '12',
+            controller: _employeesController,
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 16),
+          _buildDropdown(
+            label: 'Annual Turnover',
+            value: _turnoverRange,
+            items: const {
+              'under_50000': '< \$50,000',
+              '50000_to_250000': '\$50,000 – \$250,000',
+              '250000_to_1000000': '\$250,000 – \$1M',
+              'over_1000000': '> \$1M',
+            },
+            onChanged: (value) => setState(() => _turnoverRange = value),
+          ),
+          const SizedBox(height: 28),
+          _buildSectionHeader(
+            'Section 3: Registered Office / Physical Address',
+          ),
           const SizedBox(height: 16),
           _buildLocationDropdown(
             label: 'Country',
@@ -98,16 +281,14 @@ class _SellerRegistrationScreenState
               }
             },
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           _buildLocationDropdown(
-            label: 'State',
+            label: 'State / Province',
             value: _selectedStateName.isEmpty
                 ? 'Select State'
                 : _selectedStateName,
             onTap: () async {
-              if (_selectedCountryName.isEmpty) {
-                return;
-              }
+              if (_selectedCountryName.isEmpty) return;
               final state = await StatePickerSheet.show(
                 context,
                 countryName: _selectedCountryName,
@@ -118,109 +299,68 @@ class _SellerRegistrationScreenState
               }
             },
           ),
-          const SizedBox(height: 20),
-          _buildTextInput("City", "Your City", controller: _cityController),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           _buildTextInput(
-            "Address Line",
-            "Street, house number etc",
+            'City / Municipality',
+            'Lagos',
+            controller: _cityController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Street Address',
+            '12 Allen Avenue',
             controller: _addressController,
           ),
-
-          const SizedBox(height: 40),
-
-          // --- Contacts Section ---
-          _buildSectionHeader("Contacts"),
           const SizedBox(height: 16),
           _buildTextInput(
-            "Business Email",
-            "you@example.com",
-            controller: _emailController,
+            'Postal / Zip Code',
+            '100001',
+            controller: _postalCodeController,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 28),
+          _buildSectionHeader('Section 4: Authorized Signatory'),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Full Name',
+            'Ada Okafor',
+            controller: _signatoryNameController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Job Title',
+            'Director',
+            controller: _signatoryJobTitleController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Email Address',
+            'ada@example.com',
+            controller: _signatoryEmailController,
+          ),
+          const SizedBox(height: 16),
           _buildPhoneInputWithPicker(
-            "Business Phone Number",
-            controller: _phoneController,
+            'Phone Number',
+            controller: _signatoryPhoneController,
           ),
-
-          const SizedBox(height: 40),
-
-          // --- Social handles Section ---
-          _buildSectionHeader("Social handles"),
           const SizedBox(height: 16),
           _buildTextInput(
-            "Instagram",
-            "Your Instagram URL",
-            controller: _instagramController,
+            'National ID / Passport Number',
+            'A12345678',
+            controller: _signatoryIdController,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           _buildTextInput(
-            "Facebook",
-            "Your Facebook URL",
-            controller: _facebookController,
+            'Date of Birth',
+            '1990-01-01',
+            controller: _signatoryDobController,
           ),
-
-          const SizedBox(height: 40),
-
-          // --- Means Identification Section ---
-          _buildSectionHeader("Means Identification"),
           const SizedBox(height: 16),
           _buildFileUploadSection(),
-
-          const SizedBox(height: 40),
-
+          const SizedBox(height: 36),
           _buildSubmitButton(context),
           const SizedBox(height: 40),
         ],
       ),
-    );
-  }
-
-  // Helper: Stepper UI
-  Widget _buildStepper() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _stepCircle("1", "Basic\nInfo", true),
-        _stepCircle("2", "Business\nDetails", false),
-        _stepCircle("3", "Account\non review", false),
-      ],
-    );
-  }
-
-  Widget _stepCircle(String num, String label, bool isActive) {
-    final colors = context.appColors;
-    return Row(
-      children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: isActive ? colors.textPrimary : colors.surfaceSecondary,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            num,
-            style: TextStyle(
-              color: isActive ? colors.background : colors.textTertiary,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 12,
-            height: 1.2,
-            color: isActive ? colors.textPrimary : colors.textSecondary,
-            fontWeight: isActive ? FontWeight.w500 : FontWeight.w400,
-          ),
-        ),
-      ],
     );
   }
 
@@ -230,7 +370,7 @@ class _SellerRegistrationScreenState
       title,
       style: TextStyle(
         fontSize: 16,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         color: colors.textPrimary,
       ),
     );
@@ -240,6 +380,9 @@ class _SellerRegistrationScreenState
     String label,
     String hint, {
     TextEditingController? controller,
+    TextInputType? keyboardType,
+    String? initialValue,
+    ValueChanged<String>? onChanged,
   }) {
     final colors = context.appColors;
     return Column(
@@ -252,11 +395,10 @@ class _SellerRegistrationScreenState
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
-          style: TextStyle(
-            fontFamily: 'Campton',
-            fontSize: 16,
-            color: colors.textPrimary,
-          ),
+          initialValue: controller == null ? initialValue : null,
+          keyboardType: keyboardType,
+          onChanged: onChanged,
+          style: TextStyle(fontSize: 16, color: colors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: colors.textTertiary),
@@ -273,6 +415,52 @@ class _SellerRegistrationScreenState
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
               borderSide: BorderSide(color: colors.accent),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdown({
+    required String label,
+    required String value,
+    required Map<String, String> items,
+    required ValueChanged<String> onChanged,
+  }) {
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: colors.border),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: value,
+              isExpanded: true,
+              dropdownColor: colors.surface,
+              style: TextStyle(color: colors.textPrimary, fontSize: 16),
+              items: items.entries
+                  .map(
+                    (entry) => DropdownMenuItem<String>(
+                      value: entry.key,
+                      child: Text(entry.value),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (next) {
+                if (next != null) onChanged(next);
+              },
             ),
           ),
         ),
@@ -340,7 +528,7 @@ class _SellerRegistrationScreenState
         ),
         const SizedBox(height: 8),
         Container(
-          height: 49,
+          height: 54,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
             color: colors.surface,
@@ -363,7 +551,6 @@ class _SellerRegistrationScreenState
                   }
                 },
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     if (hasCountryCode) ...[
                       Text(
@@ -382,10 +569,7 @@ class _SellerRegistrationScreenState
                     ] else
                       Text(
                         'Code',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: colors.textTertiary,
-                        ),
+                        style: TextStyle(color: colors.textTertiary),
                       ),
                     const SizedBox(width: 4),
                     Icon(
@@ -430,16 +614,16 @@ class _SellerRegistrationScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Upload Document',
+            'Identity Document Upload',
             style: TextStyle(color: colors.textSecondary, fontSize: 14),
           ),
           const SizedBox(height: 8),
           Container(
             width: double.infinity,
-            height: 140,
+            height: 120,
             decoration: BoxDecoration(
               color: colors.surface,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(color: colors.borderStrong),
             ),
             child: Column(
@@ -450,35 +634,12 @@ class _SellerRegistrationScreenState
                   size: 24,
                   color: colors.textSecondary,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 Text(
                   _identityDocumentLocalPath == null
-                      ? 'Browse Document'
+                      ? 'Browse document'
                       : 'Document selected',
-                  style: TextStyle(fontSize: 16, color: colors.textPrimary),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'High resolution image\nPDF, JPG, PNG formats',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    Text(
-                      '200 x 200px\n20kb max',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                  ],
+                  style: TextStyle(fontSize: 15, color: colors.textPrimary),
                 ),
               ],
             ),
@@ -488,20 +649,92 @@ class _SellerRegistrationScreenState
     );
   }
 
+  bool _validateStep1() {
+    final requiredControllers = [
+      _businessNameController,
+      _legalBusinessNameController,
+      _registrationNumberController,
+      _tinController,
+      _dateOfIncorporationController,
+      _countryOfIncorporationController,
+      _emailController,
+      _phoneController,
+      _industryController,
+      _employeesController,
+      _cityController,
+      _addressController,
+      _postalCodeController,
+      _signatoryNameController,
+      _signatoryJobTitleController,
+      _signatoryEmailController,
+      _signatoryPhoneController,
+      _signatoryIdController,
+      _signatoryDobController,
+    ];
+    if (requiredControllers.any((c) => c.text.trim().isEmpty)) {
+      AppSnackbars.showError(
+        context,
+        'Complete all required compliance fields',
+      );
+      return false;
+    }
+    if (_selectedCountryName.isEmpty || _selectedStateName.isEmpty) {
+      AppSnackbars.showError(context, 'Select your country and state');
+      return false;
+    }
+    if (_identityDocumentLocalPath == null ||
+        _identityDocumentLocalPath!.isEmpty) {
+      AppSnackbars.showError(context, 'Upload the identity document');
+      return false;
+    }
+    if (int.tryParse(_employeesController.text.trim()) == null) {
+      AppSnackbars.showError(context, 'Number of employees must be numeric');
+      return false;
+    }
+    return true;
+  }
+
   Widget _buildSubmitButton(BuildContext context) {
     final colors = context.appColors;
     return InkWell(
       onTap: () {
+        if (!_validateStep1()) return;
         final draft =
             sellerDraftFromArgs(ModalRoute.of(context)?.settings.arguments)
+              ..businessName = _businessNameController.text.trim()
+              ..legalBusinessName = _legalBusinessNameController.text.trim()
+              ..tradingName = _tradingNameController.text.trim()
+              ..businessRegistrationNumber = _registrationNumberController.text
+                  .trim()
+              ..taxIdentificationNumber = _tinController.text.trim()
+              ..dateOfIncorporation = _dateOfIncorporationController.text.trim()
+              ..countryOfIncorporation = _countryOfIncorporationController.text
+                  .trim()
+              ..websiteUrl = _websiteController.text.trim()
+              ..businessEmail = _emailController.text.trim()
+              ..businessPhoneNumber = _phoneController.text.trim()
+              ..industrySector = _industryController.text.trim()
+              ..businessType = _businessType
+              ..otherBusinessType = _otherBusinessType.trim()
+              ..numberOfEmployees = int.tryParse(
+                _employeesController.text.trim(),
+              )
+              ..annualTurnoverRange = _turnoverRange
               ..country = _selectedCountryName
               ..state = _selectedStateName
               ..city = _cityController.text.trim()
               ..address = _addressController.text.trim()
-              ..businessEmail = _emailController.text.trim()
-              ..businessPhoneNumber = _phoneController.text.trim()
-              ..instagram = _instagramController.text.trim()
-              ..facebook = _facebookController.text.trim()
+              ..postalCode = _postalCodeController.text.trim()
+              ..authorizedSignatoryFullName = _signatoryNameController.text
+                  .trim()
+              ..authorizedSignatoryJobTitle = _signatoryJobTitleController.text
+                  .trim()
+              ..authorizedSignatoryEmail = _signatoryEmailController.text.trim()
+              ..authorizedSignatoryPhoneNumber = _signatoryPhoneController.text
+                  .trim()
+              ..authorizedSignatoryIdNumber = _signatoryIdController.text.trim()
+              ..authorizedSignatoryDateOfBirth = _signatoryDobController.text
+                  .trim()
               ..identityDocumentPath = _identityDocumentLocalPath;
 
         Navigator.of(
@@ -525,7 +758,7 @@ class _SellerRegistrationScreenState
         ),
         child: Center(
           child: Text(
-            'Save and Continue',
+            'Continue',
             style: TextStyle(
               color: colors.onAccent,
               fontSize: 16,

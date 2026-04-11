@@ -16,8 +16,9 @@ class SellerProfileApi {
         '/api/seller/profile',
         data: payload.toJson(),
       );
-      if (res.data is Map<String, dynamic>)
+      if (res.data is Map<String, dynamic>) {
         return res.data as Map<String, dynamic>;
+      }
       throw const FormatException('Unexpected seller profile response');
     } catch (e) {
       throw mapDioError(e);
@@ -32,8 +33,9 @@ class SellerProfileApi {
         '/api/seller/profile',
         data: payload.toJson(includeFileFields: false),
       );
-      if (res.data is Map<String, dynamic>)
+      if (res.data is Map<String, dynamic>) {
         return res.data as Map<String, dynamic>;
+      }
       throw const FormatException('Unexpected seller profile response');
     } catch (e) {
       throw mapDioError(e);

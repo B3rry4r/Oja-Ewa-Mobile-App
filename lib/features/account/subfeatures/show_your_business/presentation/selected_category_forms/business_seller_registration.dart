@@ -3,16 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
-
-import '../../../../../../app/router/app_router.dart';
-
-import 'business_registration_draft.dart';
 import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/location/location_picker_sheets.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/features/account/subfeatures/shared/widgets/compliance_progress_banner.dart';
 import 'package:ojaewa/features/categories/domain/category_node.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
 import 'package:ojaewa/features/categories/presentation/widgets/category_tree_picker_sheet.dart';
+
+import '../../../../../../app/router/app_router.dart';
+import 'business_registration_draft.dart';
 
 class BusinessSellerRegistrationScreen extends ConsumerStatefulWidget {
   const BusinessSellerRegistrationScreen({super.key});
@@ -24,47 +24,290 @@ class BusinessSellerRegistrationScreen extends ConsumerStatefulWidget {
 
 class _BusinessSellerRegistrationScreenState
     extends ConsumerState<BusinessSellerRegistrationScreen> {
-  final _cityController = TextEditingController();
-  String? _identityDocumentLocalPath;
-  final _addressController = TextEditingController();
+  final _businessNameController = TextEditingController();
+  final _legalBusinessNameController = TextEditingController();
+  final _tradingNameController = TextEditingController();
+  final _registrationNumberController = TextEditingController();
+  final _tinController = TextEditingController();
+  final _dateOfIncorporationController = TextEditingController();
+  final _countryOfIncorporationController = TextEditingController();
+  final _industryController = TextEditingController();
+  final _employeesController = TextEditingController();
+  final _websiteController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _websiteController = TextEditingController();
-  final _instagramController = TextEditingController();
-  final _facebookController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _postalCodeController = TextEditingController();
+  final _signatoryNameController = TextEditingController();
+  final _signatoryJobTitleController = TextEditingController();
+  final _signatoryEmailController = TextEditingController();
+  final _signatoryPhoneController = TextEditingController();
+  final _signatoryIdController = TextEditingController();
+  final _signatoryDobController = TextEditingController();
 
-  // Location selections - empty by default
   String _selectedCountryName = '';
   String _selectedCountryFlag = '';
   String _selectedStateName = '';
-  String _selectedCountryCode = '';
+  String _businessType = 'limited_liability_company';
+  String _turnoverRange = '50000_to_250000';
+  String _otherBusinessType = '';
+  String? _identityDocumentLocalPath;
+
+  static const _sections = [
+    'Business Information',
+    'Business Type & Industry',
+    'Registered Office',
+    'Authorized Signatory',
+    'Beneficial Owners',
+    'Banking & Settlement',
+    'Declarations',
+    'Signature',
+  ];
 
   @override
   void dispose() {
-    _cityController.dispose();
-    _addressController.dispose();
+    _businessNameController.dispose();
+    _legalBusinessNameController.dispose();
+    _tradingNameController.dispose();
+    _registrationNumberController.dispose();
+    _tinController.dispose();
+    _dateOfIncorporationController.dispose();
+    _countryOfIncorporationController.dispose();
+    _industryController.dispose();
+    _employeesController.dispose();
+    _websiteController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _websiteController.dispose();
-    _instagramController.dispose();
-    _facebookController.dispose();
+    _cityController.dispose();
+    _addressController.dispose();
+    _postalCodeController.dispose();
+    _signatoryNameController.dispose();
+    _signatoryJobTitleController.dispose();
+    _signatoryEmailController.dispose();
+    _signatoryPhoneController.dispose();
+    _signatoryIdController.dispose();
+    _signatoryDobController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final draftFromArgs = args is Map<String, dynamic>
+        ? BusinessRegistrationDraft.fromJson(args)
+        : null;
+    final selectedCategory =
+        draftFromArgs?.categoryLabel ?? (args as String?) ?? 'Schools';
+
+    _businessNameController.text = _businessNameController.text.isEmpty
+        ? (draftFromArgs?.businessName ?? '')
+        : _businessNameController.text;
+    _legalBusinessNameController.text =
+        _legalBusinessNameController.text.isEmpty
+        ? (draftFromArgs?.legalBusinessName ?? '')
+        : _legalBusinessNameController.text;
+    _tradingNameController.text = _tradingNameController.text.isEmpty
+        ? (draftFromArgs?.tradingName ?? '')
+        : _tradingNameController.text;
+    _registrationNumberController.text =
+        _registrationNumberController.text.isEmpty
+        ? (draftFromArgs?.businessRegistrationNumber ?? '')
+        : _registrationNumberController.text;
+    _tinController.text = _tinController.text.isEmpty
+        ? (draftFromArgs?.taxIdentificationNumber ?? '')
+        : _tinController.text;
+    _dateOfIncorporationController.text =
+        _dateOfIncorporationController.text.isEmpty
+        ? (draftFromArgs?.dateOfIncorporation ?? '')
+        : _dateOfIncorporationController.text;
+    _countryOfIncorporationController.text =
+        _countryOfIncorporationController.text.isEmpty
+        ? (draftFromArgs?.countryOfIncorporation ?? '')
+        : _countryOfIncorporationController.text;
+    _industryController.text = _industryController.text.isEmpty
+        ? (draftFromArgs?.industrySector ?? '')
+        : _industryController.text;
+    _employeesController.text = _employeesController.text.isEmpty
+        ? (draftFromArgs?.numberOfEmployees?.toString() ?? '')
+        : _employeesController.text;
+    _websiteController.text = _websiteController.text.isEmpty
+        ? (draftFromArgs?.website ?? '')
+        : _websiteController.text;
+    _emailController.text = _emailController.text.isEmpty
+        ? (draftFromArgs?.businessEmail ?? '')
+        : _emailController.text;
+    _phoneController.text = _phoneController.text.isEmpty
+        ? (draftFromArgs?.businessPhoneNumber ?? '')
+        : _phoneController.text;
+    _cityController.text = _cityController.text.isEmpty
+        ? (draftFromArgs?.city ?? '')
+        : _cityController.text;
+    _addressController.text = _addressController.text.isEmpty
+        ? (draftFromArgs?.address ?? '')
+        : _addressController.text;
+    _postalCodeController.text = _postalCodeController.text.isEmpty
+        ? (draftFromArgs?.postalCode ?? '')
+        : _postalCodeController.text;
+    _signatoryNameController.text = _signatoryNameController.text.isEmpty
+        ? (draftFromArgs?.authorizedSignatoryFullName ?? '')
+        : _signatoryNameController.text;
+    _signatoryJobTitleController.text =
+        _signatoryJobTitleController.text.isEmpty
+        ? (draftFromArgs?.authorizedSignatoryJobTitle ?? '')
+        : _signatoryJobTitleController.text;
+    _signatoryEmailController.text = _signatoryEmailController.text.isEmpty
+        ? (draftFromArgs?.authorizedSignatoryEmail ?? '')
+        : _signatoryEmailController.text;
+    _signatoryPhoneController.text = _signatoryPhoneController.text.isEmpty
+        ? (draftFromArgs?.authorizedSignatoryPhoneNumber ?? '')
+        : _signatoryPhoneController.text;
+    _signatoryIdController.text = _signatoryIdController.text.isEmpty
+        ? (draftFromArgs?.authorizedSignatoryIdNumber ?? '')
+        : _signatoryIdController.text;
+    _signatoryDobController.text = _signatoryDobController.text.isEmpty
+        ? (draftFromArgs?.authorizedSignatoryDateOfBirth ?? '')
+        : _signatoryDobController.text;
+    _selectedCountryName = _selectedCountryName.isEmpty
+        ? (draftFromArgs?.country ?? '')
+        : _selectedCountryName;
+    _selectedStateName = _selectedStateName.isEmpty
+        ? (draftFromArgs?.state ?? '')
+        : _selectedStateName;
+    _businessType = draftFromArgs?.businessType ?? _businessType;
+    _turnoverRange = draftFromArgs?.annualTurnoverRange ?? _turnoverRange;
+    _otherBusinessType = draftFromArgs?.otherBusinessType ?? _otherBusinessType;
+    _identityDocumentLocalPath =
+        _identityDocumentLocalPath ?? draftFromArgs?.identityDocumentPath;
+
     return AppPageScaffold(
       scrollable: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          _buildStepper(),
-          const SizedBox(height: 32),
-
-          // --- Location Section ---
-          _buildSectionHeader("Location"),
+          const ComplianceProgressBanner(
+            title: 'Business compliance onboarding',
+            subtitle:
+                'Start with the legal business profile, registered address, and authorized signatory details.',
+            currentSection: 'Business Information',
+            sectionLabels: _sections,
+          ),
+          const SizedBox(height: 28),
+          _buildSectionHeader('Section 1: Business Information'),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Business Name',
+            'Oja Ewa Academy',
+            controller: _businessNameController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Legal Business Name',
+            'Oja Ewa Academy Ltd',
+            controller: _legalBusinessNameController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Trading Name',
+            'Oja Ewa Academy',
+            controller: _tradingNameController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Business Registration Number',
+            'RC9876543',
+            controller: _registrationNumberController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Tax Identification Number',
+            '12345678-0002',
+            controller: _tinController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Date of Incorporation',
+            '2022-01-15',
+            controller: _dateOfIncorporationController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Country of Incorporation',
+            'Nigeria',
+            controller: _countryOfIncorporationController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Business Website',
+            'https://ojaewa.com',
+            controller: _websiteController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Business Email',
+            'academy@ojaewa.com',
+            controller: _emailController,
+          ),
+          const SizedBox(height: 16),
+          _buildPhoneInput(
+            'Business Phone Number',
+            controller: _phoneController,
+          ),
+          const SizedBox(height: 28),
+          _buildSectionHeader('Section 2: Business Type & Industry'),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Industry / Sector',
+            'Education',
+            controller: _industryController,
+          ),
+          const SizedBox(height: 16),
+          _buildDropdown(
+            label: 'Business Type',
+            value: _businessType,
+            items: const {
+              'limited_liability_company': 'Limited Liability Company',
+              'partnership': 'Partnership',
+              'sole_proprietorship_corporate':
+                  'Sole Proprietorship (Corporate)',
+              'non_profit_ngo': 'Non-Profit / NGO',
+              'other': 'Other',
+            },
+            onChanged: (value) => setState(() => _businessType = value),
+          ),
+          if (_businessType == 'other') ...[
+            const SizedBox(height: 16),
+            _buildTextInput(
+              'Other Business Type',
+              'Describe business type',
+              initialValue: _otherBusinessType,
+              onChanged: (value) => _otherBusinessType = value,
+            ),
+          ],
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Number of Employees',
+            '20',
+            controller: _employeesController,
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 16),
+          _buildDropdown(
+            label: 'Annual Turnover',
+            value: _turnoverRange,
+            items: const {
+              'under_50000': '< \$50,000',
+              '50000_to_250000': '\$50,000 – \$250,000',
+              '250000_to_1000000': '\$250,000 – \$1M',
+              'over_1000000': '> \$1M',
+            },
+            onChanged: (value) => setState(() => _turnoverRange = value),
+          ),
+          const SizedBox(height: 28),
+          _buildSectionHeader(
+            'Section 3: Registered Office / Physical Address',
+          ),
           const SizedBox(height: 16),
           _buildLocationDropdown(
             label: 'Country',
@@ -77,144 +320,104 @@ class _BusinessSellerRegistrationScreenState
                 context,
                 selectedCountry: _selectedCountryName,
               );
-              if (country != null)
+              if (country != null) {
                 setState(() {
                   _selectedCountryName = country.name;
                   _selectedCountryFlag = country.flag;
-                  _selectedCountryCode = country.dialCode;
                   _selectedStateName = '';
                 });
+              }
             },
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           _buildLocationDropdown(
-            label: 'State',
+            label: 'State / Province',
             value: _selectedStateName.isEmpty
                 ? 'Select State'
                 : _selectedStateName,
             onTap: () async {
-              if (_selectedCountryName.isEmpty)
-                return; // Must select country first
+              if (_selectedCountryName.isEmpty) return;
               final state = await StatePickerSheet.show(
                 context,
                 countryName: _selectedCountryName,
                 selectedState: _selectedStateName,
               );
-              if (state != null)
+              if (state != null) {
                 setState(() => _selectedStateName = state.name);
+              }
             },
           ),
-          const SizedBox(height: 20),
-          _buildTextInput("City", "Your City", controller: _cityController),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           _buildTextInput(
-            "Address Line",
-            "Street, house number etc",
+            'City / Municipality',
+            'Lekki',
+            controller: _cityController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Street Address',
+            '5 Admiralty Way',
             controller: _addressController,
           ),
-
-          const SizedBox(height: 40),
-
-          // --- Contacts Section ---
-          _buildSectionHeader("Contacts"),
           const SizedBox(height: 16),
           _buildTextInput(
-            "Business Email",
-            "you@example.com",
-            controller: _emailController,
+            'Postal / Zip Code',
+            '106104',
+            controller: _postalCodeController,
           ),
-          const SizedBox(height: 20),
-          _buildPhoneInputWithPicker(
-            "Business Phone Number",
-            controller: _phoneController,
-          ),
-          const SizedBox(height: 20),
-          _buildTextInput(
-            "Website URL",
-            "https://example.com",
-            controller: _websiteController,
-          ),
-
-          const SizedBox(height: 40),
-
-          // --- Social handles Section ---
-          _buildSectionHeader("Social handles"),
+          const SizedBox(height: 28),
+          _buildSectionHeader('Section 4: Authorized Signatory'),
           const SizedBox(height: 16),
           _buildTextInput(
-            "Instagram",
-            "Your Instagram URL",
-            controller: _instagramController,
+            'Full Name',
+            'Kemi James',
+            controller: _signatoryNameController,
           ),
-          const SizedBox(height: 20),
-          _buildTextInput(
-            "Facebook",
-            "Your Facebook URL",
-            controller: _facebookController,
-          ),
-
-          // Music platform links are entered in Step 2 (Music Business Details)
-          const SizedBox(height: 40),
-
-          // --- Means Identification Section ---
-          _buildSectionHeader("Means Identification"),
           const SizedBox(height: 16),
-          _buildFileUploadSection(),
-
-          const SizedBox(height: 40),
-
-          // --- Save Button ---
-          _buildSubmitButton(context),
+          _buildTextInput(
+            'Job Title',
+            'CEO',
+            controller: _signatoryJobTitleController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Email Address',
+            'kemi@ojaewa.com',
+            controller: _signatoryEmailController,
+          ),
+          const SizedBox(height: 16),
+          _buildPhoneInput(
+            'Phone Number',
+            controller: _signatoryPhoneController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'National ID / Passport Number',
+            'NIN 12345678901',
+            controller: _signatoryIdController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Date of Birth',
+            '1988-06-12',
+            controller: _signatoryDobController,
+          ),
+          const SizedBox(height: 16),
+          _buildUploadCard(
+            label: 'Identity Document',
+            selectedPath: _identityDocumentLocalPath,
+            onTap: () async {
+              final path = await pickSingleFilePath();
+              if (path != null) {
+                setState(() => _identityDocumentLocalPath = path);
+              }
+            },
+          ),
+          const SizedBox(height: 36),
+          _buildContinueButton(context, selectedCategory),
           const SizedBox(height: 40),
         ],
       ),
-    );
-  }
-
-  // Helper: Stepper UI
-  Widget _buildStepper() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _stepCircle("1", "Basic\nInfo", true),
-        _stepCircle("2", "Business\nDetails", false),
-        _stepCircle("3", "Account\non review", false),
-      ],
-    );
-  }
-
-  Widget _stepCircle(String num, String label, bool isActive) {
-    final colors = context.appColors;
-    return Row(
-      children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: isActive ? colors.textPrimary : colors.surfaceSecondary,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            num,
-            style: TextStyle(
-              color: isActive ? colors.background : colors.textTertiary,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 12,
-            height: 1.2,
-            color: isActive ? colors.textPrimary : colors.textSecondary,
-            fontWeight: isActive ? FontWeight.w500 : FontWeight.w400,
-          ),
-        ),
-      ],
     );
   }
 
@@ -224,7 +427,7 @@ class _BusinessSellerRegistrationScreenState
       title,
       style: TextStyle(
         fontSize: 16,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         color: colors.textPrimary,
       ),
     );
@@ -234,6 +437,9 @@ class _BusinessSellerRegistrationScreenState
     String label,
     String hint, {
     TextEditingController? controller,
+    TextInputType? keyboardType,
+    String? initialValue,
+    ValueChanged<String>? onChanged,
   }) {
     final colors = context.appColors;
     return Column(
@@ -246,16 +452,15 @@ class _BusinessSellerRegistrationScreenState
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
-          style: TextStyle(
-            fontFamily: 'Campton',
-            fontSize: 16,
-            color: colors.textPrimary,
-          ),
+          initialValue: controller == null ? initialValue : null,
+          onChanged: onChanged,
+          keyboardType: keyboardType,
+          style: TextStyle(fontSize: 16, color: colors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: colors.textTertiary),
             filled: true,
-            fillColor: colors.surfaceElevated,
+            fillColor: colors.surface,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 20,
               vertical: 16,
@@ -267,6 +472,52 @@ class _BusinessSellerRegistrationScreenState
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
               borderSide: BorderSide(color: colors.accent),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdown({
+    required String label,
+    required String value,
+    required Map<String, String> items,
+    required ValueChanged<String> onChanged,
+  }) {
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: colors.border),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: value,
+              isExpanded: true,
+              dropdownColor: colors.surface,
+              style: TextStyle(color: colors.textPrimary, fontSize: 16),
+              items: items.entries
+                  .map(
+                    (entry) => DropdownMenuItem<String>(
+                      value: entry.key,
+                      child: Text(entry.value),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (next) {
+                if (next != null) onChanged(next);
+              },
             ),
           ),
         ),
@@ -294,16 +545,9 @@ class _BusinessSellerRegistrationScreenState
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
-              color: colors.surfaceElevated,
+              color: colors.surface,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(color: colors.border),
-              boxShadow: [
-                BoxShadow(
-                  color: colors.shadow,
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
             ),
             child: Row(
               children: [
@@ -326,12 +570,11 @@ class _BusinessSellerRegistrationScreenState
     );
   }
 
-  Widget _buildPhoneInputWithPicker(
+  Widget _buildPhoneInput(
     String label, {
     required TextEditingController controller,
   }) {
     final colors = context.appColors;
-    final hasCountryCode = _selectedCountryCode.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -340,149 +583,72 @@ class _BusinessSellerRegistrationScreenState
           style: TextStyle(color: colors.textSecondary, fontSize: 14),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 49,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          decoration: BoxDecoration(
-            color: colors.surfaceElevated,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: colors.border),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow,
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              GestureDetector(
-                onTap: () async {
-                  final country = await CountryCodePickerSheet.show(
-                    context,
-                    selectedDialCode: _selectedCountryCode,
-                  );
-                  if (country != null)
-                    setState(() {
-                      _selectedCountryCode = country.dialCode;
-                      _selectedCountryFlag = country.flag;
-                    });
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (hasCountryCode) ...[
-                      Text(
-                        _selectedCountryFlag,
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        _selectedCountryCode,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: colors.textPrimary,
-                        ),
-                      ),
-                    ] else
-                      Text(
-                        'Code',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: colors.textTertiary,
-                        ),
-                      ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 18,
-                      color: colors.textSecondary,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextFormField(
-                  controller: controller,
-                  keyboardType: TextInputType.phone,
-                  style: TextStyle(fontSize: 16, color: colors.textPrimary),
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                    hintText: 'Enter phone number',
-                    hintStyle: TextStyle(color: colors.textTertiary),
-                  ),
-                ),
-              ),
-            ],
+        TextFormField(
+          controller: controller,
+          keyboardType: TextInputType.phone,
+          style: TextStyle(fontSize: 16, color: colors.textPrimary),
+          decoration: InputDecoration(
+            hintText: '+2348012345678',
+            hintStyle: TextStyle(color: colors.textTertiary),
+            filled: true,
+            fillColor: colors.surface,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 16,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.border),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.accent),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildFileUploadSection() {
+  Widget _buildUploadCard({
+    required String label,
+    required String? selectedPath,
+    required VoidCallback onTap,
+  }) {
     final colors = context.appColors;
+    final hasFile = (selectedPath ?? '').isNotEmpty;
     return InkWell(
-      onTap: () async {
-        final path = await pickSingleFilePath();
-        if (path == null) return;
-        setState(() => _identityDocumentLocalPath = path);
-      },
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Upload Document', style: TextStyle(fontSize: 14)),
+          Text(
+            label,
+            style: TextStyle(color: colors.textSecondary, fontSize: 14),
+          ),
           const SizedBox(height: 8),
           Container(
             width: double.infinity,
-            height: 140,
+            height: 120,
             decoration: BoxDecoration(
-              color: colors.surfaceElevated,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: colors.borderStrong),
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: hasFile ? colors.accent : colors.border,
+              ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.cloud_upload_outlined,
-                  size: 24,
-                  color: colors.textSecondary,
+                  hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
+                  color: hasFile ? colors.accent : colors.textSecondary,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 Text(
-                  _identityDocumentLocalPath == null
-                      ? 'Browse Document'
-                      : 'Document selected',
-                  style: TextStyle(fontSize: 16, color: colors.textPrimary),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'High resolution image\nPDF, JPG, PNG formats',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    Text(
-                      '200 x 200px\n20kb max',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                  ],
+                  hasFile ? 'File selected' : 'Browse document',
+                  style: TextStyle(fontSize: 15, color: colors.textPrimary),
                 ),
               ],
             ),
@@ -492,144 +658,122 @@ class _BusinessSellerRegistrationScreenState
     );
   }
 
-  bool _isValidUrl(String v) {
-    final value = v.trim();
-    if (value.isEmpty) return false;
-    final uri = Uri.tryParse(value);
-    return uri != null && uri.hasScheme && uri.host.isNotEmpty;
-  }
-
-  bool _validateStep1() {
-    if (_selectedCountryName.isEmpty) {
-      AppSnackbars.showError(context, 'Please select a country');
+  bool _validate() {
+    final requiredControllers = [
+      _businessNameController,
+      _legalBusinessNameController,
+      _registrationNumberController,
+      _tinController,
+      _dateOfIncorporationController,
+      _countryOfIncorporationController,
+      _industryController,
+      _employeesController,
+      _emailController,
+      _phoneController,
+      _cityController,
+      _addressController,
+      _postalCodeController,
+      _signatoryNameController,
+      _signatoryJobTitleController,
+      _signatoryEmailController,
+      _signatoryPhoneController,
+      _signatoryIdController,
+      _signatoryDobController,
+    ];
+    if (requiredControllers.any((c) => c.text.trim().isEmpty)) {
+      AppSnackbars.showError(
+        context,
+        'Complete all required business compliance fields',
+      );
       return false;
     }
-    if (_selectedStateName.isEmpty) {
-      AppSnackbars.showError(context, 'Please select a state');
-      return false;
-    }
-    if (_cityController.text.trim().isEmpty) {
-      AppSnackbars.showError(context, 'Please enter your city');
-      return false;
-    }
-    if (_addressController.text.trim().isEmpty) {
-      AppSnackbars.showError(context, 'Please enter your address');
-      return false;
-    }
-    final email = _emailController.text.trim();
-    if (email.isEmpty || !email.contains('@')) {
-      AppSnackbars.showError(context, 'Please enter a valid email address');
-      return false;
-    }
-    if (_phoneController.text.trim().isEmpty) {
-      AppSnackbars.showError(context, 'Please enter a phone number');
+    if (_selectedCountryName.isEmpty || _selectedStateName.isEmpty) {
+      AppSnackbars.showError(context, 'Select your country and state');
       return false;
     }
     if (_identityDocumentLocalPath == null ||
         _identityDocumentLocalPath!.isEmpty) {
-      AppSnackbars.showError(context, 'Please upload your identity document');
+      AppSnackbars.showError(context, 'Upload the identity document');
       return false;
     }
-
-    // Optional URLs: if provided, must be valid
-    final website = _websiteController.text.trim();
-    if (website.isNotEmpty && !_isValidUrl(website)) {
-      AppSnackbars.showError(
-        context,
-        'Please enter a valid website URL (include https://)',
-      );
+    if (int.tryParse(_employeesController.text.trim()) == null) {
+      AppSnackbars.showError(context, 'Number of employees must be numeric');
       return false;
     }
-
-    final instagram = _instagramController.text.trim();
-    if (instagram.isNotEmpty && !_isValidUrl(instagram)) {
-      AppSnackbars.showError(
-        context,
-        'Please enter a valid Instagram URL (include https://)',
-      );
-      return false;
-    }
-
-    final facebook = _facebookController.text.trim();
-    if (facebook.isNotEmpty && !_isValidUrl(facebook)) {
-      AppSnackbars.showError(
-        context,
-        'Please enter a valid Facebook URL (include https://)',
-      );
-      return false;
-    }
-
     return true;
   }
 
-  Widget _buildSubmitButton(BuildContext context) {
+  Widget _buildContinueButton(BuildContext context, String selectedCategory) {
     final colors = context.appColors;
     return InkWell(
       onTap: () async {
-        if (!_validateStep1()) return;
+        if (!_validate()) return;
 
         final args = ModalRoute.of(context)?.settings.arguments;
         final draftFromArgs = (args is Map<String, dynamic>)
             ? BusinessRegistrationDraft.fromJson(args)
             : null;
-        final selectedCategory =
-            draftFromArgs?.categoryLabel ?? (args as String?) ?? 'Beauty';
-
         final draft =
             (draftFromArgs ??
                   BusinessRegistrationDraft(categoryLabel: selectedCategory))
+              ..businessName = _businessNameController.text.trim()
+              ..legalBusinessName = _legalBusinessNameController.text.trim()
+              ..tradingName = _tradingNameController.text.trim()
+              ..businessRegistrationNumber = _registrationNumberController.text
+                  .trim()
+              ..taxIdentificationNumber = _tinController.text.trim()
+              ..dateOfIncorporation = _dateOfIncorporationController.text.trim()
+              ..countryOfIncorporation = _countryOfIncorporationController.text
+                  .trim()
+              ..industrySector = _industryController.text.trim()
+              ..businessType = _businessType
+              ..otherBusinessType = _otherBusinessType.trim()
+              ..numberOfEmployees = int.tryParse(
+                _employeesController.text.trim(),
+              )
+              ..annualTurnoverRange = _turnoverRange
+              ..website = _websiteController.text.trim()
+              ..businessEmail = _emailController.text.trim()
+              ..businessPhoneNumber = _phoneController.text.trim()
               ..country = _selectedCountryName
               ..state = _selectedStateName
               ..city = _cityController.text.trim()
               ..address = _addressController.text.trim()
-              ..businessEmail = _emailController.text.trim()
-              ..businessPhoneNumber =
-                  '$_selectedCountryCode${_phoneController.text.trim()}'
-              ..websiteUrl = _websiteController.text.trim()
-              ..instagram = _instagramController.text.trim()
-              ..facebook = _facebookController.text.trim()
+              ..postalCode = _postalCodeController.text.trim()
+              ..authorizedSignatoryFullName = _signatoryNameController.text
+                  .trim()
+              ..authorizedSignatoryJobTitle = _signatoryJobTitleController.text
+                  .trim()
+              ..authorizedSignatoryEmail = _signatoryEmailController.text.trim()
+              ..authorizedSignatoryPhoneNumber = _signatoryPhoneController.text
+                  .trim()
+              ..authorizedSignatoryIdNumber = _signatoryIdController.text.trim()
+              ..authorizedSignatoryDateOfBirth = _signatoryDobController.text
+                  .trim()
+              ..identityDocumentPath = _identityDocumentLocalPath
               ..youtube = null
-              ..spotify = null
-              ..identityDocumentPath = _identityDocumentLocalPath;
+              ..spotify = null;
 
-        // Map UI category labels to form routes
-        // Currently only Schools is enabled for business registration
-        final route = switch (selectedCategory) {
-          'Schools' => AppRoutes.businessSchoolsForm,
-          _ => AppRoutes.businessSchoolsForm,
-        };
-
-        // If we came in via legacy string-only args, we may not have categoryId/subcategoryId.
-        // Force selection before continuing.
         if (draft.categoryId == null || draft.subcategoryId == null) {
           final catalog = await ref.read(allCategoriesProvider.future);
-          if (!mounted) return;
-          final all = catalog.categories;
-
-          // Map UI category labels to backend category types
-          // Currently only Schools is enabled
-          List<CategoryNode> roots;
-          switch (selectedCategory) {
-            case 'Schools':
-              roots = all['school'] ?? const [];
-              break;
-            default:
-              roots = all[selectedCategory.toLowerCase()] ?? const [];
-          }
-
+          if (!context.mounted) return;
+          final roots = catalog.categories['school'] ?? const <CategoryNode>[];
           final selectedNode = await showCategoryTreePickerSheet(
             context: context,
             title: 'Select Category',
             roots: roots,
           );
+          if (!context.mounted) return;
           if (selectedNode == null) return;
-
           draft
             ..categoryId = selectedNode.parentId ?? selectedNode.id
             ..subcategoryId = selectedNode.id;
         }
 
-        Navigator.of(context).pushNamed(route, arguments: draft.toJson());
+        if (!context.mounted) return;
+        Navigator.of(
+          context,
+        ).pushNamed(AppRoutes.businessSchoolsForm, arguments: draft.toJson());
       },
       borderRadius: BorderRadius.circular(18),
       child: Container(

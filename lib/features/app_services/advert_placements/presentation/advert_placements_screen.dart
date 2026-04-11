@@ -28,7 +28,6 @@ class _AdvertPlacementsScreenState
   final _imageUrlController = TextEditingController();
   final _videoUrlController = TextEditingController();
   final _thumbnailUrlController = TextEditingController();
-  final _displayAmountController = TextEditingController();
   String _mediaType = 'image';
   String _displayCurrency = 'NGN';
   int _durationDays = 1;
@@ -42,7 +41,6 @@ class _AdvertPlacementsScreenState
     _imageUrlController.dispose();
     _videoUrlController.dispose();
     _thumbnailUrlController.dispose();
-    _displayAmountController.dispose();
     super.dispose();
   }
 
@@ -168,28 +166,14 @@ class _AdvertPlacementsScreenState
                   ),
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _ServiceDropdown(
-                        label: 'Display currency',
-                        value: _displayCurrency,
-                        items: const ['NGN', 'USD'],
-                        onChanged: (value) {
-                          if (value == null) return;
-                          setState(() => _displayCurrency = value);
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _ServiceField(
-                        controller: _displayAmountController,
-                        label: 'Display total amount',
-                        hint: '35000',
-                      ),
-                    ),
-                  ],
+                _ServiceDropdown(
+                  label: 'Display currency',
+                  value: _displayCurrency,
+                  items: const ['NGN', 'USD'],
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() => _displayCurrency = value);
+                  },
                 ),
               ],
             ),
@@ -243,9 +227,6 @@ class _AdvertPlacementsScreenState
                         subtitle: '${item.mediaType} · ${item.placement}',
                         status: item.status,
                         reference: item.applicationReference,
-                        trailing: item.displayTotalAmount == null
-                            ? null
-                            : '${item.displayCurrency ?? 'NGN'} ${item.displayTotalAmount}',
                       ),
                     ),
                 ],
@@ -261,7 +242,6 @@ class _AdvertPlacementsScreenState
     if (_titleController.text.trim().isEmpty ||
         _descriptionController.text.trim().isEmpty ||
         _targetUrlController.text.trim().isEmpty ||
-        _displayAmountController.text.trim().isEmpty ||
         (_mediaType == 'image' && _imageUrlController.text.trim().isEmpty) ||
         (_mediaType == 'video' && _videoUrlController.text.trim().isEmpty)) {
       AppSnackbars.showError(context, 'Fill all advert fields first');
@@ -312,8 +292,7 @@ class _AdvertPlacementsScreenState
             startDate: _startDateForPackage(),
             endDate: _endDateForPackage(_durationDays),
             displayCurrency: _displayCurrency,
-            displayTotalAmount:
-                num.tryParse(_displayAmountController.text.trim()) ?? 0,
+            displayTotalAmount: _displayTotalAmountForPackage(_durationDays),
             purchase: purchase,
           );
       ref.invalidate(advertPlacementRequestsProvider);
@@ -336,6 +315,23 @@ class _AdvertPlacementsScreenState
   String _startDateForPackage() {
     final now = DateTime.now().toUtc();
     return _formatDate(now);
+  }
+
+  num _displayTotalAmountForPackage(int days) {
+    switch (days) {
+      case 1:
+        return 35000;
+      case 3:
+        return 105000;
+      case 7:
+        return 245000;
+      case 14:
+        return 490000;
+      case 30:
+        return 1050000;
+      default:
+        return 0;
+    }
   }
 
   String _endDateForPackage(int days) {

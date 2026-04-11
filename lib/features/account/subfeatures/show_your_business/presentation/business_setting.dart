@@ -112,7 +112,8 @@ class BusinessSettingsScreen extends ConsumerWidget {
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           itemCount: businesses.length,
-          separatorBuilder: (_, __) => Divider(color: colors.border, height: 1),
+          separatorBuilder: (_, separatorIndex) =>
+              Divider(color: colors.border, height: 1),
           itemBuilder: (context, index) {
             final b = businesses[index];
             final status = b.storeStatus;

@@ -299,38 +299,6 @@ class _BrandBusinessDetailsScreenState
     );
   }
 
-  Widget _buildDropdownField(String label, String value) {
-    final colors = context.appColors;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(color: colors.textSecondary, fontSize: 14),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          decoration: BoxDecoration(
-            color: colors.surface,
-            border: Border.all(color: colors.border),
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                value,
-                style: TextStyle(color: colors.textTertiary, fontSize: 16),
-              ),
-              Icon(Icons.keyboard_arrow_down, color: colors.textSecondary),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildUploadCard({
     required String title,
     required String hintLeft,

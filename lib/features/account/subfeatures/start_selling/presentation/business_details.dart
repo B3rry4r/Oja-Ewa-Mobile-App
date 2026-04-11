@@ -1,9 +1,10 @@
-// business_details_screen.dart
 import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/files/pick_file.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/features/account/subfeatures/shared/widgets/compliance_progress_banner.dart';
 
 import '../../../../../app/router/app_router.dart';
 import 'draft_utils.dart';
@@ -17,19 +18,63 @@ class BusinessDetailsScreen extends StatefulWidget {
 
 class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
   bool _initializedFromDraft = false;
-  final _businessNameController = TextEditingController();
-  final _registrationNumberController = TextEditingController();
+
   final _bankNameController = TextEditingController();
   final _accountNumberController = TextEditingController();
+  final _owner1NameController = TextEditingController();
+  final _owner1PercentageController = TextEditingController();
+  final _owner1NationalityController = TextEditingController();
+  final _owner1IdController = TextEditingController();
+  final _owner2NameController = TextEditingController();
+  final _owner2PercentageController = TextEditingController();
+  final _owner2NationalityController = TextEditingController();
+  final _owner2IdController = TextEditingController();
+  final _owner3NameController = TextEditingController();
+  final _owner3PercentageController = TextEditingController();
+  final _owner3NationalityController = TextEditingController();
+  final _owner3IdController = TextEditingController();
+  final _printedNameController = TextEditingController();
+  final _submissionDateController = TextEditingController();
+
+  String _preferredSettlementCurrency = 'NGN';
+  bool _declarationLegalRegistered = false;
+  bool _declarationInformationTrue = false;
+  bool _declarationAuthorizeVerification = false;
+  bool _authorizeSettlementAccount = false;
+  bool _acceptPartnerBankTerms = false;
   String? _businessCertificatePath;
   String? _businessLogoPath;
+  String? _signaturePath;
+
+  static const _sections = [
+    'Business Information',
+    'Business Type & Industry',
+    'Registered Office',
+    'Authorized Signatory',
+    'Beneficial Owners',
+    'Banking & Settlement',
+    'Declarations',
+    'Signature',
+  ];
 
   @override
   void dispose() {
-    _businessNameController.dispose();
-    _registrationNumberController.dispose();
     _bankNameController.dispose();
     _accountNumberController.dispose();
+    _owner1NameController.dispose();
+    _owner1PercentageController.dispose();
+    _owner1NationalityController.dispose();
+    _owner1IdController.dispose();
+    _owner2NameController.dispose();
+    _owner2PercentageController.dispose();
+    _owner2NationalityController.dispose();
+    _owner2IdController.dispose();
+    _owner3NameController.dispose();
+    _owner3PercentageController.dispose();
+    _owner3NationalityController.dispose();
+    _owner3IdController.dispose();
+    _printedNameController.dispose();
+    _submissionDateController.dispose();
     super.dispose();
   }
 
@@ -40,56 +85,130 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
     );
     if (!_initializedFromDraft) {
       _initializedFromDraft = true;
-      _businessNameController.text = draft.businessName ?? '';
-      _registrationNumberController.text =
-          draft.businessRegistrationNumber ?? '';
       _bankNameController.text = draft.bankName ?? '';
       _accountNumberController.text = draft.accountNumber ?? '';
+      final owners = draft.beneficialOwners ?? const [];
+      if (owners.isNotEmpty) _fillOwnerControllers(owners[0], 1);
+      if (owners.length > 1) _fillOwnerControllers(owners[1], 2);
+      if (owners.length > 2) _fillOwnerControllers(owners[2], 3);
+      _preferredSettlementCurrency =
+          draft.preferredSettlementCurrency ?? _preferredSettlementCurrency;
+      _declarationLegalRegistered = draft.declarationLegalRegistered ?? false;
+      _declarationInformationTrue = draft.declarationInformationTrue ?? false;
+      _declarationAuthorizeVerification =
+          draft.declarationAuthorizeVerification ?? false;
+      _authorizeSettlementAccount = draft.authorizeSettlementAccount ?? false;
+      _acceptPartnerBankTerms = draft.acceptPartnerBankTerms ?? false;
+      _printedNameController.text =
+          draft.printedNameOfAuthorizedSignatory ?? '';
+      _submissionDateController.text = draft.submissionDate ?? '';
       _businessCertificatePath = draft.businessCertificatePath;
       _businessLogoPath = draft.businessLogoPath;
+      _signaturePath = draft.authorizedSignatorySignaturePath;
     }
+
     return AppPageScaffold(
       scrollable: true,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          _buildStepper(),
-          const SizedBox(height: 40),
-
-          _buildSectionHeader("About Business"),
+          const ComplianceProgressBanner(
+            title: 'Seller compliance onboarding',
+            subtitle:
+                'Finish ownership, settlement, declarations, and signature. This keeps the flow fluid while still covering all compliance sections.',
+            currentSection: 'Beneficial Owners',
+            sectionLabels: _sections,
+          ),
+          const SizedBox(height: 28),
+          _buildSectionHeader('Section 5: Beneficial Owners'),
+          const SizedBox(height: 16),
+          _buildOwnerCard(1),
+          const SizedBox(height: 16),
+          _buildOwnerCard(2),
+          const SizedBox(height: 16),
+          _buildOwnerCard(3),
+          const SizedBox(height: 28),
+          _buildSectionHeader('Section 6: Banking & Settlement Preferences'),
           const SizedBox(height: 16),
           _buildTextInput(
-            "Business Name",
-            "Enter business name",
-            controller: _businessNameController,
-          ),
-          const SizedBox(height: 20),
-          _buildTextInput(
-            "Business Registration Number",
-            "Enter registration number",
-            controller: _registrationNumberController,
-          ),
-
-          const SizedBox(height: 40),
-
-          _buildSectionHeader("Account Details"),
-          const SizedBox(height: 16),
-          _buildTextInput(
-            "Bank Name",
-            "Your Bank",
+            'Bank Name',
+            'GTBank',
             controller: _bankNameController,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           _buildTextInput(
-            "Account Number",
-            "Your Account Number",
+            'Account Number',
+            '0123456789',
             controller: _accountNumberController,
           ),
-
-          const SizedBox(height: 40),
-
-          _buildSectionHeader("Business Documents"),
+          const SizedBox(height: 16),
+          _buildDropdown(
+            label: 'Preferred Settlement Currency',
+            value: _preferredSettlementCurrency,
+            items: const ['USD', 'EUR', 'GBP', 'NGN'],
+            onChanged: (value) =>
+                setState(() => _preferredSettlementCurrency = value),
+          ),
+          const SizedBox(height: 28),
+          _buildSectionHeader('Section 7: Compliance & Declarations'),
+          const SizedBox(height: 16),
+          _buildCheckTile(
+            value: _declarationLegalRegistered,
+            label:
+                'I confirm the business is legally registered and operating.',
+            onChanged: (value) =>
+                setState(() => _declarationLegalRegistered = value),
+          ),
+          _buildCheckTile(
+            value: _declarationInformationTrue,
+            label: 'The information provided is true and complete.',
+            onChanged: (value) =>
+                setState(() => _declarationInformationTrue = value),
+          ),
+          _buildCheckTile(
+            value: _declarationAuthorizeVerification,
+            label:
+                'I authorize Ojaewa to verify this information with third parties.',
+            onChanged: (value) =>
+                setState(() => _declarationAuthorizeVerification = value),
+          ),
+          _buildCheckTile(
+            value: _authorizeSettlementAccount,
+            label: 'I authorize Ojaewa to open a settlement account for me.',
+            onChanged: (value) =>
+                setState(() => _authorizeSettlementAccount = value),
+          ),
+          _buildCheckTile(
+            value: _acceptPartnerBankTerms,
+            label:
+                'I accept Ojaewa partner bank terms of service and corporate account agreement.',
+            onChanged: (value) =>
+                setState(() => _acceptPartnerBankTerms = value),
+          ),
+          const SizedBox(height: 28),
+          _buildSectionHeader('Section 8: Submission & Signature'),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Printed Name of Authorized Signatory',
+            'Ada Okafor',
+            controller: _printedNameController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Submission Date',
+            '2026-04-11',
+            controller: _submissionDateController,
+          ),
+          const SizedBox(height: 16),
+          _buildUploadCard(
+            label: 'Authorized Signatory Signature',
+            selectedPath: _signaturePath,
+            onTap: () async {
+              final path = await pickSingleFilePath();
+              if (path != null) setState(() => _signaturePath = path);
+            },
+          ),
           const SizedBox(height: 16),
           _buildUploadCard(
             label: 'Business Certificate',
@@ -101,20 +220,16 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
               }
             },
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           _buildUploadCard(
             label: 'Business Logo',
             selectedPath: _businessLogoPath,
             onTap: () async {
               final path = await pickSingleFilePath();
-              if (path != null) {
-                setState(() => _businessLogoPath = path);
-              }
+              if (path != null) setState(() => _businessLogoPath = path);
             },
           ),
-
-          const SizedBox(height: 48),
-
+          const SizedBox(height: 36),
           _buildSubmitButton(context),
           const SizedBox(height: 40),
         ],
@@ -122,76 +237,129 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
     );
   }
 
-  Widget _buildStepper() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _stepItem(1, "Basic\nInfo", isComplete: true, isActive: false),
-        _stepItem(2, "Business\nDetails", isComplete: false, isActive: true),
-        _stepItem(3, "Account\non review", isComplete: false, isActive: false),
-      ],
-    );
+  void _fillOwnerControllers(Map<String, dynamic> owner, int index) {
+    final controllers = _ownerControllers(index);
+    controllers.$1.text = (owner['full_name'] as String?) ?? '';
+    controllers.$2.text = (owner['ownership_percentage']?.toString()) ?? '';
+    controllers.$3.text = (owner['nationality'] as String?) ?? '';
+    controllers.$4.text = (owner['id_type_and_number'] as String?) ?? '';
   }
 
-  Widget _stepItem(
-    int num,
-    String label, {
-    required bool isComplete,
-    required bool isActive,
-  }) {
-    final colors = context.appColors;
-    final Color activeColor = colors.textPrimary;
-    final Color inactiveColor = colors.borderStrong;
+  ({
+    TextEditingController $1,
+    TextEditingController $2,
+    TextEditingController $3,
+    TextEditingController $4,
+  })
+  _ownerControllers(int index) {
+    switch (index) {
+      case 1:
+        return (
+          $1: _owner1NameController,
+          $2: _owner1PercentageController,
+          $3: _owner1NationalityController,
+          $4: _owner1IdController,
+        );
+      case 2:
+        return (
+          $1: _owner2NameController,
+          $2: _owner2PercentageController,
+          $3: _owner2NationalityController,
+          $4: _owner2IdController,
+        );
+      default:
+        return (
+          $1: _owner3NameController,
+          $2: _owner3PercentageController,
+          $3: _owner3NationalityController,
+          $4: _owner3IdController,
+        );
+    }
+  }
 
-    final Color boxColor = isActive || isComplete ? activeColor : inactiveColor;
-
-    return Row(
-      children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: boxColor,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          alignment: Alignment.center,
-          child: isComplete
-              ? Icon(Icons.check, color: colors.background, size: 16)
-              : Text(
-                  num.toString(),
-                  style: TextStyle(
-                    color: colors.background,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            height: 1.2,
-            color: isActive || isComplete ? activeColor : inactiveColor,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
+  List<Map<String, dynamic>> _beneficialOwners() {
+    final owners = <Map<String, dynamic>>[];
+    for (var i = 1; i <= 3; i++) {
+      final controllers = _ownerControllers(i);
+      final name = controllers.$1.text.trim();
+      final percentage = controllers.$2.text.trim();
+      final nationality = controllers.$3.text.trim();
+      final id = controllers.$4.text.trim();
+      if (name.isEmpty &&
+          percentage.isEmpty &&
+          nationality.isEmpty &&
+          id.isEmpty) {
+        continue;
+      }
+      owners.add({
+        'full_name': name,
+        'ownership_percentage': num.tryParse(percentage) ?? 0,
+        'nationality': nationality,
+        'id_type_and_number': id,
+      });
+    }
+    return owners;
   }
 
   Widget _buildSectionHeader(String title) {
     final colors = context.appColors;
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16,
-          fontFamily: 'Campton',
-          fontWeight: FontWeight.w600,
-          color: colors.textPrimary,
-        ),
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+        color: colors.textPrimary,
+      ),
+    );
+  }
+
+  Widget _buildOwnerCard(int index) {
+    final controllers = _ownerControllers(index);
+    final colors = context.appColors;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Owner $index',
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _buildTextInput(
+            'Full Name',
+            'Ada Okafor',
+            controller: controllers.$1,
+          ),
+          const SizedBox(height: 12),
+          _buildTextInput(
+            'Ownership %',
+            '60',
+            controller: controllers.$2,
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 12),
+          _buildTextInput(
+            'Nationality',
+            'Nigerian',
+            controller: controllers.$3,
+          ),
+          const SizedBox(height: 12),
+          _buildTextInput(
+            'ID Type & Number',
+            'Passport A12345678',
+            controller: controllers.$4,
+          ),
+        ],
       ),
     );
   }
@@ -200,6 +368,7 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
     String label,
     String hint, {
     TextEditingController? controller,
+    TextInputType? keyboardType,
   }) {
     final colors = context.appColors;
     return Column(
@@ -207,21 +376,13 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 14,
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w400,
-            color: colors.textTertiary,
-          ),
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
-          style: TextStyle(
-            fontFamily: 'Campton',
-            fontSize: 16,
-            color: colors.textPrimary,
-          ),
+          keyboardType: keyboardType,
+          style: TextStyle(fontSize: 16, color: colors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: colors.textTertiary),
@@ -245,6 +406,72 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
     );
   }
 
+  Widget _buildDropdown({
+    required String label,
+    required String value,
+    required List<String> items,
+    required ValueChanged<String> onChanged,
+  }) {
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: colors.border),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: value,
+              isExpanded: true,
+              dropdownColor: colors.surface,
+              style: TextStyle(color: colors.textPrimary, fontSize: 16),
+              items: items
+                  .map(
+                    (item) => DropdownMenuItem<String>(
+                      value: item,
+                      child: Text(item),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (next) {
+                if (next != null) onChanged(next);
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCheckTile({
+    required bool value,
+    required String label,
+    required ValueChanged<bool> onChanged,
+  }) {
+    final colors = context.appColors;
+    return CheckboxListTile(
+      value: value,
+      contentPadding: EdgeInsets.zero,
+      activeColor: colors.accent,
+      checkColor: colors.onAccent,
+      controlAffinity: ListTileControlAffinity.leading,
+      title: Text(
+        label,
+        style: TextStyle(color: colors.textPrimary, fontSize: 14),
+      ),
+      onChanged: (next) => onChanged(next ?? false),
+    );
+  }
+
   Widget _buildUploadCard({
     required String label,
     required String? selectedPath,
@@ -260,12 +487,7 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
         children: [
           Text(
             label,
-            style: TextStyle(
-              fontSize: 14,
-              fontFamily: 'Campton',
-              fontWeight: FontWeight.w400,
-              color: colors.textTertiary,
-            ),
+            style: TextStyle(color: colors.textSecondary, fontSize: 14),
           ),
           const SizedBox(height: 8),
           Container(
@@ -287,7 +509,7 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  hasFile ? 'File selected' : 'Browse Document',
+                  hasFile ? 'File selected' : 'Browse document',
                   style: TextStyle(fontSize: 15, color: colors.textPrimary),
                 ),
               ],
@@ -298,17 +520,63 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
     );
   }
 
+  bool _validateStep2() {
+    if (_bankNameController.text.trim().isEmpty ||
+        _accountNumberController.text.trim().isEmpty ||
+        _printedNameController.text.trim().isEmpty ||
+        _submissionDateController.text.trim().isEmpty) {
+      AppSnackbars.showError(
+        context,
+        'Complete the settlement and signature fields',
+      );
+      return false;
+    }
+    if (_beneficialOwners().isEmpty) {
+      AppSnackbars.showError(context, 'Add at least one beneficial owner');
+      return false;
+    }
+    if (!_declarationLegalRegistered ||
+        !_declarationInformationTrue ||
+        !_declarationAuthorizeVerification ||
+        !_authorizeSettlementAccount ||
+        !_acceptPartnerBankTerms) {
+      AppSnackbars.showError(
+        context,
+        'All compliance declarations are required',
+      );
+      return false;
+    }
+    if ((_signaturePath ?? '').isEmpty) {
+      AppSnackbars.showError(
+        context,
+        'Upload the authorized signatory signature',
+      );
+      return false;
+    }
+    return true;
+  }
+
   Widget _buildSubmitButton(BuildContext context) {
     final colors = context.appColors;
     return InkWell(
       onTap: () {
+        if (!_validateStep2()) return;
         final draft =
             sellerDraftFromArgs(ModalRoute.of(context)?.settings.arguments)
-              ..businessName = _businessNameController.text.trim()
-              ..businessRegistrationNumber = _registrationNumberController.text
-                  .trim()
               ..bankName = _bankNameController.text.trim()
               ..accountNumber = _accountNumberController.text.trim()
+              ..beneficialOwners = _beneficialOwners()
+              ..preferredSettlementCurrency = _preferredSettlementCurrency
+              ..declarationLegalRegistered = _declarationLegalRegistered
+              ..declarationInformationTrue = _declarationInformationTrue
+              ..declarationAuthorizeVerification =
+                  _declarationAuthorizeVerification
+              ..authorizeSettlementAccount = _authorizeSettlementAccount
+              ..acceptPartnerBankTerms = _acceptPartnerBankTerms
+              ..printedNameOfAuthorizedSignatory = _printedNameController.text
+                  .trim()
+              ..authorizedSignatorySignaturePath = _signaturePath
+              ..submissionDate = _submissionDateController.text.trim()
               ..businessCertificatePath = _businessCertificatePath
               ..businessLogoPath = _businessLogoPath;
 
@@ -333,11 +601,10 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
         ),
         child: Center(
           child: Text(
-            "Continue",
+            'Continue',
             style: TextStyle(
               color: colors.onAccent,
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
             ),
           ),

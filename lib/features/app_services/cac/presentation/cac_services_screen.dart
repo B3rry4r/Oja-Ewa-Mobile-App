@@ -221,7 +221,7 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
                       height: 18,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Proceed to Paystack'),
+                  : const Text('Pay & Submit CAC Request'),
             ),
           ),
           const SizedBox(height: 24),

@@ -8,10 +8,14 @@ class BusinessProfileApi {
 
   final Dio _dio;
 
-  Future<Map<String, dynamic>> createBusiness(BusinessProfilePayload payload) async {
+  Future<Map<String, dynamic>> createBusiness(
+    BusinessProfilePayload payload,
+  ) async {
     try {
       final res = await _dio.post('/api/business', data: payload.toJson());
-      if (res.data is Map<String, dynamic>) return res.data as Map<String, dynamic>;
+      if (res.data is Map<String, dynamic>) {
+        return res.data as Map<String, dynamic>;
+      }
       throw const FormatException('Unexpected business create response');
     } catch (e) {
       throw mapDioError(e);
@@ -20,18 +24,28 @@ class BusinessProfileApi {
 
   Future<Map<String, dynamic>> getBusiness(int id) async {
     try {
-      final res = await _dio.get('/api/business/$id');
-      if (res.data is Map<String, dynamic>) return res.data as Map<String, dynamic>;
+      final res = await _dio.get('/api/business/my/$id');
+      if (res.data is Map<String, dynamic>) {
+        return res.data as Map<String, dynamic>;
+      }
       throw const FormatException('Unexpected business get response');
     } catch (e) {
       throw mapDioError(e);
     }
   }
 
-  Future<Map<String, dynamic>> updateBusiness(int id, BusinessProfilePayload payload) async {
+  Future<Map<String, dynamic>> updateBusiness(
+    int id,
+    BusinessProfilePayload payload,
+  ) async {
     try {
-      final res = await _dio.put('/api/business/$id', data: payload.toJson());
-      if (res.data is Map<String, dynamic>) return res.data as Map<String, dynamic>;
+      final res = await _dio.put(
+        '/api/business/my/$id',
+        data: payload.toJson(),
+      );
+      if (res.data is Map<String, dynamic>) {
+        return res.data as Map<String, dynamic>;
+      }
       throw const FormatException('Unexpected business update response');
     } catch (e) {
       throw mapDioError(e);
@@ -41,7 +55,9 @@ class BusinessProfileApi {
   Future<Map<String, dynamic>> deactivateBusiness(int id) async {
     try {
       final res = await _dio.patch('/api/business/$id/deactivate');
-      if (res.data is Map<String, dynamic>) return res.data as Map<String, dynamic>;
+      if (res.data is Map<String, dynamic>) {
+        return res.data as Map<String, dynamic>;
+      }
       throw const FormatException('Unexpected deactivate response');
     } catch (e) {
       throw mapDioError(e);
@@ -54,12 +70,17 @@ class BusinessProfileApi {
     required String billingCycle,
   }) async {
     try {
-      final res = await _dio.put('/api/business/subscription', data: {
-        'business_id': businessId,
-        'subscription_type': subscriptionType,
-        'billing_cycle': billingCycle,
-      });
-      if (res.data is Map<String, dynamic>) return res.data as Map<String, dynamic>;
+      final res = await _dio.put(
+        '/api/business/subscription',
+        data: {
+          'business_id': businessId,
+          'subscription_type': subscriptionType,
+          'billing_cycle': billingCycle,
+        },
+      );
+      if (res.data is Map<String, dynamic>) {
+        return res.data as Map<String, dynamic>;
+      }
       throw const FormatException('Unexpected subscription response');
     } catch (e) {
       throw mapDioError(e);
@@ -70,22 +91,22 @@ class BusinessProfileApi {
   /// docs: POST /api/business/{id}/upload (multipart)
   Future<Map<String, dynamic>> uploadFile({
     required int businessId,
-    required String fileType, // business_logo|business_certificates|identity_document
+    required String
+    fileType, // business_logo|business_certificates|identity_document
     required MultipartFile file,
   }) async {
     try {
-      final form = FormData.fromMap({
-        'file': file,
-        'file_type': fileType,
-      });
+      final form = FormData.fromMap({'file': file, 'file_type': fileType});
 
       final res = await _dio.post(
-        '/api/business/$businessId/upload',
+        '/api/business/my/$businessId/upload',
         data: form,
         options: Options(contentType: 'multipart/form-data'),
       );
 
-      if (res.data is Map<String, dynamic>) return res.data as Map<String, dynamic>;
+      if (res.data is Map<String, dynamic>) {
+        return res.data as Map<String, dynamic>;
+      }
       throw const FormatException('Unexpected upload response');
     } catch (e) {
       throw mapDioError(e);

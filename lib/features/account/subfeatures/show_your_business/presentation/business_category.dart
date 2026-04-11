@@ -150,7 +150,7 @@ class _BusinessCategoryScreenState
     return InkWell(
       onTap: () async {
         final catalog = await ref.read(allCategoriesProvider.future);
-        if (!mounted) return;
+        if (!context.mounted) return;
 
         final roots = _rootsForLabel(catalog.categories, selectedCategory);
         if (roots.isEmpty) {
@@ -163,6 +163,7 @@ class _BusinessCategoryScreenState
           title: 'Select Category',
           roots: roots,
         );
+        if (!context.mounted) return;
         if (selectedNode == null) return;
 
         final draft = BusinessRegistrationDraft(categoryLabel: selectedCategory)

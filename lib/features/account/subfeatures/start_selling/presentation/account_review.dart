@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
+import 'package:ojaewa/features/account/subfeatures/shared/widgets/compliance_progress_banner.dart';
 
 import '../../../../../app/router/app_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,7 +45,22 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-            _buildStepper(),
+            const ComplianceProgressBanner(
+              title: 'Seller compliance review',
+              subtitle:
+                  'Review the completed compliance sections before final submission. The form will be sent as one full current-state payload.',
+              currentSection: 'Signature',
+              sectionLabels: [
+                'Business Information',
+                'Business Type & Industry',
+                'Registered Office',
+                'Authorized Signatory',
+                'Beneficial Owners',
+                'Banking & Settlement',
+                'Declarations',
+                'Signature',
+              ],
+            ),
             const Spacer(flex: 2),
             Icon(
               Icons.access_time_filled_rounded,
@@ -77,57 +93,6 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  // Row-based Stepper with all items highlighted
-  Widget _buildStepper() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _stepItem(1, "Basic\nInfo", isComplete: true),
-        _stepItem(2, "Business\nDetails", isComplete: true),
-        _stepItem(3, "Account\non review", isComplete: true),
-      ],
-    );
-  }
-
-  Widget _stepItem(int num, String label, {required bool isComplete}) {
-    final colors = context.appColors;
-    final Color activeColor = colors.textPrimary;
-
-    return Row(
-      children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: activeColor,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          alignment: Alignment.center,
-          child: (num < 3)
-              ? Icon(Icons.check, color: colors.background, size: 16)
-              : Text(
-                  num.toString(),
-                  style: TextStyle(
-                    color: colors.background,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            height: 1.2,
-            color: activeColor,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
     );
   }
 
@@ -275,22 +240,56 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
     setState(() => _isSubmitting = true);
 
     final payload = SellerProfilePayload(
+      businessName: (draft.businessName ?? '').trim(),
+      legalBusinessName: (draft.legalBusinessName ?? '').trim(),
+      tradingName: (draft.tradingName ?? '').trim(),
+      businessEmail: (draft.businessEmail ?? '').trim(),
+      businessPhoneNumber: (draft.businessPhoneNumber ?? '').trim(),
+      websiteUrl: (draft.websiteUrl ?? '').trim(),
+      businessRegistrationNumber: (draft.businessRegistrationNumber ?? '')
+          .trim(),
+      taxIdentificationNumber: (draft.taxIdentificationNumber ?? '').trim(),
+      dateOfIncorporation: (draft.dateOfIncorporation ?? '').trim(),
+      countryOfIncorporation: (draft.countryOfIncorporation ?? '').trim(),
+      industrySector: (draft.industrySector ?? '').trim(),
+      businessType: (draft.businessType ?? '').trim(),
+      otherBusinessType: (draft.otherBusinessType ?? '').trim(),
+      numberOfEmployees: draft.numberOfEmployees ?? 0,
+      annualTurnoverRange: (draft.annualTurnoverRange ?? '').trim(),
       country: (draft.country ?? '').trim(),
       state: (draft.state ?? '').trim(),
       city: (draft.city ?? '').trim(),
       address: (draft.address ?? '').trim(),
-      businessEmail: (draft.businessEmail ?? '').trim(),
-      businessPhoneNumber: (draft.businessPhoneNumber ?? '').trim(),
-      instagram: draft.instagram,
-      facebook: draft.facebook,
-      identityDocument: draft.identityDocumentPath,
-      businessName: (draft.businessName ?? '').trim(),
-      businessRegistrationNumber: (draft.businessRegistrationNumber ?? '')
-          .trim(),
-      businessCertificate: draft.businessCertificatePath,
-      businessLogo: draft.businessLogoPath,
+      postalCode: (draft.postalCode ?? '').trim(),
       bankName: (draft.bankName ?? '').trim(),
       accountNumber: (draft.accountNumber ?? '').trim(),
+      authorizedSignatoryFullName: (draft.authorizedSignatoryFullName ?? '')
+          .trim(),
+      authorizedSignatoryJobTitle: (draft.authorizedSignatoryJobTitle ?? '')
+          .trim(),
+      authorizedSignatoryEmail: (draft.authorizedSignatoryEmail ?? '').trim(),
+      authorizedSignatoryPhoneNumber:
+          (draft.authorizedSignatoryPhoneNumber ?? '').trim(),
+      authorizedSignatoryIdNumber: (draft.authorizedSignatoryIdNumber ?? '')
+          .trim(),
+      authorizedSignatoryDateOfBirth:
+          (draft.authorizedSignatoryDateOfBirth ?? '').trim(),
+      beneficialOwners: draft.beneficialOwners ?? const [],
+      preferredSettlementCurrency: (draft.preferredSettlementCurrency ?? 'NGN')
+          .trim(),
+      declarationLegalRegistered: draft.declarationLegalRegistered ?? false,
+      declarationInformationTrue: draft.declarationInformationTrue ?? false,
+      declarationAuthorizeVerification:
+          draft.declarationAuthorizeVerification ?? false,
+      authorizeSettlementAccount: draft.authorizeSettlementAccount ?? false,
+      acceptPartnerBankTerms: draft.acceptPartnerBankTerms ?? false,
+      printedNameOfAuthorizedSignatory:
+          (draft.printedNameOfAuthorizedSignatory ?? '').trim(),
+      authorizedSignatorySignature: draft.authorizedSignatorySignaturePath,
+      submissionDate: (draft.submissionDate ?? '').trim(),
+      identityDocument: draft.identityDocumentPath,
+      businessCertificate: draft.businessCertificatePath,
+      businessLogo: draft.businessLogoPath,
     );
 
     try {
@@ -317,6 +316,13 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
         await uploadRepo.upload(
           type: 'business_logo',
           file: multipartFromPath(draft.businessLogoPath!),
+        );
+      }
+
+      if (_isLocalFilePath(draft.authorizedSignatorySignaturePath)) {
+        await uploadRepo.upload(
+          type: 'authorized_signatory_signature',
+          file: multipartFromPath(draft.authorizedSignatorySignaturePath!),
         );
       }
 
