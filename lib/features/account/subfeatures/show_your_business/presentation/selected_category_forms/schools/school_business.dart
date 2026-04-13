@@ -238,8 +238,10 @@ class _SchoolBusinessDetailsScreenState
           const SizedBox(height: 16),
           _buildInputField(
             'Submission Date',
-            '2026-04-11',
+            'Select date',
             controller: _submissionDateController,
+            readOnly: true,
+            onTap: _pickSubmissionDate,
           ),
           const SizedBox(height: 24),
           _buildUploadSection(
@@ -554,6 +556,8 @@ class _SchoolBusinessDetailsScreenState
     int maxLines = 1,
     TextEditingController? controller,
     TextInputType? keyboardType,
+    bool readOnly = false,
+    VoidCallback? onTap,
   }) {
     final colors = context.appColors;
     return Column(
@@ -567,6 +571,8 @@ class _SchoolBusinessDetailsScreenState
         TextField(
           controller: controller,
           keyboardType: keyboardType,
+          readOnly: readOnly,
+          onTap: onTap,
           style: TextStyle(
             fontFamily: 'Campton',
             fontSize: 16,
@@ -591,6 +597,25 @@ class _SchoolBusinessDetailsScreenState
         ),
       ],
     );
+  }
+
+  Future<void> _pickSubmissionDate() async {
+    final initial =
+        DateTime.tryParse(_submissionDateController.text.trim()) ??
+        DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked == null) return;
+    final year = picked.year.toString().padLeft(4, '0');
+    final month = picked.month.toString().padLeft(2, '0');
+    final day = picked.day.toString().padLeft(2, '0');
+    setState(() {
+      _submissionDateController.text = '$year-$month-$day';
+    });
   }
 
   bool _validateForm() {

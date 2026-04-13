@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -306,6 +307,16 @@ class HomeScreen extends ConsumerWidget {
         Expanded(
           child: _buildServiceShortcut(
             context: context,
+            iconAsset: AppIcons.nepcRegistration,
+            label: 'NEPC',
+            onTap: () =>
+                Navigator.of(context).pushNamed(AppRoutes.nepcServices),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildServiceShortcut(
+            context: context,
             iconAsset: AppIcons.adsPlacement,
             label: 'Adverts',
             onTap: () =>
@@ -333,37 +344,33 @@ class HomeScreen extends ConsumerWidget {
     required VoidCallback onTap,
   }) {
     final colors = context.appColors;
-    return Material(
-      color: colors.surface,
-      borderRadius: BorderRadius.circular(20),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: 55,
-                height: 55,
-                child: Image.asset(iconAsset, fit: BoxFit.contain),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 76,
+              height: 76,
+              child: Image.asset(iconAsset, fit: BoxFit.contain),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11.2,
+                fontWeight: FontWeight.w500,
+                color: colors.textPrimary,
+                height: 1.1,
               ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.normal,
-                  color: colors.textPrimary,
-                  height: 1.1,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -697,21 +704,96 @@ class _AdvertBannerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final imageUrl = (advert.imageUrl ?? '').trim();
     final hasImage = imageUrl.isNotEmpty;
+    final colors = context.appColors;
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: context.appColors.surfaceSecondary,
+        color: colors.surfaceSecondary,
       ),
       clipBehavior: Clip.antiAlias,
       child: hasImage
-          ? Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  const SizedBox.shrink(),
+          ? Stack(
+              fit: StackFit.expand,
+              children: [
+                _AdvertImagePlaceholder(colors: colors),
+                Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  frameBuilder:
+                      (context, child, frame, wasSynchronouslyLoaded) {
+                        if (wasSynchronouslyLoaded) return child;
+                        return AnimatedOpacity(
+                          opacity: frame == null ? 0 : 1,
+                          duration: const Duration(milliseconds: 320),
+                          curve: Curves.easeOut,
+                          child: child,
+                        );
+                      },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    final expected = loadingProgress.expectedTotalBytes;
+                    final loaded = loadingProgress.cumulativeBytesLoaded;
+                    final progress = expected == null || expected == 0
+                        ? 0.0
+                        : (loaded / expected).clamp(0.0, 1.0);
+                    final blurSigma = 16 - (progress * 14);
+                    return Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        _AdvertImagePlaceholder(colors: colors),
+                        Opacity(
+                          opacity: 0.28 + (progress * 0.5),
+                          child: ImageFiltered(
+                            imageFilter: ImageFilter.blur(
+                              sigmaX: blurSigma,
+                              sigmaY: blurSigma,
+                            ),
+                            child: child,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) =>
+                      _AdvertImagePlaceholder(colors: colors),
+                ),
+              ],
             )
           : const SizedBox.shrink(),
+    );
+  }
+}
+
+class _AdvertImagePlaceholder extends StatelessWidget {
+  const _AdvertImagePlaceholder({required this.colors});
+
+  final AppThemeColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colors.surfaceSecondary,
+            colors.surfaceElevated.withValues(alpha: 0.92),
+            colors.surfaceSecondary,
+          ],
+        ),
+      ),
+      child: Center(
+        child: Container(
+          width: 72,
+          height: 72,
+          decoration: BoxDecoration(
+            color: colors.surface.withValues(alpha: 0.26),
+            shape: BoxShape.circle,
+          ),
+        ),
+      ),
     );
   }
 }

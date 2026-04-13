@@ -21,6 +21,8 @@ class BusinessProfilePayload {
     required this.businessPhoneNumber,
     this.businessRegistrationNumber,
     this.taxIdentificationNumber,
+    this.nin,
+    this.bvn,
     this.dateOfIncorporation,
     this.countryOfIncorporation,
     this.industrySector,
@@ -79,6 +81,8 @@ class BusinessProfilePayload {
   final String businessPhoneNumber;
   final String? businessRegistrationNumber;
   final String? taxIdentificationNumber;
+  final String? nin;
+  final String? bvn;
   final String? dateOfIncorporation;
   final String? countryOfIncorporation;
   final String? industrySector;
@@ -128,7 +132,7 @@ class BusinessProfilePayload {
       'category': category,
       'category_id': categoryId,
       'subcategory_id': subcategoryId,
-      'business_name': businessName,
+      if (businessName.trim().isNotEmpty) 'business_name': businessName,
       if (legalBusinessName != null && legalBusinessName!.isNotEmpty)
         'legal_business_name': legalBusinessName,
       if (tradingName != null && tradingName!.isNotEmpty)
@@ -136,15 +140,17 @@ class BusinessProfilePayload {
       'business_description': businessDescription,
       if ((website ?? websiteUrl) != null &&
           (website ?? websiteUrl)!.isNotEmpty)
-        'website': website ?? websiteUrl,
+        'website_url': website ?? websiteUrl,
       'business_email': businessEmail,
-      'business_phone': businessPhoneNumber,
+      'business_phone_number': businessPhoneNumber,
       if (businessRegistrationNumber != null &&
           businessRegistrationNumber!.isNotEmpty)
         'business_registration_number': businessRegistrationNumber,
       if (taxIdentificationNumber != null &&
           taxIdentificationNumber!.isNotEmpty)
         'tax_identification_number': taxIdentificationNumber,
+      'nin': nin?.trim().isEmpty ?? true ? null : nin,
+      'bvn': bvn?.trim().isEmpty ?? true ? null : bvn,
       if (dateOfIncorporation != null && dateOfIncorporation!.isNotEmpty)
         'date_of_incorporation': dateOfIncorporation,
       if (countryOfIncorporation != null && countryOfIncorporation!.isNotEmpty)

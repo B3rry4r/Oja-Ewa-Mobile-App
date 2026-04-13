@@ -4,12 +4,16 @@ import 'package:dio/dio.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
+import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/subscriptions/iap_service.dart';
 import 'package:ojaewa/core/subscriptions/subscription_constants.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/app_services/presentation/screens/app_service_ui.dart';
 
 import '../data/badge_verifications_api.dart';
+import '../domain/badge_option.dart';
+import '../domain/badge_verification_request.dart';
 import 'controllers/badge_verifications_controller.dart';
 
 class BadgeVerificationsScreen extends ConsumerStatefulWidget {
@@ -22,19 +26,14 @@ class BadgeVerificationsScreen extends ConsumerStatefulWidget {
 
 class _BadgeVerificationsScreenState
     extends ConsumerState<BadgeVerificationsScreen> {
-  final _sellerProfileIdController = TextEditingController();
-  final _businessProfileUrlController = TextEditingController();
-  final _validIdUrlController = TextEditingController();
   final _yearsExperienceController = TextEditingController();
   final _notesController = TextEditingController();
   String? _selectedBadge;
   bool _isSubmitting = false;
+  final List<String> _supportingDocumentUrls = [];
 
   @override
   void dispose() {
-    _sellerProfileIdController.dispose();
-    _businessProfileUrlController.dispose();
-    _validIdUrlController.dispose();
     _yearsExperienceController.dispose();
     _notesController.dispose();
     super.dispose();
@@ -44,185 +43,37 @@ class _BadgeVerificationsScreenState
   Widget build(BuildContext context) {
     final optionsAsync = ref.watch(badgeOptionsProvider);
     final requestsAsync = ref.watch(badgeVerificationRequestsProvider);
-    final colors = context.appColors;
+    final sellerStatusAsync = ref.watch(mySellerStatusProvider);
 
     return AppPageScaffold(
       title: 'Verification Badges',
       scrollable: true,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const ServiceIntroCard(
-            title: 'Apply for a verification badge',
-            description:
-                'Choose the badge you want, attach the required details, and then continue to payment and submission.',
-            badge: 'Badges',
-          ),
-          const SizedBox(height: 20),
-          SectionTitle(
-            title: 'Available badges',
-            actionLabel: 'Refresh',
-            onAction: () {
-              ref.invalidate(badgeOptionsProvider);
-            },
-          ),
-          const SizedBox(height: 12),
-          optionsAsync.when(
-            loading: () => const ServiceListSkeleton(),
-            error: (error, stackTrace) => ServiceErrorState(
-              message: 'Unable to load badge options',
-              onRetry: () {
-                ref.invalidate(badgeOptionsProvider);
-              },
-            ),
-            data: (options) {
-              if (options.isEmpty) {
-                return const ServiceEmptyState(
-                  title: 'No badge options available',
-                  description: 'Badge options will appear here when available.',
-                );
-              }
+      child: sellerStatusAsync.when(
+        loading: () => const ServiceListSkeleton(),
+        error: (error, stackTrace) => const ServiceEmptyState(
+          title: 'Seller profile unavailable',
+          description:
+              'We could not load your seller profile right now. Try again before applying for a badge.',
+        ),
+        data: (seller) {
+          if (seller == null || seller.id == null) {
+            return const ServiceEmptyState(
+              title: 'Create your seller profile first',
+              description:
+                  'Finish your seller profile first, then come back here to apply for a badge.',
+            );
+          }
 
-              _selectedBadge ??= options.first.key;
+          final hasIdentityDocument = (seller.identityDocument ?? '')
+              .trim()
+              .isNotEmpty;
+          final hasBusinessDocument =
+              (seller.businessCertificate ?? '').trim().isNotEmpty ||
+              (seller.businessLogo ?? '').trim().isNotEmpty;
+          final sellerName =
+              (seller.legalBusinessName ?? seller.businessName ?? '').trim();
 
-              return Column(
-                children: [
-                  for (final option in options)
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedBadge = option.key;
-                        });
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: option.key == _selectedBadge
-                              ? colors.surfaceSecondary
-                              : colors.surface,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: option.key == _selectedBadge
-                                ? colors.accent
-                                : colors.border,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    option.displayName,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: colors.textPrimary,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  'NGN ${option.priceNgn}',
-                                  style: TextStyle(
-                                    color: colors.accent,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              option.name,
-                              style: TextStyle(color: colors.textSecondary),
-                            ),
-                            if (option.requirements.isNotEmpty) ...[
-                              const SizedBox(height: 10),
-                              for (final requirement in option.requirements)
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 4),
-                                  child: Text(
-                                    '• $requirement',
-                                    style: TextStyle(
-                                      color: colors.textTertiary,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 16),
-          _FormCard(
-            title: 'Application details',
-            child: Column(
-              children: [
-                _ServiceField(
-                  controller: _sellerProfileIdController,
-                  label: 'Seller profile ID',
-                  hint: '14',
-                ),
-                const SizedBox(height: 12),
-                _ServiceField(
-                  controller: _businessProfileUrlController,
-                  label: 'Business profile URL',
-                  hint: 'https://example.com/profile.pdf',
-                ),
-                const SizedBox(height: 12),
-                _ServiceField(
-                  controller: _validIdUrlController,
-                  label: 'Valid ID URL',
-                  hint: 'https://example.com/id.jpg',
-                ),
-                const SizedBox(height: 12),
-                _ServiceField(
-                  controller: _yearsExperienceController,
-                  label: 'Years of experience',
-                  hint: '7',
-                ),
-                const SizedBox(height: 12),
-                _ServiceField(
-                  controller: _notesController,
-                  label: 'Notes',
-                  hint: 'Traditional weaving specialist',
-                  minLines: 3,
-                  maxLines: 4,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _isSubmitting ? null : _submit,
-              child: _isSubmitting
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Pay & Submit Badge Request'),
-            ),
-          ),
-          const SizedBox(height: 24),
-          SectionTitle(
-            title: 'My requests',
-            actionLabel: 'Refresh',
-            onAction: () {
-              ref.invalidate(badgeVerificationRequestsProvider);
-            },
-          ),
-          const SizedBox(height: 12),
-          requestsAsync.when(
+          return requestsAsync.when(
             loading: () => const ServiceListSkeleton(),
             error: (error, stackTrace) => ServiceErrorState(
               message: 'Unable to load badge requests',
@@ -231,45 +82,273 @@ class _BadgeVerificationsScreenState
               },
             ),
             data: (items) {
-              if (items.isEmpty) {
-                return const ServiceEmptyState(
-                  title: 'No badge verification requests yet',
-                  description:
-                      'Submitted badge applications will appear here with their review status.',
-                );
+              BadgeVerificationRequest? activeRequest;
+              for (final item in items) {
+                if (_isActiveRequest(item.status)) {
+                  activeRequest = item;
+                  break;
+                }
               }
+
               return Column(
-                children: [
-                  for (final item in items)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: StatusCard(
-                        title: item.badge,
-                        status: item.status,
-                        reference: item.applicationReference,
-                        trailing: item.amount == null
-                            ? null
-                            : '${item.currency ?? 'NGN'} ${item.amount}',
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: activeRequest != null
+                    ? _buildActiveRequestState(
+                        sellerName: sellerName.isEmpty
+                            ? 'Seller profile'
+                            : sellerName,
+                        currentBadge: seller.badge,
+                        request: activeRequest,
+                      )
+                    : _buildApplyState(
+                        sellerName: sellerName.isEmpty
+                            ? 'Seller profile'
+                            : sellerName,
+                        currentBadge: seller.badge,
+                        hasIdentityDocument: hasIdentityDocument,
+                        hasBusinessDocument: hasBusinessDocument,
+                        optionsAsync: optionsAsync,
                       ),
-                    ),
-                ],
               );
             },
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
+  bool _isActiveRequest(String status) {
+    return status == 'submitted' ||
+        status == 'under_review' ||
+        status == 'info_required';
+  }
+
+  List<Widget> _buildActiveRequestState({
+    required String sellerName,
+    required String? currentBadge,
+    required BadgeVerificationRequest request,
+  }) {
+    return [
+      const ServiceIntroCard(
+        title: 'Badge review in progress',
+        description:
+            'Your current badge application is already being processed. Track the review status here instead of submitting another one.',
+        badge: 'Badges',
+      ),
+      const SizedBox(height: 20),
+      _ProfileSourceCard(
+        sellerName: sellerName,
+        badge: currentBadge,
+        hasIdentityDocument: true,
+        hasBusinessDocument: true,
+      ),
+      const SizedBox(height: 16),
+      StatusCard(
+        title: _badgeLabel(request.badge),
+        status: request.status,
+        reference: request.applicationReference,
+      ),
+    ];
+  }
+
+  List<Widget> _buildApplyState({
+    required String sellerName,
+    required String? currentBadge,
+    required bool hasIdentityDocument,
+    required bool hasBusinessDocument,
+    required AsyncValue<List<BadgeOption>> optionsAsync,
+  }) {
+    final colors = context.appColors;
+    return [
+      const ServiceIntroCard(
+        title: 'Grow your seller badge',
+        description:
+            'Badges build trust on your seller profile and unlock stronger selling privileges. Choose the level you want and continue to payment.',
+        badge: 'Badges',
+      ),
+      const SizedBox(height: 20),
+      _ProfileSourceCard(
+        sellerName: sellerName,
+        badge: currentBadge,
+        hasIdentityDocument: hasIdentityDocument,
+        hasBusinessDocument: hasBusinessDocument,
+      ),
+      const SizedBox(height: 16),
+      SectionTitle(
+        title: 'Available badges',
+        actionLabel: 'Refresh',
+        onAction: () {
+          ref.invalidate(badgeOptionsProvider);
+        },
+      ),
+      const SizedBox(height: 12),
+      optionsAsync.when(
+        loading: () => const ServiceListSkeleton(),
+        error: (error, stackTrace) => ServiceErrorState(
+          message: 'Unable to load badge options',
+          onRetry: () {
+            ref.invalidate(badgeOptionsProvider);
+          },
+        ),
+        data: (options) {
+          if (options.isEmpty) {
+            return const ServiceEmptyState(
+              title: 'No badge options available',
+              description: 'Badge options will appear here when available.',
+            );
+          }
+
+          _selectedBadge ??= options.first.key;
+
+          return Column(
+            children: [
+              for (final option in options)
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedBadge = option.key;
+                    });
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: option.key == _selectedBadge
+                          ? colors.surfaceSecondary
+                          : colors.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: option.key == _selectedBadge
+                            ? colors.accent
+                            : colors.border,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                option.displayName,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: colors.textPrimary,
+                                ),
+                              ),
+                            ),
+                            if (option.key == _selectedBadge)
+                              Icon(
+                                Icons.check_circle,
+                                color: colors.accent,
+                                size: 20,
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          option.name,
+                          style: TextStyle(color: colors.textSecondary),
+                        ),
+                        if (option.requirements.isNotEmpty) ...[
+                          const SizedBox(height: 10),
+                          for (final requirement in option.requirements)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Text(
+                                '• $requirement',
+                                style: TextStyle(
+                                  color: colors.textTertiary,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+      const SizedBox(height: 16),
+      _FormCard(
+        title: 'Application details',
+        child: Column(
+          children: [
+            _ServiceField(
+              controller: _yearsExperienceController,
+              label: 'Years of experience',
+              hint: '7',
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 12),
+            _ServiceField(
+              controller: _notesController,
+              label: 'Nomination source or notes',
+              hint: 'Guild recommendation, curator note, or other context',
+              minLines: 3,
+              maxLines: 4,
+            ),
+            const SizedBox(height: 12),
+            _UploadCard(
+              label: 'Supporting documents',
+              helper: _supportingDocumentUrls.isEmpty
+                  ? 'Optional. Upload supporting files if this badge needs more proof.'
+                  : '${_supportingDocumentUrls.length} file(s) uploaded',
+              uploaded: _supportingDocumentUrls.isNotEmpty,
+              onTap: _uploadSupportingDocument,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Make sure your seller profile documents are complete before you apply for a badge.',
+              style: TextStyle(
+                color: colors.textSecondary,
+                fontSize: 12,
+                height: 1.45,
+              ),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 16),
+      SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: _isSubmitting ? null : _submit,
+          child: _isSubmitting
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Pay & Apply for Badge'),
+        ),
+      ),
+    ];
+  }
+
   Future<void> _submit() async {
     final selectedBadge = _selectedBadge;
-    if (selectedBadge == null ||
-        _sellerProfileIdController.text.trim().isEmpty ||
-        _businessProfileUrlController.text.trim().isEmpty ||
-        _validIdUrlController.text.trim().isEmpty) {
+    final seller = ref.read(mySellerStatusProvider).value;
+    if (selectedBadge == null || seller == null || seller.id == null) {
       AppSnackbars.showError(
         context,
-        'Fill all badge application fields first',
+        'Create your seller profile before applying for a badge',
+      );
+      return;
+    }
+
+    final businessProfileUrl =
+        (seller.businessCertificate ?? seller.businessLogo ?? '').trim();
+    final validIdUrl = (seller.identityDocument ?? '').trim();
+    if (businessProfileUrl.isEmpty || validIdUrl.isEmpty) {
+      AppSnackbars.showError(
+        context,
+        'Update your seller profile documents before applying for a badge',
       );
       return;
     }
@@ -296,18 +375,14 @@ class _BadgeVerificationsScreenState
           .read(badgeVerificationsApiProvider)
           .createRequest(
             badge: selectedBadge,
-            sellerProfileId:
-                int.tryParse(_sellerProfileIdController.text.trim()) ?? 0,
-            documents: {
-              'business_profile_url': _businessProfileUrlController.text.trim(),
-              'valid_id_url': _validIdUrlController.text.trim(),
-            },
+            documents: _supportingDocumentUrls
+                .map((url) => {'type': 'supporting_document', 'url': url})
+                .toList(),
             answers: {
               if (_yearsExperienceController.text.trim().isNotEmpty)
-                'years_experience':
-                    int.tryParse(_yearsExperienceController.text.trim()) ?? 0,
+                'experience_years': _yearsExperienceController.text.trim(),
               if (_notesController.text.trim().isNotEmpty)
-                'notes': _notesController.text.trim(),
+                'nomination_source': _notesController.text.trim(),
             },
             purchase: purchase,
           );
@@ -335,6 +410,45 @@ class _BadgeVerificationsScreenState
       }
     }
     return 'Unable to submit badge request';
+  }
+
+  Future<void> _uploadSupportingDocument() async {
+    final path = await pickSingleFilePath();
+    if (path == null) return;
+    try {
+      final upload = await ref
+          .read(badgeVerificationsApiProvider)
+          .uploadDocument(filePath: path, type: 'supporting_document');
+      final url = upload['url'] as String?;
+      if (url == null || url.isEmpty) {
+        if (mounted) AppSnackbars.showError(context, 'Upload failed');
+        return;
+      }
+      if (!mounted) return;
+      setState(() {
+        _supportingDocumentUrls.add(url);
+      });
+      AppSnackbars.showSuccess(context, 'Supporting document uploaded');
+    } on DioException catch (e) {
+      if (mounted) AppSnackbars.showError(context, _dioMessage(e));
+    } catch (_) {
+      if (mounted) {
+        AppSnackbars.showError(context, 'Unable to upload supporting document');
+      }
+    }
+  }
+
+  String _badgeLabel(String key) {
+    switch (key) {
+      case 'certified_authentic':
+        return 'Black Badge';
+      case 'heritage_artisan':
+        return 'Gold Badge';
+      case 'sustainable_innovator':
+        return 'Green Badge';
+      default:
+        return key.replaceAll('_', ' ');
+    }
   }
 }
 
@@ -374,6 +488,69 @@ class _FormCard extends StatelessWidget {
   }
 }
 
+class _UploadCard extends StatelessWidget {
+  const _UploadCard({
+    required this.label,
+    required this.helper,
+    required this.uploaded,
+    required this.onTap,
+  });
+
+  final String label;
+  final String helper;
+  final bool uploaded;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: colors.surfaceSecondary,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: uploaded ? colors.accent : colors.border),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    helper,
+                    style: TextStyle(
+                      color: uploaded ? colors.accent : colors.textSecondary,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              uploaded ? Icons.check_circle : Icons.upload_file,
+              color: uploaded ? colors.accent : colors.textSecondary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _ServiceField extends StatelessWidget {
   const _ServiceField({
     required this.controller,
@@ -381,6 +558,7 @@ class _ServiceField extends StatelessWidget {
     required this.hint,
     this.minLines = 1,
     this.maxLines = 1,
+    this.keyboardType,
   });
 
   final TextEditingController controller;
@@ -388,6 +566,7 @@ class _ServiceField extends StatelessWidget {
   final String hint;
   final int minLines;
   final int maxLines;
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -406,6 +585,7 @@ class _ServiceField extends StatelessWidget {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
+          keyboardType: keyboardType,
           minLines: minLines,
           maxLines: maxLines,
           style: TextStyle(color: colors.textPrimary),
@@ -425,6 +605,65 @@ class _ServiceField extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _ProfileSourceCard extends StatelessWidget {
+  const _ProfileSourceCard({
+    required this.sellerName,
+    required this.badge,
+    required this.hasIdentityDocument,
+    required this.hasBusinessDocument,
+  });
+
+  final String sellerName;
+  final String? badge;
+  final bool hasIdentityDocument;
+  final bool hasBusinessDocument;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: colors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            sellerName,
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            badge == null || badge!.trim().isEmpty
+                ? 'No badge active yet'
+                : 'Current badge: ${badge!.replaceAll('_', ' ')}',
+            style: TextStyle(color: colors.textSecondary, fontSize: 13),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            hasIdentityDocument && hasBusinessDocument
+                ? 'Your seller profile is ready for badge review. Choose the badge you want and continue to payment.'
+                : 'Some required seller documents are still missing. Update your seller profile first, then return here to apply.',
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: 12,
+              height: 1.45,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -71,13 +71,9 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/cox.mp4
-    - assets/
-    - assets/fonts/
+    - assets/OJAEWA3.mpeg
     - assets/docs/
     - assets/icons/
-    - assets/icons/Icons/
-    - assets/icons/new_icons/
     - assets/app_icon/
 
   fonts:

@@ -9,17 +9,17 @@ class PendingCacRequest {
     required this.firstChoiceName,
     required this.secondChoiceName,
     required this.acceptedNameModificationAuthorization,
+    required this.consentToProcessRequest,
     required this.businessObjective,
     required this.proprietors,
-    required this.email,
   });
 
   final String firstChoiceName;
   final String secondChoiceName;
   final bool acceptedNameModificationAuthorization;
+  final bool consentToProcessRequest;
   final String businessObjective;
   final List<Map<String, dynamic>> proprietors;
-  final String email;
 }
 
 class CacPaymentState {
@@ -73,7 +73,7 @@ class CacPaymentController extends Notifier<CacPaymentState> {
     try {
       final paymentUrl = await ref
           .read(cacServicesApiProvider)
-          .createPaymentLink(email: request.email, amount: cacAmountNgn);
+          .createPaymentLink();
       state = state.copyWith(isProcessing: false);
       return paymentUrl;
     } catch (e) {
@@ -93,20 +93,6 @@ class CacPaymentController extends Notifier<CacPaymentState> {
 
     state = state.copyWith(isProcessing: true, error: null);
     try {
-      final verify = await ref
-          .read(cacServicesApiProvider)
-          .verifyPayment(reference: reference);
-      final verifyData = verify['data'] as Map<String, dynamic>? ?? const {};
-      final paymentStatus = (verifyData['payment_status'] ?? verify['status'])
-          ?.toString();
-      if (paymentStatus != 'success') {
-        state = state.copyWith(
-          isProcessing: false,
-          error: 'CAC payment verification failed',
-        );
-        return null;
-      }
-
       final request = await ref
           .read(cacServicesApiProvider)
           .createRequest(
@@ -114,15 +100,13 @@ class CacPaymentController extends Notifier<CacPaymentState> {
             secondChoiceName: pending.secondChoiceName,
             acceptedNameModificationAuthorization:
                 pending.acceptedNameModificationAuthorization,
+            consentToProcessRequest: pending.consentToProcessRequest,
             businessObjective: pending.businessObjective,
             proprietors: pending.proprietors,
             paymentReference: reference,
             currency: 'NGN',
             amount: cacAmountNgn,
-            rawData: {
-              'gateway_response': verifyData['gateway_response'],
-              'paid_at': verifyData['paid_at'],
-            },
+            rawData: {'gateway': 'paystack'},
           );
       state = state.copyWith(
         isProcessing: false,

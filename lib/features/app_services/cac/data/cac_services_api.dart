@@ -31,6 +31,7 @@ class CacServicesApi {
     required String firstChoiceName,
     required String secondChoiceName,
     required bool acceptedNameModificationAuthorization,
+    required bool consentToProcessRequest,
     required String businessObjective,
     required List<Map<String, dynamic>> proprietors,
     required String paymentReference,
@@ -45,6 +46,7 @@ class CacServicesApi {
         'second_choice_name': secondChoiceName,
         'accepted_name_modification_authorization':
             acceptedNameModificationAuthorization,
+        'consent_to_process_request': consentToProcessRequest,
         'business_objective': businessObjective,
         'proprietors': proprietors,
         'payment_provider': 'paystack',
@@ -59,27 +61,31 @@ class CacServicesApi {
     return CacRegistrationRequest.fromJson(payload);
   }
 
-  Future<String?> createPaymentLink({
-    required String email,
-    required num amount,
+  Future<Map<String, dynamic>> uploadDocument({
+    required String filePath,
+    required String type,
   }) async {
+    final form = FormData.fromMap({
+      'file': await MultipartFile.fromFile(filePath),
+      'type': type,
+    });
+    final response = await _dio.post(
+      '/api/services/cac-registrations/upload',
+      data: form,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return data['data'] as Map<String, dynamic>;
+  }
+
+  Future<String?> createPaymentLink() async {
     final response = await _dio.post(
       '/api/payment/link/cac',
-      data: {'email': email, 'amount': amount, 'callback_url': callbackUrl},
+      data: {'callback_url': callbackUrl},
     );
     final data = response.data as Map<String, dynamic>;
     final payload = data['data'] as Map<String, dynamic>? ?? const {};
     return payload['payment_url'] as String?;
-  }
-
-  Future<Map<String, dynamic>> verifyPayment({
-    required String reference,
-  }) async {
-    final response = await _dio.post(
-      '/api/payment/verify',
-      data: {'reference': reference},
-    );
-    return response.data as Map<String, dynamic>;
   }
 }
 

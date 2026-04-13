@@ -5,10 +5,13 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
+import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
-import 'package:ojaewa/features/account/presentation/controllers/profile_controller.dart';
+import 'package:ojaewa/core/widgets/selection_bottom_sheet.dart';
 import 'package:ojaewa/features/app_services/presentation/screens/app_service_ui.dart';
 
+import '../data/cac_services_api.dart';
+import '../domain/cac_registration_request.dart';
 import 'controllers/cac_payment_controller.dart';
 import 'controllers/cac_requests_controller.dart';
 
@@ -20,6 +23,9 @@ class CacServicesScreen extends ConsumerStatefulWidget {
 }
 
 class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
+  static const _businessObjectiveText =
+      'To engage in the production, sale, supply and distribution of goods and services, retail and wholesale trade, marketing and other lawful business activities.';
+
   final _firstChoiceController = TextEditingController();
   final _secondChoiceController = TextEditingController();
   final _objectiveController = TextEditingController();
@@ -29,12 +35,19 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
   final _ownerEmailController = TextEditingController();
   final _ownerAddressController = TextEditingController();
   final _ownerNinController = TextEditingController();
-  final _passportPhotoUrlController = TextEditingController();
-  final _meansOfIdUrlController = TextEditingController();
-  final _signatureUrlController = TextEditingController();
   bool _nameModificationAllowed = true;
+  bool _consentAccepted = false;
   String _gender = 'female';
   bool _isSubmitting = false;
+  String? _passportUrl;
+  String? _identityUrl;
+  String? _signatureUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _objectiveController.text = _businessObjectiveText;
+  }
 
   @override
   void dispose() {
@@ -47,232 +60,275 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
     _ownerEmailController.dispose();
     _ownerAddressController.dispose();
     _ownerNinController.dispose();
-    _passportPhotoUrlController.dispose();
-    _meansOfIdUrlController.dispose();
-    _signatureUrlController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final requestsAsync = ref.watch(cacRequestsProvider);
-    final colors = context.appColors;
 
     return AppPageScaffold(
       title: 'CAC Registration',
       scrollable: true,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const ServiceIntroCard(
-            title: 'Register a new business name',
-            description:
-                'Fill in your business name choices and proprietor details here, then complete payment before submission.',
-            badge: 'CAC Service',
-          ),
-          const SizedBox(height: 20),
-          _FormCard(
-            title: 'Business details',
-            child: Column(
-              children: [
-                _ServiceField(
-                  controller: _firstChoiceController,
-                  label: 'First choice name',
-                  hint: 'Oja Ewa Ventures',
-                ),
-                const SizedBox(height: 12),
-                _ServiceField(
-                  controller: _secondChoiceController,
-                  label: 'Second choice name',
-                  hint: 'Oja Ewa Creative Hub',
-                ),
-                const SizedBox(height: 12),
-                _ServiceField(
-                  controller: _objectiveController,
-                  label: 'Business objective',
-                  hint: 'Describe the purpose of the business',
-                  minLines: 4,
-                  maxLines: 6,
-                ),
-                const SizedBox(height: 12),
-                CheckboxListTile(
-                  value: _nameModificationAllowed,
-                  onChanged: (value) {
-                    setState(() {
-                      _nameModificationAllowed = value ?? false;
-                    });
-                  },
-                  contentPadding: EdgeInsets.zero,
-                  activeColor: colors.accent,
-                  checkColor: colors.onAccent,
-                  title: Text(
-                    'Allow minor name modification if required',
-                    style: TextStyle(
-                      color: colors.textPrimary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  subtitle: Text(
-                    'Use this if you want admin to proceed with the closest available CAC name where needed.',
-                    style: TextStyle(color: colors.textSecondary, fontSize: 12),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          _FormCard(
-            title: 'Proprietor details',
-            child: Column(
-              children: [
-                _ServiceField(
-                  controller: _ownerNameController,
-                  label: 'Full name',
-                  hint: 'Ada Okafor',
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _ServiceField(
-                        controller: _ownerDobController,
-                        label: 'Date of birth',
-                        hint: '1990-01-01',
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _ServiceField(
-                        controller: _ownerNinController,
-                        label: 'NIN',
-                        hint: '12345678901',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _ServiceField(
-                        controller: _ownerPhoneController,
-                        label: 'Phone number',
-                        hint: '08012345678',
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _ServiceField(
-                        controller: _ownerEmailController,
-                        label: 'Email address',
-                        hint: 'ada@example.com',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                _ServiceField(
-                  controller: _ownerAddressController,
-                  label: 'Residential address',
-                  hint: '12 Allen Avenue, Lagos',
-                  minLines: 2,
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 12),
-                _ServiceDropdown(
-                  label: 'Gender',
-                  value: _gender,
-                  items: const ['female', 'male'],
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setState(() => _gender = value);
-                  },
-                ),
-                const SizedBox(height: 12),
-                _ServiceField(
-                  controller: _passportPhotoUrlController,
-                  label: 'Passport photograph URL',
-                  hint: 'https://example.com/passport.jpg',
-                ),
-                const SizedBox(height: 12),
-                _ServiceField(
-                  controller: _meansOfIdUrlController,
-                  label: 'Means of identification URL',
-                  hint: 'https://example.com/id.jpg',
-                ),
-                const SizedBox(height: 12),
-                _ServiceField(
-                  controller: _signatureUrlController,
-                  label: 'Signature URL',
-                  hint: 'https://example.com/signature.jpg',
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _isSubmitting ? null : _submit,
-              child: _isSubmitting
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Pay & Submit CAC Request'),
-            ),
-          ),
-          const SizedBox(height: 24),
-          SectionTitle(
-            title: 'Your requests',
-            actionLabel: 'Refresh',
-            onAction: () {
-              ref.invalidate(cacRequestsProvider);
-            },
-          ),
-          const SizedBox(height: 12),
-          requestsAsync.when(
-            loading: () => const ServiceListSkeleton(),
-            error: (error, stackTrace) => ServiceErrorState(
-              message: 'Unable to load CAC requests',
-              onRetry: () {
-                ref.invalidate(cacRequestsProvider);
-              },
-            ),
-            data: (items) {
-              if (items.isEmpty) {
-                return const ServiceEmptyState(
-                  title: 'No CAC requests yet',
-                  description:
-                      'Once a request is submitted, its review status and reference will show here.',
-                );
-              }
-              return Column(
-                children: [
-                  for (final item in items)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: StatusCard(
-                        title: item.firstChoiceName,
-                        subtitle: item.secondChoiceName.isEmpty
-                            ? null
-                            : item.secondChoiceName,
-                        status: item.status,
-                        reference: item.applicationReference,
-                        trailing: item.amount == null
-                            ? null
-                            : '${item.currency ?? 'NGN'} ${item.amount}',
-                      ),
-                    ),
-                ],
-              );
-            },
-          ),
-        ],
+      child: requestsAsync.when(
+        loading: () => const ServiceListSkeleton(),
+        error: (error, stackTrace) => ServiceErrorState(
+          message: 'Unable to load CAC requests',
+          onRetry: () {
+            ref.invalidate(cacRequestsProvider);
+          },
+        ),
+        data: (items) {
+          final latest = items.isEmpty ? null : items.first;
+          final hasRequest = latest != null;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: hasRequest
+                ? _buildRegisteredState(latest)
+                : _buildRegistrationForm(context),
+          );
+        },
       ),
     );
+  }
+
+  List<Widget> _buildRegisteredState(CacRegistrationRequest request) {
+    return [
+      const ServiceIntroCard(
+        title: 'CAC request received',
+        description:
+            'Your CAC registration is already on file. Track the review status here instead of filling the form again.',
+        badge: 'CAC Service',
+      ),
+      const SizedBox(height: 20),
+      StatusCard(
+        title: request.firstChoiceName,
+        subtitle: request.secondChoiceName.isEmpty
+            ? null
+            : request.secondChoiceName,
+        status: request.status,
+        reference: request.applicationReference,
+      ),
+    ];
+  }
+
+  List<Widget> _buildRegistrationForm(BuildContext context) {
+    final colors = context.appColors;
+    return [
+      const ServiceIntroCard(
+        title: 'Register a new business name',
+        description:
+            'Fill in your CAC details, upload the required documents, review the consent clause, and then continue to payment.',
+        badge: 'CAC Service',
+      ),
+      const SizedBox(height: 20),
+      _FormCard(
+        title: 'Business details',
+        child: Column(
+          children: [
+            _ServiceField(
+              controller: _firstChoiceController,
+              label: 'First choice name',
+              hint: 'Oja Ewa Ventures',
+            ),
+            const SizedBox(height: 12),
+            _ServiceField(
+              controller: _secondChoiceController,
+              label: 'Second choice name',
+              hint: 'Oja Ewa Creative Hub',
+            ),
+            const SizedBox(height: 12),
+            _ServiceField(
+              controller: _objectiveController,
+              label: 'Business objective',
+              hint: _businessObjectiveText,
+              minLines: 4,
+              maxLines: 6,
+              readOnly: true,
+            ),
+            const SizedBox(height: 12),
+            CheckboxListTile(
+              value: _nameModificationAllowed,
+              onChanged: (value) {
+                setState(() {
+                  _nameModificationAllowed = value ?? false;
+                });
+              },
+              contentPadding: EdgeInsets.zero,
+              activeColor: colors.accent,
+              checkColor: colors.onAccent,
+              title: Text(
+                'Allow minor name modification if required',
+                style: TextStyle(
+                  color: colors.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              subtitle: Text(
+                'Use this if you want admin to proceed with the closest available CAC name where needed.',
+                style: TextStyle(color: colors.textSecondary, fontSize: 12),
+              ),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 16),
+      _FormCard(
+        title: 'Proprietor details',
+        child: Column(
+          children: [
+            _ServiceField(
+              controller: _ownerNameController,
+              label: 'Full name',
+              hint: 'Ada Okafor',
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _PickerField(
+                    controller: _ownerDobController,
+                    label: 'Date of birth',
+                    hint: 'Select date of birth',
+                    onTap: _pickOwnerDob,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _ServiceField(
+                    controller: _ownerNinController,
+                    label: 'NIN',
+                    hint: '12345678901',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _ServiceField(
+                    controller: _ownerPhoneController,
+                    label: 'Phone number',
+                    hint: '08012345678',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _ServiceField(
+                    controller: _ownerEmailController,
+                    label: 'Email address',
+                    hint: 'ada@example.com',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _ServiceField(
+              controller: _ownerAddressController,
+              label: 'Residential address',
+              hint: '12 Allen Avenue, Lagos',
+              minLines: 2,
+              maxLines: 3,
+            ),
+            const SizedBox(height: 12),
+            _PickerValueField(
+              value: _gender == 'female' ? 'Female' : 'Male',
+              label: 'Gender',
+              hint: 'Select gender',
+              onTap: () async {
+                final next = await SelectionBottomSheet.show(
+                  context,
+                  title: 'Select gender',
+                  options: const ['Female', 'Male'],
+                  selected: _gender == 'female' ? 'Female' : 'Male',
+                );
+                if (next == null) return;
+                setState(() {
+                  _gender = next.toLowerCase();
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 16),
+      _FormCard(
+        title: 'Required documents',
+        child: Column(
+          children: [
+            _UploadCard(
+              label: 'Passport photograph',
+              selectedUrl: _passportUrl,
+              onTap: () => _uploadDocument('passport_photograph'),
+            ),
+            const SizedBox(height: 12),
+            _UploadCard(
+              label: 'Means of identification',
+              selectedUrl: _identityUrl,
+              onTap: () => _uploadDocument('means_of_identification'),
+            ),
+            const SizedBox(height: 12),
+            _UploadCard(
+              label: 'Signature',
+              selectedUrl: _signatureUrl,
+              onTap: () => _uploadDocument('signature'),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'All signatures must be clearly written on plain white paper before upload. Blurred, cropped, or dark-background signatures will not be accepted and may lead to rejection.',
+              style: TextStyle(
+                color: colors.textSecondary,
+                fontSize: 12,
+                height: 1.45,
+              ),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 16),
+      _FormCard(
+        title: 'Consent',
+        child: CheckboxListTile(
+          value: _consentAccepted,
+          onChanged: (value) {
+            setState(() {
+              _consentAccepted = value ?? false;
+            });
+          },
+          contentPadding: EdgeInsets.zero,
+          activeColor: colors.accent,
+          checkColor: colors.onAccent,
+          title: Text(
+            'I acknowledge that a name availability search will be conducted before submission. If the proposed business name is rejected by the CAC, I hereby authorize Ojaewa to make necessary modifications including adding, removing, or rearranging words to the name and resubmit it on my behalf to ensure successful registration and approval.',
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          subtitle: Text(
+            'I Accept',
+            style: TextStyle(color: colors.textSecondary, fontSize: 12),
+          ),
+        ),
+      ),
+      const SizedBox(height: 16),
+      SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: _isSubmitting ? null : _submit,
+          child: _isSubmitting
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Pay & Submit CAC Request'),
+        ),
+      ),
+    ];
   }
 
   Future<void> _submit() async {
@@ -284,24 +340,29 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
         _ownerPhoneController.text.trim().isEmpty ||
         _ownerEmailController.text.trim().isEmpty ||
         _ownerAddressController.text.trim().isEmpty ||
-        _ownerNinController.text.trim().isEmpty ||
-        _passportPhotoUrlController.text.trim().isEmpty ||
-        _meansOfIdUrlController.text.trim().isEmpty ||
-        _signatureUrlController.text.trim().isEmpty) {
+        _ownerNinController.text.trim().isEmpty) {
       AppSnackbars.showError(context, 'Fill all CAC request fields first');
+      return;
+    }
+    if ((_passportUrl ?? '').isEmpty ||
+        (_identityUrl ?? '').isEmpty ||
+        (_signatureUrl ?? '').isEmpty) {
+      AppSnackbars.showError(
+        context,
+        'Upload the required CAC documents before continuing',
+      );
+      return;
+    }
+    if (!_consentAccepted) {
+      AppSnackbars.showError(
+        context,
+        'You need to accept the CAC consent clause before continuing',
+      );
       return;
     }
 
     setState(() => _isSubmitting = true);
     try {
-      final email = await _resolveEmail();
-      if (email == null || email.isEmpty) {
-        if (mounted) {
-          AppSnackbars.showError(context, 'Email is required for payment');
-        }
-        return;
-      }
-
       final paymentUrl = await ref
           .read(cacPaymentControllerProvider.notifier)
           .startCheckout(
@@ -309,6 +370,7 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
               firstChoiceName: _firstChoiceController.text.trim(),
               secondChoiceName: _secondChoiceController.text.trim(),
               acceptedNameModificationAuthorization: _nameModificationAllowed,
+              consentToProcessRequest: _consentAccepted,
               businessObjective: _objectiveController.text.trim(),
               proprietors: [
                 {
@@ -318,15 +380,12 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
                   'phone_number': _ownerPhoneController.text.trim(),
                   'email_address': _ownerEmailController.text.trim(),
                   'residential_address': _ownerAddressController.text.trim(),
-                  'passport_photograph_url': _passportPhotoUrlController.text
-                      .trim(),
-                  'means_of_identification_url': _meansOfIdUrlController.text
-                      .trim(),
-                  'signature_url': _signatureUrlController.text.trim(),
+                  'passport_photograph_url': _passportUrl,
+                  'means_of_identification_url': _identityUrl,
+                  'signature_url': _signatureUrl,
                   'nin': _ownerNinController.text.trim(),
                 },
               ],
-              email: email,
             ),
           );
 
@@ -369,52 +428,57 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
     }
   }
 
-  Future<String?> _resolveEmail() async {
-    final profile = ref.read(userProfileProvider).value;
-    final profileEmail = profile?.email.trim() ?? '';
-    if (profileEmail.isNotEmpty) {
-      return profileEmail;
+  Future<void> _uploadDocument(String type) async {
+    final path = await pickSingleFilePath();
+    if (path == null) return;
+    try {
+      final upload = await ref
+          .read(cacServicesApiProvider)
+          .uploadDocument(filePath: path, type: type);
+      final url = upload['url'] as String?;
+      if (url == null || url.isEmpty) {
+        if (mounted) AppSnackbars.showError(context, 'Upload failed');
+        return;
+      }
+      if (!mounted) return;
+      setState(() {
+        switch (type) {
+          case 'passport_photograph':
+            _passportUrl = url;
+            break;
+          case 'means_of_identification':
+            _identityUrl = url;
+            break;
+          case 'signature':
+            _signatureUrl = url;
+            break;
+        }
+      });
+      AppSnackbars.showSuccess(context, 'Document uploaded');
+    } on DioException catch (e) {
+      if (mounted) AppSnackbars.showError(context, _dioMessage(e));
+    } catch (_) {
+      if (mounted) AppSnackbars.showError(context, 'Unable to upload document');
     }
-    return _promptForEmail();
   }
 
-  Future<String?> _promptForEmail() async {
-    final controller = TextEditingController();
-    final result = await showDialog<String>(
+  Future<void> _pickOwnerDob() async {
+    final initial =
+        DateTime.tryParse(_ownerDobController.text.trim()) ??
+        DateTime(1990, 1, 1);
+    final picked = await showDatePicker(
       context: context,
-      builder: (context) {
-        final colors = context.appColors;
-        return AlertDialog(
-          backgroundColor: colors.surface,
-          title: Text(
-            'Enter your email',
-            style: TextStyle(color: colors.textPrimary),
-          ),
-          content: TextField(
-            controller: controller,
-            keyboardType: TextInputType.emailAddress,
-            style: TextStyle(color: colors.textPrimary),
-            decoration: InputDecoration(
-              hintText: 'you@example.com',
-              hintStyle: TextStyle(color: colors.textTertiary),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () =>
-                  Navigator.of(context).pop(controller.text.trim()),
-              child: const Text('Continue'),
-            ),
-          ],
-        );
-      },
+      initialDate: initial,
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
     );
-    controller.dispose();
-    return result;
+    if (picked == null || !mounted) return;
+    final year = picked.year.toString().padLeft(4, '0');
+    final month = picked.month.toString().padLeft(2, '0');
+    final day = picked.day.toString().padLeft(2, '0');
+    setState(() {
+      _ownerDobController.text = '$year-$month-$day';
+    });
   }
 
   String _dioMessage(DioException e) {
@@ -428,6 +492,68 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
       }
     }
     return 'Unable to submit CAC request';
+  }
+}
+
+class _UploadCard extends StatelessWidget {
+  const _UploadCard({
+    required this.label,
+    required this.selectedUrl,
+    required this.onTap,
+  });
+
+  final String label;
+  final String? selectedUrl;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final uploaded = (selectedUrl ?? '').isNotEmpty;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: colors.surfaceSecondary,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: uploaded ? colors.accent : colors.border),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    uploaded ? 'File uploaded' : 'Tap to choose a file',
+                    style: TextStyle(
+                      color: uploaded ? colors.accent : colors.textSecondary,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              uploaded ? Icons.check_circle : Icons.upload_file,
+              color: uploaded ? colors.accent : colors.textSecondary,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -474,6 +600,7 @@ class _ServiceField extends StatelessWidget {
     required this.hint,
     this.minLines = 1,
     this.maxLines = 1,
+    this.readOnly = false,
   });
 
   final TextEditingController controller;
@@ -481,6 +608,7 @@ class _ServiceField extends StatelessWidget {
   final String hint;
   final int minLines;
   final int maxLines;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -501,6 +629,7 @@ class _ServiceField extends StatelessWidget {
           controller: controller,
           minLines: minLines,
           maxLines: maxLines,
+          readOnly: readOnly,
           style: TextStyle(color: colors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
@@ -522,18 +651,18 @@ class _ServiceField extends StatelessWidget {
   }
 }
 
-class _ServiceDropdown extends StatelessWidget {
-  const _ServiceDropdown({
+class _PickerField extends StatelessWidget {
+  const _PickerField({
+    required this.controller,
     required this.label,
-    required this.value,
-    required this.items,
-    required this.onChanged,
+    required this.hint,
+    required this.onTap,
   });
 
+  final TextEditingController controller;
   final String label;
-  final String value;
-  final List<String> items;
-  final ValueChanged<String?> onChanged;
+  final String hint;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -550,33 +679,95 @@ class _ServiceDropdown extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          initialValue: value,
-          onChanged: onChanged,
-          dropdownColor: colors.surfaceElevated,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: colors.surfaceSecondary,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
-              borderSide: BorderSide(color: colors.border),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
-              borderSide: BorderSide(color: colors.accent),
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: IgnorePointer(
+            child: TextFormField(
+              controller: controller,
+              style: TextStyle(color: colors.textPrimary),
+              decoration: InputDecoration(
+                hintText: hint,
+                hintStyle: TextStyle(color: colors.textTertiary),
+                filled: true,
+                fillColor: colors.surfaceSecondary,
+                suffixIcon: Icon(
+                  Icons.keyboard_arrow_down,
+                  color: colors.textSecondary,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: BorderSide(color: colors.border),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: BorderSide(color: colors.accent),
+                ),
+              ),
             ),
           ),
-          items: items
-              .map(
-                (item) => DropdownMenuItem<String>(
-                  value: item,
+        ),
+      ],
+    );
+  }
+}
+
+class _PickerValueField extends StatelessWidget {
+  const _PickerValueField({
+    required this.value,
+    required this.label,
+    required this.hint,
+    required this.onTap,
+  });
+
+  final String value;
+  final String label;
+  final String hint;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final hasValue = value.trim().isNotEmpty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: colors.textPrimary,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: colors.surfaceSecondary,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: colors.border),
+            ),
+            child: Row(
+              children: [
+                Expanded(
                   child: Text(
-                    item,
-                    style: TextStyle(color: colors.textPrimary),
+                    hasValue ? value : hint,
+                    style: TextStyle(
+                      color: hasValue
+                          ? colors.textPrimary
+                          : colors.textTertiary,
+                    ),
                   ),
                 ),
-              )
-              .toList(),
+                Icon(Icons.keyboard_arrow_down, color: colors.textSecondary),
+              ],
+            ),
+          ),
         ),
       ],
     );

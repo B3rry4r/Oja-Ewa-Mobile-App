@@ -9,6 +9,7 @@ import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/location/location_picker_sheets.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
+import 'package:ojaewa/core/widgets/selection_bottom_sheet.dart';
 import 'package:ojaewa/features/account/subfeatures/shared/widgets/compliance_progress_banner.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/domain/business_profile_payload.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_management_controller.dart';
@@ -88,6 +89,19 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
     'Banking & Settlement',
     'Declarations',
     'Signature',
+  ];
+  static const _industryOptions = [
+    'Retail',
+    'Technology',
+    'Logistics',
+    'Education',
+    'Manufacturing',
+    'Fashion',
+    'Beauty',
+    'Agriculture',
+    'Healthcare',
+    'Creative',
+    'Other',
   ];
 
   @override
@@ -206,8 +220,10 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 'Date of Incorporation',
-                '2022-01-15',
+                'Select date',
                 controller: _dateOfIncorporationController,
+                readOnly: true,
+                onTap: () => _pickDateInto(_dateOfIncorporationController),
               ),
               const SizedBox(height: 16),
               _buildTextField(
@@ -243,10 +259,11 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
               const SizedBox(height: 24),
               _buildSectionHeader('Section 2: Business Type & Industry'),
               const SizedBox(height: 16),
-              _buildTextField(
+              _buildPickerField(
                 'Industry / Sector',
-                'Education',
-                controller: _industryController,
+                _industryController.text,
+                hint: 'Select industry',
+                onTap: _pickIndustry,
               ),
               const SizedBox(height: 16),
               _buildDropdown(
@@ -382,8 +399,10 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 'Date of Birth',
-                '1988-06-12',
+                'Select date',
                 controller: _signatoryDobController,
+                readOnly: true,
+                onTap: () => _pickDateInto(_signatoryDobController),
               ),
               const SizedBox(height: 24),
               _buildSectionHeader('Section 5: Beneficial Owners'),
@@ -447,8 +466,11 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 'Submission Date',
-                '2026-04-11',
+                'Select date',
                 controller: _submissionDateController,
+                readOnly: true,
+                onTap: () =>
+                    _pickDateInto(_submissionDateController, allowFuture: true),
               ),
               const SizedBox(height: 16),
               _buildDocumentSection(
@@ -673,6 +695,8 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
     ValueChanged<String>? onChanged,
     TextEditingController? controller,
     TextInputType? keyboardType,
+    bool readOnly = false,
+    VoidCallback? onTap,
   }) {
     final colors = context.appColors;
     return Column(
@@ -698,6 +722,8 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
             keyboardType: keyboardType,
             maxLines: maxLines,
             onChanged: onChanged,
+            readOnly: readOnly,
+            onTap: onTap,
             style: TextStyle(color: colors.textPrimary),
             decoration: InputDecoration(
               hintText: hint,
@@ -712,6 +738,94 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
         ),
       ],
     );
+  }
+
+  Widget _buildPickerField(
+    String label,
+    String value, {
+    required String hint,
+    required VoidCallback onTap,
+  }) {
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: colors.textSecondary,
+            fontSize: 14,
+            fontFamily: 'Campton',
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              color: colors.surfaceElevated,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: colors.border),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    value.trim().isEmpty ? hint : value,
+                    style: TextStyle(
+                      color: value.trim().isEmpty
+                          ? colors.textTertiary
+                          : colors.textPrimary,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                Icon(Icons.keyboard_arrow_down, color: colors.textSecondary),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _pickIndustry() async {
+    final selected = _industryController.text.trim().isEmpty
+        ? _industryOptions.first
+        : _industryController.text.trim();
+    final next = await SelectionBottomSheet.show(
+      context,
+      title: 'Select industry',
+      options: _industryOptions,
+      selected: selected,
+    );
+    if (next == null) return;
+    setState(() {
+      _industryController.text = next;
+    });
+  }
+
+  Future<void> _pickDateInto(
+    TextEditingController controller, {
+    bool allowFuture = false,
+  }) async {
+    final initial = DateTime.tryParse(controller.text.trim()) ?? DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(1900),
+      lastDate: allowFuture
+          ? DateTime.now().add(const Duration(days: 365))
+          : DateTime.now(),
+    );
+    if (picked == null) return;
+    final year = picked.year.toString().padLeft(4, '0');
+    final month = picked.month.toString().padLeft(2, '0');
+    final day = picked.day.toString().padLeft(2, '0');
+    setState(() {
+      controller.text = '$year-$month-$day';
+    });
   }
 
   Widget _buildDropdown({
@@ -942,9 +1056,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
 
   bool _validate() {
     final requiredControllers = [
-      _businessNameController,
       _legalBusinessNameController,
-      _registrationNumberController,
       _tinController,
       _dateOfIncorporationController,
       _countryOfIncorporationController,
@@ -973,6 +1085,14 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
     }
     if (_selectedCountryName.isEmpty || _selectedStateName.isEmpty) {
       AppSnackbars.showError(context, 'Select country and state');
+      return false;
+    }
+    if (_businessNameController.text.trim().isEmpty &&
+        _registrationNumberController.text.trim().isEmpty) {
+      AppSnackbars.showError(
+        context,
+        'Provide either business name or registration number',
+      );
       return false;
     }
     if (_beneficialOwners().isEmpty) {
@@ -1011,6 +1131,8 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
           businessPhoneNumber: _phoneController.text.trim(),
           businessRegistrationNumber: _registrationNumberController.text.trim(),
           taxIdentificationNumber: _tinController.text.trim(),
+          nin: _derivedNin(),
+          bvn: _derivedBvn(),
           dateOfIncorporation: _dateOfIncorporationController.text.trim(),
           countryOfIncorporation: _countryOfIncorporationController.text.trim(),
           industrySector: _industryController.text.trim(),
@@ -1135,5 +1257,23 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
         ),
       ),
     );
+  }
+
+  String? _derivedNin() {
+    final raw = _signatoryIdController.text.trim();
+    if (raw.toUpperCase().startsWith('NIN:')) {
+      final value = raw.substring(4).trim();
+      return value.isEmpty ? null : value;
+    }
+    return null;
+  }
+
+  String? _derivedBvn() {
+    final raw = _signatoryIdController.text.trim();
+    if (raw.toUpperCase().startsWith('BVN:')) {
+      final value = raw.substring(4).trim();
+      return value.isEmpty ? null : value;
+    }
+    return null;
   }
 }

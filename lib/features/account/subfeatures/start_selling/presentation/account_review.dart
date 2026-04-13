@@ -249,6 +249,8 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
       businessRegistrationNumber: (draft.businessRegistrationNumber ?? '')
           .trim(),
       taxIdentificationNumber: (draft.taxIdentificationNumber ?? '').trim(),
+      nin: (draft.nin ?? '').trim().isEmpty ? null : (draft.nin ?? '').trim(),
+      bvn: (draft.bvn ?? '').trim().isEmpty ? null : (draft.bvn ?? '').trim(),
       dateOfIncorporation: (draft.dateOfIncorporation ?? '').trim(),
       countryOfIncorporation: (draft.countryOfIncorporation ?? '').trim(),
       industrySector: (draft.industrySector ?? '').trim(),
@@ -270,8 +272,10 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
       authorizedSignatoryEmail: (draft.authorizedSignatoryEmail ?? '').trim(),
       authorizedSignatoryPhoneNumber:
           (draft.authorizedSignatoryPhoneNumber ?? '').trim(),
-      authorizedSignatoryIdNumber: (draft.authorizedSignatoryIdNumber ?? '')
-          .trim(),
+      authorizedSignatoryIdNumber:
+          (draft.authorizedSignatoryIdNumber ?? '').trim().isNotEmpty
+          ? (draft.authorizedSignatoryIdNumber ?? '').trim()
+          : _derivedIdentityNumber(draft),
       authorizedSignatoryDateOfBirth:
           (draft.authorizedSignatoryDateOfBirth ?? '').trim(),
       beneficialOwners: draft.beneficialOwners ?? const [],
@@ -346,5 +350,13 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
       setState(() => _isSubmitting = false);
       AppSnackbars.showError(context, UiErrorMessage.from(e));
     }
+  }
+
+  String _derivedIdentityNumber(SellerRegistrationDraft draft) {
+    final nin = (draft.nin ?? '').trim();
+    if (nin.isNotEmpty) return 'NIN:$nin';
+    final bvn = (draft.bvn ?? '').trim();
+    if (bvn.isNotEmpty) return 'BVN:$bvn';
+    return '';
   }
 }

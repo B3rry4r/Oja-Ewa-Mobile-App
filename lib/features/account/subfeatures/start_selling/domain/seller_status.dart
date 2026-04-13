@@ -11,6 +11,11 @@ class SellerStatus {
     this.legalBusinessName,
     this.tradingName,
     this.badge,
+    this.nin,
+    this.bvn,
+    this.productUploadLimit,
+    this.canUploadMoreProducts,
+    this.activeEntitlements,
     this.taxIdentificationNumber,
     this.dateOfIncorporation,
     this.countryOfIncorporation,
@@ -59,6 +64,11 @@ class SellerStatus {
   final String? legalBusinessName;
   final String? tradingName;
   final String? badge;
+  final String? nin;
+  final String? bvn;
+  final int? productUploadLimit;
+  final bool? canUploadMoreProducts;
+  final Map<String, dynamic>? activeEntitlements;
   final String? taxIdentificationNumber;
   final String? dateOfIncorporation;
   final String? countryOfIncorporation;
@@ -113,6 +123,13 @@ class SellerStatus {
       legalBusinessName: json['legal_business_name'] as String?,
       tradingName: json['trading_name'] as String?,
       badge: json['badge'] as String?,
+      nin: json['nin'] as String?,
+      bvn: json['bvn'] as String?,
+      productUploadLimit: (json['product_upload_limit'] as num?)?.toInt(),
+      canUploadMoreProducts: json['can_upload_more_products'] as bool?,
+      activeEntitlements: json['active_entitlements'] is Map<String, dynamic>
+          ? json['active_entitlements'] as Map<String, dynamic>
+          : null,
       taxIdentificationNumber: json['tax_identification_number'] as String?,
       dateOfIncorporation: json['date_of_incorporation'] as String?,
       countryOfIncorporation: json['country_of_incorporation'] as String?,

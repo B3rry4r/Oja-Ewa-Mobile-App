@@ -5,6 +5,8 @@ class SellerRegistrationDraft {
     this.tradingName,
     this.businessRegistrationNumber,
     this.taxIdentificationNumber,
+    this.nin,
+    this.bvn,
     this.dateOfIncorporation,
     this.countryOfIncorporation,
     this.websiteUrl,
@@ -49,6 +51,8 @@ class SellerRegistrationDraft {
   String? tradingName;
   String? businessRegistrationNumber;
   String? taxIdentificationNumber;
+  String? nin;
+  String? bvn;
   String? dateOfIncorporation;
   String? countryOfIncorporation;
   String? websiteUrl;
@@ -93,6 +97,8 @@ class SellerRegistrationDraft {
     'tradingName': tradingName,
     'businessRegistrationNumber': businessRegistrationNumber,
     'taxIdentificationNumber': taxIdentificationNumber,
+    'nin': nin,
+    'bvn': bvn,
     'dateOfIncorporation': dateOfIncorporation,
     'countryOfIncorporation': countryOfIncorporation,
     'websiteUrl': websiteUrl,
@@ -139,6 +145,8 @@ class SellerRegistrationDraft {
       tradingName: json['tradingName'] as String?,
       businessRegistrationNumber: json['businessRegistrationNumber'] as String?,
       taxIdentificationNumber: json['taxIdentificationNumber'] as String?,
+      nin: json['nin'] as String?,
+      bvn: json['bvn'] as String?,
       dateOfIncorporation: json['dateOfIncorporation'] as String?,
       countryOfIncorporation: json['countryOfIncorporation'] as String?,
       websiteUrl: json['websiteUrl'] as String?,

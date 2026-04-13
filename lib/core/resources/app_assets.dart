@@ -18,8 +18,10 @@ abstract class AppIcons {
   static const String hardware = 'assets/icons/new_icons/hardware.PNG';
   static const String schools = 'assets/icons/new_icons/education.PNG';
   static const String cacRegistration = 'assets/icons/new_icons/cac_reg.PNG';
+  static const String nepcRegistration = 'assets/icons/new_icons/nepc.PNG';
   static const String adsPlacement = 'assets/icons/new_icons/ads_placement.PNG';
-  static const String verifiedBadges = 'assets/icons/new_icons/verified_badges.PNG';
+  static const String verifiedBadges =
+      'assets/icons/new_icons/verified_badges.PNG';
   static const String connectToUs = 'assets/icons/connect_to_us.svg';
   static const String editYourProfile = 'assets/icons/edit_your_profile.svg';
   static const String emailUs = 'assets/icons/email_us.svg';
@@ -47,7 +49,6 @@ abstract class AppIcons {
 
 abstract class AppImages {
   static const String comingSoon = 'assets/icons/coming_soon_i.png';
-  // assets/icons/*.png
   static const String onboarding = 'assets/icons/l.png';
   static const String onboardingHero = 'assets/icons/oja-ewa-onboard.PNG';
   static const String logoOutline = 'assets/icons/logo_outline.png';
@@ -58,5 +59,4 @@ abstract class AppImages {
   static const String appIconPng = 'assets/app_icon/icon.png';
   static const String appIconPng2 = 'assets/app_icon/icon2.png';
   static const String appBackground = 'assets/app_icon/background.png';
-  static const String coxVideo = 'assets/cox.mp4';
 }

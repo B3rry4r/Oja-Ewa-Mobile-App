@@ -23,6 +23,8 @@ class BusinessRegistrationDraft {
   String? facebook;
   String? businessRegistrationNumber;
   String? taxIdentificationNumber;
+  String? nin;
+  String? bvn;
   String? dateOfIncorporation;
   String? countryOfIncorporation;
   String? industrySector;
@@ -82,6 +84,8 @@ class BusinessRegistrationDraft {
     'facebook': facebook,
     'businessRegistrationNumber': businessRegistrationNumber,
     'taxIdentificationNumber': taxIdentificationNumber,
+    'nin': nin,
+    'bvn': bvn,
     'dateOfIncorporation': dateOfIncorporation,
     'countryOfIncorporation': countryOfIncorporation,
     'industrySector': industrySector,
@@ -145,6 +149,8 @@ class BusinessRegistrationDraft {
     draft.businessRegistrationNumber =
         json['businessRegistrationNumber'] as String?;
     draft.taxIdentificationNumber = json['taxIdentificationNumber'] as String?;
+    draft.nin = json['nin'] as String?;
+    draft.bvn = json['bvn'] as String?;
     draft.dateOfIncorporation = json['dateOfIncorporation'] as String?;
     draft.countryOfIncorporation = json['countryOfIncorporation'] as String?;
     draft.industrySector = json['industrySector'] as String?;

@@ -14,6 +14,8 @@ SellerRegistrationDraft sellerDraftFromStatus(SellerStatus status) {
     legalBusinessName: status.legalBusinessName,
     tradingName: status.tradingName,
     taxIdentificationNumber: status.taxIdentificationNumber,
+    nin: status.nin,
+    bvn: status.bvn,
     dateOfIncorporation: status.dateOfIncorporation,
     countryOfIncorporation: status.countryOfIncorporation,
     websiteUrl: status.websiteUrl,

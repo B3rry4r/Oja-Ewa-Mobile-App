@@ -11,6 +11,8 @@ class SellerProfilePayload {
     this.websiteUrl,
     required this.businessRegistrationNumber,
     required this.taxIdentificationNumber,
+    this.nin,
+    this.bvn,
     required this.dateOfIncorporation,
     required this.countryOfIncorporation,
     required this.industrySector,
@@ -54,6 +56,8 @@ class SellerProfilePayload {
   final String? websiteUrl;
   final String businessRegistrationNumber;
   final String taxIdentificationNumber;
+  final String? nin;
+  final String? bvn;
   final String dateOfIncorporation;
   final String countryOfIncorporation;
   final String industrySector;
@@ -90,16 +94,19 @@ class SellerProfilePayload {
 
   Map<String, dynamic> toJson({bool includeFileFields = true}) {
     return {
-      'business_name': businessName,
+      if (businessName.trim().isNotEmpty) 'business_name': businessName,
       'legal_business_name': legalBusinessName,
       if (tradingName != null && tradingName!.isNotEmpty)
         'trading_name': tradingName,
       'business_email': businessEmail,
-      'business_phone': businessPhoneNumber,
+      'business_phone_number': businessPhoneNumber,
       if (websiteUrl != null && websiteUrl!.isNotEmpty)
         'website_url': websiteUrl,
-      'business_registration_number': businessRegistrationNumber,
+      if (businessRegistrationNumber.trim().isNotEmpty)
+        'business_registration_number': businessRegistrationNumber,
       'tax_identification_number': taxIdentificationNumber,
+      'nin': nin?.trim().isEmpty ?? true ? null : nin,
+      'bvn': bvn?.trim().isEmpty ?? true ? null : bvn,
       'date_of_incorporation': dateOfIncorporation,
       'country_of_incorporation': countryOfIncorporation,
       'industry_sector': industrySector,

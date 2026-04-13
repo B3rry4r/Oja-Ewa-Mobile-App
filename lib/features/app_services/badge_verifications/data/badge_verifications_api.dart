@@ -44,8 +44,7 @@ class BadgeVerificationsApi {
 
   Future<BadgeVerificationRequest> createRequest({
     required String badge,
-    required int sellerProfileId,
-    required Map<String, dynamic> documents,
+    required List<Map<String, dynamic>> documents,
     required Map<String, dynamic> answers,
     required AppServicePurchase purchase,
   }) async {
@@ -53,7 +52,6 @@ class BadgeVerificationsApi {
       '/api/services/badge-verifications',
       data: {
         'badge': badge,
-        'seller_profile_id': sellerProfileId,
         'documents': documents,
         'answers': answers,
         ...purchase.toJson(),
@@ -62,6 +60,23 @@ class BadgeVerificationsApi {
     final payload =
         (response.data as Map<String, dynamic>)['data'] as Map<String, dynamic>;
     return BadgeVerificationRequest.fromJson(payload);
+  }
+
+  Future<Map<String, dynamic>> uploadDocument({
+    required String filePath,
+    required String type,
+  }) async {
+    final form = FormData.fromMap({
+      'file': await MultipartFile.fromFile(filePath),
+      'type': type,
+    });
+    final response = await _dio.post(
+      '/api/services/badge-verifications/upload',
+      data: form,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return data['data'] as Map<String, dynamic>;
   }
 }
 

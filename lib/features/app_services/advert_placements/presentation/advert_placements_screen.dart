@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
+import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/subscriptions/iap_service.dart';
 import 'package:ojaewa/core/subscriptions/subscription_constants.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
@@ -25,22 +26,20 @@ class _AdvertPlacementsScreenState
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _targetUrlController = TextEditingController();
-  final _imageUrlController = TextEditingController();
   final _videoUrlController = TextEditingController();
-  final _thumbnailUrlController = TextEditingController();
   String _mediaType = 'image';
   String _displayCurrency = 'NGN';
   int _durationDays = 1;
   bool _isSubmitting = false;
+  String? _uploadedImageUrl;
+  String? _uploadedThumbnailUrl;
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     _targetUrlController.dispose();
-    _imageUrlController.dispose();
     _videoUrlController.dispose();
-    _thumbnailUrlController.dispose();
     super.dispose();
   }
 
@@ -58,7 +57,7 @@ class _AdvertPlacementsScreenState
           const ServiceIntroCard(
             title: 'Create a new advert request',
             description:
-                'Set your advert content, campaign dates, and destination link here before payment and submission.',
+                'Choose your advert type, upload the required media, then continue to payment and submission.',
             badge: 'Adverts',
           ),
           const SizedBox(height: 20),
@@ -97,10 +96,11 @@ class _AdvertPlacementsScreenState
                 ),
                 const SizedBox(height: 12),
                 if (_mediaType == 'image')
-                  _ServiceField(
-                    controller: _imageUrlController,
-                    label: 'Image URL',
-                    hint: 'https://example.com/banner.jpg',
+                  _UploadCard(
+                    label: 'Advert image',
+                    helper: 'Upload the banner image for this advert.',
+                    selectedUrl: _uploadedImageUrl,
+                    onTap: () => _uploadMedia('image'),
                   )
                 else ...[
                   _ServiceField(
@@ -109,10 +109,11 @@ class _AdvertPlacementsScreenState
                     hint: 'https://youtube.com/watch?v=test',
                   ),
                   const SizedBox(height: 12),
-                  _ServiceField(
-                    controller: _thumbnailUrlController,
-                    label: 'Thumbnail URL',
-                    hint: 'https://example.com/thumb.jpg',
+                  _UploadCard(
+                    label: 'Thumbnail',
+                    helper: 'Optional thumbnail for the video advert.',
+                    selectedUrl: _uploadedThumbnailUrl,
+                    onTap: () => _uploadMedia('thumbnail'),
                   ),
                 ],
                 const SizedBox(height: 12),
@@ -242,7 +243,7 @@ class _AdvertPlacementsScreenState
     if (_titleController.text.trim().isEmpty ||
         _descriptionController.text.trim().isEmpty ||
         _targetUrlController.text.trim().isEmpty ||
-        (_mediaType == 'image' && _imageUrlController.text.trim().isEmpty) ||
+        (_mediaType == 'image' && (_uploadedImageUrl ?? '').isEmpty) ||
         (_mediaType == 'video' && _videoUrlController.text.trim().isEmpty)) {
       AppSnackbars.showError(context, 'Fill all advert fields first');
       return;
@@ -276,18 +277,14 @@ class _AdvertPlacementsScreenState
             description: _descriptionController.text.trim(),
             placement: 'banner',
             mediaType: _mediaType,
-            imageUrl: _mediaType == 'image'
-                ? _imageUrlController.text.trim()
-                : null,
+            imageUrl: _mediaType == 'image' ? _uploadedImageUrl : null,
             videoUrl: _mediaType == 'video'
                 ? _videoUrlController.text.trim()
                 : null,
             videoSource: _mediaType == 'video'
                 ? _videoSourceFromUrl(_videoUrlController.text.trim())
                 : null,
-            thumbnailUrl: _mediaType == 'video'
-                ? _thumbnailUrlController.text.trim()
-                : null,
+            thumbnailUrl: _mediaType == 'video' ? _uploadedThumbnailUrl : null,
             targetUrl: _targetUrlController.text.trim(),
             startDate: _startDateForPackage(),
             endDate: _endDateForPackage(_durationDays),
@@ -309,6 +306,34 @@ class _AdvertPlacementsScreenState
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  Future<void> _uploadMedia(String type) async {
+    final path = await pickSingleFilePath();
+    if (path == null) return;
+    try {
+      final upload = await ref
+          .read(advertPlacementsApiProvider)
+          .uploadMedia(filePath: path, type: type);
+      final url = upload['url'] as String?;
+      if (url == null || url.isEmpty) {
+        if (mounted) AppSnackbars.showError(context, 'Upload failed');
+        return;
+      }
+      if (!mounted) return;
+      setState(() {
+        if (type == 'image') {
+          _uploadedImageUrl = url;
+        } else {
+          _uploadedThumbnailUrl = url;
+        }
+      });
+      AppSnackbars.showSuccess(context, 'Media uploaded');
+    } on DioException catch (e) {
+      if (mounted) AppSnackbars.showError(context, _dioMessage(e));
+    } catch (_) {
+      if (mounted) AppSnackbars.showError(context, 'Unable to upload media');
     }
   }
 
@@ -399,6 +424,70 @@ class _ServiceFormCard extends StatelessWidget {
           const SizedBox(height: 14),
           child,
         ],
+      ),
+    );
+  }
+}
+
+class _UploadCard extends StatelessWidget {
+  const _UploadCard({
+    required this.label,
+    required this.helper,
+    required this.selectedUrl,
+    required this.onTap,
+  });
+
+  final String label;
+  final String helper;
+  final String? selectedUrl;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final uploaded = (selectedUrl ?? '').isNotEmpty;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: colors.surfaceSecondary,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: uploaded ? colors.accent : colors.border),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    uploaded ? 'File uploaded' : helper,
+                    style: TextStyle(
+                      color: uploaded ? colors.accent : colors.textSecondary,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              uploaded ? Icons.check_circle : Icons.upload_file,
+              color: uploaded ? colors.accent : colors.textSecondary,
+            ),
+          ],
+        ),
       ),
     );
   }

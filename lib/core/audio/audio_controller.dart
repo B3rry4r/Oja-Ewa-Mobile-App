@@ -13,7 +13,7 @@ class AudioController extends Notifier<bool> {
   bool build() {
     _player = AudioPlayer();
     _player.setReleaseMode(ReleaseMode.loop);
-    
+
     // Listen for player state changes to keep UI in sync
     _player.onPlayerStateChanged.listen((PlayerState playerState) {
       final isPlaying = playerState == PlayerState.playing;
@@ -21,12 +21,12 @@ class AudioController extends Notifier<bool> {
         state = isPlaying;
       }
     });
-    
+
     // Listen for errors
     _player.onLog.listen((String message) {
       debugPrint('AudioPlayer log: $message');
     });
-    
+
     ref.onDispose(() {
       _player.dispose();
     });
@@ -38,10 +38,9 @@ class AudioController extends Notifier<bool> {
   Future<void> initialize() async {
     if (_initialized) return;
     _initialized = true;
-    
+
     try {
-      // Use MP3 format for better cross-platform compatibility
-      await _player.setSource(AssetSource('ojaewa2.mp3'));
+      await _player.setSource(AssetSource('OJAEWA3.mpeg'));
       _sourceSet = true;
       debugPrint('AudioPlayer: Source set successfully');
       await play();

@@ -15,9 +15,6 @@ import 'package:ojaewa/features/auth/presentation/controllers/auth_controller.da
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_status_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/connect/presentation/controllers/connect_controller.dart';
-import 'package:ojaewa/core/subscriptions/subscription_constants.dart';
-import 'package:ojaewa/core/subscriptions/subscription_controller.dart';
-import 'package:ojaewa/core/subscriptions/iap_service.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/widgets/confirmation_modal.dart';
 import 'package:ojaewa/features/auth/data/auth_repository_impl.dart';
@@ -97,7 +94,7 @@ class AccountScreen extends ConsumerWidget {
 
           if (isLoggedIn) ...[
             const SizedBox(height: 16),
-            _buildSubscriptionStatusCard(context, ref),
+            _buildBadgeStatusCard(context, ref),
           ],
 
           const SizedBox(height: 24),
@@ -215,14 +212,16 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSubscriptionStatusCard(BuildContext context, WidgetRef ref) {
+  Widget _buildBadgeStatusCard(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final subscriptionState = ref.watch(subscriptionControllerProvider).value;
-    final subscription = subscriptionState?.subscription;
-    final hasPro = subscription != null && subscription.status.isActive;
-    final expiresText = subscription?.expiresAt != null
-        ? 'Expires on ${subscription!.expiresAt.toLocal().toString().split(' ').first}'
-        : 'Subscribe to unlock premium seller tools';
+    final sellerStatus = ref.watch(sellerStatusProvider);
+    final badge = (sellerStatus?.badge ?? '').trim();
+    final hasBadge = badge.isNotEmpty;
+    final hasSellerProfile = sellerStatus?.id != null;
+    final uploadLimit = sellerStatus?.productUploadLimit;
+    final canUploadMoreProducts = sellerStatus?.canUploadMoreProducts;
+    final badgeColor = _badgeColor(badge, colors);
+    final badgeIconColor = _badgeIconColor(badge);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -236,12 +235,12 @@ class AccountScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: hasPro ? const Color(0xFF4CAF50) : colors.borderStrong,
+              color: hasBadge ? badgeColor : colors.borderStrong,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
-              hasPro ? Icons.verified : Icons.lock_outline,
-              color: Colors.white,
+              hasBadge ? Icons.verified : Icons.workspace_premium_outlined,
+              color: hasBadge ? badgeIconColor : Colors.white,
               size: 18,
             ),
           ),
@@ -251,7 +250,7 @@ class AccountScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  hasPro ? 'Ojaewa Pro Active' : 'Ojaewa Pro Inactive',
+                  hasBadge ? _badgeLabel(badge) : 'No verification badge yet',
                   style: TextStyle(
                     fontSize: 14,
                     fontFamily: 'Campton',
@@ -261,27 +260,38 @@ class AccountScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  hasPro
-                      ? expiresText
-                      : 'Subscribe to sell and publish your business profile',
+                  hasSellerProfile
+                      ? 'Badges strengthen trust on your seller profile and unlock stronger selling privileges.'
+                      : 'Create your seller profile first, then apply for a badge.',
                   style: TextStyle(
                     fontSize: 12,
                     fontFamily: 'Campton',
                     color: colors.textSecondary,
                   ),
                 ),
+                if (hasSellerProfile && uploadLimit != null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    canUploadMoreProducts == false
+                        ? 'Product upload limit: $uploadLimit reached'
+                        : 'Product upload limit: $uploadLimit',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'Campton',
+                      fontWeight: FontWeight.w500,
+                      color: colors.textTertiary,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
-          if (!hasPro)
+          if (!hasBadge)
             TextButton(
-              onPressed: () async {
-                await ref
-                    .read(iapServiceProvider)
-                    .purchaseSubscription(SubscriptionProducts.ojaewaProYearly);
-              },
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.badgeVerifications),
               child: const Text(
-                'Subscribe',
+                'View badges',
                 style: TextStyle(
                   fontSize: 12,
                   fontFamily: 'Campton',
@@ -293,6 +303,43 @@ class AccountScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  String _badgeLabel(String badge) {
+    switch (badge) {
+      case 'certified_authentic':
+        return 'Black Badge Active';
+      case 'heritage_artisan':
+        return 'Gold Badge Active';
+      case 'sustainable_innovator':
+        return 'Green Badge Active';
+      default:
+        return 'Badge Active';
+    }
+  }
+
+  Color _badgeColor(String badge, AppThemeColors colors) {
+    switch (badge) {
+      case 'certified_authentic':
+        return const Color(0xFF111111);
+      case 'heritage_artisan':
+        return const Color(0xFFD4AF37);
+      case 'sustainable_innovator':
+        return const Color(0xFF2E7D32);
+      case 'design_excellence':
+        return const Color(0xFF2F80ED);
+      default:
+        return colors.accent;
+    }
+  }
+
+  Color _badgeIconColor(String badge) {
+    switch (badge) {
+      case 'heritage_artisan':
+        return const Color(0xFF111111);
+      default:
+        return Colors.white;
+    }
   }
 
   Widget _buildBusinessList(BuildContext context, WidgetRef ref) {

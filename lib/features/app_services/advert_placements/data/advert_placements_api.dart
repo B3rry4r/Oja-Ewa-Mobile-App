@@ -68,6 +68,23 @@ class AdvertPlacementsApi {
         (response.data as Map<String, dynamic>)['data'] as Map<String, dynamic>;
     return AdvertPlacementRequest.fromJson(payload);
   }
+
+  Future<Map<String, dynamic>> uploadMedia({
+    required String filePath,
+    required String type,
+  }) async {
+    final form = FormData.fromMap({
+      'file': await MultipartFile.fromFile(filePath),
+      'type': type,
+    });
+    final response = await _dio.post(
+      '/api/services/advert-placements/upload',
+      data: form,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+    final data = response.data as Map<String, dynamic>;
+    return data['data'] as Map<String, dynamic>;
+  }
 }
 
 final advertPlacementsApiProvider = Provider<AdvertPlacementsApi>((ref) {

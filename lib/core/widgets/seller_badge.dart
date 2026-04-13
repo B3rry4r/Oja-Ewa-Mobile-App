@@ -17,8 +17,9 @@ class SellerBadge extends StatelessWidget {
         return _buildBadge(
           context,
           "Certified Authentic",
-          const Color(0xFF2B2B2B),
-          Colors.white,
+          const Color(0xFF111111),
+          const Color(0xFFF5F5F5),
+          borderColor: const Color(0xFF3A3A3A),
         );
       case "heritage_artisan":
         return _buildBadge(
@@ -46,13 +47,19 @@ class SellerBadge extends StatelessWidget {
     }
   }
 
-  Widget _buildBadge(BuildContext context, String text, Color bg, Color fg) {
+  Widget _buildBadge(
+    BuildContext context,
+    String text,
+    Color bg,
+    Color fg, {
+    Color? borderColor,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: bg,
         border: Border.all(
-          color: context.appColors.accent.withValues(alpha: 0.2),
+          color: borderColor ?? context.appColors.accent.withValues(alpha: 0.2),
         ),
         borderRadius: BorderRadius.circular(6),
       ),
