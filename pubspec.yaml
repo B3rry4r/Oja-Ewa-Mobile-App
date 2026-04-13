@@ -74,6 +74,7 @@ flutter:
     - assets/OJAEWA3.mpeg
     - assets/docs/
     - assets/icons/
+    - assets/icons/new_icons/
     - assets/app_icon/
 
   fonts:
