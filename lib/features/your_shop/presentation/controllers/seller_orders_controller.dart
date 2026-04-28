@@ -81,6 +81,12 @@ class SellerOrdersRealtimeController extends AsyncNotifier<List<SellerOrder>> {
                   shippedAt: order.shippedAt,
                   deliveredAt: order.deliveredAt,
                   cancellationReason: order.cancellationReason,
+                  returnRequestStatus: order.returnRequestStatus,
+                  returnRequestReason: order.returnRequestReason,
+                  returnRequestRejectionReason: order.returnRequestRejectionReason,
+                  returnRequestRequestedAt: order.returnRequestRequestedAt,
+                  returnRequestDeadlineAt: order.returnRequestDeadlineAt,
+                  returnRequestRefundedAt: order.returnRequestRefundedAt,
                 )
               : order,
         )
@@ -215,6 +221,13 @@ class SellerOrder {
   final DateTime? shippedAt;
   final DateTime? deliveredAt;
   final String? cancellationReason;
+  final String? returnRequestStatus;
+  final String? returnRequestReason;
+  final String? returnRequestRejectionReason;
+  final DateTime? returnRequestRequestedAt;
+  final DateTime? returnRequestDeadlineAt;
+  final DateTime? returnRequestRefundedAt;
+  final String? returnRequestShipbubbleLabelUrl;
 
   SellerOrder({
     required this.id,
@@ -236,6 +249,13 @@ class SellerOrder {
     this.shippedAt,
     this.deliveredAt,
     this.cancellationReason,
+    this.returnRequestStatus,
+    this.returnRequestReason,
+    this.returnRequestRejectionReason,
+    this.returnRequestRequestedAt,
+    this.returnRequestDeadlineAt,
+    this.returnRequestRefundedAt,
+    this.returnRequestShipbubbleLabelUrl,
   });
 
   factory SellerOrder.fromJson(Map<String, dynamic> json) {
@@ -247,6 +267,7 @@ class SellerOrder {
       itemsList = [];
     }
     final customer = json['customer'] as Map<String, dynamic>?;
+    final returnRequest = json['return_request'] as Map<String, dynamic>?;
 
     // Helper to parse int from various types
     int? parseInt(dynamic value) {
@@ -299,6 +320,33 @@ class SellerOrder {
           : null,
       cancellationReason:
           json['cancellation_reason'] as String? ?? json['reason'] as String?,
+      returnRequestStatus:
+          json['return_request_status'] as String? ??
+          returnRequest?['status'] as String?,
+      returnRequestReason:
+          returnRequest?['reason'] as String? ??
+          json['return_request_reason'] as String?,
+      returnRequestRejectionReason:
+          returnRequest?['rejection_reason'] as String? ??
+          json['return_request_rejection_reason'] as String?,
+      returnRequestRequestedAt:
+          returnRequest?['requested_at'] != null
+          ? DateTime.tryParse(returnRequest!['requested_at'] as String)
+          : (json['return_request_requested_at'] != null
+                ? DateTime.tryParse(json['return_request_requested_at'] as String)
+                : null),
+      returnRequestDeadlineAt:
+          returnRequest?['return_deadline_at'] != null
+          ? DateTime.tryParse(returnRequest!['return_deadline_at'] as String)
+          : (json['return_request_deadline_at'] != null
+                ? DateTime.tryParse(json['return_request_deadline_at'] as String)
+                : null),
+      returnRequestRefundedAt:
+          returnRequest?['refunded_at'] != null
+          ? DateTime.tryParse(returnRequest!['refunded_at'] as String)
+          : null,
+      returnRequestShipbubbleLabelUrl:
+          returnRequest?['shipbubble_return_label_url'] as String?,
     );
   }
 

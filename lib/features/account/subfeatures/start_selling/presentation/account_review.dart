@@ -294,6 +294,7 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
       identityDocument: draft.identityDocumentPath,
       businessCertificate: draft.businessCertificatePath,
       businessLogo: draft.businessLogoPath,
+      bankCode: draft.bankCode ?? '',
     );
 
     try {

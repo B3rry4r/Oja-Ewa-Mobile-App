@@ -8,6 +8,7 @@ import 'package:ojaewa/features/account/subfeatures/shared/widgets/compliance_pr
 
 import '../../../../../app/router/app_router.dart';
 import 'draft_utils.dart';
+import 'widgets/bank_picker_sheet.dart';
 
 class BusinessDetailsScreen extends StatefulWidget {
   const BusinessDetailsScreen({super.key});
@@ -37,6 +38,7 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
   final _submissionDateController = TextEditingController();
 
   String _preferredSettlementCurrency = 'NGN';
+  String? _bankCode;
   bool _declarationLegalRegistered = false;
   bool _declarationInformationTrue = false;
   bool _declarationAuthorizeVerification = false;
@@ -91,6 +93,9 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
       if (owners.isNotEmpty) _fillOwnerControllers(owners[0], 1);
       if (owners.length > 1) _fillOwnerControllers(owners[1], 2);
       if (owners.length > 2) _fillOwnerControllers(owners[2], 3);
+      _bankNameController.text = draft.bankName ?? '';
+      _bankCode = draft.bankCode;
+      _accountNumberController.text = draft.accountNumber ?? '';
       _preferredSettlementCurrency =
           draft.preferredSettlementCurrency ?? _preferredSettlementCurrency;
       _declarationLegalRegistered = draft.declarationLegalRegistered ?? false;
@@ -131,11 +136,22 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
           const SizedBox(height: 28),
           _buildSectionHeader('Section 6: Banking & Settlement Preferences'),
           const SizedBox(height: 16),
-          _buildTextInput(
+          _buildPickerInput(
             'Bank Name',
-            'GTBank',
-            controller: _bankNameController,
+            _bankNameController.text,
+            hint: 'Select bank',
+            onTap: _pickBank,
           ),
+          if ((_bankCode ?? '').isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Bank code will be stored automatically',
+              style: TextStyle(
+                color: context.appColors.textTertiary,
+                fontSize: 12,
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           _buildTextInput(
             'Account Number',
@@ -412,6 +428,52 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
     );
   }
 
+  Widget _buildPickerInput(
+    String label,
+    String value, {
+    required String hint,
+    required VoidCallback onTap,
+  }) {
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: colors.border),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    value.trim().isEmpty ? hint : value,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: value.trim().isEmpty
+                          ? colors.textTertiary
+                          : colors.textPrimary,
+                    ),
+                  ),
+                ),
+                Icon(Icons.keyboard_arrow_down, color: colors.textSecondary),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Future<void> _pickSubmissionDate() async {
     final initial =
         DateTime.tryParse(_submissionDateController.text.trim()) ??
@@ -589,6 +651,7 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
         final draft =
             sellerDraftFromArgs(ModalRoute.of(context)?.settings.arguments)
               ..bankName = _bankNameController.text.trim()
+              ..bankCode = _bankCode ?? ''
               ..accountNumber = _accountNumberController.text.trim()
               ..beneficialOwners = _beneficialOwners()
               ..preferredSettlementCurrency = _preferredSettlementCurrency
@@ -636,5 +699,18 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _pickBank() async {
+    final selected = await BankPickerSheet.show(
+      context,
+      selectedBankCode: _bankCode,
+      country: 'NG',
+    );
+    if (selected == null) return;
+    setState(() {
+      _bankCode = selected.code;
+      _bankNameController.text = selected.name;
+    });
   }
 }

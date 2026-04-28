@@ -120,4 +120,43 @@ class OrdersApi {
       throw mapDioError(e);
     }
   }
+
+  Future<Map<String, dynamic>> requestReturn({
+    required int orderId,
+    required int shipmentId,
+    required String reason,
+  }) async {
+    try {
+      final res = await _dio.post(
+        '/api/orders/$orderId/shipments/$shipmentId/returns',
+        data: {'reason': reason},
+      );
+      final data = res.data;
+      if (data is! Map<String, dynamic>) {
+        throw const FormatException('Unexpected response');
+      }
+      return data;
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> shipReturnBack({
+    required int orderId,
+    required int shipmentId,
+    required int returnRequestId,
+  }) async {
+    try {
+      final res = await _dio.post(
+        '/api/orders/$orderId/shipments/$shipmentId/returns/$returnRequestId/ship-back',
+      );
+      final data = res.data;
+      if (data is! Map<String, dynamic>) {
+        throw const FormatException('Unexpected response');
+      }
+      return data;
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
 }

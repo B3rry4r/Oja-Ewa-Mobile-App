@@ -61,6 +61,26 @@ class OrdersRepository {
   Future<void> cancelOrder({required int id, required String reason}) =>
       _ordersApi.cancelOrder(id: id, reason: reason);
 
+  Future<Map<String, dynamic>> requestReturn({
+    required int orderId,
+    required int shipmentId,
+    required String reason,
+  }) => _ordersApi.requestReturn(
+    orderId: orderId,
+    shipmentId: shipmentId,
+    reason: reason,
+  );
+
+  Future<Map<String, dynamic>> shipReturnBack({
+    required int orderId,
+    required int shipmentId,
+    required int returnRequestId,
+  }) => _ordersApi.shipReturnBack(
+    orderId: orderId,
+    shipmentId: shipmentId,
+    returnRequestId: returnRequestId,
+  );
+
   Future<PaymentLink> createOrderPaymentLink({required int orderId}) =>
       _paymentsApi.createOrderPaymentLink(orderId: orderId);
 

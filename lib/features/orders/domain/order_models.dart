@@ -51,6 +51,9 @@ class ShipmentSummary {
     required this.status,
     required this.trackingNumber,
     required this.shippingFee,
+    required this.canRequestReturn,
+    required this.returnDeadlineAt,
+    required this.returnRequest,
   });
 
   final int id;
@@ -60,6 +63,9 @@ class ShipmentSummary {
   final String? status;
   final String? trackingNumber;
   final num? shippingFee;
+  final bool canRequestReturn;
+  final DateTime? returnDeadlineAt;
+  final ShipmentReturnRequestSummary? returnRequest;
 
   static num? _parseNum(dynamic v) {
     if (v is num) return v;
@@ -79,6 +85,83 @@ class ShipmentSummary {
       status: json['status'] as String?,
       trackingNumber: json['tracking_number'] as String?,
       shippingFee: _parseNum(json['shipping_fee']),
+      canRequestReturn: json['can_request_return'] == true,
+      returnDeadlineAt: DateTime.tryParse(
+        (json['return_deadline_at'] as String?) ?? '',
+      ),
+      returnRequest: json['return_request'] is Map<String, dynamic>
+          ? ShipmentReturnRequestSummary.fromJson(
+              json['return_request'] as Map<String, dynamic>,
+            )
+          : null,
+    );
+  }
+}
+
+@immutable
+class ShipmentReturnRequestSummary {
+  const ShipmentReturnRequestSummary({
+    required this.id,
+    required this.status,
+    required this.reason,
+    required this.rejectionReason,
+    required this.requestedAt,
+    required this.returnDeadlineAt,
+    required this.reviewedAt,
+    required this.approvedAt,
+    required this.rejectedAt,
+    required this.buyerReturnCarrier,
+    required this.buyerReturnTrackingNumber,
+    required this.buyerReturnShippedAt,
+    required this.shipbubbleReturnLabelUrl,
+    required this.refundedAt,
+    required this.refundReference,
+  });
+
+  final int id;
+  final String? status;
+  final String? reason;
+  final String? rejectionReason;
+  final DateTime? requestedAt;
+  final DateTime? returnDeadlineAt;
+  final DateTime? reviewedAt;
+  final DateTime? approvedAt;
+  final DateTime? rejectedAt;
+  final String? buyerReturnCarrier;
+  final String? buyerReturnTrackingNumber;
+  final DateTime? buyerReturnShippedAt;
+  final String? shipbubbleReturnLabelUrl;
+  final DateTime? refundedAt;
+  final String? refundReference;
+
+  static num? _parseNum(dynamic v) {
+    if (v is num) return v;
+    if (v is String) return num.tryParse(v);
+    return null;
+  }
+
+  static ShipmentReturnRequestSummary fromJson(Map<String, dynamic> json) {
+    return ShipmentReturnRequestSummary(
+      id: _parseNum(json['id'])?.toInt() ?? 0,
+      status: json['status'] as String?,
+      reason: json['reason'] as String?,
+      rejectionReason: json['rejection_reason'] as String?,
+      requestedAt: DateTime.tryParse((json['requested_at'] as String?) ?? ''),
+      returnDeadlineAt: DateTime.tryParse(
+        (json['return_deadline_at'] as String?) ?? '',
+      ),
+      reviewedAt: DateTime.tryParse((json['reviewed_at'] as String?) ?? ''),
+      approvedAt: DateTime.tryParse((json['approved_at'] as String?) ?? ''),
+      rejectedAt: DateTime.tryParse((json['rejected_at'] as String?) ?? ''),
+      buyerReturnCarrier: json['buyer_return_carrier'] as String?,
+      buyerReturnTrackingNumber:
+          json['buyer_return_tracking_number'] as String?,
+      buyerReturnShippedAt: DateTime.tryParse(
+        (json['buyer_return_shipped_at'] as String?) ?? '',
+      ),
+      shipbubbleReturnLabelUrl: json['shipbubble_return_label_url'] as String?,
+      refundedAt: DateTime.tryParse((json['refunded_at'] as String?) ?? ''),
+      refundReference: json['refund_reference'] as String?,
     );
   }
 }
@@ -207,9 +290,15 @@ class PaymentLink {
     final data = json['data'];
     final payload = data is Map<String, dynamic> ? data : json;
     return PaymentLink(
-      paymentUrl: (payload['payment_url'] as String?) ?? '',
+      paymentUrl:
+          (payload['payment_url'] as String?) ??
+          (payload['link'] as String?) ??
+          '',
       accessCode: (payload['access_code'] as String?) ?? '',
-      reference: (payload['reference'] as String?) ?? '',
+      reference:
+          (payload['reference'] as String?) ??
+          (payload['tx_ref'] as String?) ??
+          '',
       amount: _parseNum(payload['amount']) ?? 0,
       currency: (payload['currency'] as String?) ?? 'NGN',
     );

@@ -53,6 +53,7 @@ SellerRegistrationDraft sellerDraftFromStatus(SellerStatus status) {
     businessCertificatePath: status.businessCertificate,
     businessLogoPath: status.businessLogo,
     bankName: status.bankName,
+    bankCode: status.bankCode,
     accountNumber: status.accountNumber,
   );
 }

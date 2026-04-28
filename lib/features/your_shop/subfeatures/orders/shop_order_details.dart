@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, unused_element, unnecessary_underscores
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
@@ -108,6 +110,31 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
             ),
           if ((order.paymentStatus ?? '').isNotEmpty)
             _buildDetailTile(context, "Payment Status", order.paymentStatus!),
+          if ((order.returnRequestStatus ?? '').isNotEmpty) ...[
+            _buildDetailTile(
+              context,
+              "Return Request",
+              _buildReturnRequestLabel(order.returnRequestStatus!),
+            ),
+            if ((order.returnRequestReason ?? '').isNotEmpty)
+              _buildDetailTile(
+                context,
+                "Return Reason",
+                order.returnRequestReason!,
+              ),
+            if ((order.returnRequestRejectionReason ?? '').isNotEmpty)
+              _buildDetailTile(
+                context,
+                "Return Rejection",
+                order.returnRequestRejectionReason!,
+              ),
+            if ((order.returnRequestShipbubbleLabelUrl ?? '').isNotEmpty)
+              _buildDetailTile(
+                context,
+                "Return Label",
+                "Generated",
+              ),
+          ],
           if (order.shippingAddress != null)
             _buildDetailTile(
               context,
@@ -142,6 +169,25 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  String _buildReturnRequestLabel(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending_review':
+        return 'Under review';
+      case 'approved':
+        return 'Approved, awaiting return';
+      case 'return_in_transit':
+        return 'Return in transit';
+      case 'refund_pending':
+        return 'Refund pending';
+      case 'refunded':
+        return 'Refunded';
+      case 'rejected':
+        return 'Rejected';
+      default:
+        return status;
+    }
   }
 
   Widget _buildStatusChip(String status) {

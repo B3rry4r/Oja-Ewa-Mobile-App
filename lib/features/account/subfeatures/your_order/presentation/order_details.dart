@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
@@ -16,7 +18,6 @@ class OrderDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
     final args = ModalRoute.of(context)?.settings.arguments;
     final orderId = (args is Map && args['orderId'] is int)
         ? args['orderId'] as int
@@ -86,7 +87,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                 _buildItemsInOrder(context, order.items),
                 const SizedBox(height: 16),
                 if (effectiveOrder.shipments.isNotEmpty) ...[
-                  _buildShipments(context, effectiveOrder.shipments),
+                  _buildShipments(context, ref, effectiveOrder, effectiveOrder.shipments),
                   const SizedBox(height: 16),
                 ],
                 _buildPaymentDetails(
@@ -430,6 +431,8 @@ class OrderDetailsScreen extends ConsumerWidget {
 
   Widget _buildShipments(
     BuildContext context,
+    WidgetRef ref,
+    OrderSummary order,
     List<ShipmentSummary> shipments,
   ) {
     final colors = context.appColors;
@@ -455,7 +458,7 @@ class OrderDetailsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           for (int i = 0; i < shipments.length; i++) ...[
-            _buildShipmentRow(context, shipments[i]),
+            _buildShipmentRow(context, ref, order, shipments[i]),
             if (i < shipments.length - 1) const Divider(height: 24),
           ],
         ],
@@ -463,11 +466,19 @@ class OrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildShipmentRow(BuildContext context, ShipmentSummary shipment) {
+  Widget _buildShipmentRow(
+    BuildContext context,
+    WidgetRef ref,
+    OrderSummary order,
+    ShipmentSummary shipment,
+  ) {
     final colors = context.appColors;
     final provider = shipment.provider?.toUpperCase() ?? 'PROVIDER';
     final serviceName = shipment.serviceName ?? 'Shipping service';
     final status = OrderStatusUi.label(shipment.status);
+    final returnRequest = shipment.returnRequest;
+    final canRequestReturn =
+        shipment.canRequestReturn && returnRequest == null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -499,6 +510,111 @@ class OrderDetailsScreen extends ConsumerWidget {
             color: colors.textSecondary,
           ),
         ),
+        if (shipment.returnDeadlineAt != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            'Return deadline: ${DateFormat('MMM d, yyyy h:mm a').format(shipment.returnDeadlineAt!.toLocal())}',
+            style: TextStyle(
+              fontSize: 13,
+              fontFamily: 'Campton',
+              color: colors.textSecondary,
+            ),
+          ),
+        ],
+        if (returnRequest != null) ...[
+          const SizedBox(height: 8),
+          _buildReturnRequestChip(context, returnRequest),
+          const SizedBox(height: 8),
+          if ((returnRequest.reason ?? '').isNotEmpty)
+            Text(
+              'Reason: ${returnRequest.reason}',
+              style: TextStyle(
+                fontSize: 13,
+                fontFamily: 'Campton',
+                color: colors.textSecondary,
+              ),
+            ),
+          if ((returnRequest.rejectionReason ?? '').isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              'Rejection: ${returnRequest.rejectionReason}',
+              style: TextStyle(
+                fontSize: 13,
+                fontFamily: 'Campton',
+                color: colors.textSecondary,
+              ),
+            ),
+          ],
+          if ((returnRequest.shipbubbleReturnLabelUrl ?? '').isNotEmpty) ...[
+            const SizedBox(height: 4),
+            GestureDetector(
+              onTap: () async {
+                final url = Uri.tryParse(returnRequest.shipbubbleReturnLabelUrl!);
+                if (url == null) return;
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              },
+              child: Text(
+                'Open return label',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontFamily: 'Campton',
+                  color: colors.accent,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ],
+          if ((returnRequest.buyerReturnTrackingNumber ?? '').isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              'Return tracking: ${returnRequest.buyerReturnTrackingNumber}',
+              style: TextStyle(
+                fontSize: 13,
+                fontFamily: 'Campton',
+                color: colors.textSecondary,
+              ),
+            ),
+          ],
+          if (returnRequest.status == 'approved') ...[
+            const SizedBox(height: 12),
+            Text(
+              'Approved. Use the return label to send the item back, then tap below once it has been handed to the courier.',
+              style: TextStyle(
+                fontSize: 13,
+                fontFamily: 'Campton',
+                color: colors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => _showShipBackDialog(
+                  context,
+                  ref,
+                  order.id,
+                  shipment.id,
+                  returnRequest.id,
+                ),
+                child: const Text('Mark Shipped Back'),
+              ),
+            ),
+          ],
+        ] else if (canRequestReturn) ...[
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () => _showReturnDialog(
+                context,
+                ref,
+                order.id,
+                shipment.id,
+              ),
+              child: const Text('Request Return / Refund'),
+            ),
+          ),
+        ],
         if ((shipment.trackingNumber ?? '').isNotEmpty) ...[
           const SizedBox(height: 4),
           Text(
@@ -512,6 +628,178 @@ class OrderDetailsScreen extends ConsumerWidget {
         ],
       ],
     );
+  }
+
+  Widget _buildReturnRequestChip(
+    BuildContext context,
+    ShipmentReturnRequestSummary request,
+  ) {
+    final status = (request.status ?? 'pending_review').toLowerCase();
+    final config = switch (status) {
+      'approved' => (
+          label: 'Return approved',
+          background: const Color(0xFFE8F5E9),
+          foreground: const Color(0xFF2E7D32),
+        ),
+      'return_in_transit' => (
+          label: 'Returned in transit',
+          background: const Color(0xFFE0F2F1),
+          foreground: const Color(0xFF00897B),
+        ),
+      'rejected' => (
+          label: 'Return rejected',
+          background: const Color(0xFFFFEBEE),
+          foreground: const Color(0xFFC62828),
+        ),
+      'refund_pending' => (
+          label: 'Refund pending',
+          background: const Color(0xFFFFF1CC),
+          foreground: const Color(0xFF856404),
+        ),
+      'refunded' => (
+          label: 'Refunded',
+          background: const Color(0xFFE3F2FD),
+          foreground: const Color(0xFF1565C0),
+        ),
+      _ => (
+          label: 'Return under review',
+          background: const Color(0xFFE0F2F1),
+          foreground: const Color(0xFF00897B),
+        ),
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: config.background,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        config.label,
+        style: TextStyle(
+          fontSize: 12,
+          fontFamily: 'Campton',
+          fontWeight: FontWeight.w600,
+          color: config.foreground,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showReturnDialog(
+    BuildContext context,
+    WidgetRef ref,
+    int orderId,
+    int shipmentId,
+  ) async {
+    final controller = TextEditingController();
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Request Return'),
+        content: TextField(
+          controller: controller,
+          maxLines: 4,
+          decoration: const InputDecoration(
+            labelText: 'Reason',
+            hintText: 'Explain why you want to return this item',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Submit'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != true || !context.mounted) {
+      return;
+    }
+
+    if (controller.text.trim().isEmpty) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please provide a reason')),
+        );
+      }
+      return;
+    }
+
+    try {
+      await ref.read(orderActionsProvider.notifier).requestReturn(
+            orderId: orderId,
+            shipmentId: shipmentId,
+            reason: controller.text.trim(),
+          );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Return request submitted')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to submit return request: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _showShipBackDialog(
+    BuildContext context,
+    WidgetRef ref,
+    int orderId,
+    int shipmentId,
+    int returnRequestId,
+  ) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Mark Shipped Back'),
+        content: const Text(
+          'Confirm that you have handed the return package to the courier. Shipbubble details are already attached by the backend.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Submit'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != true || !context.mounted) {
+      return;
+    }
+
+    try {
+      await ref.read(orderActionsProvider.notifier).shipReturnBack(
+            orderId: orderId,
+            shipmentId: shipmentId,
+            returnRequestId: returnRequestId,
+          );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Return shipment marked')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to mark return shipment: $e')),
+        );
+      }
+    }
   }
 
   Widget _buildPaymentDetails(

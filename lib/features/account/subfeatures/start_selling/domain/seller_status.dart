@@ -53,6 +53,7 @@ class SellerStatus {
     this.businessCertificate,
     this.businessLogo,
     this.bankName,
+    this.bankCode,
     this.accountNumber,
   });
 
@@ -106,6 +107,7 @@ class SellerStatus {
   final String? businessCertificate;
   final String? businessLogo;
   final String? bankName;
+  final String? bankCode;
   final String? accountNumber;
 
   bool get isApprovedAndActive => registrationStatus == 'approved' && active;
@@ -180,6 +182,7 @@ class SellerStatus {
       businessCertificate: json['business_certificate'] as String?,
       businessLogo: json['business_logo'] as String?,
       bankName: json['bank_name'] as String?,
+      bankCode: json['bank_code'] as String?,
       accountNumber: json['account_number'] as String?,
     );
   }

@@ -43,6 +43,7 @@ class SellerRegistrationDraft {
     this.businessCertificatePath,
     this.businessLogoPath,
     this.bankName,
+    this.bankCode,
     this.accountNumber,
   });
 
@@ -89,6 +90,7 @@ class SellerRegistrationDraft {
   String? businessCertificatePath;
   String? businessLogoPath;
   String? bankName;
+  String? bankCode;
   String? accountNumber;
 
   Map<String, dynamic> toJson() => {
@@ -135,6 +137,7 @@ class SellerRegistrationDraft {
     'businessCertificatePath': businessCertificatePath,
     'businessLogoPath': businessLogoPath,
     'bankName': bankName,
+    'bankCode': bankCode,
     'accountNumber': accountNumber,
   };
 
@@ -194,6 +197,7 @@ class SellerRegistrationDraft {
       businessCertificatePath: json['businessCertificatePath'] as String?,
       businessLogoPath: json['businessLogoPath'] as String?,
       bankName: json['bankName'] as String?,
+      bankCode: json['bankCode'] as String?,
       accountNumber: json['accountNumber'] as String?,
     );
   }

@@ -26,6 +26,7 @@ class SellerProfilePayload {
     required this.address,
     required this.postalCode,
     required this.bankName,
+    required this.bankCode,
     required this.accountNumber,
     required this.authorizedSignatoryFullName,
     required this.authorizedSignatoryJobTitle,
@@ -71,6 +72,7 @@ class SellerProfilePayload {
   final String address;
   final String postalCode;
   final String bankName;
+  final String bankCode;
   final String accountNumber;
   final String authorizedSignatoryFullName;
   final String authorizedSignatoryJobTitle;
@@ -121,6 +123,7 @@ class SellerProfilePayload {
       'postal_code': postalCode,
       'country': country,
       'bank_name': bankName,
+      'bank_code': bankCode,
       'account_number': accountNumber,
       'authorized_signatory_full_name': authorizedSignatoryFullName,
       'authorized_signatory_job_title': authorizedSignatoryJobTitle,

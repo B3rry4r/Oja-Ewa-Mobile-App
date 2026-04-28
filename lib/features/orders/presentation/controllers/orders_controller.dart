@@ -142,6 +142,50 @@ class OrderActionsController extends AsyncNotifier<void> {
       rethrow;
     }
   }
+
+  Future<void> requestReturn({
+    required int orderId,
+    required int shipmentId,
+    required String reason,
+  }) async {
+    state = const AsyncLoading();
+    try {
+      await ref
+          .read(ordersRepositoryProvider)
+          .requestReturn(
+            orderId: orderId,
+            shipmentId: shipmentId,
+            reason: reason,
+          );
+      state = const AsyncData(null);
+      ref.invalidate(orderDetailsProvider(orderId));
+      ref.invalidate(ordersProvider);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
+  }
+
+  Future<void> shipReturnBack({
+    required int orderId,
+    required int shipmentId,
+    required int returnRequestId,
+  }) async {
+    state = const AsyncLoading();
+    try {
+      await ref.read(ordersRepositoryProvider).shipReturnBack(
+        orderId: orderId,
+        shipmentId: shipmentId,
+        returnRequestId: returnRequestId,
+      );
+      state = const AsyncData(null);
+      ref.invalidate(orderDetailsProvider(orderId));
+      ref.invalidate(ordersProvider);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
+  }
 }
 
 final orderActionsProvider =
