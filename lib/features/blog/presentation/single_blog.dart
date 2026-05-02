@@ -49,53 +49,63 @@ class BlogDetailScreen extends ConsumerWidget {
                     IconButton(
                       onPressed: () async {
                         final shareUrl = 'https://ojaewa.com/blog/$blogSlug';
-                        Share.share('Check out this blog: ${post.title}\n$shareUrl');
+                        Share.share(
+                          'Check out this blog: ${post.title}\n$shareUrl',
+                        );
                       },
                       icon: const Icon(Icons.share),
                     ),
                     IconButton(
                       onPressed: () async {
-                      final token = ref.read(accessTokenProvider);
-                      if (token == null || token.isEmpty) {
-                        if (!context.mounted) return;
-                        Navigator.of(context).pushNamed(AppRoutes.onboarding);
-                        return;
-                      }
-                      try {
-                        if (isFav) {
-                          await ref
-                              .read(blogFavoritesActionsProvider.notifier)
-                              .remove(post.id);
+                        final token = ref.read(accessTokenProvider);
+                        if (token == null || token.isEmpty) {
                           if (!context.mounted) return;
-                          AppSnackbars.showSuccess(
-                            context,
-                            'Removed from favorites',
-                          );
-                        } else {
-                          await ref
-                              .read(blogFavoritesActionsProvider.notifier)
-                              .add(post.id);
+                          Navigator.of(context).pushNamed(AppRoutes.onboarding);
+                          return;
+                        }
+                        try {
+                          if (isFav) {
+                            await ref
+                                .read(blogFavoritesActionsProvider.notifier)
+                                .remove(post.id);
+                            if (!context.mounted) return;
+                            AppSnackbars.showSuccess(
+                              context,
+                              'Removed from favorites',
+                            );
+                          } else {
+                            await ref
+                                .read(blogFavoritesActionsProvider.notifier)
+                                .add(post.id);
+                            if (!context.mounted) return;
+                            AppSnackbars.showSuccess(
+                              context,
+                              'Added to favorites',
+                            );
+                          }
+                        } catch (e) {
                           if (!context.mounted) return;
-                          AppSnackbars.showSuccess(
+                          AppSnackbars.showError(
                             context,
-                            'Added to favorites',
+                            UiErrorMessage.from(e),
                           );
                         }
-                      } catch (e) {
-                        if (!context.mounted) return;
-                        AppSnackbars.showError(context, UiErrorMessage.from(e));
-                      }
-                    },
-                    icon: Icon(
-                      isFav ? Icons.favorite : Icons.favorite_border,
-                      color: colors.accent,
+                      },
+                      icon: Icon(
+                        isFav ? Icons.favorite : Icons.favorite_border,
+                        color: colors.accent,
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
               Container(
                 color: colors.surfaceSecondary,
-                padding: const EdgeInsets.only(left: 18, right: 16, bottom: 24),
+                padding: const EdgeInsets.only(
+                  left: 18,
+                  right: 16,
+                  bottom: 24,
+                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -113,7 +123,7 @@ class BlogDetailScreen extends ConsumerWidget {
                               fit: BoxFit.cover,
                               width: 165,
                               height: 100,
-                              errorBuilder: (_, _, _) =>
+                              errorBuilder: (_, __, ___) =>
                                   const AppImagePlaceholder(
                                     width: 150,
                                     height: 100,
