@@ -423,9 +423,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () async {
-                      final details = ref.read(productDetailsProvider(productId));
+                      final details = ref.read(productDetailsProvider(widget.productId));
                       details.whenData((product) {
-                        final shareUrl = 'https://ojaewa.com/product/$productId';
+                        final shareUrl = 'https://ojaewa.com/product/${widget.productId}';
                         Share.share('Check out this product: ${product.name ?? "Item"}\n$shareUrl');
                       });
                     },

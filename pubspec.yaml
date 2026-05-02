@@ -39,6 +39,7 @@ dependencies:
   path: ^1.9.1
   shared_preferences: ^2.2.2
   app_links: ^6.1.1
+  share_plus: ^10.1.4
   syncfusion_flutter_pdfviewer: ^32.1.24
   audioplayers: ^5.2.1
   
