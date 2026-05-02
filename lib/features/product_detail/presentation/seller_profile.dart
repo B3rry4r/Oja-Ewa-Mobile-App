@@ -124,7 +124,7 @@ class SellerProfileScreen extends ConsumerWidget {
                                   fontWeight: FontWeight.w400,
                                   color: colors.textSecondary,
                                 ),
-),
+                              ),
                             ],
                           ),
                         ],
@@ -139,13 +139,12 @@ class SellerProfileScreen extends ConsumerWidget {
                       icon: const Icon(Icons.share, size: 24),
                     ),
                   ],
-                ),
-              ),
+                ), // ← Row closes here; Column children list continues below
 
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              // Contact info sections - only show if data exists
-              if ((seller.businessEmail ?? '').trim().isNotEmpty) ...[
+                // Contact info sections - only show if data exists
+                if ((seller.businessEmail ?? '').trim().isNotEmpty) ...[
                   Text(
                     'Email',
                     style: TextStyle(
@@ -325,7 +324,7 @@ class SellerProfileScreen extends ConsumerWidget {
                 ),
 
                 const SizedBox(height: 24),
-              ],
+              ], // ← Column children closes here
             ),
           );
         },
