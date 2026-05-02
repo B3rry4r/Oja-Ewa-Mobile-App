@@ -147,36 +147,6 @@ if (uri.host == 'nepc') {
       ),
     );
   }
-    }
-
-    // Handle product deep link: ojaewa://product/123
-    if (uri.host == 'product' && uri.pathSegments.isNotEmpty) {
-      final productId = int.tryParse(uri.pathSegments.first);
-      if (productId != null) {
-        _navigateToProduct(productId);
-      }
-    }
-
-    // Handle seller profile deep link: ojaewa://seller/123
-    if (uri.host == 'seller' && uri.pathSegments.isNotEmpty) {
-      final sellerId = int.tryParse(uri.pathSegments.first);
-      if (sellerId != null) {
-        _navigateToSeller(sellerId);
-      }
-    }
-
-    // Handle blog deep link: ojaewa://blog/some-slug
-    if (uri.host == 'blog' && uri.pathSegments.isNotEmpty) {
-      final blogSlug = uri.pathSegments.first;
-      _navigateToBlog(blogSlug);
-    }
-
-    // Handle advert deep link: ojaewa://ad/123
-    if (uri.host == 'ad' && uri.pathSegments.isNotEmpty) {
-      final adId = uri.pathSegments.first;
-      _showInfo('Ad view: $adId - Opens in app soon');
-    }
-  }
 
   Future<void> _handlePaymentCallback(Uri uri) async {
     final reference = uri.queryParameters['reference'];

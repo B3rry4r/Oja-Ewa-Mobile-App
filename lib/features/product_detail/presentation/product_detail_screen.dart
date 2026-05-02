@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -422,9 +423,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () async {
-                      final details = ref.read(productDetailsProvider(widget.productId));
+                      final details = ref.read(productDetailsProvider(productId));
                       details.whenData((product) {
-                        final shareUrl = 'https://ojaewa.com/product/${widget.productId}';
+                        final shareUrl = 'https://ojaewa.com/product/$productId';
                         Share.share('Check out this product: ${product.name ?? "Item"}\n$shareUrl');
                       });
                     },

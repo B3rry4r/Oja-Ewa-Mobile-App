@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
@@ -47,7 +48,7 @@ class BlogDetailScreen extends ConsumerWidget {
                   children: [
                     IconButton(
                       onPressed: () async {
-                        final shareUrl = 'https://ojaewa.com/blog/${widget.blogSlug}';
+                        final shareUrl = 'https://ojaewa.com/blog/$blogSlug';
                         Share.share('Check out this blog: ${post.title}\n$shareUrl');
                       },
                       icon: const Icon(Icons.share),

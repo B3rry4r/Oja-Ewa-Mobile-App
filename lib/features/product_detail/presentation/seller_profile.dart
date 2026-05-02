@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -132,7 +133,7 @@ class SellerProfileScreen extends ConsumerWidget {
                     const SizedBox(width: 8),
                     IconButton(
                       onPressed: () {
-                        final shareUrl = 'https://ojaewa.com/seller/${widget.sellerId}';
+                        final shareUrl = 'https://ojaewa.com/seller/$sellerId';
                         Share.share('Check out this shop: ${seller.businessName}\n$shareUrl');
                       },
                       icon: const Icon(Icons.share, size: 24),
