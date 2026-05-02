@@ -225,7 +225,11 @@ class _AdvertPlacementsScreenState
                       padding: const EdgeInsets.only(bottom: 12),
                       child: StatusCard(
                         title: item.title,
-                        subtitle: '${item.mediaType} · ${item.placement}',
+                        subtitle: [
+                          '${item.mediaType} · ${item.placement}',
+                          if ((item.adminNote ?? '').isNotEmpty)
+                            item.adminNote!,
+                        ].join(' · '),
                         status: item.status,
                         reference: item.applicationReference,
                       ),

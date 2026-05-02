@@ -107,13 +107,38 @@ class _NepcServicesScreenState extends ConsumerState<NepcServicesScreen> {
         badge: 'NEPC',
       ),
       const SizedBox(height: 20),
+      SectionTitle(
+        title: 'Application status',
+        actionLabel: 'Refresh',
+        onAction: () => ref.invalidate(nepcRequestsProvider),
+      ),
+      const SizedBox(height: 12),
       StatusCard(
         title: request.businessName,
-        subtitle:
-            '${_applicationTypes[request.applicationType] ?? request.applicationType} · ${_businessTypes[request.businessType] ?? request.businessType}',
+        subtitle: [
+          '${_applicationTypes[request.applicationType] ?? request.applicationType} · ${_businessTypes[request.businessType] ?? request.businessType}',
+          if ((request.adminNote ?? '').isNotEmpty) request.adminNote!,
+          if ((request.certificateUrl ?? '').isNotEmpty)
+            'Certificate available',
+        ].join(' · '),
         status: request.status,
         reference: request.applicationReference,
       ),
+      if ((request.certificateUrl ?? '').isNotEmpty) ...[
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton(
+            onPressed: () {
+              final uri = Uri.tryParse(request.certificateUrl!);
+              if (uri != null) {
+                launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            },
+            child: const Text('Open Certificate'),
+          ),
+        ),
+      ],
     ];
   }
 

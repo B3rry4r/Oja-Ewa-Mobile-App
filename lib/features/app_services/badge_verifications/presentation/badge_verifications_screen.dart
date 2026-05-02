@@ -143,8 +143,18 @@ class _BadgeVerificationsScreenState
         hasBusinessDocument: true,
       ),
       const SizedBox(height: 16),
+      SectionTitle(
+        title: 'Application status',
+        actionLabel: 'Refresh',
+        onAction: () {
+          ref.invalidate(badgeVerificationRequestsProvider);
+          ref.invalidate(mySellerStatusProvider);
+        },
+      ),
+      const SizedBox(height: 12),
       StatusCard(
         title: _badgeLabel(request.badge),
+        subtitle: request.reviewNote,
         status: request.status,
         reference: request.applicationReference,
       ),
@@ -179,6 +189,8 @@ class _BadgeVerificationsScreenState
         actionLabel: 'Refresh',
         onAction: () {
           ref.invalidate(badgeOptionsProvider);
+          ref.invalidate(badgeVerificationRequestsProvider);
+          ref.invalidate(mySellerStatusProvider);
         },
       ),
       const SizedBox(height: 12),

@@ -187,7 +187,7 @@ class _SellerRegistrationScreenState
           ),
           const SizedBox(height: 16),
           _buildTextInput(
-            'Business Registration Number (Optional if business name is provided)',
+            'Business Registration Number',
             'RC1234567',
             controller: _registrationNumberController,
           ),
@@ -198,18 +198,26 @@ class _SellerRegistrationScreenState
             controller: _tinController,
           ),
           const SizedBox(height: 16),
-          _buildDropdown(
-            label: 'Identity Type',
-            value: _identityType,
-            items: const {'nin': 'NIN', 'bvn': 'BVN'},
-            onChanged: (value) => setState(() => _identityType = value),
-          ),
-          const SizedBox(height: 16),
-          _buildTextInput(
-            _identityType == 'bvn' ? 'BVN' : 'NIN',
-            _identityType == 'bvn' ? 'Enter BVN' : 'Enter NIN',
-            controller: _identityValueController,
-          ),
+          if (_isNigerianSeller) ...[
+            _buildDropdown(
+              label: 'Identity Type',
+              value: _identityType,
+              items: const {'nin': 'NIN', 'bvn': 'BVN'},
+              onChanged: (value) => setState(() => _identityType = value),
+            ),
+            const SizedBox(height: 16),
+            _buildTextInput(
+              _identityType == 'bvn' ? 'BVN' : 'NIN',
+              _identityType == 'bvn' ? 'Enter BVN' : 'Enter NIN',
+              controller: _identityValueController,
+            ),
+          ] else ...[
+            _buildTextInput(
+              'Passport / Government ID Number',
+              'A12345678',
+              controller: _identityValueController,
+            ),
+          ],
           const SizedBox(height: 16),
           _buildTextInput(
             'Date of Incorporation',
@@ -737,7 +745,9 @@ class _SellerRegistrationScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Identity Document Upload',
+            _isNigerianSeller
+                ? 'Identity Document Upload'
+                : 'International Passport Upload',
             style: TextStyle(color: colors.textSecondary, fontSize: 14),
           ),
           const SizedBox(height: 8),
@@ -775,8 +785,6 @@ class _SellerRegistrationScreenState
   bool _validateStep1() {
     final requiredControllers = [
       _legalBusinessNameController,
-      _tinController,
-      _identityValueController,
       _dateOfIncorporationController,
       _countryOfIncorporationController,
       _emailController,
@@ -803,6 +811,24 @@ class _SellerRegistrationScreenState
       AppSnackbars.showError(context, 'Select your country and state');
       return false;
     }
+    if (_isNigerianSeller) {
+      if (_tinController.text.trim().isEmpty) {
+        AppSnackbars.showError(context, 'Provide Tax Identification Number');
+        return false;
+      }
+      if (_identityValueController.text.trim().isEmpty) {
+        AppSnackbars.showError(context, 'Provide either NIN or BVN');
+        return false;
+      }
+      if (_registrationNumberController.text.trim().isEmpty) {
+        AppSnackbars.showError(
+          context,
+          'Complete CAC registration before seller submission',
+        );
+        Navigator.of(context).pushNamed(AppRoutes.cacServices);
+        return false;
+      }
+    }
     if (_businessNameController.text.trim().isEmpty &&
         _registrationNumberController.text.trim().isEmpty) {
       AppSnackbars.showError(
@@ -811,8 +837,9 @@ class _SellerRegistrationScreenState
       );
       return false;
     }
-    if (_identityDocumentLocalPath == null ||
-        _identityDocumentLocalPath!.isEmpty) {
+    if (_isNigerianSeller &&
+        (_identityDocumentLocalPath == null ||
+            _identityDocumentLocalPath!.isEmpty)) {
       AppSnackbars.showError(context, 'Upload the identity document');
       return false;
     }
@@ -870,7 +897,7 @@ class _SellerRegistrationScreenState
               ..authorizedSignatoryIdNumber =
                   _signatoryIdController.text.trim().isNotEmpty
                   ? _signatoryIdController.text.trim()
-                  : '${_identityType.toUpperCase()}:${_identityValueController.text.trim()}'
+                  : _defaultSignatoryIdNumber()
               ..authorizedSignatoryDateOfBirth = _signatoryDobController.text
                   .trim()
               ..identityDocumentPath = _identityDocumentLocalPath;
@@ -906,5 +933,24 @@ class _SellerRegistrationScreenState
         ),
       ),
     );
+  }
+
+  bool get _isNigerianSeller {
+    return _isNigeria(_selectedCountryName) ||
+        _isNigeria(_countryOfIncorporationController.text);
+  }
+
+  bool _isNigeria(String value) {
+    final normalized = value.trim().toLowerCase();
+    return normalized == 'nigeria' || normalized == 'ng' || normalized == 'nga';
+  }
+
+  String _defaultSignatoryIdNumber() {
+    final value = _identityValueController.text.trim();
+    if (value.isEmpty) return '';
+    if (_isNigerianSeller) {
+      return '${_identityType.toUpperCase()}:$value';
+    }
+    return 'PASSPORT:$value';
   }
 }

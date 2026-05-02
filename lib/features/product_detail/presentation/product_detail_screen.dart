@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -417,6 +418,34 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                     onTap: () => Navigator.of(
                       context,
                     ).pushNamed(AppRoutes.notifications),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      final details = ref.read(productDetailsProvider(widget.productId));
+                      details.whenData((product) {
+                        final shareUrl = 'https://ojaewa.com/product/${widget.productId}';
+                        Share.share('Check out this product: ${product.name ?? "Item"}\n$shareUrl');
+                      });
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: colors.iconBackground,
+                        border: Border.all(color: colors.border),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: colors.shadow,
+                            blurRadius: 14,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.share, size: 20),
+                    ),
                   ),
                   const SizedBox(width: 8),
                   HeaderIconButton(

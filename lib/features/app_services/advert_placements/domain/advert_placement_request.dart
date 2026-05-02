@@ -11,6 +11,7 @@ class AdvertPlacementRequest {
     this.endDate,
     this.displayCurrency,
     this.displayTotalAmount,
+    this.adminNote,
   });
 
   final int id;
@@ -24,6 +25,7 @@ class AdvertPlacementRequest {
   final String? endDate;
   final String? displayCurrency;
   final String? displayTotalAmount;
+  final String? adminNote;
 
   factory AdvertPlacementRequest.fromJson(Map<String, dynamic> json) {
     return AdvertPlacementRequest(
@@ -38,6 +40,7 @@ class AdvertPlacementRequest {
       endDate: json['end_date'] as String?,
       displayCurrency: json['display_currency'] as String?,
       displayTotalAmount: json['display_total_amount']?.toString(),
+      adminNote: json['admin_note'] as String?,
     );
   }
 }

@@ -10,6 +10,7 @@ class CacRegistrationRequest {
     this.currency,
     this.amount,
     this.paidAt,
+    this.adminNote,
   });
 
   final int id;
@@ -22,6 +23,7 @@ class CacRegistrationRequest {
   final String? currency;
   final String? amount;
   final DateTime? paidAt;
+  final String? adminNote;
 
   factory CacRegistrationRequest.fromJson(Map<String, dynamic> json) {
     return CacRegistrationRequest(
@@ -37,6 +39,7 @@ class CacRegistrationRequest {
       paidAt: json['paid_at'] != null
           ? DateTime.tryParse(json['paid_at'].toString())
           : null,
+      adminNote: json['admin_note'] as String?,
     );
   }
 }

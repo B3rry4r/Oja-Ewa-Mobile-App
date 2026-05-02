@@ -101,11 +101,18 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
         badge: 'CAC Service',
       ),
       const SizedBox(height: 20),
+      SectionTitle(
+        title: 'Application status',
+        actionLabel: 'Refresh',
+        onAction: () => ref.invalidate(cacRequestsProvider),
+      ),
+      const SizedBox(height: 12),
       StatusCard(
         title: request.firstChoiceName,
-        subtitle: request.secondChoiceName.isEmpty
-            ? null
-            : request.secondChoiceName,
+        subtitle: [
+          if (request.secondChoiceName.isNotEmpty) request.secondChoiceName,
+          if ((request.adminNote ?? '').isNotEmpty) request.adminNote!,
+        ].join(' · '),
         status: request.status,
         reference: request.applicationReference,
       ),

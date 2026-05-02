@@ -6,6 +6,7 @@ class BadgeVerificationRequest {
     required this.applicationReference,
     this.currency,
     this.amount,
+    this.reviewNote,
   });
 
   final int id;
@@ -14,6 +15,7 @@ class BadgeVerificationRequest {
   final String applicationReference;
   final String? currency;
   final String? amount;
+  final String? reviewNote;
 
   factory BadgeVerificationRequest.fromJson(Map<String, dynamic> json) {
     return BadgeVerificationRequest(
@@ -23,6 +25,7 @@ class BadgeVerificationRequest {
       applicationReference: json['application_reference'] as String? ?? '',
       currency: json['currency'] as String?,
       amount: json['amount']?.toString(),
+      reviewNote: json['review_note'] as String?,
     );
   }
 }

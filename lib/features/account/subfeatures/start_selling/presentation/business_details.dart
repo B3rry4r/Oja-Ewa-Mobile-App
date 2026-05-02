@@ -8,6 +8,7 @@ import 'package:ojaewa/features/account/subfeatures/shared/widgets/compliance_pr
 
 import '../../../../../app/router/app_router.dart';
 import 'draft_utils.dart';
+import 'seller_registration_draft.dart';
 import 'widgets/bank_picker_sheet.dart';
 
 class BusinessDetailsScreen extends StatefulWidget {
@@ -229,7 +230,9 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
           ),
           const SizedBox(height: 16),
           _buildUploadCard(
-            label: 'Business Certificate',
+            label: _isNigerianDraft(draft)
+                ? 'CAC Business Certificate'
+                : 'Verified Business Document',
             selectedPath: _businessCertificatePath,
             onTap: () async {
               final path = await pickSingleFilePath();
@@ -640,6 +643,26 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
       );
       return false;
     }
+    final draft = sellerDraftFromArgs(
+      ModalRoute.of(context)?.settings.arguments,
+    );
+    if (_isNigerianDraft(draft) && (_businessCertificatePath ?? '').isEmpty) {
+      AppSnackbars.showError(
+        context,
+        'Complete CAC registration before seller submission',
+      );
+      Navigator.of(context).pushNamed(AppRoutes.cacServices);
+      return false;
+    }
+    if (!_isNigerianDraft(draft) &&
+        (_businessCertificatePath ?? '').isEmpty &&
+        (draft.identityDocumentPath ?? '').isEmpty) {
+      AppSnackbars.showError(
+        context,
+        'Upload a verified business document or international passport',
+      );
+      return false;
+    }
     return true;
   }
 
@@ -712,5 +735,15 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
       _bankCode = selected.code;
       _bankNameController.text = selected.name;
     });
+  }
+
+  bool _isNigerianDraft(SellerRegistrationDraft draft) {
+    return _isNigeria((draft.country ?? '').toString()) ||
+        _isNigeria((draft.countryOfIncorporation ?? '').toString());
+  }
+
+  bool _isNigeria(String value) {
+    final normalized = value.trim().toLowerCase();
+    return normalized == 'nigeria' || normalized == 'ng' || normalized == 'nga';
   }
 }

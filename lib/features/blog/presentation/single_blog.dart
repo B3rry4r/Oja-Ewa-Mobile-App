@@ -1,5 +1,6 @@
 // blog_detail_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
@@ -41,10 +42,18 @@ class BlogDetailScreen extends ConsumerWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(right: 16),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: IconButton(
-                    onPressed: () async {
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: () async {
+                        final shareUrl = 'https://ojaewa.com/blog/${widget.blogSlug}';
+                        Share.share('Check out this blog: ${post.title}\n$shareUrl');
+                      },
+                      icon: const Icon(Icons.share),
+                    ),
+                    IconButton(
+                      onPressed: () async {
                       final token = ref.read(accessTokenProvider);
                       if (token == null || token.isEmpty) {
                         if (!context.mounted) return;
