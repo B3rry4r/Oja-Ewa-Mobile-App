@@ -4,11 +4,15 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/router/app_router.dart';
 import '../../app/theme/app_theme_colors.dart';
 import '../../features/app_services/cac/presentation/controllers/cac_payment_controller.dart';
 import '../../features/app_services/nepc/presentation/controllers/nepc_payment_controller.dart';
+import '../../features/blog/presentation/single_blog.dart';
 import '../../features/home/subfeatures/schools/presentation/controllers/school_registration_controller.dart';
 import '../../features/orders/presentation/controllers/orders_controller.dart';
+import '../../features/product_detail/presentation/product_detail_screen.dart';
+import '../../features/product_detail/presentation/seller_profile.dart';
 import '../ui/snackbars.dart';
 
 /// Handles deep links for the app, particularly payment callbacks (Paystack and MoMo).
@@ -79,13 +83,98 @@ class DeepLinkHandler {
       }
     }
 
-    if (uri.host == 'nepc') {
+if (uri.host == 'nepc') {
       final pathSegments = uri.pathSegments;
       if (pathSegments.length >= 2 &&
           pathSegments[0] == 'payment' &&
           pathSegments[1] == 'callback') {
         _handleNepcPaymentCallback(uri);
       }
+    }
+
+    // Handle product deep link: ojaewa://product/123
+    if (uri.host == 'product' && uri.pathSegments.isNotEmpty) {
+      final productId = int.tryParse(uri.pathSegments.first);
+      if (productId != null) {
+        _navigateToProduct(productId);
+      }
+    }
+
+    // Handle seller profile deep link: ojaewa://seller/123
+    if (uri.host == 'seller' && uri.pathSegments.isNotEmpty) {
+      final sellerId = int.tryParse(uri.pathSegments.first);
+      if (sellerId != null) {
+        _navigateToSeller(sellerId);
+      }
+    }
+
+    // Handle blog deep link: ojaewa://blog/some-slug
+    if (uri.host == 'blog' && uri.pathSegments.isNotEmpty) {
+      final blogSlug = uri.pathSegments.first;
+      _navigateToBlog(blogSlug);
+    }
+  }
+
+  void _navigateToProduct(int productId) {
+    final context = _navigatorKey?.currentContext;
+    if (context == null) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ProductDetailsScreen(productId: productId),
+      ),
+    );
+  }
+
+  void _navigateToSeller(int sellerId) {
+    final context = _navigatorKey?.currentContext;
+    if (context == null) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => SellerProfileScreen(sellerId: sellerId),
+      ),
+    );
+  }
+
+  void _navigateToBlog(String slug) {
+    final context = _navigatorKey?.currentContext;
+    if (context == null) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => BlogDetailScreen(blogSlug: slug),
+      ),
+    );
+  }
+    }
+
+    // Handle product deep link: ojaewa://product/123
+    if (uri.host == 'product' && uri.pathSegments.isNotEmpty) {
+      final productId = int.tryParse(uri.pathSegments.first);
+      if (productId != null) {
+        _navigateToProduct(productId);
+      }
+    }
+
+    // Handle seller profile deep link: ojaewa://seller/123
+    if (uri.host == 'seller' && uri.pathSegments.isNotEmpty) {
+      final sellerId = int.tryParse(uri.pathSegments.first);
+      if (sellerId != null) {
+        _navigateToSeller(sellerId);
+      }
+    }
+
+    // Handle blog deep link: ojaewa://blog/some-slug
+    if (uri.host == 'blog' && uri.pathSegments.isNotEmpty) {
+      final blogSlug = uri.pathSegments.first;
+      _navigateToBlog(blogSlug);
+    }
+
+    // Handle advert deep link: ojaewa://ad/123
+    if (uri.host == 'ad' && uri.pathSegments.isNotEmpty) {
+      final adId = uri.pathSegments.first;
+      _showInfo('Ad view: $adId - Opens in app soon');
     }
   }
 
