@@ -133,8 +133,10 @@ class SellerProfileScreen extends ConsumerWidget {
                     const SizedBox(width: 8),
                     IconButton(
                       onPressed: () {
+                        final box = context.findRenderObject() as RenderBox?;
+                        final sharePositionOrigin = box != null ? box.localToGlobal(Offset.zero) & box.size : null;
                         final shareUrl = 'https://ojaewa.com/seller/$sellerId';
-                        Share.share('Check out this shop: ${seller.businessName}\n$shareUrl');
+                        Share.share('Check out this shop: ${seller.businessName}\n$shareUrl', sharePositionOrigin: sharePositionOrigin);
                       },
                       icon: const Icon(Icons.share, size: 24),
                     ),

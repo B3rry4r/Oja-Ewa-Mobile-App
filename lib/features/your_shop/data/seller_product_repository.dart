@@ -40,6 +40,10 @@ class SellerProductRepository {
     required int processingDays,
     required num price,
     int? discount,
+    num? weightKg,
+    num? lengthCm,
+    num? widthCm,
+    num? heightCm,
   }) {
     return _api.createProduct(
       categoryId: categoryId,
@@ -54,6 +58,10 @@ class SellerProductRepository {
       processingDays: processingDays,
       price: price,
       discount: discount,
+      weightKg: weightKg,
+      lengthCm: lengthCm,
+      widthCm: widthCm,
+      heightCm: heightCm,
     );
   }
 
@@ -79,6 +87,10 @@ class SellerProductRepository {
     int? processingDays,
     num? price,
     int? discount,
+    num? weightKg,
+    num? lengthCm,
+    num? widthCm,
+    num? heightCm,
   }) {
     return _api.updateProduct(
       productId: productId,
@@ -94,6 +106,10 @@ class SellerProductRepository {
       processingDays: processingDays,
       price: price,
       discount: discount,
+      weightKg: weightKg,
+      lengthCm: lengthCm,
+      widthCm: widthCm,
+      heightCm: heightCm,
     );
   }
 

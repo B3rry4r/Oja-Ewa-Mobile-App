@@ -422,12 +422,21 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                   ),
                   const SizedBox(width: 8),
                   GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () async {
-                      final details = ref.read(productDetailsProvider(widget.productId));
-                      details.whenData((product) {
-                        final shareUrl = 'https://ojaewa.com/product/${widget.productId}';
-                        Share.share('Check out this product: ${product.name ?? "Item"}\n$shareUrl');
-                      });
+                      final box = context.findRenderObject() as RenderBox?;
+                      final sharePositionOrigin = box != null 
+                          ? box.localToGlobal(Offset.zero) & box.size 
+                          : null;
+                      
+                      final shareUrl = 'https://ojaewa.com/product/${widget.productId}';
+                      // Use productTitle which is already calculated in build()
+                      final text = 'Check out this product: ${productTitle.isNotEmpty ? productTitle : "Item"}\n$shareUrl';
+                      
+                      Share.share(
+                        text,
+                        sharePositionOrigin: sharePositionOrigin,
+                      );
                     },
                     child: Container(
                       width: 40,

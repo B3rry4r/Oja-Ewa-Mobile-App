@@ -51,6 +51,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   final _discountController = TextEditingController();
+  final _weightController = TextEditingController();
+  final _lengthController = TextEditingController();
+  final _widthController = TextEditingController();
+  final _heightController = TextEditingController();
   final _processingDaysController = TextEditingController(text: '3');
 
   String? _imagePath;
@@ -90,6 +94,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     _descriptionController.dispose();
     _priceController.dispose();
     _discountController.dispose();
+    _weightController.dispose();
+    _lengthController.dispose();
+    _widthController.dispose();
+    _heightController.dispose();
     _processingDaysController.dispose();
     super.dispose();
   }
@@ -192,6 +200,56 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             hint: 'Enter discount percentage',
             controller: _discountController,
             keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 16),
+
+          // Shipping Dimensions (New)
+          Text(
+            'Shipping Dimensions (Optional)',
+            style: TextStyle(
+              fontSize: 16,
+              fontFamily: 'Campton',
+              fontWeight: FontWeight.w600,
+              color: context.appColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          _buildTextField(
+            label: 'Weight (kg)',
+            hint: 'e.g. 0.5',
+            controller: _weightController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildTextField(
+                  label: 'Length (cm)',
+                  hint: '30',
+                  controller: _lengthController,
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildTextField(
+                  label: 'Width (cm)',
+                  hint: '20',
+                  controller: _widthController,
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildTextField(
+                  label: 'Height (cm)',
+                  hint: '10',
+                  controller: _heightController,
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
 
@@ -762,6 +820,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               processingDays: processingDays,
               price: price,
               discount: discount,
+              weightKg: num.tryParse(_weightController.text.trim()),
+              lengthCm: num.tryParse(_lengthController.text.trim()),
+              widthCm: num.tryParse(_widthController.text.trim()),
+              heightCm: num.tryParse(_heightController.text.trim()),
             );
 
         // Upload image if provided
@@ -805,6 +867,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               processingDays: processingDays,
               price: price,
               discount: discount,
+              weightKg: num.tryParse(_weightController.text.trim()),
+              lengthCm: num.tryParse(_lengthController.text.trim()),
+              widthCm: num.tryParse(_widthController.text.trim()),
+              heightCm: num.tryParse(_heightController.text.trim()),
             );
 
         // Upload image if provided - get product ID from result

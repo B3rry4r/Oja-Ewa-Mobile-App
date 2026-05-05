@@ -30,6 +30,10 @@ class SellerProductActionsNotifier extends AsyncNotifier<void> {
     required int processingDays,
     required num price,
     int? discount,
+    num? weightKg,
+    num? lengthCm,
+    num? widthCm,
+    num? heightCm,
   }) async {
     state = const AsyncLoading();
     try {
@@ -46,6 +50,10 @@ class SellerProductActionsNotifier extends AsyncNotifier<void> {
             processingDays: processingDays,
             price: price,
             discount: discount,
+            weightKg: weightKg,
+            lengthCm: lengthCm,
+            widthCm: widthCm,
+            heightCm: heightCm,
           );
       state = const AsyncData(null);
       return result;
@@ -84,6 +92,10 @@ class SellerProductActionsNotifier extends AsyncNotifier<void> {
     int? processingDays,
     num? price,
     int? discount,
+    num? weightKg,
+    num? lengthCm,
+    num? widthCm,
+    num? heightCm,
   }) async {
     state = const AsyncLoading();
     try {
@@ -101,6 +113,10 @@ class SellerProductActionsNotifier extends AsyncNotifier<void> {
             processingDays: processingDays,
             price: price,
             discount: discount,
+            weightKg: weightKg,
+            lengthCm: lengthCm,
+            widthCm: widthCm,
+            heightCm: heightCm,
           );
       state = const AsyncData(null);
       return result;
