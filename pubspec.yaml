@@ -71,12 +71,13 @@ flutter:
 
   uses-material-design: true
 
-  assets:
-    - assets/OJAEWA3.mpeg
-    - assets/docs/
-    - assets/icons/
-    - assets/icons/new_icons/
-    - assets/app_icon/
+assets:
+  - assets/ojaewa_landng_video.mp4
+  - assets/OJAEWA3.mp3
+  - assets/docs/
+  - assets/icons/
+  - assets/icons/new_icons/
+  - assets/app_icon/
 
   fonts:
     - family: Campton

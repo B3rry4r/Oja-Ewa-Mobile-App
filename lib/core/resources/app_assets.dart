@@ -60,3 +60,7 @@ abstract class AppImages {
   static const String appIconPng2 = 'assets/app_icon/icon2.png';
   static const String appBackground = 'assets/app_icon/background.png';
 }
+
+abstract class AppVideos {
+  static const String onboardingVideo = 'assets/ojaewa_landng_video.mp4';
+}

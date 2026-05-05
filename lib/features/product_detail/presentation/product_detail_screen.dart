@@ -430,8 +430,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                           : null;
                       
                       final shareUrl = 'https://ojaewa.com/product/${widget.productId}';
-                      // Use productTitle which is already calculated in build()
-                      final text = 'Check out this product: ${productTitle.isNotEmpty ? productTitle : "Item"}\n$shareUrl';
+                      final product = ref.read(productDetailsProvider(widget.productId)).value;
+                      final title = (product?.name ?? '').trim();
+                      final text = 'Check out this product: ${title.isNotEmpty ? title : "Item"}\n$shareUrl';
                       
                       Share.share(
                         text,

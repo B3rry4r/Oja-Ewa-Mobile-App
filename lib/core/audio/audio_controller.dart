@@ -40,7 +40,7 @@ class AudioController extends Notifier<bool> {
     _initialized = true;
 
     try {
-      await _player.setSource(AssetSource('OJAEWA3.mpeg'));
+      await _player.setSource(AssetSource('OJAEWA3.mp3'));
       _sourceSet = true;
       debugPrint('AudioPlayer: Source set successfully');
       await play();
