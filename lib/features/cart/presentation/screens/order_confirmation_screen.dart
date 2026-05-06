@@ -204,6 +204,7 @@ class _OrderConfirmationScreenState
                     context: context,
                     cart: cart,
                     quotesAsync: shippingQuotesAsync,
+                    selectedAddress: selectedAddress,
                   ),
                   const SizedBox(height: 32),
                   _buildItemsSection(context, cart.items.length),
@@ -218,6 +219,7 @@ class _OrderConfirmationScreenState
     required BuildContext context,
     required Cart cart,
     required AsyncValue<List<SellerShippingQuotes>> quotesAsync,
+    required Address? selectedAddress,
   }) {
     final colors = context.appColors;
     final sellerNames = _sellerNamesById(cart);
