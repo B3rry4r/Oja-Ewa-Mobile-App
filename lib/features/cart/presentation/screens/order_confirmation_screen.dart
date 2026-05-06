@@ -254,6 +254,23 @@ class _OrderConfirmationScreenState
             'Failed to load shipping options: $error',
             style: const TextStyle(color: Color(0xFFB3261E)),
           ),
+          const SizedBox(height: 8),
+          TextButton.icon(
+            onPressed: () {
+              final req = ref.read(logisticsQuoteRequestProvider(selectedAddress));
+              if (req != null) {
+                ref.invalidate(logisticsQuotesProvider(req));
+              }
+            },
+            icon: const Icon(Icons.refresh, size: 18),
+            label: const Text('Retry'),
+            style: TextButton.styleFrom(
+              foregroundColor: colors.accent,
+              padding: EdgeInsets.zero,
+              minimumSize: const Size(0, 32),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
         ],
       ),
       data: (groups) {

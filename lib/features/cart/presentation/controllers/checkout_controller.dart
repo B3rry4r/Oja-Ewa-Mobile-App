@@ -36,5 +36,7 @@ final logisticsQuotesProvider = FutureProvider.autoDispose
       final token = ref.watch(accessTokenProvider);
       if (token == null || token.isEmpty) return const [];
 
+      ref.keepAlive();
+
       return ref.read(ordersRepositoryProvider).getShippingQuotes(request);
     });
