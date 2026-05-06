@@ -101,9 +101,10 @@ class _OrderConfirmationScreenState
                   return;
                 }
                 if (shippingQuotesAsync.hasError || quoteGroups == null) {
+                  final errorMsg = shippingQuotesAsync.error?.toString() ?? 'Failed to load shipping options';
                   AppSnackbars.showError(
                     context,
-                    'Failed to load shipping options',
+                    errorMsg.length > 100 ? '${errorMsg.substring(0, 100)}...' : errorMsg,
                   );
                   return;
                 }
