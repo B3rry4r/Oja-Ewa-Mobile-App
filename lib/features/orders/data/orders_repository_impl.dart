@@ -81,8 +81,11 @@ class OrdersRepository {
     returnRequestId: returnRequestId,
   );
 
-  Future<PaymentLink> createOrderPaymentLink({required int orderId}) =>
-      _paymentsApi.createOrderPaymentLink(orderId: orderId);
+  Future<PaymentLink> createOrderPaymentLink({
+    required int orderId,
+    String? currency,
+  }) =>
+      _paymentsApi.createOrderPaymentLink(orderId: orderId, currency: currency);
 
   Future<PaymentVerifyResult> verifyPayment({required String reference, String? transactionId}) =>
       _paymentsApi.verify(reference: reference, transactionId: transactionId);

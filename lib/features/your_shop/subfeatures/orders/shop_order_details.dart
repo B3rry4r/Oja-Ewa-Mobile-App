@@ -106,7 +106,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
             _buildDetailTile(
               context,
               "Shipping Fee",
-              formatPrice(order.shippingFee!),
+              formatPriceFx(order.shippingFee!, order.currency),
             ),
           if ((order.paymentStatus ?? '').isNotEmpty)
             _buildDetailTile(context, "Payment Status", order.paymentStatus!),
@@ -156,7 +156,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
           ...order.items.map((item) => _buildItemTile(context, item)),
 
           const SizedBox(height: 20),
-          _buildDetailTile(context, "Total", formatPrice(order.totalPrice)),
+          _buildDetailTile(context, "Total", formatPriceFx(order.totalPrice, order.currency)),
 
           if (order.trackingNumber != null)
             _buildDetailTile(context, "Tracking Number", order.trackingNumber!),
@@ -323,7 +323,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  formatPrice(item.price),
+                  formatPriceFx(item.price, order.currency),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

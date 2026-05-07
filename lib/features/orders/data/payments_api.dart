@@ -11,12 +11,22 @@ class PaymentsApi {
   /// The callback URL scheme for deep linking back to the app after payment
   static const callbackUrl = 'ojaewa://payment/callback';
 
-  Future<PaymentLink> createOrderPaymentLink({required int orderId}) async {
+  Future<PaymentLink> createOrderPaymentLink({
+    required int orderId,
+    // Currency is optional — server derives it from the order's shipping country.
+    // Passing it here is belt-and-suspenders: the server will prefer its own
+    // stored value but having it in the request aids debugging.
+    String? currency,
+  }) async {
     try {
-      final res = await _dio.post('/api/payment/link', data: {
+      final body = <String, dynamic>{
         'order_id': orderId,
         'callback_url': callbackUrl,
-      });
+      };
+      if (currency != null && currency.isNotEmpty) {
+        body['currency'] = currency.toUpperCase();
+      }
+      final res = await _dio.post('/api/payment/link', data: body);
       final data = res.data;
       if (data is! Map<String, dynamic>) throw const FormatException('Unexpected response');
       return PaymentLink.fromWrappedResponse((data['data'] as Map?)?.cast<String, dynamic>() ?? const {});

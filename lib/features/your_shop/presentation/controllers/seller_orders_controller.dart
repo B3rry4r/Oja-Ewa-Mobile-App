@@ -73,6 +73,7 @@ class SellerOrdersRealtimeController extends AsyncNotifier<List<SellerOrder>> {
                   provider: order.provider,
                   serviceName: order.serviceName,
                   shippingFee: order.shippingFee,
+                  currency: order.currency,
                   paymentStatus: order.paymentStatus,
                   shippingAddress: order.shippingAddress,
                   items: order.items,
@@ -217,6 +218,8 @@ class SellerOrder {
   final ShippingAddress? shippingAddress;
   final List<SellerOrderItem> items;
   final double totalPrice;
+  /// ISO 4217 currency code. Defaults to NGN for legacy orders.
+  final String currency;
   final String? trackingNumber;
   final DateTime? shippedAt;
   final DateTime? deliveredAt;
@@ -245,6 +248,7 @@ class SellerOrder {
     this.shippingAddress,
     required this.items,
     required this.totalPrice,
+    this.currency = 'NGN',
     this.trackingNumber,
     this.shippedAt,
     this.deliveredAt,
@@ -311,6 +315,7 @@ class SellerOrder {
           : null,
       items: itemsList.map((e) => SellerOrderItem.fromJson(e)).toList(),
       totalPrice: _parseDouble(json['total_price']) ?? 0,
+      currency: (json['currency'] as String?)?.toUpperCase() ?? 'NGN',
       trackingNumber: json['tracking_number'] as String?,
       shippedAt: json['shipped_at'] != null
           ? DateTime.tryParse(json['shipped_at'] as String)

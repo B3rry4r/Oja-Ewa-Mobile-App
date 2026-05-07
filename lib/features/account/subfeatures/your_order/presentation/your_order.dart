@@ -54,7 +54,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
               final hasReviewButton = status == 'delivered';
               final itemCount =
                   '${order.items.length} item${order.items.length == 1 ? '' : 's'}';
-              final totalAmount = formatPrice(order.totalPrice ?? 0);
+              final totalAmount = formatPriceFx(order.totalPrice ?? 0, order.currency);
 
               return InkWell(
                 onTap: () => Navigator.of(context).pushNamed(

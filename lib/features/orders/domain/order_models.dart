@@ -215,6 +215,7 @@ class OrderSummary {
     required this.createdAt,
     required this.items,
     required this.shipments,
+    this.currency = 'NGN',
   });
 
   final int id;
@@ -228,6 +229,8 @@ class OrderSummary {
   final DateTime? createdAt;
   final List<OrderItem> items;
   final List<ShipmentSummary> shipments;
+  /// ISO 4217 currency code for this order. Defaults to NGN for legacy orders.
+  final String currency;
 
   static num? _parseNum(dynamic v) {
     if (v is num) return v;
@@ -260,6 +263,7 @@ class OrderSummary {
                 .map(ShipmentSummary.fromJson)
                 .toList()
           : const [],
+      currency: (json['currency'] as String?)?.toUpperCase() ?? 'NGN',
     );
   }
 }

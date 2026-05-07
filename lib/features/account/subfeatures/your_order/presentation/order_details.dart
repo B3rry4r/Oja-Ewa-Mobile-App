@@ -84,7 +84,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 _buildShippingAddress(context, shippingTo),
                 const SizedBox(height: 16),
-                _buildItemsInOrder(context, order.items),
+                _buildItemsInOrder(context, order.items, currency: order.currency),
                 const SizedBox(height: 16),
                 if (effectiveOrder.shipments.isNotEmpty) ...[
                   _buildShipments(context, ref, effectiveOrder, effectiveOrder.shipments),
@@ -96,6 +96,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                   effectiveOrder.deliveryFee,
                   effectiveOrder.paymentStatus,
                   effectiveOrder.paymentReference,
+                  currency: effectiveOrder.currency,
                 ),
                 const SizedBox(height: 16),
               ],
@@ -301,7 +302,7 @@ class OrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildItemsInOrder(BuildContext context, List<OrderItem> items) {
+  Widget _buildItemsInOrder(BuildContext context, List<OrderItem> items, {String currency = 'NGN'}) {
     final colors = context.appColors;
     return Container(
       width: double.infinity,
@@ -327,7 +328,7 @@ class OrderDetailsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
 
           for (int i = 0; i < items.length; i++) ...[
-            _buildOrderItem(context: context, item: items[i]),
+            _buildOrderItem(context: context, item: items[i], currency: currency),
             if (i < items.length - 1) const SizedBox(height: 20),
           ],
         ],
@@ -338,6 +339,7 @@ class OrderDetailsScreen extends ConsumerWidget {
   Widget _buildOrderItem({
     required BuildContext context,
     required OrderItem item,
+    String currency = 'NGN',
   }) {
     final colors = context.appColors;
     final img = item.product.image;
@@ -387,7 +389,7 @@ class OrderDetailsScreen extends ConsumerWidget {
               const SizedBox(height: 8),
 
               Text(
-                formatPrice(price),
+                formatPriceFx(price, currency),
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'Campton',
@@ -503,7 +505,7 @@ class OrderDetailsScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'Shipping Fee: ${formatPrice(shipment.shippingFee ?? 0)}',
+          'Shipping Fee: ${formatPriceFx(shipment.shippingFee ?? 0, order.currency)}',
           style: TextStyle(
             fontSize: 13,
             fontFamily: 'Campton',
@@ -807,8 +809,9 @@ class OrderDetailsScreen extends ConsumerWidget {
     num total,
     num? deliveryFee,
     String? paymentStatus,
-    String? paymentReference,
-  ) {
+    String? paymentReference, {
+    String currency = 'NGN',
+  }) {
     final colors = context.appColors;
     final subtotal = deliveryFee == null ? total : (total - deliveryFee);
 
@@ -875,7 +878,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                 ),
               ),
               Text(
-                formatPrice(subtotal < 0 ? 0 : subtotal),
+                formatPriceFx(subtotal < 0 ? 0 : subtotal, currency),
                 style: TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
@@ -899,7 +902,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                 ),
               ),
               Text(
-                formatPrice(deliveryFee ?? 0),
+                formatPriceFx(deliveryFee ?? 0, currency),
                 style: TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',
@@ -949,7 +952,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                 ),
               ),
               Text(
-                formatPrice(total),
+                formatPriceFx(total, currency),
                 style: TextStyle(
                   fontSize: 10,
                   fontFamily: 'Campton',

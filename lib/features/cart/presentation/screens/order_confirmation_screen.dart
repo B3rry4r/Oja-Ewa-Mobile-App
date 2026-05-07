@@ -17,6 +17,7 @@ import 'package:ojaewa/features/cart/presentation/widgets/payment_method_sheet.d
 import 'package:ojaewa/features/orders/data/orders_repository_impl.dart';
 import 'package:ojaewa/features/orders/domain/logistics_models.dart';
 import 'package:ojaewa/features/cart/presentation/screens/momo_payment_screen.dart';
+import 'package:ojaewa/core/utils/currency_utils.dart';
 
 class OrderConfirmationScreen extends ConsumerStatefulWidget {
   const OrderConfirmationScreen({super.key, this.hasAddress = true});
@@ -77,6 +78,7 @@ class _OrderConfirmationScreenState
         cart: cart,
         quotesAsync: shippingQuotesAsync,
         isBusy: isBusy,
+        currency: currencyForCountry(selectedAddress?.country ?? ''),
         onPlaceOrder: isBusy
             ? null
             : () async {
@@ -188,8 +190,17 @@ class _OrderConfirmationScreenState
                       selectedAddress.phone,
                     );
                   } else {
-                    // Flutterwave payment flow
-                    await _handleFlutterwavePayment(context, ref, order.id);
+                    // Flutterwave payment flow.
+                    // Derive currency from the delivery country — server does the same.
+                    // This is for belt-and-suspenders: the server stored the currency on
+                    // the order at creation time and is the authoritative source.
+                    final orderCurrency = currencyForCountry(selectedAddress.country);
+                    await _handleFlutterwavePayment(
+                      context,
+                      ref,
+                      order.id,
+                      currency: orderCurrency,
+                    );
                   }
                 } catch (e) {
                   if (context.mounted) {
@@ -355,7 +366,7 @@ class _OrderConfirmationScreenState
                           style: TextStyle(color: colors.textSecondary),
                         ),
                         secondary: Text(
-                          formatPrice(quote.amount),
+                          formatPriceFx(quote.amount, quote.currency.isNotEmpty ? quote.currency : 'NGN'),
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             color: colors.textPrimary,
@@ -529,6 +540,7 @@ class _OrderConfirmationScreenState
     required AsyncValue<List<SellerShippingQuotes>> quotesAsync,
     required bool isBusy,
     required VoidCallback? onPlaceOrder,
+    required String currency,
   }) {
     final colors = context.appColors;
     final subtotal = cart?.total ?? 0;
@@ -588,7 +600,7 @@ class _OrderConfirmationScreenState
                     style: TextStyle(fontSize: 14, color: colors.textSecondary),
                   ),
                   Text(
-                    formatPrice(subtotal),
+                    Text(formatPriceFx(subtotal, currency), style: TextStyle(fontSize: 14, color: colors.textPrimary)),
                     style: TextStyle(fontSize: 14, color: colors.textPrimary),
                   ),
                 ],
@@ -603,7 +615,7 @@ class _OrderConfirmationScreenState
                     style: TextStyle(fontSize: 14, color: colors.textSecondary),
                   ),
                   Text(
-                    formatPrice(deliveryFee),
+                    Text(formatPriceFx(deliveryFee, currency), style: TextStyle(fontSize: 14, color: colors.textPrimary)),
                     style: TextStyle(fontSize: 14, color: colors.textPrimary),
                   ),
                 ],
@@ -624,7 +636,7 @@ class _OrderConfirmationScreenState
                     ),
                   ),
                   Text(
-                    formatPrice(total),
+                    Text(formatPriceFx(total, currency), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFFFDAF40))),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -682,12 +694,13 @@ class _OrderConfirmationScreenState
   Future<void> _handleFlutterwavePayment(
     BuildContext context,
     WidgetRef ref,
-    int orderId,
-  ) async {
+    int orderId, {
+    String currency = 'NGN',
+  }) async {
     try {
       final link = await ref
           .read(ordersRepositoryProvider)
-          .createOrderPaymentLink(orderId: orderId);
+          .createOrderPaymentLink(orderId: orderId, currency: currency);
 
       final uri = Uri.tryParse(link.paymentUrl);
       if (uri == null || link.paymentUrl.isEmpty) {
