@@ -66,8 +66,8 @@ class PaymentMethodSheet extends StatelessWidget {
 
               // Flutterwave option
               _PaymentMethodOption(
-                title: 'Card / Bank Transfer',
-                subtitle: 'Pay securely with Flutterwave',
+                title: 'Flutterwave',
+                subtitle: 'Pay with card or bank transfer',
                 onTap: () => Navigator.of(context).pop('flutterwave'),
               ),
               const SizedBox(height: 16),
