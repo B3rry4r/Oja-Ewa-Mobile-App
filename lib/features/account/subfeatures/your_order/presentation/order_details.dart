@@ -811,6 +811,8 @@ class OrderDetailsScreen extends ConsumerWidget {
     String? paymentStatus,
     String? paymentReference, {
     String currency = 'NGN',
+    num? exchangeRate,
+    num? originalAmountNgn,
   }) {
     final colors = context.appColors;
     final subtotal = deliveryFee == null ? total : (total - deliveryFee);
