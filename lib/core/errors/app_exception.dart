@@ -9,7 +9,7 @@ class AppException implements Exception {
   final Object? cause;
 
   @override
-  String toString() => 'AppException(message: $message, code: $code, cause: $cause)';
+  String toString() => message;
 }
 
 class NetworkException extends AppException {

@@ -92,19 +92,34 @@ class _OrderConfirmationScreenState
                   AppSnackbars.showError(context, 'Your cart is empty');
                   return;
                 }
-                final quoteGroups = shippingQuotesAsync.asData?.value;
-                if (shippingQuotesAsync.isLoading) {
+                // Check error BEFORE loading: a failed request (422/502) transitions
+                // directly to error — checking isLoading first would show a misleading
+                // "still loading" message when the request has actually failed.
+                if (shippingQuotesAsync.hasError) {
+                  final err = shippingQuotesAsync.error;
+                  final errorMsg = (err is Exception)
+                      ? err.toString()
+                      : (err?.toString() ?? 'Failed to load shipping options');
                   AppSnackbars.showError(
                     context,
-                    'Shipping options are still loading',
+                    errorMsg.length > 150
+                        ? '${errorMsg.substring(0, 150)}...'
+                        : errorMsg,
                   );
                   return;
                 }
-                if (shippingQuotesAsync.hasError || quoteGroups == null) {
-                  final errorMsg = shippingQuotesAsync.error?.toString() ?? 'Failed to load shipping options';
+                if (shippingQuotesAsync.isLoading) {
                   AppSnackbars.showError(
                     context,
-                    errorMsg.length > 100 ? '${errorMsg.substring(0, 100)}...' : errorMsg,
+                    'Shipping options are still loading, please wait',
+                  );
+                  return;
+                }
+                final quoteGroups = shippingQuotesAsync.asData?.value;
+                if (quoteGroups == null) {
+                  AppSnackbars.showError(
+                    context,
+                    'Failed to load shipping options. Please try again.',
                   );
                   return;
                 }
