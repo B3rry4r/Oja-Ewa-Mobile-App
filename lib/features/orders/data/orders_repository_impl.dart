@@ -84,8 +84,8 @@ class OrdersRepository {
   Future<PaymentLink> createOrderPaymentLink({required int orderId}) =>
       _paymentsApi.createOrderPaymentLink(orderId: orderId);
 
-  Future<PaymentVerifyResult> verifyPayment({required String reference}) =>
-      _paymentsApi.verify(reference: reference);
+  Future<PaymentVerifyResult> verifyPayment({required String reference, String? transactionId}) =>
+      _paymentsApi.verify(reference: reference, transactionId: transactionId);
 
   // MoMo payment methods
   Future<MoMoPaymentInitResponse> initializeMoMoPayment({

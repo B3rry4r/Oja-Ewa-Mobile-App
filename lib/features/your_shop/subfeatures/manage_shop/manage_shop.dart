@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
+import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
+import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/draft_utils.dart';
 
 import '../../../../../app/router/app_router.dart';
 
-class ManageShopScreen extends StatelessWidget {
+class ManageShopScreen extends ConsumerWidget {
   const ManageShopScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
+    final sellerStatus = ref.watch(sellerStatusProvider);
+
     return AppPageScaffold(
       title: 'Manage Shop',
       child: Column(
@@ -19,8 +24,17 @@ class ManageShopScreen extends StatelessWidget {
           _buildMenuOption(
             context: context,
             title: "Edit Business Information",
-            onTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.editBusiness),
+            onTap: () {
+              // Pre-fill the seller registration form with existing profile data
+              // so the seller sees their current info and can update it.
+              final args = sellerStatus != null
+                  ? sellerDraftFromStatus(sellerStatus).toJson()
+                  : <String, dynamic>{};
+              Navigator.of(context).pushNamed(
+                AppRoutes.sellerRegistration,
+                arguments: args,
+              );
+            },
           ),
           _buildMenuOption(
             context: context,
@@ -42,7 +56,7 @@ class ManageShopScreen extends StatelessWidget {
     final colors = context.appColors;
     return Container(
       width: double.infinity,
-      height: 72, // Height from IR
+      height: 72,
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(

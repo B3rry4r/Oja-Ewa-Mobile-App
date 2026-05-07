@@ -128,12 +128,12 @@ class OrderActionsController extends AsyncNotifier<void> {
     }
   }
 
-  Future<PaymentVerifyResult> verifyPayment({required String reference}) async {
+  Future<PaymentVerifyResult> verifyPayment({required String reference, String? transactionId}) async {
     state = const AsyncLoading();
     try {
       final res = await ref
           .read(ordersRepositoryProvider)
-          .verifyPayment(reference: reference);
+          .verifyPayment(reference: reference, transactionId: transactionId);
       state = const AsyncData(null);
       ref.invalidate(ordersProvider);
       return res;

@@ -188,8 +188,8 @@ class _OrderConfirmationScreenState
                       selectedAddress.phone,
                     );
                   } else {
-                    // Paystack payment flow (original)
-                    await _handlePaystackPayment(context, ref, order.id);
+                    // Flutterwave payment flow
+                    await _handleFlutterwavePayment(context, ref, order.id);
                   }
                 } catch (e) {
                   if (context.mounted) {
@@ -679,7 +679,7 @@ class _OrderConfirmationScreenState
     );
   }
 
-  Future<void> _handlePaystackPayment(
+  Future<void> _handleFlutterwavePayment(
     BuildContext context,
     WidgetRef ref,
     int orderId,
@@ -702,7 +702,7 @@ class _OrderConfirmationScreenState
       if (context.mounted) {
         AppSnackbars.showError(
           context,
-          'Failed to initialize Paystack payment: ${e.toString()}',
+          'Failed to initialize payment: ${e.toString()}',
         );
       }
     }

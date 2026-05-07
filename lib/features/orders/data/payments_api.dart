@@ -25,9 +25,13 @@ class PaymentsApi {
     }
   }
 
-  Future<PaymentVerifyResult> verify({required String reference}) async {
+  Future<PaymentVerifyResult> verify({required String reference, String? transactionId}) async {
     try {
-      final res = await _dio.post('/api/payment/verify', data: {'reference': reference});
+      final body = <String, dynamic>{'reference': reference};
+      if (transactionId != null && transactionId.isNotEmpty) {
+        body['transaction_id'] = int.tryParse(transactionId) ?? transactionId;
+      }
+      final res = await _dio.post('/api/payment/verify', data: body);
       final data = res.data;
       if (data is! Map<String, dynamic>) throw const FormatException('Unexpected response');
       return PaymentVerifyResult.fromWrappedResponse((data['data'] as Map?)?.cast<String, dynamic>() ?? const {});

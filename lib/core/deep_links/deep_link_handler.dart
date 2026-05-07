@@ -149,10 +149,14 @@ if (uri.host == 'nepc') {
   }
 
   Future<void> _handlePaymentCallback(Uri uri) async {
-    final reference = uri.queryParameters['reference'];
+    // Flutterwave redirects with tx_ref + transaction_id + status
+    // (not 'reference' — that was Paystack terminology)
+    final txRef = uri.queryParameters['tx_ref']
+        ?? uri.queryParameters['reference']; // fallback for older links
+    final transactionId = uri.queryParameters['transaction_id'];
     final status = uri.queryParameters['status'];
     final gateway =
-        uri.queryParameters['gateway']; // 'momo' or 'paystack' or null
+        uri.queryParameters['gateway']; // 'momo' or null
     final orderIdStr = uri.queryParameters['order_id'];
 
     final context = _navigatorKey?.currentContext;
@@ -167,8 +171,8 @@ if (uri.host == 'nepc') {
       return;
     }
 
-    // Handle Paystack callback (original flow)
-    if (reference == null || reference.isEmpty) {
+    // Handle Flutterwave callback
+    if ((txRef == null || txRef.isEmpty) && (transactionId == null || transactionId.isEmpty)) {
       _showError('Invalid payment callback: missing reference');
       return;
     }
@@ -177,10 +181,10 @@ if (uri.host == 'nepc') {
     _showLoading(context, 'Verifying payment...');
 
     try {
-      // Verify payment with backend
+      // Verify payment with backend — pass both tx_ref and transaction_id
       final result = await _ref
           .read(orderActionsProvider.notifier)
-          .verifyPayment(reference: reference);
+          .verifyPayment(reference: txRef ?? '', transactionId: transactionId);
 
       // Hide loading
       if (!context.mounted) return;
