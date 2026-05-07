@@ -962,6 +962,33 @@ class OrderDetailsScreen extends ConsumerWidget {
               ),
             ],
           ),
+          // FX rate info — only shown for non-NGN orders
+          if (currency != 'NGN' && exchangeRate != null && originalAmountNgn != null) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF8EC),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Text('🔄', style: TextStyle(fontSize: 12)),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Rate: 1 ${currency} = ${formatPrice(exchangeRate)} NGN  •  NGN equivalent: ${formatPrice(originalAmountNgn)}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontFamily: 'Campton',
+                        color: colors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );

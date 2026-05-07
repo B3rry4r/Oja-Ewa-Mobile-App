@@ -216,6 +216,8 @@ class OrderSummary {
     required this.items,
     required this.shipments,
     this.currency = 'NGN',
+    this.exchangeRate,
+    this.originalAmountNgn,
   });
 
   final int id;
@@ -231,6 +233,13 @@ class OrderSummary {
   final List<ShipmentSummary> shipments;
   /// ISO 4217 currency code for this order. Defaults to NGN for legacy orders.
   final String currency;
+
+  /// The live FX rate used at order creation (NGN per 1 unit of order currency).
+  /// e.g. for GBP: 2050 means ₦2,050 = £1. Null for NGN orders.
+  final num? exchangeRate;
+
+  /// The original NGN total before FX conversion. Used for accounting/display.
+  final num? originalAmountNgn;
 
   static num? _parseNum(dynamic v) {
     if (v is num) return v;
@@ -264,6 +273,8 @@ class OrderSummary {
                 .toList()
           : const [],
       currency: (json['currency'] as String?)?.toUpperCase() ?? 'NGN',
+      exchangeRate: json['exchange_rate'] as num?,
+      originalAmountNgn: json['original_amount_ngn'] as num?,
     );
   }
 }

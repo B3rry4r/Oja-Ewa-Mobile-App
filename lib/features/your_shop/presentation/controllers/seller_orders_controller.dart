@@ -220,6 +220,12 @@ class SellerOrder {
   final double totalPrice;
   /// ISO 4217 currency code. Defaults to NGN for legacy orders.
   final String currency;
+
+  /// Live FX rate used at order creation (NGN per 1 unit of currency). Null for NGN orders.
+  final num? exchangeRate;
+
+  /// Original NGN total before FX conversion. For seller settlement reference.
+  final num? originalAmountNgn;
   final String? trackingNumber;
   final DateTime? shippedAt;
   final DateTime? deliveredAt;
@@ -249,6 +255,8 @@ class SellerOrder {
     required this.items,
     required this.totalPrice,
     this.currency = 'NGN',
+    this.exchangeRate,
+    this.originalAmountNgn,
     this.trackingNumber,
     this.shippedAt,
     this.deliveredAt,
@@ -316,6 +324,8 @@ class SellerOrder {
       items: itemsList.map((e) => SellerOrderItem.fromJson(e)).toList(),
       totalPrice: _parseDouble(json['total_price']) ?? 0,
       currency: (json['currency'] as String?)?.toUpperCase() ?? 'NGN',
+      exchangeRate: json['exchange_rate'] as num?,
+      originalAmountNgn: json['original_amount_ngn'] as num?,
       trackingNumber: json['tracking_number'] as String?,
       shippedAt: json['shipped_at'] != null
           ? DateTime.tryParse(json['shipped_at'] as String)
