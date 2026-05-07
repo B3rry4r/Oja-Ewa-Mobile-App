@@ -153,7 +153,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          ...order.items.map((item) => _buildItemTile(context, item)),
+          ...order.items.map((item) => _buildItemTile(context, item, currency: order.currency)),
 
           const SizedBox(height: 20),
           _buildDetailTile(context, "Total", formatPriceFx(order.totalPrice, order.currency)),
@@ -270,7 +270,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildItemTile(BuildContext context, SellerOrderItem item) {
+  Widget _buildItemTile(BuildContext context, SellerOrderItem item, {String currency = 'NGN'}) {
     final colors = context.appColors;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -323,7 +323,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  formatPriceFx(item.price, order.currency),
+                  formatPriceFx(item.price, currency),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
