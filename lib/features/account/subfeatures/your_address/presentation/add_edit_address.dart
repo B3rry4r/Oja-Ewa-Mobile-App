@@ -36,7 +36,6 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
   String _selectedCountryName = '';
   String _selectedCountryFlag = '';
   String _selectedStateName = '';
-  String _selectedCountryCode = '';
 
   @override
   void initState() {
@@ -52,8 +51,8 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
 
     // Initialize location from existing address
     if (a != null) {
-      _selectedCountryName = a.country ?? 'Nigeria';
-      _selectedStateName = a.state ?? '';
+      _selectedCountryName = a.country;
+      _selectedStateName = a.state;
     }
   }
 
@@ -93,7 +92,6 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                 setState(() {
                   _selectedCountryName = country.name;
                   _selectedCountryFlag = country.flag;
-                  _selectedCountryCode = country.dialCode;
                   _selectedStateName = '';
                 });
               }
