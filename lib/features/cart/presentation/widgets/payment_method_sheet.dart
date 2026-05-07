@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 
 /// Payment method selection bottom sheet
-/// Allows users to choose between Flutterwave and MTN MoMo
+/// Allows users to pay via Flutterwave (card or bank transfer)
 class PaymentMethodSheet extends StatelessWidget {
   const PaymentMethodSheet({super.key});
 
@@ -55,14 +55,6 @@ class PaymentMethodSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-
-              // MTN MoMo option
-              _PaymentMethodOption(
-                title: 'MTN Mobile Money',
-                subtitle: 'Pay with MTN Mobile Money',
-                onTap: () => Navigator.of(context).pop('momo'),
-              ),
-              const SizedBox(height: 16),
 
               // Flutterwave option
               _PaymentMethodOption(

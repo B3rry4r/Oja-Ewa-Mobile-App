@@ -16,7 +16,6 @@ import 'package:ojaewa/features/cart/presentation/controllers/checkout_controlle
 import 'package:ojaewa/features/cart/presentation/widgets/payment_method_sheet.dart';
 import 'package:ojaewa/features/orders/data/orders_repository_impl.dart';
 import 'package:ojaewa/features/orders/domain/logistics_models.dart';
-import 'package:ojaewa/features/cart/presentation/screens/momo_payment_screen.dart';
 import 'package:ojaewa/core/utils/currency_utils.dart';
 
 class OrderConfirmationScreen extends ConsumerStatefulWidget {
@@ -181,27 +180,15 @@ class _OrderConfirmationScreenState
 
                   if (!context.mounted) return;
 
-                  if (paymentMethod == 'momo') {
-                    // MoMo payment flow
-                    await _handleMoMoPayment(
-                      context,
-                      ref,
-                      order.id,
-                      selectedAddress.phone,
-                    );
-                  } else {
-                    // Flutterwave payment flow.
-                    // Derive currency from the delivery country — server does the same.
-                    // This is for belt-and-suspenders: the server stored the currency on
-                    // the order at creation time and is the authoritative source.
-                    final orderCurrency = currencyForCountry(selectedAddress.country);
-                    await _handleFlutterwavePayment(
-                      context,
-                      ref,
-                      order.id,
-                      currency: orderCurrency,
-                    );
-                  }
+                  // Flutterwave payment flow.
+                  // Currency is derived from the delivery country — server does the same.
+                  final orderCurrency = currencyForCountry(selectedAddress.country);
+                  await _handleFlutterwavePayment(
+                    context,
+                    ref,
+                    order.id,
+                    currency: orderCurrency,
+                  );
                 } catch (e) {
                   if (context.mounted) {
                     AppSnackbars.showError(
@@ -708,37 +695,4 @@ class _OrderConfirmationScreenState
     }
   }
 
-  Future<void> _handleMoMoPayment(
-    BuildContext context,
-    WidgetRef ref,
-    int orderId,
-    String phone,
-  ) async {
-    try {
-      // Initialize MoMo payment
-      final response = await ref
-          .read(ordersRepositoryProvider)
-          .initializeMoMoPayment(orderId: orderId, phone: phone);
-
-      if (!context.mounted) return;
-
-      // Navigate to MoMo payment screen with polling
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => MoMoPaymentScreen(
-            referenceId: response.referenceId,
-            orderId: response.orderId,
-            phone: phone,
-          ),
-        ),
-      );
-    } catch (e) {
-      if (context.mounted) {
-        AppSnackbars.showError(
-          context,
-          'Failed to initialize MoMo payment: ${e.toString()}',
-        );
-      }
-    }
-  }
 }
