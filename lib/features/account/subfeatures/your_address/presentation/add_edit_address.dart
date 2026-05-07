@@ -119,7 +119,29 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
             },
           ),
           const SizedBox(height: 24),
-          _buildTextField(label: 'City', controller: _city),
+          _buildLocationDropdown(
+            label: 'City/LGA',
+            value: _city.text.isEmpty ? 'Select City/LGA' : _city.text,
+            onTap: () async {
+              if (_selectedStateName.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please select a state first')),
+                );
+                return;
+              }
+              final city = await CityPickerSheet.show(
+                context,
+                countryName: _selectedCountryName,
+                stateName: _selectedStateName,
+                selectedCity: _city.text,
+              );
+              if (city != null) {
+                setState(() {
+                  _city.text = city;
+                });
+              }
+            },
+          ),
           const SizedBox(height: 24),
           _buildTextField(label: 'Post/Zip Code', controller: _postCode),
           const SizedBox(height: 24),

@@ -138,6 +138,55 @@ class LocationApi {
     }
   }
 
+  /// Fetches cities for a given country and state
+  /// Uses CountriesNow API
+  Future<List<String>> fetchCities(String countryName, String stateName) async {
+    try {
+      // CountriesNow expects the state name without " State" suffix for some endpoints
+      final cleanState = stateName.replaceAll(' State', '');
+      
+      final response = await _dio.post(
+        'https://countriesnow.space/api/v0.1/countries/state/cities',
+        data: {
+          'country': countryName,
+          'state': cleanState,
+        },
+      );
+
+      final data = response.data as Map<String, dynamic>;
+      if (data['error'] == true) {
+        return [];
+      }
+
+      final List<dynamic> citiesData = data['data'] ?? [];
+      final cities = citiesData.map((e) => e.toString()).toList();
+
+      // Sort alphabetically
+      cities.sort();
+
+      return cities;
+    } catch (e) {
+      // Fallback: if post fails, try get with query params
+      try {
+        final response = await _dio.get(
+          'https://countriesnow.space/api/v0.1/countries/state/cities/q',
+          queryParameters: {
+            'country': countryName,
+            'state': stateName,
+          },
+        );
+        final data = response.data as Map<String, dynamic>;
+        if (data['error'] == true) return [];
+        final List<dynamic> citiesData = data['data'] ?? [];
+        final cities = citiesData.map((e) => e.toString()).toList();
+        cities.sort();
+        return cities;
+      } catch (_) {
+        throw Exception('Failed to fetch cities for $stateName, $countryName: $e');
+      }
+    }
+  }
+
   /// Helper to get country code from name (basic mapping for common countries)
   String _getCountryCode(String countryName) {
     final mapping = {

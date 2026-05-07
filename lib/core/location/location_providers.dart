@@ -29,6 +29,16 @@ final statesProvider = FutureProvider.family<List<StateProvince>, String>((
   return api.fetchStates(countryName);
 });
 
+/// Provider that fetches cities for a given country and state
+final citiesProvider =
+    FutureProvider.family<List<String>, ({String country, String state})>((
+  ref,
+  args,
+) async {
+  final api = ref.watch(locationApiProvider);
+  return api.fetchCities(args.country, args.state);
+});
+
 /// Helper provider to get a country by its code
 final countryByCodeProvider = Provider.family<Country?, String>((ref, code) {
   final countriesAsync = ref.watch(africanCountriesProvider);
