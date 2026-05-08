@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
@@ -202,7 +203,6 @@ class _SellerRegistrationScreenState
             'Tax Identification Number',
             '12345678-0001',
             controller: _tinController,
-          ,
             maxLength: 14,
           ),
           const SizedBox(height: 16),
@@ -667,6 +667,46 @@ class _SellerRegistrationScreenState
     required String value,
     String? flag,
     required VoidCallback onTap,
+  }) {
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(color: colors.textSecondary, fontSize: 14)),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: colors.border),
+            ),
+            child: Row(
+              children: [
+                if (flag != null) ...[
+                  Text(flag, style: const TextStyle(fontSize: 18)),
+                  const SizedBox(width: 8),
+                ],
+                Expanded(
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: (value == 'Select Country' || value == 'Select State')
+                          ? colors.textTertiary
+                          : colors.textPrimary,
+                    ),
+                  ),
+                ),
+                Icon(Icons.keyboard_arrow_down_rounded, color: colors.textSecondary),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   /// Website input that pre-fills https:// and allows the user to clear it fully

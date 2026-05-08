@@ -7,6 +7,7 @@ import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/features/account/subfeatures/shared/widgets/compliance_progress_banner.dart';
 
+import 'package:ojaewa/core/location/location_picker_sheets.dart';
 import '../../../../../../../app/router/app_router.dart';
 import '../classes_offered_editor.dart';
 import '../draft_utils.dart';
@@ -760,5 +761,56 @@ class _SchoolBusinessDetailsScreenState
         ),
       ),
     );
+  }
+
+  Widget _buildLocationDropdown({
+    required String label,
+    required String value,
+    required VoidCallback onTap,
+  }) {
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(color: colors.textSecondary, fontSize: 13, fontFamily: 'Campton')),
+        const SizedBox(height: 6),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: colors.border),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Campton',
+                      color: value == 'Select Country' ? colors.textTertiary : colors.textPrimary,
+                    ),
+                  ),
+                ),
+                Icon(Icons.keyboard_arrow_down_rounded, color: colors.textSecondary, size: 20),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PercentageInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue o, TextEditingValue n) {
+    if (n.text.isEmpty) return n;
+    final val = int.tryParse(n.text);
+    if (val == null || val > 100) return o;
+    return n;
   }
 }

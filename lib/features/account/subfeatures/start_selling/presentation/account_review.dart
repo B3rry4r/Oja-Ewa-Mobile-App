@@ -45,7 +45,7 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-            const ComplianceProgressBanner(
+            ComplianceProgressBanner(
               title: draft.isResubmission ? 'Review Updates' : 'Seller compliance review',
               subtitle: draft.isResubmission
                   ? 'Review your updated business information before resubmitting for approval.'

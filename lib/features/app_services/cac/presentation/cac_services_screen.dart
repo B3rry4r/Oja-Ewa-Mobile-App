@@ -42,6 +42,8 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
   String? _passportUrl;
   String? _identityUrl;
   String? _signatureUrl;
+  // Upload loading state per document type
+  final Map<String, bool> _uploadingTypes = {};
 
   @override
   void initState() {
@@ -441,17 +443,20 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
   Future<void> _uploadDocument(String type) async {
     final path = await pickSingleFilePath();
     if (path == null) return;
+    setState(() => _uploadingTypes[type] = true);
     try {
       final upload = await ref
           .read(cacServicesApiProvider)
           .uploadDocument(filePath: path, type: type);
       final url = upload['url'] as String?;
       if (url == null || url.isEmpty) {
+        if (mounted) setState(() => _uploadingTypes[type] = false);
         if (mounted) AppSnackbars.showError(context, 'Upload failed');
         return;
       }
       if (!mounted) return;
       setState(() {
+        _uploadingTypes[type] = false;
         switch (type) {
           case 'passport_photograph':
             _passportUrl = url;
@@ -466,10 +471,11 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
       });
       AppSnackbars.showSuccess(context, 'Document uploaded');
     } on DioException catch (e) {
+      if (mounted) setState(() => _uploadingTypes[type] = false);
       if (mounted) AppSnackbars.showError(context, _dioMessage(e));
     } catch (_) {
       if (mounted) setState(() => _uploadingTypes[type] = false);
-      AppSnackbars.showError(context, 'Unable to upload document');
+      if (mounted) AppSnackbars.showError(context, 'Unable to upload document');
     }
   }
 

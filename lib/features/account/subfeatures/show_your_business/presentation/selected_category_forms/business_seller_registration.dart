@@ -212,7 +212,7 @@ class _BusinessSellerRegistrationScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          const ComplianceProgressBanner(
+          ComplianceProgressBanner(
             title: (ModalRoute.of(context)?.settings.arguments is Map) ? 'Edit Business Information' : 'Business compliance onboarding',
             subtitle:
                 'Start with the legal business profile, registered address, and authorized signatory details.',
@@ -250,7 +250,6 @@ class _BusinessSellerRegistrationScreenState
             'Tax Identification Number',
             '12345678-0002',
             controller: _tinController,
-          ,
             maxLength: 14,
           ),
           const SizedBox(height: 16),
@@ -294,15 +293,6 @@ class _BusinessSellerRegistrationScreenState
                 });
               }
             },
-          );
-              if (country != null) {
-                setState(() {
-                  _selectedCountryName = country.name;
-                  _selectedCountryFlag = country.flag;
-                  _selectedStateName = '';
-                });
-              }
-            },
           ),
           const SizedBox(height: 16),
           _buildLocationDropdown(
@@ -339,7 +329,6 @@ class _BusinessSellerRegistrationScreenState
             'Postal / Zip Code',
             '106104',
             controller: _postalCodeController,
-          ,
             maxLength: 10,
             inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9 -]'))],
           ),

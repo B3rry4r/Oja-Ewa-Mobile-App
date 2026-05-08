@@ -7,6 +7,7 @@ import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/features/account/subfeatures/shared/widgets/compliance_progress_banner.dart';
 
+import 'package:ojaewa/core/location/location_picker_sheets.dart';
 import '../../../../../app/router/app_router.dart';
 import 'draft_utils.dart';
 import 'seller_registration_draft.dart';
@@ -366,7 +367,7 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
           _buildTextInput(
             'Ownership % (max 100)',
             '60',
-            controller: controllers.\$2,
+            controller: controllers.$2,
             keyboardType: TextInputType.number,
             maxLength: 3,
             inputFormatters: [
@@ -377,14 +378,14 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
           const SizedBox(height: 12),
           _buildLocationDropdown(
             label: 'Nationality',
-            value: controllers.\$3.text.isEmpty ? 'Select Country' : controllers.\$3.text,
+            value: controllers.$3.text.isEmpty ? 'Select Country' : controllers.$3.text,
             onTap: () async {
               final country = await CountryPickerSheet.show(
                 context,
-                selectedCountry: controllers.\$3.text,
+                selectedCountry: controllers.$3.text,
               );
               if (country != null && mounted) {
-                setState(() => controllers.\$3.text = country.name);
+                setState(() => controllers.$3.text = country.name);
               }
             },
           ),
@@ -392,7 +393,7 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
           _buildTextInput(
             'ID Type & Number',
             'Passport A12345678',
-            controller: controllers.\$4,
+            controller: controllers.$4,
             maxLength: 20,
           ),
         ],
@@ -765,5 +766,47 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
   bool _isNigeria(String value) {
     final normalized = value.trim().toLowerCase();
     return normalized == 'nigeria' || normalized == 'ng' || normalized == 'nga';
+  }
+
+  Widget _buildLocationDropdown({
+    required String label,
+    required String value,
+    required VoidCallback onTap,
+  }) {
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(color: colors.textSecondary, fontSize: 14)),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: colors.border),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: value == 'Select Country'
+                          ? colors.textTertiary
+                          : colors.textPrimary,
+                    ),
+                  ),
+                ),
+                Icon(Icons.keyboard_arrow_down_rounded, color: colors.textSecondary),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

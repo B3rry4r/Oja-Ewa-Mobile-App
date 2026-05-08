@@ -37,74 +37,15 @@ final sellerOrdersProvider = FutureProvider.autoDispose
       return items.map(SellerOrder.fromJson).toList();
     });
 
-class SellerOrdersRealtimeController
-    extends FamilyAsyncNotifier<List<SellerOrder>, String?> {
-  // Uses FamilyAsyncNotifier so the family arg (status) is properly received
-  // via this.arg — constructor-based injection does NOT work with .family
-
-  @override
-  FutureOr<List<SellerOrder>> build(String? arg) {
-    final async = ref.watch(sellerOrdersProvider(arg));
-    async.whenData((data) {
-      state = AsyncData(data);
-    });
-    return async.value ?? const [];
-  }
-
-  // Keep _status as alias for clarity in helper methods
-  String? get _status => arg;
-
-  void applyNewOrder(SellerOrder order) {
-    final current = state.value ?? const [];
-    state = AsyncData([order, ...current]);
-  }
-
-  void applyStatusUpdate(int orderId, String statusValue) {
-    final current = state.value ?? const [];
-    final updated = current
-        .map(
-          (order) => order.orderId == orderId
-              ? SellerOrder(
-                  id: order.id,
-                  shipmentId: order.shipmentId,
-                  orderId: order.orderId,
-                  orderNumber: order.orderNumber,
-                  status: statusValue,
-                  createdAt: order.createdAt,
-                  customerName: order.customerName,
-                  customerPhone: order.customerPhone,
-                  provider: order.provider,
-                  serviceName: order.serviceName,
-                  shippingFee: order.shippingFee,
-                  currency: order.currency,
-                  paymentStatus: order.paymentStatus,
-                  shippingAddress: order.shippingAddress,
-                  items: order.items,
-                  totalPrice: order.totalPrice,
-                  trackingNumber: order.trackingNumber,
-                  shippedAt: order.shippedAt,
-                  deliveredAt: order.deliveredAt,
-                  cancellationReason: order.cancellationReason,
-                  returnRequestStatus: order.returnRequestStatus,
-                  returnRequestReason: order.returnRequestReason,
-                  returnRequestRejectionReason: order.returnRequestRejectionReason,
-                  returnRequestRequestedAt: order.returnRequestRequestedAt,
-                  returnRequestDeadlineAt: order.returnRequestDeadlineAt,
-                  returnRequestRefundedAt: order.returnRequestRefundedAt,
-                )
-              : order,
-        )
-        .toList();
-    state = AsyncData(updated);
-  }
-}
-
+/// Realtime seller orders — wraps sellerOrdersProvider for compatibility.
+/// The orders screen watches this provider and can invalidate it for refresh.
 final sellerOrdersRealtimeProvider =
-    AsyncNotifierProvider.family<
-      SellerOrdersRealtimeController,
-      List<SellerOrder>,
-      String?
-    >(SellerOrdersRealtimeController.new);
+    FutureProvider.autoDispose.family<List<SellerOrder>, String?>(
+  (ref, status) async {
+    // Watch the underlying provider so invalidating either one refreshes both
+    return await ref.watch(sellerOrdersProvider(status).future);
+  },
+);
 
 /// Provider for getting a single order's details
 final sellerOrderDetailsProvider = FutureProvider.autoDispose
