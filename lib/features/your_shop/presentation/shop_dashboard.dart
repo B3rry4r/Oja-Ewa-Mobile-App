@@ -17,7 +17,7 @@ import '../subfeatures/orders/orders.dart';
 import '../../your_shop/data/seller_product_repository.dart';
 
 // Import seller products provider
-final sellerProductsProvider = FutureProvider.autoDispose<List<dynamic>>((
+final sellerProductsProvider = FutureProvider<List<dynamic>>((
   ref,
 ) async {
   final repo = ref.watch(sellerProductRepositoryProvider);

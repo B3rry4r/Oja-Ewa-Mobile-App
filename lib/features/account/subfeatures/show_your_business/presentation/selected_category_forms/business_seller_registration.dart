@@ -213,7 +213,7 @@ class _BusinessSellerRegistrationScreenState
         children: [
           const SizedBox(height: 20),
           const ComplianceProgressBanner(
-            title: 'Business compliance onboarding',
+            title: (ModalRoute.of(context)?.settings.arguments is Map) ? 'Edit Business Information' : 'Business compliance onboarding',
             subtitle:
                 'Start with the legal business profile, registered address, and authorized signatory details.',
             currentSection: 'Business Information',
@@ -250,6 +250,8 @@ class _BusinessSellerRegistrationScreenState
             'Tax Identification Number',
             '12345678-0002',
             controller: _tinController,
+          ,
+            maxLength: 14,
           ),
           const SizedBox(height: 16),
           _buildDropdown(
@@ -337,6 +339,9 @@ class _BusinessSellerRegistrationScreenState
             'Postal / Zip Code',
             '106104',
             controller: _postalCodeController,
+          ,
+            maxLength: 10,
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9 -]'))],
           ),
           const SizedBox(height: 28),
           _buildSectionHeader('Section 4: Authorized Signatory'),
@@ -884,5 +889,13 @@ class _BusinessSellerRegistrationScreenState
         ),
       ),
     );
+  }
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    return newValue.copyWith(text: newValue.text.toUpperCase());
   }
 }

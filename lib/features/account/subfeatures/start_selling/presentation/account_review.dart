@@ -46,9 +46,10 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
           children: [
             const SizedBox(height: 20),
             const ComplianceProgressBanner(
-              title: 'Seller compliance review',
-              subtitle:
-                  'Review the completed compliance sections before final submission. The form will be sent as one full current-state payload.',
+              title: draft.isResubmission ? 'Review Updates' : 'Seller compliance review',
+              subtitle: draft.isResubmission
+                  ? 'Review your updated business information before resubmitting for approval.'
+                  : 'Review the completed compliance sections before final submission. The form will be sent as one full current-state payload.',
               currentSection: 'Signature',
               sectionLabels: [
                 'Business Information',

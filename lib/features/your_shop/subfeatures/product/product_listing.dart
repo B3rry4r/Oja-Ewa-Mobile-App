@@ -39,7 +39,7 @@ class ProductListingsScreen extends ConsumerStatefulWidget {
 }
 
 class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
-  String _selectedStatus = 'Approved';
+  String _selectedStatus = 'All';
 
   @override
   Widget build(BuildContext context) {

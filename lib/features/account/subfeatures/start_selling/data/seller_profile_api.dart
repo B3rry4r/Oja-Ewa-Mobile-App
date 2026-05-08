@@ -30,9 +30,25 @@ class SellerProfileApi {
     SellerProfilePayload payload,
   ) async {
     try {
+      // On update, include existing file URLs in the JSON body so the API's
+      // 'sometimes|required' validation passes for signature and documents.
+      // These are URLs (already uploaded), not new file paths to upload.
+      final body = payload.toJson(includeFileFields: false);
+      if ((payload.authorizedSignatorySignature ?? '').isNotEmpty) {
+        body['authorized_signatory_signature'] = payload.authorizedSignatorySignature;
+      }
+      if ((payload.identityDocument ?? '').isNotEmpty) {
+        body['identity_document'] = payload.identityDocument;
+      }
+      if ((payload.businessCertificate ?? '').isNotEmpty) {
+        body['business_certificate'] = payload.businessCertificate;
+      }
+      if ((payload.businessLogo ?? '').isNotEmpty) {
+        body['business_logo'] = payload.businessLogo;
+      }
       final res = await _dio.put(
         '/api/seller/profile',
-        data: payload.toJson(includeFileFields: false),
+        data: body,
       );
       if (res.data is Map<String, dynamic>) {
         return res.data as Map<String, dynamic>;

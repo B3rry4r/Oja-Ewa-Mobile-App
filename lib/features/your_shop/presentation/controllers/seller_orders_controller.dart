@@ -37,19 +37,22 @@ final sellerOrdersProvider = FutureProvider.autoDispose
       return items.map(SellerOrder.fromJson).toList();
     });
 
-class SellerOrdersRealtimeController extends AsyncNotifier<List<SellerOrder>> {
-  SellerOrdersRealtimeController(this._status);
-
-  final String? _status;
+class SellerOrdersRealtimeController
+    extends FamilyAsyncNotifier<List<SellerOrder>, String?> {
+  // Uses FamilyAsyncNotifier so the family arg (status) is properly received
+  // via this.arg — constructor-based injection does NOT work with .family
 
   @override
-  FutureOr<List<SellerOrder>> build() {
-    final async = ref.watch(sellerOrdersProvider(_status));
+  FutureOr<List<SellerOrder>> build(String? arg) {
+    final async = ref.watch(sellerOrdersProvider(arg));
     async.whenData((data) {
       state = AsyncData(data);
     });
     return async.value ?? const [];
   }
+
+  // Keep _status as alias for clarity in helper methods
+  String? get _status => arg;
 
   void applyNewOrder(SellerOrder order) {
     final current = state.value ?? const [];

@@ -56,6 +56,9 @@ class _SellerRegistrationScreenState
   String _annualTurnoverCurrency = 'NGN';
   String _otherBusinessType = '';
   String _identityType = 'nin';
+
+  // True when opened from 'Edit Business Information' (pre-filled draft)
+  bool get _isEditing => (ModalRoute.of(context)?.settings.arguments is Map);
   String? _identityDocumentLocalPath;
 
   static const _sections = [
@@ -160,10 +163,11 @@ class _SellerRegistrationScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          const ComplianceProgressBanner(
-            title: 'Seller compliance onboarding',
-            subtitle:
-                'Complete your legal business profile. This first page covers identity, business registration, registered address, and signatory details.',
+          ComplianceProgressBanner(
+            title: _isEditing ? 'Edit Business Information' : 'Seller compliance onboarding',
+            subtitle: _isEditing
+                ? 'Update your business profile details. Changes will be sent for review.'
+                : 'Complete your legal business profile. This first page covers identity, business registration, registered address, and signatory details.',
             currentSection: 'Business Information',
             sectionLabels: _sections,
           ),
@@ -198,6 +202,8 @@ class _SellerRegistrationScreenState
             'Tax Identification Number',
             '12345678-0001',
             controller: _tinController,
+          ,
+            maxLength: 14,
           ),
           const SizedBox(height: 16),
           if (_isNigerianSeller) ...[

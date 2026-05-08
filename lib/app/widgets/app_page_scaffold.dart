@@ -68,37 +68,37 @@ class AppPageScaffold extends StatelessWidget {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-      backgroundColor: Colors.transparent,
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          color: colors.background,
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              isDark ? colors.surface : colors.surfaceSecondary,
-              colors.background,
-            ],
+        backgroundColor: Colors.transparent,
+        body: DecoratedBox(
+          decoration: BoxDecoration(
+            color: colors.background,
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                isDark ? colors.surface : colors.surfaceSecondary,
+                colors.background,
+              ],
+            ),
           ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              AppHeader(
-                showBack: showBack,
-                showActions: showActions,
-                onBack: onBack,
-                title: headerTitle,
-              ),
-              const SizedBox(height: 4),
-              Expanded(child: body),
-              if (bottomBar != null) bottomBar!,
-            ],
+          child: SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                AppHeader(
+                  showBack: showBack,
+                  showActions: showActions,
+                  onBack: onBack,
+                  title: headerTitle,
+                ),
+                const SizedBox(height: 4),
+                Expanded(child: body),
+                if (bottomBar != null) bottomBar!,
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }
