@@ -575,8 +575,10 @@ class _SchoolBusinessDetailsScreenState
     String label,
     String hint, {
     int maxLines = 1,
+    int? maxLength,
     TextEditingController? controller,
     TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
     bool readOnly = false,
     VoidCallback? onTap,
   }) {
@@ -594,6 +596,8 @@ class _SchoolBusinessDetailsScreenState
           keyboardType: keyboardType,
           readOnly: readOnly,
           onTap: onTap,
+          maxLength: maxLength,
+          inputFormatters: inputFormatters,
           style: TextStyle(
             fontFamily: 'Campton',
             fontSize: 16,
@@ -601,6 +605,7 @@ class _SchoolBusinessDetailsScreenState
           ),
           maxLines: maxLines,
           decoration: InputDecoration(
+            counterText: maxLength != null ? null : '',
             hintText: hint,
             hintStyle: TextStyle(color: colors.textTertiary),
             filled: true,

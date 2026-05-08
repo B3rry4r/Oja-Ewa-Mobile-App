@@ -810,3 +810,13 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
     );
   }
 }
+
+class _PercentageInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue o, TextEditingValue n) {
+    if (n.text.isEmpty) return n;
+    final val = int.tryParse(n.text);
+    if (val == null || val > 100) return o;
+    return n;
+  }
+}

@@ -772,46 +772,6 @@ class _SellerRegistrationScreenState
     }
   }
 
-) {
-    final colors = context.appColors;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(color: colors.textSecondary, fontSize: 14),
-        ),
-        const SizedBox(height: 8),
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            decoration: BoxDecoration(
-              color: colors.surface,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: colors.border),
-            ),
-            child: Row(
-              children: [
-                if (flag != null) ...[
-                  Text(flag, style: const TextStyle(fontSize: 20)),
-                  const SizedBox(width: 12),
-                ],
-                Expanded(
-                  child: Text(
-                    value,
-                    style: TextStyle(fontSize: 16, color: colors.textPrimary),
-                  ),
-                ),
-                Icon(Icons.keyboard_arrow_down, color: colors.textSecondary),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildPhoneInputWithPicker(
     String label, {
     required TextEditingController controller,

@@ -376,10 +376,7 @@ class _BusinessSellerRegistrationScreenState
             label: 'Identity Document',
             selectedPath: _identityDocumentLocalPath,
             onTap: () async {
-              final path = await pickSingleFilePath(),
-            maxLength: 10,
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9 -]'))],
-          );
+              final path = await pickSingleFilePath();
               if (path != null) {
                 setState(() => _identityDocumentLocalPath = path);
               }
