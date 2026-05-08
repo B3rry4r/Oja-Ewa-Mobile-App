@@ -39,11 +39,16 @@ class OrderDetailsScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, st) => Center(child: Text('Failed to load order: $e')),
         data: (data) {
-          if (data.isEmpty) {
+          // API returns { "status": "success", "data": { id, order_number, ... } }
+          // Extract the nested data object before parsing
+          final orderData = (data['data'] is Map<String, dynamic>)
+              ? data['data'] as Map<String, dynamic>
+              : data;
+          if (orderData.isEmpty || orderData['id'] == null) {
             return const Center(child: Text('Order not found'));
           }
 
-          final order = OrderSummary.fromJson(data);
+          final order = OrderSummary.fromJson(orderData);
           final overrideStatus = statusOverrides[order.id];
           final effectiveOrder = overrideStatus == null
               ? order
@@ -62,19 +67,17 @@ class OrderDetailsScreen extends ConsumerWidget {
                 );
 
           // Build shipping address from available fields
-          final shippingAddress =
-              data['shipping_address'] as String? ?? data['address'] as String?;
-          final shippingCity = data['shipping_city'] as String?;
-          final shippingState = data['shipping_state'] as String?;
-          final shippingCountry = data['shipping_country'] as String?;
-          final shippingToParts =
-              [shippingAddress, shippingCity, shippingState, shippingCountry]
-                  .whereType<String>()
-                  .where((part) => part.trim().isNotEmpty)
-                  .toList();
-          final shippingTo = shippingToParts.isEmpty
-              ? null
-              : shippingToParts.join(', ');
+          // Build shipping display from model fields (now returned directly by API)
+          final shippingToParts = [
+            if ((order.shippingName ?? '').isNotEmpty) order.shippingName!,
+            if ((orderData['shipping_address'] as String? ?? '').isNotEmpty)
+              orderData['shipping_address'] as String,
+            if ((order.shippingCity ?? '').isNotEmpty) order.shippingCity!,
+            if ((order.shippingState ?? '').isNotEmpty) order.shippingState!,
+            if ((order.shippingCountry ?? '').isNotEmpty) order.shippingCountry!,
+          ];
+          final shippingTo = shippingToParts.isEmpty ? null : shippingToParts.join(', ');
+          final shippingPhone = order.shippingPhone;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -82,7 +85,7 @@ class OrderDetailsScreen extends ConsumerWidget {
               children: [
                 _buildOrderInformation(context, effectiveOrder),
                 const SizedBox(height: 16),
-                _buildShippingAddress(context, shippingTo),
+                _buildShippingAddress(context, shippingTo, phone: shippingPhone),
                 const SizedBox(height: 16),
                 _buildItemsInOrder(context, order.items, currency: order.currency),
                 const SizedBox(height: 16),
@@ -260,7 +263,7 @@ class OrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildShippingAddress(BuildContext context, String? shippingTo) {
+  Widget _buildShippingAddress(BuildContext context, String? shippingTo, {String? phone}) {
     final colors = context.appColors;
     return Container(
       width: double.infinity,

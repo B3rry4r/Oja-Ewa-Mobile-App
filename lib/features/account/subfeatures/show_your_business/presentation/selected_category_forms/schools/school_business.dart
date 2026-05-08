@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
@@ -426,18 +427,37 @@ class _SchoolBusinessDetailsScreenState
           _buildInputField('Full Name', 'Kemi James', controller: name),
           const SizedBox(height: 12),
           _buildInputField(
-            'Ownership %',
+            'Ownership % (max 100)',
             '70',
             controller: percentage,
             keyboardType: TextInputType.number,
+            maxLength: 3,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              _PercentageInputFormatter(),
+            ],
           ),
           const SizedBox(height: 12),
-          _buildInputField('Nationality', 'Nigerian', controller: nationality),
+          _buildLocationDropdown(
+            label: 'Nationality',
+            value: nationality.text.isEmpty ? 'Select Country' : nationality.text,
+            onTap: () async {
+              final country = await CountryPickerSheet.show(
+                context,
+                selectedCountry: nationality.text,
+              );
+              if (country != null && mounted) {
+                setState(() => nationality.text = country.name);
+              }
+            },
+          ),
           const SizedBox(height: 12),
           _buildInputField(
-            'ID Type & Number',
-            'NIN 12345678901',
+            'NIN (11 digits)',
+            '12345678901',
             controller: id,
+            maxLength: 11,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
         ],
       ),

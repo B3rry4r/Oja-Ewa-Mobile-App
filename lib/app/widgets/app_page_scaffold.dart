@@ -65,7 +65,9 @@ class AppPageScaffold extends StatelessWidget {
       ),
     );
 
-    return Scaffold(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
       backgroundColor: Colors.transparent,
       body: DecoratedBox(
         decoration: BoxDecoration(
@@ -96,6 +98,7 @@ class AppPageScaffold extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

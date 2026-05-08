@@ -106,7 +106,7 @@ class CacPaymentController extends Notifier<CacPaymentState> {
             paymentReference: reference,
             currency: 'NGN',
             amount: cacAmountNgn,
-            rawData: {'gateway': 'paystack'},
+            rawData: {'gateway': 'flutterwave'},
           );
       state = state.copyWith(
         isProcessing: false,

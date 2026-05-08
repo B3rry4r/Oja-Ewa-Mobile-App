@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
@@ -259,9 +260,12 @@ class _BusinessSellerRegistrationScreenState
           ),
           const SizedBox(height: 16),
           _buildTextInput(
-            _identityType == 'bvn' ? 'BVN' : 'NIN',
-            _identityType == 'bvn' ? 'Enter BVN' : 'Enter NIN',
+            _identityType == 'bvn' ? 'BVN (11 digits)' : 'NIN (11 digits)',
+            '12345678901',
             controller: _identityValueController,
+            keyboardType: TextInputType.number,
+            maxLength: 11,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
           const SizedBox(height: 16),
           _buildTextInput(
@@ -272,95 +276,23 @@ class _BusinessSellerRegistrationScreenState
             onTap: () => _pickDateInto(_dateOfIncorporationController),
           ),
           const SizedBox(height: 16),
-          _buildTextInput(
-            'Country of Incorporation',
-            'Nigeria',
-            controller: _countryOfIncorporationController,
-          ),
-          const SizedBox(height: 16),
-          _buildTextInput(
-            'Business Website',
-            'https://ojaewa.com',
-            controller: _websiteController,
-          ),
-          const SizedBox(height: 16),
-          _buildTextInput(
-            'Business Email',
-            'academy@ojaewa.com',
-            controller: _emailController,
-          ),
-          const SizedBox(height: 16),
-          _buildPhoneInput(
-            'Business Phone Number',
-            controller: _phoneController,
-          ),
-          const SizedBox(height: 28),
-          _buildSectionHeader('Section 2: Business Type & Industry'),
-          const SizedBox(height: 16),
-          _buildPickerInput(
-            'Industry / Sector',
-            _industryController.text,
-            hint: 'Select industry',
-            onTap: _pickIndustry,
-          ),
-          const SizedBox(height: 16),
-          _buildDropdown(
-            label: 'Business Type',
-            value: _businessType,
-            items: const {
-              'limited_liability_company': 'Limited Liability Company',
-              'partnership': 'Partnership',
-              'sole_proprietorship_corporate':
-                  'Sole Proprietorship (Corporate)',
-              'non_profit_ngo': 'Non-Profit / NGO',
-              'other': 'Other',
-            },
-            onChanged: (value) => setState(() => _businessType = value),
-          ),
-          if (_businessType == 'other') ...[
-            const SizedBox(height: 16),
-            _buildTextInput(
-              'Other Business Type',
-              'Describe business type',
-              initialValue: _otherBusinessType,
-              onChanged: (value) => _otherBusinessType = value,
-            ),
-          ],
-          const SizedBox(height: 16),
-          _buildTextInput(
-            'Number of Employees',
-            '20',
-            controller: _employeesController,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: 16),
-          _buildDropdown(
-            label: 'Annual Turnover',
-            value: _turnoverRange,
-            items: const {
-              'under_50000': '< \$50,000',
-              '50000_to_250000': '\$50,000 – \$250,000',
-              '250000_to_1000000': '\$250,000 – \$1M',
-              'over_1000000': '> \$1M',
-            },
-            onChanged: (value) => setState(() => _turnoverRange = value),
-          ),
-          const SizedBox(height: 28),
-          _buildSectionHeader(
-            'Section 3: Registered Office / Physical Address',
-          ),
-          const SizedBox(height: 16),
           _buildLocationDropdown(
-            label: 'Country',
-            value: _selectedCountryName.isEmpty
+            label: 'Country of Incorporation',
+            value: _countryOfIncorporationController.text.isEmpty
                 ? 'Select Country'
-                : _selectedCountryName,
-            flag: _selectedCountryFlag.isEmpty ? null : _selectedCountryFlag,
+                : _countryOfIncorporationController.text,
             onTap: () async {
               final country = await CountryPickerSheet.show(
                 context,
-                selectedCountry: _selectedCountryName,
+                selectedCountry: _countryOfIncorporationController.text,
               );
+              if (country != null && mounted) {
+                setState(() {
+                  _countryOfIncorporationController.text = country.name;
+                });
+              }
+            },
+          );
               if (country != null) {
                 setState(() {
                   _selectedCountryName = country.name;
@@ -450,7 +382,10 @@ class _BusinessSellerRegistrationScreenState
             label: 'Identity Document',
             selectedPath: _identityDocumentLocalPath,
             onTap: () async {
-              final path = await pickSingleFilePath();
+              final path = await pickSingleFilePath(),
+            maxLength: 10,
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9 -]'))],
+          );
               if (path != null) {
                 setState(() => _identityDocumentLocalPath = path);
               }
@@ -481,6 +416,8 @@ class _BusinessSellerRegistrationScreenState
     String hint, {
     TextEditingController? controller,
     TextInputType? keyboardType,
+    int? maxLength,
+    List<TextInputFormatter>? inputFormatters,
     String? initialValue,
     ValueChanged<String>? onChanged,
     bool readOnly = false,
@@ -500,11 +437,14 @@ class _BusinessSellerRegistrationScreenState
           initialValue: controller == null ? initialValue : null,
           onChanged: onChanged,
           keyboardType: keyboardType,
+          maxLength: maxLength,
+          inputFormatters: inputFormatters,
           readOnly: readOnly,
           onTap: onTap,
           style: TextStyle(fontSize: 16, color: colors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
+            counterText: '',
             hintStyle: TextStyle(color: colors.textTertiary),
             filled: true,
             fillColor: colors.surface,

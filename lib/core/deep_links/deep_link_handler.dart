@@ -190,12 +190,21 @@ if (uri.host == 'nepc') {
       if (!context.mounted) return;
       Navigator.of(context).pop(); // Close loading dialog
 
-      if (result.status == 'success' || status == 'success') {
+      // result.status is payment_status from the API — 'paid' when successful
+      // status URL param from Flutterwave is 'successful' (not 'success')
+      final isSuccess = result.status == 'paid'
+          || result.status == 'success'
+          || result.status == 'successful'
+          || result.status == 'completed'
+          || status == 'successful'
+          || status == 'success';
+
+      if (isSuccess) {
         _showPaymentSuccess(context, result.orderId);
       } else {
         _showPaymentFailed(
           context,
-          'Payment verification failed. Status: ${result.status}',
+          'Payment verification failed. Please contact support if payment was deducted.',
         );
       }
     } catch (e) {
@@ -227,7 +236,9 @@ if (uri.host == 'nepc') {
   }
 
   Future<void> _handleSchoolPaymentCallback(Uri uri) async {
-    final reference = uri.queryParameters['reference'];
+    // Flutterwave redirects with tx_ref (not 'reference' — that was Paystack)
+    final reference = uri.queryParameters['tx_ref']
+        ?? uri.queryParameters['reference'];
     final status = uri.queryParameters['status'];
 
     if (reference == null || reference.isEmpty) {
@@ -256,12 +267,18 @@ if (uri.host == 'nepc') {
       final data = result['data'] as Map<String, dynamic>?;
       final paymentStatus = data?['payment_status'] as String? ?? status;
 
-      if (paymentStatus == 'success' || status == 'success') {
+      final isSchoolSuccess = paymentStatus == 'paid'
+          || paymentStatus == 'success'
+          || paymentStatus == 'successful'
+          || status == 'successful'
+          || status == 'success';
+
+      if (isSchoolSuccess) {
         _showSchoolPaymentSuccess(context);
       } else {
         _showPaymentFailed(
           context,
-          'School payment verification failed. Status: $paymentStatus',
+          'School payment could not be verified. Please contact support if payment was deducted.',
         );
       }
     } catch (e) {
@@ -273,7 +290,8 @@ if (uri.host == 'nepc') {
   }
 
   Future<void> _handleCacPaymentCallback(Uri uri) async {
-    final reference = uri.queryParameters['reference'];
+    final reference = uri.queryParameters['tx_ref']
+        ?? uri.queryParameters['reference'];
     final status = uri.queryParameters['status'];
 
     if (reference == null || reference.isEmpty) {
@@ -314,7 +332,8 @@ if (uri.host == 'nepc') {
   }
 
   Future<void> _handleNepcPaymentCallback(Uri uri) async {
-    final reference = uri.queryParameters['reference'];
+    final reference = uri.queryParameters['tx_ref']
+        ?? uri.queryParameters['reference'];
     final status = uri.queryParameters['status'];
 
     if (reference == null || reference.isEmpty) {

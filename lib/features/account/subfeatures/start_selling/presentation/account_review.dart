@@ -258,6 +258,7 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
       otherBusinessType: (draft.otherBusinessType ?? '').trim(),
       numberOfEmployees: draft.numberOfEmployees ?? 0,
       annualTurnoverRange: (draft.annualTurnoverRange ?? '').trim(),
+      annualTurnoverCurrency: (draft.annualTurnoverCurrency ?? 'NGN').trim(),
       country: (draft.country ?? '').trim(),
       state: (draft.state ?? '').trim(),
       city: (draft.city ?? '').trim(),

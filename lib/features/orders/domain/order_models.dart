@@ -215,6 +215,11 @@ class OrderSummary {
     required this.createdAt,
     required this.items,
     required this.shipments,
+    this.shippingName,
+    this.shippingPhone,
+    this.shippingCity,
+    this.shippingState,
+    this.shippingCountry,
     this.currency = 'NGN',
     this.exchangeRate,
     this.originalAmountNgn,
@@ -231,6 +236,13 @@ class OrderSummary {
   final DateTime? createdAt;
   final List<OrderItem> items;
   final List<ShipmentSummary> shipments;
+  // Shipping details (individual fields for display in order detail screen)
+  final String? shippingName;
+  final String? shippingPhone;
+  final String? shippingCity;
+  final String? shippingState;
+  final String? shippingCountry;
+
   /// ISO 4217 currency code for this order. Defaults to NGN for legacy orders.
   final String currency;
 
@@ -272,6 +284,11 @@ class OrderSummary {
                 .map(ShipmentSummary.fromJson)
                 .toList()
           : const [],
+      shippingName: json['shipping_name'] as String?,
+      shippingPhone: json['shipping_phone'] as String?,
+      shippingCity: json['shipping_city'] as String?,
+      shippingState: json['shipping_state'] as String?,
+      shippingCountry: json['shipping_country'] as String?,
       currency: (json['currency'] as String?)?.toUpperCase() ?? 'NGN',
       exchangeRate: json['exchange_rate'] as num?,
       originalAmountNgn: json['original_amount_ngn'] as num?,

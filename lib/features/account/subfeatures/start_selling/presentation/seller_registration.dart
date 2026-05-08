@@ -53,6 +53,7 @@ class _SellerRegistrationScreenState
   String _selectedCountryCode = '';
   String _businessType = 'limited_liability_company';
   String _turnoverRange = '50000_to_250000';
+  String _annualTurnoverCurrency = 'NGN';
   String _otherBusinessType = '';
   String _identityType = 'nin';
   String? _identityDocumentLocalPath;
@@ -148,6 +149,7 @@ class _SellerRegistrationScreenState
       _signatoryDobController.text = draft.authorizedSignatoryDateOfBirth ?? '';
       _businessType = draft.businessType ?? _businessType;
       _turnoverRange = draft.annualTurnoverRange ?? _turnoverRange;
+      _annualTurnoverCurrency = draft.annualTurnoverCurrency ?? _annualTurnoverCurrency;
       _otherBusinessType = draft.otherBusinessType ?? '';
       _identityDocumentLocalPath = draft.identityDocumentPath;
     }
@@ -207,15 +209,23 @@ class _SellerRegistrationScreenState
             ),
             const SizedBox(height: 16),
             _buildTextInput(
-              _identityType == 'bvn' ? 'BVN' : 'NIN',
-              _identityType == 'bvn' ? 'Enter BVN' : 'Enter NIN',
+              _identityType == 'bvn' ? 'BVN (11 digits)' : 'NIN (11 digits)',
+              '12345678901',
               controller: _identityValueController,
+              keyboardType: TextInputType.number,
+              maxLength: 11,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
           ] else ...[
             _buildTextInput(
               'Passport / Government ID Number',
               'A12345678',
               controller: _identityValueController,
+              maxLength: 9,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
+                UpperCaseTextFormatter(),
+              ],
             ),
           ],
           const SizedBox(height: 16),
@@ -227,15 +237,27 @@ class _SellerRegistrationScreenState
             onTap: () => _pickDateInto(_dateOfIncorporationController),
           ),
           const SizedBox(height: 16),
-          _buildTextInput(
-            'Country of Incorporation',
-            'Nigeria',
-            controller: _countryOfIncorporationController,
+          _buildLocationDropdown(
+            label: 'Country of Incorporation',
+            value: _countryOfIncorporationController.text.isEmpty
+                ? 'Select Country'
+                : _countryOfIncorporationController.text,
+            onTap: () async {
+              final country = await CountryPickerSheet.show(
+                context,
+                selectedCountry: _countryOfIncorporationController.text,
+              );
+              if (country != null && mounted) {
+                setState(() {
+                  _countryOfIncorporationController.text = country.name;
+                });
+              }
+            },
           ),
           const SizedBox(height: 16),
-          _buildTextInput(
+          _buildWebsiteInput(
             'Business Website',
-            'https://example.com',
+            'yoursite.com',
             controller: _websiteController,
           ),
           const SizedBox(height: 16),
@@ -289,16 +311,40 @@ class _SellerRegistrationScreenState
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 16),
-          _buildDropdown(
-            label: 'Annual Turnover',
-            value: _turnoverRange,
-            items: const {
-              'under_50000': '< \$50,000',
-              '50000_to_250000': '\$50,000 – \$250,000',
-              '250000_to_1000000': '\$250,000 – \$1M',
-              'over_1000000': '> \$1M',
-            },
-            onChanged: (value) => setState(() => _turnoverRange = value),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // Currency selector
+              SizedBox(
+                width: 100,
+                child: _buildDropdown(
+                  label: 'Currency',
+                  value: _annualTurnoverCurrency,
+                  items: const {
+                    'NGN': '₦ NGN',
+                    'USD': '\$ USD',
+                    'GBP': '£ GBP',
+                    'EUR': '€ EUR',
+                  },
+                  onChanged: (v) => setState(() => _annualTurnoverCurrency = v),
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Turnover range
+              Expanded(
+                child: _buildDropdown(
+                  label: 'Annual Turnover',
+                  value: _turnoverRange,
+                  items: {
+                    'under_50000': '< 50,000',
+                    '50000_to_250000': '50,000 – 250,000',
+                    '250000_to_1000000': '250,000 – 1M',
+                    'over_1000000': '> 1M',
+                  },
+                  onChanged: (value) => setState(() => _turnoverRange = value),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 28),
           _buildSectionHeader(
@@ -361,6 +407,8 @@ class _SellerRegistrationScreenState
             'Postal / Zip Code',
             '100001',
             controller: _postalCodeController,
+            maxLength: 10,
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9 -]'))],
           ),
           const SizedBox(height: 28),
           _buildSectionHeader('Section 4: Authorized Signatory'),
@@ -432,6 +480,10 @@ class _SellerRegistrationScreenState
     ValueChanged<String>? onChanged,
     bool readOnly = false,
     VoidCallback? onTap,
+    int? maxLength,
+    List<TextInputFormatter>? inputFormatters,
+    Widget? prefixWidget,
+    Widget? suffixWidget,
   }) {
     final colors = context.appColors;
     return Column(
@@ -449,10 +501,15 @@ class _SellerRegistrationScreenState
           onChanged: onChanged,
           readOnly: readOnly,
           onTap: onTap,
+          maxLength: maxLength,
+          inputFormatters: inputFormatters,
           style: TextStyle(fontSize: 16, color: colors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: colors.textTertiary),
+            prefix: prefixWidget,
+            suffix: suffixWidget,
+            counterText: '',
             filled: true,
             fillColor: colors.surface,
             contentPadding: const EdgeInsets.symmetric(
@@ -604,7 +661,72 @@ class _SellerRegistrationScreenState
     required String value,
     String? flag,
     required VoidCallback onTap,
+  }
+
+  /// Website input that pre-fills https:// and allows the user to clear it fully
+  Widget _buildWebsiteInput(
+    String label,
+    String hint, {
+    required TextEditingController controller,
   }) {
+    final colors = context.appColors;
+    // Ensure controller starts with https:// if empty
+    if (controller.text.isEmpty) {
+      controller.text = 'https://';
+      controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: controller.text.length),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(color: colors.textSecondary, fontSize: 14)),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          keyboardType: TextInputType.url,
+          style: TextStyle(fontSize: 16, color: colors.textPrimary),
+          onChanged: (val) {
+            // If user deletes everything, restore prefix so it's still deleteable
+            // but the field remains usable
+          },
+          decoration: InputDecoration(
+            hintText: 'https://$hint',
+            hintStyle: TextStyle(color: colors.textTertiary),
+            counterText: '',
+            filled: true,
+            fillColor: colors.surface,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.border),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.border),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: colors.accent),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Shows country picker for a nationality/text field
+  Future<void> _pickCountryInto(TextEditingController ctrl) async {
+    final country = await CountryPickerSheet.show(
+      context,
+      selectedCountry: ctrl.text,
+    );
+    if (country != null && mounted) {
+      setState(() => ctrl.text = country.name);
+    }
+  }
+
+) {
     final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -817,7 +939,7 @@ class _SellerRegistrationScreenState
         return false;
       }
       if (_identityValueController.text.trim().isEmpty) {
-        AppSnackbars.showError(context, 'Provide either NIN or BVN');
+        AppSnackbars.showError(context, 'Please provide your NIN or BVN');
         return false;
       }
       if (_registrationNumberController.text.trim().isEmpty) {
@@ -882,6 +1004,7 @@ class _SellerRegistrationScreenState
                 _employeesController.text.trim(),
               )
               ..annualTurnoverRange = _turnoverRange
+              ..annualTurnoverCurrency = _annualTurnoverCurrency
               ..country = _selectedCountryName
               ..state = _selectedStateName
               ..city = _cityController.text.trim()
@@ -952,5 +1075,16 @@ class _SellerRegistrationScreenState
       return '${_identityType.toUpperCase()}:$value';
     }
     return 'PASSPORT:$value';
+  }
+}
+
+/// Forces all input to uppercase (for passport numbers etc.)
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return newValue.copyWith(text: newValue.text.toUpperCase());
   }
 }

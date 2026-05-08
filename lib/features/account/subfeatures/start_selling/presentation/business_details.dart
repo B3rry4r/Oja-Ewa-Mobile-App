@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
@@ -363,22 +364,36 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
           ),
           const SizedBox(height: 12),
           _buildTextInput(
-            'Ownership %',
+            'Ownership % (max 100)',
             '60',
-            controller: controllers.$2,
+            controller: controllers.\$2,
             keyboardType: TextInputType.number,
+            maxLength: 3,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              _PercentageInputFormatter(),
+            ],
           ),
           const SizedBox(height: 12),
-          _buildTextInput(
-            'Nationality',
-            'Nigerian',
-            controller: controllers.$3,
+          _buildLocationDropdown(
+            label: 'Nationality',
+            value: controllers.\$3.text.isEmpty ? 'Select Country' : controllers.\$3.text,
+            onTap: () async {
+              final country = await CountryPickerSheet.show(
+                context,
+                selectedCountry: controllers.\$3.text,
+              );
+              if (country != null && mounted) {
+                setState(() => controllers.\$3.text = country.name);
+              }
+            },
           ),
           const SizedBox(height: 12),
           _buildTextInput(
             'ID Type & Number',
             'Passport A12345678',
-            controller: controllers.$4,
+            controller: controllers.\$4,
+            maxLength: 20,
           ),
         ],
       ),
@@ -392,6 +407,8 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
     TextInputType? keyboardType,
     bool readOnly = false,
     VoidCallback? onTap,
+    int? maxLength,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     final colors = context.appColors;
     return Column(
@@ -407,10 +424,13 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
           keyboardType: keyboardType,
           readOnly: readOnly,
           onTap: onTap,
+          maxLength: maxLength,
+          inputFormatters: inputFormatters,
           style: TextStyle(fontSize: 16, color: colors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: colors.textTertiary),
+            counterText: '',
             filled: true,
             fillColor: colors.surface,
             contentPadding: const EdgeInsets.symmetric(

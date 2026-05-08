@@ -20,6 +20,7 @@ class SellerRegistrationDraft {
     this.otherBusinessType,
     this.numberOfEmployees,
     this.annualTurnoverRange,
+    this.annualTurnoverCurrency,
     this.businessEmail,
     this.businessName,
     this.businessPhoneNumber,
@@ -67,6 +68,7 @@ class SellerRegistrationDraft {
   String? otherBusinessType;
   int? numberOfEmployees;
   String? annualTurnoverRange;
+  String? annualTurnoverCurrency;
   String? businessEmail;
   String? businessName;
   String? businessPhoneNumber;
@@ -114,6 +116,7 @@ class SellerRegistrationDraft {
     'otherBusinessType': otherBusinessType,
     'numberOfEmployees': numberOfEmployees,
     'annualTurnoverRange': annualTurnoverRange,
+    'annualTurnoverCurrency': annualTurnoverCurrency,
     'businessEmail': businessEmail,
     'businessName': businessName,
     'businessPhoneNumber': businessPhoneNumber,
@@ -163,6 +166,7 @@ class SellerRegistrationDraft {
       otherBusinessType: json['otherBusinessType'] as String?,
       numberOfEmployees: (json['numberOfEmployees'] as num?)?.toInt(),
       annualTurnoverRange: json['annualTurnoverRange'] as String?,
+      annualTurnoverCurrency: json['annualTurnoverCurrency'] as String?,
       businessEmail: json['businessEmail'] as String?,
       businessName: json['businessName'] as String?,
       businessPhoneNumber: json['businessPhoneNumber'] as String?,

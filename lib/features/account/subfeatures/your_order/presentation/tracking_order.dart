@@ -112,7 +112,10 @@ class TrackingOrderScreen extends ConsumerWidget {
   }
 
   String _firstProductName(Map<String, dynamic> orderDetails) {
-    final items = orderDetails['order_items'];
+    final d = (orderDetails['data'] is Map<String, dynamic>)
+        ? orderDetails['data'] as Map<String, dynamic>
+        : orderDetails;
+    final items = d['order_items'];
     if (items is List && items.isNotEmpty) {
       final first = items.first;
       if (first is Map) {
@@ -141,14 +144,17 @@ class TrackingOrderScreen extends ConsumerWidget {
           .toList();
     }
 
-    final orderShipmentsRaw = orderDetails?['shipments'];
+    final _oud = (orderDetails?['data'] is Map<String, dynamic>)
+        ? orderDetails!['data'] as Map<String, dynamic>
+        : orderDetails;
+    final orderShipmentsRaw = _oud?['shipments'];
     if (orderShipmentsRaw is List && orderShipmentsRaw.isNotEmpty) {
       return orderShipmentsRaw
           .whereType<Map>()
           .map(
             (shipment) => _ShipmentTrackingView.fromOrderJson(
               shipment: Map<String, dynamic>.from(shipment),
-              orderDetails: orderDetails ?? const {},
+              orderDetails: _oud ?? const {},
               fallbackTracking: trackingData,
             ),
           )

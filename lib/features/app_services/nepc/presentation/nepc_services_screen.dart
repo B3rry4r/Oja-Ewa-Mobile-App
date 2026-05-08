@@ -36,6 +36,7 @@ class _NepcServicesScreenState extends ConsumerState<NepcServicesScreen> {
   bool _confirmedInformation = false;
   bool _isSubmitting = false;
   final Map<String, String> _uploadedDocuments = {};
+  final Map<String, bool> _uploadingDocuments = {};
 
   static const _applicationTypes = {
     'new_registration': 'New registration',
@@ -252,6 +253,7 @@ class _NepcServicesScreenState extends ConsumerState<NepcServicesScreen> {
                 child: _UploadCard(
                   label: _documentLabels[type] ?? type,
                   selectedUrl: _uploadedDocuments[type],
+                  isLoading: _uploadingDocuments[type] ?? false,
                   onTap: () => _uploadDocument(type),
                 ),
               ),
@@ -353,25 +355,28 @@ class _NepcServicesScreenState extends ConsumerState<NepcServicesScreen> {
   Future<void> _uploadDocument(String type) async {
     final path = await pickSingleFilePath();
     if (path == null) return;
+    setState(() => _uploadingDocuments[type] = true);
     try {
       final upload = await ref
           .read(nepcServicesApiProvider)
           .uploadDocument(filePath: path, type: type);
       final url = upload['url'] as String?;
       if (url == null || url.isEmpty) {
-        if (mounted) {
-          AppSnackbars.showError(context, 'Upload failed');
-        }
+        setState(() => _uploadingDocuments[type] = false);
+        if (mounted) AppSnackbars.showError(context, 'Upload failed');
         return;
       }
       if (!mounted) return;
       setState(() {
         _uploadedDocuments[type] = url;
+        _uploadingDocuments[type] = false;
       });
       AppSnackbars.showSuccess(context, 'Document uploaded');
     } on DioException catch (e) {
+      setState(() => _uploadingDocuments[type] = false);
       if (mounted) AppSnackbars.showError(context, _dioMessage(e));
     } catch (_) {
+      setState(() => _uploadingDocuments[type] = false);
       if (mounted) AppSnackbars.showError(context, 'Unable to upload document');
     }
   }
@@ -673,54 +678,84 @@ class _UploadCard extends StatelessWidget {
     required this.label,
     required this.selectedUrl,
     required this.onTap,
+    this.isLoading = false,
   });
 
   final String label;
   final String? selectedUrl;
   final VoidCallback onTap;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final hasFile = (selectedUrl ?? '').isNotEmpty;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(color: colors.textSecondary, fontSize: 14),
-          ),
-          const SizedBox(height: 8),
-          Container(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(color: colors.textSecondary, fontSize: 14)),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: isLoading ? null : onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: Container(
             width: double.infinity,
-            height: 110,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
               color: colors.surfaceSecondary,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: hasFile ? colors.accent : colors.border,
-              ),
+              border: Border.all(color: hasFile ? colors.accent : colors.border),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
-                  color: hasFile ? colors.accent : colors.textSecondary,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  hasFile ? 'Document uploaded' : 'Select document',
-                  style: TextStyle(color: colors.textPrimary),
-                ),
-              ],
+            child: isLoading
+                ? const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 18, height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFDAF40))),
+                      SizedBox(width: 10),
+                      Text('Uploading...', style: TextStyle(fontSize: 13)),
+                    ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        hasFile ? Icons.check_circle : Icons.cloud_upload_outlined,
+                        color: hasFile ? colors.accent : colors.textSecondary,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        hasFile ? 'Uploaded ✓  Tap to change' : 'Select document',
+                        style: TextStyle(
+                          color: hasFile ? colors.accent : colors.textPrimary,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+        if (hasFile) ...[
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              selectedUrl!,
+              height: 110,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              loadingBuilder: (ctx, child, prog) => prog == null ? child
+                  : Container(height: 110, color: colors.surface,
+                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFDAF40)))),
+              errorBuilder: (ctx, e, st) => Container(
+                height: 60,
+                decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(12)),
+                child: Center(child: Icon(Icons.broken_image_outlined, color: colors.textTertiary)),
+              ),
             ),
           ),
         ],
-      ),
+      ],
     );
   }
 }

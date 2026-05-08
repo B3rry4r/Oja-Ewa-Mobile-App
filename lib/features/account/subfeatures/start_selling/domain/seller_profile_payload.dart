@@ -20,6 +20,7 @@ class SellerProfilePayload {
     this.otherBusinessType,
     required this.numberOfEmployees,
     required this.annualTurnoverRange,
+    this.annualTurnoverCurrency = 'NGN',
     required this.country,
     required this.state,
     required this.city,
@@ -66,6 +67,7 @@ class SellerProfilePayload {
   final String? otherBusinessType;
   final int numberOfEmployees;
   final String annualTurnoverRange;
+  final String annualTurnoverCurrency;
   final String country;
   final String state;
   final String city;
