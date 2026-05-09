@@ -85,7 +85,7 @@ class NepcServicesApi {
         'email': email,
         'products_to_export': productsToExport,
         'confirmed_information': confirmedInformation,
-        'payment_provider': 'paystack',
+        'payment_provider': 'flutterwave',
         'payment_reference': paymentReference,
         'currency': currency,
         'amount': amount,

@@ -30,6 +30,7 @@ class _BadgeVerificationsScreenState
   final _notesController = TextEditingController();
   String? _selectedBadge;
   bool _isSubmitting = false;
+  bool _isUploadingDocument = false;
   final List<String> _supportingDocumentUrls = [];
 
   @override
@@ -312,6 +313,7 @@ class _BadgeVerificationsScreenState
                   ? 'Optional. Upload supporting files if this badge needs more proof.'
                   : '${_supportingDocumentUrls.length} file(s) uploaded',
               uploaded: _supportingDocumentUrls.isNotEmpty,
+              isLoading: _isUploadingDocument,
               onTap: _uploadSupportingDocument,
             ),
             const SizedBox(height: 12),
@@ -427,24 +429,33 @@ class _BadgeVerificationsScreenState
   Future<void> _uploadSupportingDocument() async {
     final path = await pickSingleFilePath();
     if (path == null) return;
+    setState(() => _isUploadingDocument = true);
     try {
       final upload = await ref
           .read(badgeVerificationsApiProvider)
           .uploadDocument(filePath: path, type: 'supporting_document');
       final url = upload['url'] as String?;
       if (url == null || url.isEmpty) {
-        if (mounted) AppSnackbars.showError(context, 'Upload failed');
+        if (mounted) {
+          setState(() => _isUploadingDocument = false);
+          AppSnackbars.showError(context, 'Upload failed');
+        }
         return;
       }
       if (!mounted) return;
       setState(() {
+        _isUploadingDocument = false;
         _supportingDocumentUrls.add(url);
       });
       AppSnackbars.showSuccess(context, 'Supporting document uploaded');
     } on DioException catch (e) {
-      if (mounted) AppSnackbars.showError(context, _dioMessage(e));
+      if (mounted) {
+        setState(() => _isUploadingDocument = false);
+        AppSnackbars.showError(context, _dioMessage(e));
+      }
     } catch (_) {
       if (mounted) {
+        setState(() => _isUploadingDocument = false);
         AppSnackbars.showError(context, 'Unable to upload supporting document');
       }
     }
@@ -506,18 +517,20 @@ class _UploadCard extends StatelessWidget {
     required this.helper,
     required this.uploaded,
     required this.onTap,
+    this.isLoading = false,
   });
 
   final String label;
   final String helper;
   final bool uploaded;
   final VoidCallback onTap;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     return InkWell(
-      onTap: onTap,
+      onTap: isLoading ? null : onTap,
       borderRadius: BorderRadius.circular(18),
       child: Container(
         width: double.infinity,
@@ -527,37 +540,52 @@ class _UploadCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: uploaded ? colors.accent : colors.border),
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: isLoading
+            ? const Row(
                 children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: colors.textPrimary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0xFFFDAF40),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    helper,
-                    style: TextStyle(
-                      color: uploaded ? colors.accent : colors.textSecondary,
-                      fontSize: 12,
+                  SizedBox(width: 10),
+                  Text('Uploading...', style: TextStyle(fontSize: 13)),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          label,
+                          style: TextStyle(
+                            color: colors.textPrimary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          helper,
+                          style: TextStyle(
+                            color: uploaded ? colors.accent : colors.textSecondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
+                  Icon(
+                    uploaded ? Icons.check_circle : Icons.upload_file,
+                    color: uploaded ? colors.accent : colors.textSecondary,
                   ),
                 ],
               ),
-            ),
-            Icon(
-              uploaded ? Icons.check_circle : Icons.upload_file,
-              color: uploaded ? colors.accent : colors.textSecondary,
-            ),
-          ],
-        ),
       ),
     );
   }

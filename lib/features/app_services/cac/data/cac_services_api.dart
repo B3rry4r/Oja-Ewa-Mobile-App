@@ -49,7 +49,7 @@ class CacServicesApi {
         'consent_to_process_request': consentToProcessRequest,
         'business_objective': businessObjective,
         'proprietors': proprietors,
-        'payment_provider': 'paystack',
+        'payment_provider': 'flutterwave',
         'payment_reference': paymentReference,
         'currency': currency,
         'amount': amount,
