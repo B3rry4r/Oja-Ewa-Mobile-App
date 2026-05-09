@@ -11,7 +11,6 @@ import 'package:ojaewa/core/widgets/selection_bottom_sheet.dart';
 import 'package:ojaewa/features/account/subfeatures/shared/widgets/compliance_progress_banner.dart';
 import 'package:ojaewa/features/categories/domain/category_node.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/category_controller.dart';
-import 'package:ojaewa/features/categories/presentation/widgets/category_tree_picker_sheet.dart';
 
 import '../../../../../../app/router/app_router.dart';
 import 'business_registration_draft.dart';
@@ -48,6 +47,8 @@ class _BusinessSellerRegistrationScreenState
   final _signatoryPhoneController = TextEditingController();
   final _signatoryIdController = TextEditingController();
   final _signatoryDobController = TextEditingController();
+  final _ninController = TextEditingController();
+  final _bvnController = TextEditingController();
 
   String _selectedCountryName = '';
   String _selectedCountryFlag = '';
@@ -55,7 +56,6 @@ class _BusinessSellerRegistrationScreenState
   String _businessType = 'limited_liability_company';
   String _turnoverRange = '50000_to_250000';
   String _otherBusinessType = '';
-  String _identityType = 'nin';
   String? _identityDocumentLocalPath;
 
   static const _sections = [
@@ -100,6 +100,8 @@ class _BusinessSellerRegistrationScreenState
     _cityController.dispose();
     _addressController.dispose();
     _postalCodeController.dispose();
+    _ninController.dispose();
+    _bvnController.dispose();
     _signatoryNameController.dispose();
     _signatoryJobTitleController.dispose();
     _signatoryEmailController.dispose();
@@ -135,14 +137,12 @@ class _BusinessSellerRegistrationScreenState
     _tinController.text = _tinController.text.isEmpty
         ? (draftFromArgs?.taxIdentificationNumber ?? '')
         : _tinController.text;
-    _identityType = ((draftFromArgs?.bvn ?? '').trim().isNotEmpty)
-        ? 'bvn'
-        : _identityType;
-    _identityValueController.text = _identityValueController.text.isEmpty
-        ? (_identityType == 'bvn'
-              ? (draftFromArgs?.bvn ?? '')
-              : (draftFromArgs?.nin ?? ''))
-        : _identityValueController.text;
+    _ninController.text = _ninController.text.isEmpty
+        ? (draftFromArgs?.nin ?? '')
+        : _ninController.text;
+    _bvnController.text = _bvnController.text.isEmpty
+        ? (draftFromArgs?.bvn ?? '')
+        : _bvnController.text;
     _dateOfIncorporationController.text =
         _dateOfIncorporationController.text.isEmpty
         ? (draftFromArgs?.dateOfIncorporation ?? '')
@@ -244,6 +244,8 @@ class _BusinessSellerRegistrationScreenState
             'Business Registration Number (Optional if business name is provided)',
             'RC9876543',
             controller: _registrationNumberController,
+            maxLength: 20,
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9/\-]'))],
           ),
           const SizedBox(height: 16),
           _buildTextInput(
@@ -253,21 +255,36 @@ class _BusinessSellerRegistrationScreenState
             maxLength: 14,
           ),
           const SizedBox(height: 16),
-          _buildDropdown(
-            label: 'Identity Type',
-            value: _identityType,
-            items: const {'nin': 'NIN', 'bvn': 'BVN'},
-            onChanged: (value) => setState(() => _identityType = value),
-          ),
-          const SizedBox(height: 16),
-          _buildTextInput(
-            _identityType == 'bvn' ? 'BVN (11 digits)' : 'NIN (11 digits)',
-            '12345678901',
-            controller: _identityValueController,
-            keyboardType: TextInputType.number,
-            maxLength: 11,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          ),
+          if (_isNigerianSeller) ...[
+            _buildTextInput(
+              'NIN (11 digits)',
+              '12345678901',
+              controller: _ninController,
+              keyboardType: TextInputType.number,
+              maxLength: 11,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            ),
+            const SizedBox(height: 16),
+            _buildTextInput(
+              'BVN (11 digits)',
+              '12345678901',
+              controller: _bvnController,
+              keyboardType: TextInputType.number,
+              maxLength: 11,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            ),
+          ] else ...[
+            _buildTextInput(
+              'Passport / Government ID Number',
+              'A12345678',
+              controller: _identityValueController,
+              maxLength: 20,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
+                UpperCaseTextFormatter(),
+              ],
+            ),
+          ],
           const SizedBox(height: 16),
           _buildTextInput(
             'Date of Incorporation',
@@ -537,52 +554,6 @@ class _BusinessSellerRegistrationScreenState
     });
   }
 
-  Widget _buildDropdown({
-    required String label,
-    required String value,
-    required Map<String, String> items,
-    required ValueChanged<String> onChanged,
-  }) {
-    final colors = context.appColors;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(color: colors.textSecondary, fontSize: 14),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: colors.surface,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: colors.border),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: value,
-              isExpanded: true,
-              dropdownColor: colors.surface,
-              style: TextStyle(color: colors.textPrimary, fontSize: 16),
-              items: items.entries
-                  .map(
-                    (entry) => DropdownMenuItem<String>(
-                      value: entry.key,
-                      child: Text(entry.value),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (next) {
-                if (next != null) onChanged(next);
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildLocationDropdown({
     required String label,
     required String value,
@@ -720,7 +691,6 @@ class _BusinessSellerRegistrationScreenState
     final requiredControllers = [
       _legalBusinessNameController,
       _tinController,
-      _identityValueController,
       _dateOfIncorporationController,
       _countryOfIncorporationController,
       _industryController,
@@ -755,6 +725,21 @@ class _BusinessSellerRegistrationScreenState
       );
       return false;
     }
+    if (_isNigerianSeller) {
+      if (_ninController.text.trim().isEmpty) {
+        AppSnackbars.showError(context, 'Please provide your NIN');
+        return false;
+      }
+      if (_bvnController.text.trim().isEmpty) {
+        AppSnackbars.showError(context, 'Please provide your BVN');
+        return false;
+      }
+    } else {
+      if (_identityValueController.text.trim().isEmpty) {
+        AppSnackbars.showError(context, 'Please provide your Passport / Government ID Number');
+        return false;
+      }
+    }
     if (_identityDocumentLocalPath == null ||
         _identityDocumentLocalPath!.isEmpty) {
       AppSnackbars.showError(context, 'Upload the identity document');
@@ -786,12 +771,8 @@ class _BusinessSellerRegistrationScreenState
               ..businessRegistrationNumber = _registrationNumberController.text
                   .trim()
               ..taxIdentificationNumber = _tinController.text.trim()
-              ..nin = _identityType == 'nin'
-                  ? _identityValueController.text.trim()
-                  : null
-              ..bvn = _identityType == 'bvn'
-                  ? _identityValueController.text.trim()
-                  : null
+              ..nin = _isNigerianSeller ? _ninController.text.trim() : null
+              ..bvn = _isNigerianSeller ? _bvnController.text.trim() : null
               ..dateOfIncorporation = _dateOfIncorporationController.text.trim()
               ..countryOfIncorporation = _countryOfIncorporationController.text
                   .trim()
@@ -820,7 +801,11 @@ class _BusinessSellerRegistrationScreenState
               ..authorizedSignatoryIdNumber =
                   _signatoryIdController.text.trim().isNotEmpty
                   ? _signatoryIdController.text.trim()
-                  : '${_identityType.toUpperCase()}:${_identityValueController.text.trim()}'
+                  : _isNigerianSeller
+                      ? (_ninController.text.trim().isNotEmpty
+                          ? 'NIN:${_ninController.text.trim()}'
+                          : 'BVN:${_bvnController.text.trim()}')
+                      : 'PASSPORT:${_identityValueController.text.trim()}'
               ..authorizedSignatoryDateOfBirth = _signatoryDobController.text
                   .trim()
               ..identityDocumentPath = _identityDocumentLocalPath
@@ -831,16 +816,14 @@ class _BusinessSellerRegistrationScreenState
           final catalog = await ref.read(allCategoriesProvider.future);
           if (!context.mounted) return;
           final roots = catalog.categories['school'] ?? const <CategoryNode>[];
-          final selectedNode = await showCategoryTreePickerSheet(
-            context: context,
-            title: 'Select Category',
-            roots: roots,
-          );
-          if (!context.mounted) return;
-          if (selectedNode == null) return;
+          if (roots.isEmpty) {
+            AppSnackbars.showError(context, 'Could not resolve business category. Please try again.');
+            return;
+          }
+          final node = roots.first;
           draft
-            ..categoryId = selectedNode.parentId ?? selectedNode.id
-            ..subcategoryId = selectedNode.id;
+            ..categoryId = node.parentId ?? node.id
+            ..subcategoryId = node.id;
         }
 
         if (!context.mounted) return;
@@ -875,6 +858,15 @@ class _BusinessSellerRegistrationScreenState
         ),
       ),
     );
+  }
+
+  bool get _isNigerianSeller =>
+      _isNigeria(_selectedCountryName) ||
+      _isNigeria(_countryOfIncorporationController.text);
+
+  bool _isNigeria(String value) {
+    final normalized = value.trim().toLowerCase();
+    return normalized == 'nigeria' || normalized == 'ng' || normalized == 'nga';
   }
 }
 

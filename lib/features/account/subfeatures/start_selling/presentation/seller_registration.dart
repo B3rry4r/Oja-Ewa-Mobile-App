@@ -47,6 +47,8 @@ class _SellerRegistrationScreenState
   final _signatoryPhoneController = TextEditingController();
   final _signatoryIdController = TextEditingController();
   final _signatoryDobController = TextEditingController();
+  final _ninController = TextEditingController();
+  final _bvnController = TextEditingController();
 
   String _selectedCountryName = '';
   String _selectedCountryFlag = '';
@@ -56,7 +58,6 @@ class _SellerRegistrationScreenState
   String _turnoverRange = '50000_to_250000';
   String _annualTurnoverCurrency = 'NGN';
   String _otherBusinessType = '';
-  String _identityType = 'nin';
 
   // True when opened from 'Edit Business Information' (pre-filled draft)
   bool get _isEditing => (ModalRoute.of(context)?.settings.arguments is Map);
@@ -110,6 +111,8 @@ class _SellerRegistrationScreenState
     _signatoryPhoneController.dispose();
     _signatoryIdController.dispose();
     _signatoryDobController.dispose();
+    _ninController.dispose();
+    _bvnController.dispose();
     super.dispose();
   }
 
@@ -126,10 +129,8 @@ class _SellerRegistrationScreenState
       _registrationNumberController.text =
           draft.businessRegistrationNumber ?? '';
       _tinController.text = draft.taxIdentificationNumber ?? '';
-      _identityType = (draft.bvn ?? '').trim().isNotEmpty ? 'bvn' : 'nin';
-      _identityValueController.text = _identityType == 'bvn'
-          ? (draft.bvn ?? '')
-          : (draft.nin ?? '');
+      _ninController.text = draft.nin ?? '';
+      _bvnController.text = draft.bvn ?? '';
       _dateOfIncorporationController.text = draft.dateOfIncorporation ?? '';
       _countryOfIncorporationController.text =
           draft.countryOfIncorporation ?? '';
@@ -197,6 +198,8 @@ class _SellerRegistrationScreenState
             'Business Registration Number',
             'RC1234567',
             controller: _registrationNumberController,
+            maxLength: 20,
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9/\-]'))],
           ),
           const SizedBox(height: 16),
           _buildTextInput(
@@ -207,17 +210,19 @@ class _SellerRegistrationScreenState
           ),
           const SizedBox(height: 16),
           if (_isNigerianSeller) ...[
-            _buildDropdown(
-              label: 'Identity Type',
-              value: _identityType,
-              items: const {'nin': 'NIN', 'bvn': 'BVN'},
-              onChanged: (value) => setState(() => _identityType = value),
+            _buildTextInput(
+              'NIN (11 digits)',
+              '12345678901',
+              controller: _ninController,
+              keyboardType: TextInputType.number,
+              maxLength: 11,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
             const SizedBox(height: 16),
             _buildTextInput(
-              _identityType == 'bvn' ? 'BVN (11 digits)' : 'NIN (11 digits)',
+              'BVN (11 digits)',
               '12345678901',
-              controller: _identityValueController,
+              controller: _bvnController,
               keyboardType: TextInputType.number,
               maxLength: 11,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -944,8 +949,12 @@ class _SellerRegistrationScreenState
         AppSnackbars.showError(context, 'Provide Tax Identification Number');
         return false;
       }
-      if (_identityValueController.text.trim().isEmpty) {
-        AppSnackbars.showError(context, 'Please provide your NIN or BVN');
+      if (_ninController.text.trim().isEmpty) {
+        AppSnackbars.showError(context, 'Please provide your NIN');
+        return false;
+      }
+      if (_bvnController.text.trim().isEmpty) {
+        AppSnackbars.showError(context, 'Please provide your BVN');
         return false;
       }
       if (_registrationNumberController.text.trim().isEmpty) {
@@ -991,12 +1000,8 @@ class _SellerRegistrationScreenState
               ..businessRegistrationNumber = _registrationNumberController.text
                   .trim()
               ..taxIdentificationNumber = _tinController.text.trim()
-              ..nin = _identityType == 'nin'
-                  ? _identityValueController.text.trim()
-                  : null
-              ..bvn = _identityType == 'bvn'
-                  ? _identityValueController.text.trim()
-                  : null
+              ..nin = _isNigerianSeller ? _ninController.text.trim() : null
+              ..bvn = _isNigerianSeller ? _bvnController.text.trim() : null
               ..dateOfIncorporation = _dateOfIncorporationController.text.trim()
               ..countryOfIncorporation = _countryOfIncorporationController.text
                   .trim()
@@ -1075,12 +1080,16 @@ class _SellerRegistrationScreenState
   }
 
   String _defaultSignatoryIdNumber() {
-    final value = _identityValueController.text.trim();
-    if (value.isEmpty) return '';
     if (_isNigerianSeller) {
-      return '${_identityType.toUpperCase()}:$value';
+      final nin = _ninController.text.trim();
+      if (nin.isNotEmpty) return 'NIN:$nin';
+      final bvn = _bvnController.text.trim();
+      if (bvn.isNotEmpty) return 'BVN:$bvn';
+      return '';
     }
-    return 'PASSPORT:$value';
+    final passport = _identityValueController.text.trim();
+    if (passport.isEmpty) return '';
+    return 'PASSPORT:$passport';
   }
 }
 
