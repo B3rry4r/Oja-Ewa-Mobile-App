@@ -33,6 +33,8 @@ class _AdvertPlacementsScreenState
   bool _isSubmitting = false;
   String? _uploadedImageUrl;
   String? _uploadedThumbnailUrl;
+  bool _isUploadingImage = false;
+  bool _isUploadingThumbnail = false;
 
   @override
   void dispose() {
@@ -101,6 +103,7 @@ class _AdvertPlacementsScreenState
                     helper: 'Upload the banner image for this advert.',
                     selectedUrl: _uploadedImageUrl,
                     onTap: () => _uploadMedia('image'),
+                    isLoading: _isUploadingImage,
                   )
                 else ...[
                   _ServiceField(
@@ -114,6 +117,7 @@ class _AdvertPlacementsScreenState
                     helper: 'Optional thumbnail for the video advert.',
                     selectedUrl: _uploadedThumbnailUrl,
                     onTap: () => _uploadMedia('thumbnail'),
+                    isLoading: _isUploadingThumbnail,
                   ),
                 ],
                 const SizedBox(height: 12),
@@ -316,28 +320,64 @@ class _AdvertPlacementsScreenState
   Future<void> _uploadMedia(String type) async {
     final path = await pickSingleFilePath();
     if (path == null) return;
+    setState(() {
+      if (type == 'image') {
+        _isUploadingImage = true;
+      } else {
+        _isUploadingThumbnail = true;
+      }
+    });
     try {
       final upload = await ref
           .read(advertPlacementsApiProvider)
           .uploadMedia(filePath: path, type: type);
       final url = upload['url'] as String?;
       if (url == null || url.isEmpty) {
-        if (mounted) AppSnackbars.showError(context, 'Upload failed');
+        if (mounted) {
+          setState(() {
+            if (type == 'image') {
+              _isUploadingImage = false;
+            } else {
+              _isUploadingThumbnail = false;
+            }
+          });
+          AppSnackbars.showError(context, 'Upload failed');
+        }
         return;
       }
       if (!mounted) return;
       setState(() {
         if (type == 'image') {
+          _isUploadingImage = false;
           _uploadedImageUrl = url;
         } else {
+          _isUploadingThumbnail = false;
           _uploadedThumbnailUrl = url;
         }
       });
       AppSnackbars.showSuccess(context, 'Media uploaded');
     } on DioException catch (e) {
-      if (mounted) AppSnackbars.showError(context, _dioMessage(e));
+      if (mounted) {
+        setState(() {
+          if (type == 'image') {
+            _isUploadingImage = false;
+          } else {
+            _isUploadingThumbnail = false;
+          }
+        });
+        AppSnackbars.showError(context, _dioMessage(e));
+      }
     } catch (_) {
-      if (mounted) AppSnackbars.showError(context, 'Unable to upload media');
+      if (mounted) {
+        setState(() {
+          if (type == 'image') {
+            _isUploadingImage = false;
+          } else {
+            _isUploadingThumbnail = false;
+          }
+        });
+        AppSnackbars.showError(context, 'Unable to upload media');
+      }
     }
   }
 
@@ -439,19 +479,21 @@ class _UploadCard extends StatelessWidget {
     required this.helper,
     required this.selectedUrl,
     required this.onTap,
+    this.isLoading = false,
   });
 
   final String label;
   final String helper;
   final String? selectedUrl;
   final VoidCallback onTap;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final uploaded = (selectedUrl ?? '').isNotEmpty;
     return InkWell(
-      onTap: onTap,
+      onTap: isLoading ? null : onTap,
       borderRadius: BorderRadius.circular(18),
       child: Container(
         width: double.infinity,
@@ -461,37 +503,52 @@ class _UploadCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: uploaded ? colors.accent : colors.border),
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: isLoading
+            ? const Row(
                 children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: colors.textPrimary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0xFFFDAF40),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    uploaded ? 'File uploaded' : helper,
-                    style: TextStyle(
-                      color: uploaded ? colors.accent : colors.textSecondary,
-                      fontSize: 12,
+                  SizedBox(width: 10),
+                  Text('Uploading...', style: TextStyle(fontSize: 13)),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          label,
+                          style: TextStyle(
+                            color: colors.textPrimary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          uploaded ? 'Uploaded ✓  Tap to change' : helper,
+                          style: TextStyle(
+                            color: uploaded ? colors.accent : colors.textSecondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
+                  Icon(
+                    uploaded ? Icons.check_circle : Icons.upload_file,
+                    color: uploaded ? colors.accent : colors.textSecondary,
                   ),
                 ],
               ),
-            ),
-            Icon(
-              uploaded ? Icons.check_circle : Icons.upload_file,
-              color: uploaded ? colors.accent : colors.textSecondary,
-            ),
-          ],
-        ),
       ),
     );
   }
