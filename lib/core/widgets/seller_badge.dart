@@ -17,9 +17,9 @@ class SellerBadge extends StatelessWidget {
         return _buildBadge(
           context,
           "Certified Authentic",
-          const Color(0xFF111111),
           const Color(0xFFF5F5F5),
-          borderColor: const Color(0xFF3A3A3A),
+          const Color(0xFF111111),
+          borderColor: const Color(0xFFD0D0D0),
         );
       case "heritage_artisan":
         return _buildBadge(

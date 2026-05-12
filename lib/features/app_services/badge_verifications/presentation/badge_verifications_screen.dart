@@ -464,7 +464,7 @@ class _BadgeVerificationsScreenState
   String _badgeLabel(String key) {
     switch (key) {
       case 'certified_authentic':
-        return 'Black Badge';
+        return 'White Badge';
       case 'heritage_artisan':
         return 'Gold Badge';
       case 'sustainable_innovator':
