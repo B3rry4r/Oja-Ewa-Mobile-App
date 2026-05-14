@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/core/network/dio_clients.dart';
-import 'package:ojaewa/features/app_services/shared/domain/app_service_purchase.dart';
 
 import '../domain/advert_placement_request.dart';
 
@@ -39,9 +38,7 @@ class AdvertPlacementsApi {
     required String targetUrl,
     required String startDate,
     required String endDate,
-    required String displayCurrency,
-    required num displayTotalAmount,
-    required AppServicePurchase purchase,
+    required int durationDays,
   }) async {
     final response = await _dio.post(
       '/api/services/advert-placements',
@@ -59,9 +56,7 @@ class AdvertPlacementsApi {
         'target_url': targetUrl,
         'start_date': startDate,
         'end_date': endDate,
-        'display_currency': displayCurrency,
-        'display_total_amount': displayTotalAmount,
-        ...purchase.toJson(),
+        'duration_days': durationDays,
       },
     );
     final payload =

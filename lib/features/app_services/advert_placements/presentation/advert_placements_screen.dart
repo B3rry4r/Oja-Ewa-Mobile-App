@@ -5,8 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/files/pick_file.dart';
-import 'package:ojaewa/core/subscriptions/iap_service.dart';
-import 'package:ojaewa/core/subscriptions/subscription_constants.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/features/app_services/presentation/screens/app_service_ui.dart';
 
@@ -28,8 +26,7 @@ class _AdvertPlacementsScreenState
   final _targetUrlController = TextEditingController();
   final _videoUrlController = TextEditingController();
   String _mediaType = 'image';
-  String _displayCurrency = 'NGN';
-  int _durationDays = 1;
+  int _durationDays = 7;
   bool _isSubmitting = false;
   String? _uploadedImageUrl;
   String? _uploadedThumbnailUrl;
@@ -59,7 +56,7 @@ class _AdvertPlacementsScreenState
           const ServiceIntroCard(
             title: 'Create a new advert request',
             description:
-                'Choose your advert type, upload the required media, then continue to payment and submission.',
+                'Choose your advert type, upload the required media, and submit your request for review.',
             badge: 'Adverts',
           ),
           const SizedBox(height: 20),
@@ -131,12 +128,12 @@ class _AdvertPlacementsScreenState
           ),
           const SizedBox(height: 16),
           _ServiceFormCard(
-            title: 'Duration and pricing',
+            title: 'Preferred duration',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Advert package',
+                  'How long would you like to run this advert?',
                   style: TextStyle(
                     color: colors.textPrimary,
                     fontSize: 13,
@@ -163,22 +160,12 @@ class _AdvertPlacementsScreenState
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Placement is fixed to homepage banner. Start and end dates are generated automatically from the selected package after payment.',
+                  'This is your preferred duration. Final scheduling will be confirmed after your request is reviewed.',
                   style: TextStyle(
                     color: colors.textSecondary,
                     fontSize: 12,
                     height: 1.4,
                   ),
-                ),
-                const SizedBox(height: 12),
-                _ServiceDropdown(
-                  label: 'Display currency',
-                  value: _displayCurrency,
-                  items: const ['NGN', 'USD'],
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setState(() => _displayCurrency = value);
-                  },
                 ),
               ],
             ),
@@ -194,7 +181,7 @@ class _AdvertPlacementsScreenState
                       height: 18,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Pay & Submit Advert Request'),
+                  : const Text('Submit Advert Request'),
             ),
           ),
           const SizedBox(height: 24),
@@ -257,27 +244,8 @@ class _AdvertPlacementsScreenState
       return;
     }
 
-    final productId = ServiceProducts.advertProductForDuration(_durationDays);
-    if (productId == null) {
-      AppSnackbars.showError(
-        context,
-        'Supported advert packages are 1, 3, 7, 14, or 30 days',
-      );
-      return;
-    }
-
     setState(() => _isSubmitting = true);
     try {
-      final purchase = await ref
-          .read(iapServiceProvider)
-          .purchaseService(productId);
-      if (purchase == null) {
-        if (mounted) {
-          AppSnackbars.showError(context, 'Payment was not completed');
-        }
-        return;
-      }
-
       await ref
           .read(advertPlacementsApiProvider)
           .createRequest(
@@ -296,13 +264,14 @@ class _AdvertPlacementsScreenState
             targetUrl: _targetUrlController.text.trim(),
             startDate: _startDateForPackage(),
             endDate: _endDateForPackage(_durationDays),
-            displayCurrency: _displayCurrency,
-            displayTotalAmount: _displayTotalAmountForPackage(_durationDays),
-            purchase: purchase,
+            durationDays: _durationDays,
           );
       ref.invalidate(advertPlacementRequestsProvider);
       if (mounted) {
-        AppSnackbars.showSuccess(context, 'Advert request submitted');
+        AppSnackbars.showSuccess(
+          context,
+          'Request received. You will be communicated with on next steps.',
+        );
       }
     } on DioException catch (e) {
       if (mounted) {
@@ -384,23 +353,6 @@ class _AdvertPlacementsScreenState
   String _startDateForPackage() {
     final now = DateTime.now().toUtc();
     return _formatDate(now);
-  }
-
-  num _displayTotalAmountForPackage(int days) {
-    switch (days) {
-      case 1:
-        return 35000;
-      case 3:
-        return 105000;
-      case 7:
-        return 245000;
-      case 14:
-        return 490000;
-      case 30:
-        return 1050000;
-      default:
-        return 0;
-    }
   }
 
   String _endDateForPackage(int days) {
