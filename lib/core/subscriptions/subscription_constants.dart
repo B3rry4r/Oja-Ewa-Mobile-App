@@ -24,12 +24,12 @@ class SubscriptionProducts {
 class ServiceProducts {
   ServiceProducts._();
 
-  static const String badgeBlackYearly = 'badge_black_yearly';
-  static const String badgeGoldYearly = 'badge_gold_yearly';
-  static const String badgeGreenYearly = 'badge_green_yearly';
+  static const String badgeWhiteYearly = 'ojaewa_badge_white_yearly';
+  static const String badgeGoldYearly = 'ojaewa_badge_gold_yearly';
+  static const String badgeGreenYearly = 'ojaewa_badge_green_yearly';
 
   static const List<String> allProducts = [
-    badgeBlackYearly,
+    badgeWhiteYearly,
     badgeGoldYearly,
     badgeGreenYearly,
   ];
@@ -37,7 +37,7 @@ class ServiceProducts {
   static String? badgeProductForKey(String badgeKey) {
     switch (badgeKey) {
       case 'certified_authentic':
-        return badgeBlackYearly;
+        return badgeWhiteYearly;
       case 'heritage_artisan':
         return badgeGoldYearly;
       case 'sustainable_innovator':
