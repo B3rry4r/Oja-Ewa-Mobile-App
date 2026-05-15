@@ -156,7 +156,13 @@ class IapService {
 
     try {
       final purchaseParam = PurchaseParam(productDetails: product);
-      final success = await _iap.buyConsumable(purchaseParam: purchaseParam);
+      // Badge products are auto-renewing yearly subscriptions in the stores,
+      // so use buyNonConsumable (which the in_app_purchase plugin also uses
+      // for subscriptions). buyConsumable would acknowledge+consume the token
+      // on Android, breaking renewal.
+      final success = await _iap.buyNonConsumable(
+        purchaseParam: purchaseParam,
+      );
       if (!success) {
         _clearPendingServicePurchase();
         return null;
