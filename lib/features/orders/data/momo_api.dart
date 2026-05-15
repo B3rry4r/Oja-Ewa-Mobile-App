@@ -66,11 +66,24 @@ class MoMoPaymentInitResponse {
   final String phone;
   final String paymentStatus;
 
+  static num? _parseNum(dynamic v) {
+    if (v is num) return v;
+    if (v is String) return num.tryParse(v);
+    return null;
+  }
+
+  static int? _parseInt(dynamic v) {
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    if (v is String) return int.tryParse(v);
+    return null;
+  }
+
   factory MoMoPaymentInitResponse.fromJson(Map<String, dynamic> json) {
     return MoMoPaymentInitResponse(
       referenceId: json['reference_id'] as String? ?? '',
-      orderId: json['order_id'] as int? ?? 0,
-      amount: json['amount'] as num? ?? 0,
+      orderId: _parseInt(json['order_id']) ?? 0,
+      amount: _parseNum(json['amount']) ?? 0,
       currency: json['currency'] as String? ?? 'NGN',
       phone: json['phone'] as String? ?? '',
       paymentStatus: json['payment_status'] as String? ?? 'pending',
@@ -116,9 +129,16 @@ class MoMoOrderInfo {
   final String paymentStatus;
   final String status;
 
+  static int? _parseInt(dynamic v) {
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    if (v is String) return int.tryParse(v);
+    return null;
+  }
+
   factory MoMoOrderInfo.fromJson(Map<String, dynamic> json) {
     return MoMoOrderInfo(
-      id: json['id'] as int? ?? 0,
+      id: _parseInt(json['id']) ?? 0,
       paymentStatus: json['payment_status'] as String? ?? '',
       status: json['status'] as String? ?? '',
     );

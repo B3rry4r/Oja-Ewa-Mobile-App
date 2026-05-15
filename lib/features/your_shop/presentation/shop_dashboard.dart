@@ -346,7 +346,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
                 return _buildOrderRow(
                   context,
                   '#${order.orderNumber}',
-                  dateFormat.format(order.createdAt),
+                  order.createdAt == null ? '—' : dateFormat.format(order.createdAt!),
                   order.customerName ?? '—',
                   order.status,
                   showDivider: index != orders.length - 1,

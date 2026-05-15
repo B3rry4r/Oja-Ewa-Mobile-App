@@ -17,6 +17,7 @@ import 'package:ojaewa/features/account/subfeatures/show_your_business/presentat
 import 'package:ojaewa/features/account/subfeatures/connect/presentation/controllers/connect_controller.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/widgets/confirmation_modal.dart';
+import 'package:ojaewa/core/widgets/seller_badge.dart';
 import 'package:ojaewa/features/auth/data/auth_repository_impl.dart';
 import 'package:ojaewa/features/notifications/data/notifications_repository_impl.dart';
 
@@ -305,42 +306,13 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
-  String _badgeLabel(String badge) {
-    switch (badge) {
-      case 'certified_authentic':
-        return 'Black Badge Active';
-      case 'heritage_artisan':
-        return 'Gold Badge Active';
-      case 'sustainable_innovator':
-        return 'Green Badge Active';
-      default:
-        return 'Badge Active';
-    }
-  }
+  String _badgeLabel(String badge) =>
+      SellerBadge.labelFor(badge) ?? 'Badge Active';
 
-  Color _badgeColor(String badge, AppThemeColors colors) {
-    switch (badge) {
-      case 'certified_authentic':
-        return const Color(0xFF111111);
-      case 'heritage_artisan':
-        return const Color(0xFFD4AF37);
-      case 'sustainable_innovator':
-        return const Color(0xFF2E7D32);
-      case 'design_excellence':
-        return const Color(0xFF2F80ED);
-      default:
-        return colors.accent;
-    }
-  }
+  Color _badgeColor(String badge, AppThemeColors colors) =>
+      SellerBadge.backgroundFor(badge) ?? colors.accent;
 
-  Color _badgeIconColor(String badge) {
-    switch (badge) {
-      case 'heritage_artisan':
-        return const Color(0xFF111111);
-      default:
-        return Colors.white;
-    }
-  }
+  Color _badgeIconColor(String badge) => SellerBadge.foregroundFor(badge);
 
   Widget _buildBusinessList(BuildContext context, WidgetRef ref) {
     final isSellerApproved = ref.watch(isSellerApprovedProvider);

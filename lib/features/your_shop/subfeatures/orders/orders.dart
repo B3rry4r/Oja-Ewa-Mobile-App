@@ -212,7 +212,7 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
                 return _OrderRow(
                   orderId: order.orderId,
                   orderNumber: '#${order.orderNumber}',
-                  date: dateFormat.format(order.createdAt),
+                  date: order.createdAt == null ? '—' : dateFormat.format(order.createdAt!),
                   customer: order.customerName ?? '—',
                   status: order.status,
                   backgroundColor: index.isEven

@@ -215,6 +215,7 @@ class OrderSummary {
     required this.createdAt,
     required this.items,
     required this.shipments,
+    this.subtotal,
     this.shippingName,
     this.shippingPhone,
     this.shippingCity,
@@ -229,6 +230,7 @@ class OrderSummary {
   final String? orderNumber;
   final num? totalPrice;
   final num? deliveryFee;
+  final num? subtotal;
   final String? status;
   final String? paymentStatus;
   final String? paymentReference;
@@ -267,6 +269,7 @@ class OrderSummary {
       orderNumber: json['order_number'] as String?,
       totalPrice: _parseNum(json['total_price']),
       deliveryFee: _parseNum(json['delivery_fee']),
+      subtotal: _parseNum(json['subtotal']),
       status: json['status'] as String?,
       paymentStatus: json['payment_status'] as String?,
       paymentReference: json['payment_reference'] as String?,
@@ -290,8 +293,11 @@ class OrderSummary {
       shippingState: json['shipping_state'] as String?,
       shippingCountry: json['shipping_country'] as String?,
       currency: (json['currency'] as String?)?.toUpperCase() ?? 'NGN',
-      exchangeRate: json['exchange_rate'] as num?,
-      originalAmountNgn: json['original_amount_ngn'] as num?,
+      // Laravel `decimal:6` / `decimal:2` casts serialize as JSON strings, not
+      // numbers, so we must parse them defensively. Reading them with `as num?`
+      // throws a TypeError that surfaces as "Failed to create order".
+      exchangeRate: _parseNum(json['exchange_rate']),
+      originalAmountNgn: _parseNum(json['original_amount_ngn']),
     );
   }
 }

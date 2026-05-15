@@ -80,7 +80,7 @@ class ShopOrderDetailsScreen extends ConsumerWidget {
           _buildDetailTile(
             context,
             "Order Date",
-            dateFormat.format(order.createdAt),
+            order.createdAt == null ? '—' : dateFormat.format(order.createdAt!),
           ),
           if (order.shipmentId != 0)
             _buildDetailTile(

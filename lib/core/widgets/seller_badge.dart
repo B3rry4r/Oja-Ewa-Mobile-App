@@ -6,6 +6,47 @@ class SellerBadge extends StatelessWidget {
 
   const SellerBadge({super.key, this.badge});
 
+  /// Single source of truth for badge → display label.
+  /// Badges currently live in three places (this widget, the account screen,
+  /// and the API). Keep them aligned with this helper.
+  static String? labelFor(String? badge) {
+    switch (badge) {
+      case 'certified_authentic':
+        return 'White Badge Active';
+      case 'heritage_artisan':
+        return 'Gold Badge Active';
+      case 'sustainable_innovator':
+        return 'Green Badge Active';
+      default:
+        return null;
+    }
+  }
+
+  /// Background color for the badge pill. Returns null for unknown badges.
+  static Color? backgroundFor(String? badge) {
+    switch (badge) {
+      case 'certified_authentic':
+        return const Color(0xFFF5F5F5);
+      case 'heritage_artisan':
+        return const Color(0xFFD4AF37);
+      case 'sustainable_innovator':
+        return const Color(0xFF2E7D32);
+      default:
+        return null;
+    }
+  }
+
+  /// Foreground (icon + text) color paired with [backgroundFor].
+  static Color foregroundFor(String? badge) {
+    switch (badge) {
+      case 'certified_authentic':
+      case 'heritage_artisan':
+        return const Color(0xFF111111);
+      default:
+        return const Color(0xFFFFFFFF);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (badge == null || badge!.isEmpty) {
@@ -33,13 +74,6 @@ class SellerBadge extends StatelessWidget {
           context,
           "Sustainable Innovator",
           const Color(0xFF2E7D32),
-          Colors.white,
-        );
-      case "design_excellence":
-        return _buildBadge(
-          context,
-          "Design Excellence",
-          const Color(0xFF2F80ED),
           Colors.white,
         );
       default:

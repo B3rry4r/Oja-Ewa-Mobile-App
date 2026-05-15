@@ -152,7 +152,7 @@ class SellerOrder {
   final int orderId;
   final String orderNumber;
   final String status;
-  final DateTime createdAt;
+  final DateTime? createdAt;
   final String? customerName;
   final String? customerPhone;
   final String? provider;
@@ -244,9 +244,9 @@ class SellerOrder {
       orderId: parseInt(json['order_id']) ?? parseInt(json['id']) ?? 0,
       orderNumber: json['order_number'] as String? ?? json['id'].toString(),
       status: json['status'] as String? ?? 'pending_booking',
-      createdAt:
-          DateTime.tryParse(json['created_at'] as String? ?? '') ??
-          DateTime.now(),
+      // Fall back to null (rendered as "—" in UI) instead of DateTime.now()
+      // so a missing/garbled timestamp doesn't masquerade as a fresh order.
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? ''),
       customerName:
           json['customer_name'] as String? ??
           customer?['name'] as String? ??
@@ -268,8 +268,9 @@ class SellerOrder {
       items: itemsList.map((e) => SellerOrderItem.fromJson(e)).toList(),
       totalPrice: _parseDouble(json['total_price']) ?? 0,
       currency: (json['currency'] as String?)?.toUpperCase() ?? 'NGN',
-      exchangeRate: json['exchange_rate'] as num?,
-      originalAmountNgn: json['original_amount_ngn'] as num?,
+      // Laravel decimal casts serialize as JSON strings — `as num?` would throw.
+      exchangeRate: _parseDouble(json['exchange_rate']),
+      originalAmountNgn: _parseDouble(json['original_amount_ngn']),
       trackingNumber: json['tracking_number'] as String?,
       shippedAt: json['shipped_at'] != null
           ? DateTime.tryParse(json['shipped_at'] as String)
