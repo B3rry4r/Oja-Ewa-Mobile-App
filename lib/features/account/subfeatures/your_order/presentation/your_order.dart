@@ -6,6 +6,7 @@ import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/features/orders/presentation/controllers/orders_controller.dart';
 import 'package:ojaewa/features/orders/presentation/order_status_ui.dart';
 
@@ -39,7 +40,11 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                     .toList();
 
           if (filteredOrders.isEmpty) {
-            return const Center(child: Text('No orders yet'));
+            return const WBEmptyState(
+              illustration: WBEmptyIllustration.noOrders,
+              label: 'No orders yet',
+              sub: 'Your orders will show up here once you check out.',
+            );
           }
 
           return ListView.separated(

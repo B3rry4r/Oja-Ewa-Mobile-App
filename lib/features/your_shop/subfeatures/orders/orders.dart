@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/features/your_shop/presentation/controllers/seller_orders_controller.dart';
 
 import 'shop_order_details.dart';
@@ -164,18 +165,10 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
               .toList();
 
     if (filteredOrders.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.inbox_outlined, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              'No orders found',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            ),
-          ],
-        ),
+      return const WBEmptyState(
+        illustration: WBEmptyIllustration.noOrders,
+        label: 'No orders found',
+        sub: 'New orders for your shop will appear here.',
       );
     }
 

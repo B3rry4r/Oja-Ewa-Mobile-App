@@ -9,6 +9,7 @@ import '../add_edit_product/seller_category_selection.dart';
 import 'domain/shop_product.dart';
 
 import '../../../../core/widgets/confirmation_modal.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 
 final sellerProductsProvider = FutureProvider<List<ShopProduct>>((ref) async {
   final repo = ref.read(sellerProductRepositoryProvider);
@@ -175,14 +176,10 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
   Widget _buildProductTable(BuildContext context, List<ShopProduct> products) {
     final colors = context.appColors;
     if (products.isEmpty) {
-      return SizedBox(
-        height: 200,
-        child: Center(
-          child: Text(
-            'No products yet',
-            style: TextStyle(fontSize: 16, color: colors.textTertiary),
-          ),
-        ),
+      return const WBEmptyState(
+        illustration: WBEmptyIllustration.noProducts,
+        label: 'No products yet',
+        sub: 'Add your first product to start selling.',
       );
     }
 

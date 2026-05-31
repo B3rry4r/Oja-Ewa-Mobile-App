@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
 import 'package:ojaewa/features/categories/domain/category_items.dart';
 import 'package:ojaewa/features/categories/domain/category_node.dart';
@@ -471,19 +472,10 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
       ),
       data: (state) {
         if (state.items.isEmpty) {
-          return Padding(
-            padding: EdgeInsets.all(32),
-            child: Center(
-              child: Text(
-                'No products match your filters',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(
-                    context,
-                  ).extension<AppThemeColors>()!.textSecondary,
-                ),
-              ),
-            ),
+          return const WBEmptyState(
+            illustration: WBEmptyIllustration.noProducts,
+            label: 'No products match your filters',
+            sub: 'Try adjusting or clearing your filters.',
           );
         }
 
@@ -806,12 +798,10 @@ class _CategoryItemGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 32),
-        child: Text(
-          'No items found',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+      return const WBEmptyState(
+        illustration: WBEmptyIllustration.noProducts,
+        label: 'No items found',
+        sub: 'Nothing here yet — check back soon.',
       );
     }
 
