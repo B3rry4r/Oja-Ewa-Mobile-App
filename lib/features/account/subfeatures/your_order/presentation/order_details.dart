@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/features/orders/domain/order_models.dart';
@@ -123,9 +124,9 @@ class OrderDetailsScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        border: Border.all(color: colors.border),
-        borderRadius: BorderRadius.circular(18),
-        color: colors.surfaceElevated,
+        color: WBColors.surfaceCard,
+        borderRadius: BorderRadius.circular(WBRadius.card),
+        boxShadow: WBShadows.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,9 +262,9 @@ class OrderDetailsScreen extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        border: Border.all(color: colors.border),
-        borderRadius: BorderRadius.circular(18),
-        color: colors.surfaceElevated,
+        color: WBColors.surfaceCard,
+        borderRadius: BorderRadius.circular(WBRadius.card),
+        boxShadow: WBShadows.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,9 +302,9 @@ class OrderDetailsScreen extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        border: Border.all(color: colors.border),
-        borderRadius: BorderRadius.circular(18),
-        color: colors.surfaceElevated,
+        color: WBColors.surfaceCard,
+        borderRadius: BorderRadius.circular(WBRadius.card),
+        boxShadow: WBShadows.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -430,9 +431,9 @@ class OrderDetailsScreen extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        border: Border.all(color: colors.border),
-        borderRadius: BorderRadius.circular(18),
-        color: colors.surfaceElevated,
+        color: WBColors.surfaceCard,
+        borderRadius: BorderRadius.circular(WBRadius.card),
+        boxShadow: WBShadows.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -797,9 +798,9 @@ class OrderDetailsScreen extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        border: Border.all(color: colors.border),
-        borderRadius: BorderRadius.circular(18),
-        color: colors.surfaceElevated,
+        color: WBColors.surfaceCard,
+        borderRadius: BorderRadius.circular(WBRadius.card),
+        boxShadow: WBShadows.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
