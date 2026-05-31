@@ -547,7 +547,7 @@ class _UploadCard extends StatelessWidget {
                 ? const Row(
                     children: [
                       SizedBox(width: 16, height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFDAF40))),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF111111))),
                       SizedBox(width: 10),
                       Text('Uploading...', style: TextStyle(fontSize: 13)),
                     ],
@@ -587,7 +587,7 @@ class _UploadCard extends StatelessWidget {
               loadingBuilder: (ctx, child, prog) =>
                   prog == null ? child
                   : Container(height: 110, color: colors.surface,
-                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFDAF40)))),
+                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF111111)))),
               errorBuilder: (ctx, e, st) => Container(
                 height: 60,
                 decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(12)),

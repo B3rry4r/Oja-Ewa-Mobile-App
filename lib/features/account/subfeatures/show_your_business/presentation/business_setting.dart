@@ -126,8 +126,8 @@ class BusinessSettingsScreen extends ConsumerWidget {
                 chipText = 'Approved';
                 break;
               case 'pending':
-                chipBg = const Color(0xFFFDAF40).withAlpha(25);
-                chipFg = const Color(0xFFFDAF40);
+                chipBg = const Color(0xFF111111).withAlpha(25);
+                chipFg = const Color(0xFF111111);
                 chipText = 'Pending';
                 break;
               case 'deactivated':

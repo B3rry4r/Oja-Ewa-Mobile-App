@@ -436,12 +436,12 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFFDAF40), Color(0xFFFFCC80)],
+            colors: [Color(0xFF111111), Color(0xFF2E2E2E)],
           ),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+              color: const Color(0xFF111111).withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),

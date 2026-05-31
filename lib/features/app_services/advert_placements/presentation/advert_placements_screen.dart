@@ -463,7 +463,7 @@ class _UploadCard extends StatelessWidget {
                     height: 16,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Color(0xFFFDAF40),
+                      color: Color(0xFF111111),
                     ),
                   ),
                   SizedBox(width: 10),

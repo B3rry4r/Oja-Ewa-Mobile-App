@@ -106,7 +106,7 @@ class _AiDescriptionGeneratorState
       decoration: BoxDecoration(
         color: const Color(0xFFFFF8F1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFFDAF40).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFF111111).withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,12 +122,12 @@ class _AiDescriptionGeneratorState
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFDAF40).withOpacity(0.2),
+                      color: const Color(0xFF111111).withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.auto_awesome,
-                      color: Color(0xFFFDAF40),
+                      color: Color(0xFF111111),
                       size: 20,
                     ),
                   ),
@@ -241,7 +241,7 @@ class _AiDescriptionGeneratorState
                     child: ElevatedButton.icon(
                       onPressed: state.isLoading ? null : _generateDescription,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFDAF40),
+                        backgroundColor: const Color(0xFF111111),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(

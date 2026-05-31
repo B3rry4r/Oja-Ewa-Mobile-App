@@ -336,7 +336,7 @@ class _OrderConfirmationScreenState
                         value: quote.quoteReference,
                         groupValue:
                             _selectedQuotesBySeller[group.sellerProfileId],
-                        activeColor: const Color(0xFFFDAF40),
+                        activeColor: const Color(0xFF111111),
                         title: Text(
                           quote.serviceName,
                           style: TextStyle(
@@ -616,7 +616,7 @@ class _OrderConfirmationScreenState
                       color: colors.textPrimary,
                     ),
                   ),
-                  Text(formatPriceFx(total, currency), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFFFDAF40))),
+                  Text(formatPriceFx(total, currency), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF111111))),
                 ],
               ),
               const SizedBox(height: 24),
@@ -626,11 +626,11 @@ class _OrderConfirmationScreenState
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFDAF40),
+                    color: const Color(0xFF111111),
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+                        color: const Color(0xFF111111).withValues(alpha: 0.3),
                         blurRadius: 16,
                         offset: const Offset(0, 8),
                       ),

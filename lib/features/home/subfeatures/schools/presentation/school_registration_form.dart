@@ -796,12 +796,12 @@ class _SchoolRegistrationFormScreenState
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
+                          color: const Color(0xFF111111).withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.payment,
-                          color: Color(0xFFFDAF40),
+                          color: Color(0xFF111111),
                           size: 32,
                         ),
                       ),

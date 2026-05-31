@@ -462,7 +462,7 @@ class SchoolDetailScreen extends ConsumerWidget {
                           child: const Icon(
                             Icons.star,
                             size: 8,
-                            color: Color(0xFFFDAF40),
+                            color: Color(0xFF111111),
                           ),
                         ),
                       ],

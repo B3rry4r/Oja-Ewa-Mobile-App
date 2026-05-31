@@ -28,7 +28,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
   // App consistent colors
   static const _backgroundColor = Color(0xFFFFFBF5);
   static const _cardColor = Color(0xFFF5E0CE);
-  static const _primaryColor = Color(0xFFFDAF40);
+  static const _primaryColor = Color(0xFF111111);
   static const _textDark = Color(0xFF241508);
   static const _textSecondary = Color(0xFF777F84);
 

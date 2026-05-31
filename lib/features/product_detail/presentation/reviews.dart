@@ -257,7 +257,7 @@ class _Stars extends StatelessWidget {
         return Icon(
           Icons.star_rate_rounded,
           size: 16,
-          color: filled ? const Color(0xFFFDAF40) : const Color(0xFFDEDEDE),
+          color: filled ? const Color(0xFF111111) : const Color(0xFFDEDEDE),
         );
       }),
     );

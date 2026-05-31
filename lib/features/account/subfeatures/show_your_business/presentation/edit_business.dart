@@ -1231,11 +1231,11 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
         width: double.infinity,
         height: 56,
         decoration: BoxDecoration(
-          color: const Color(0xFFFDAF40),
+          color: const Color(0xFF111111),
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
+              color: const Color(0xFF111111).withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),

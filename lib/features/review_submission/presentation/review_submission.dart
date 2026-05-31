@@ -65,7 +65,7 @@ class _ReviewSubmissionScreenState
                   Icons.star_rate_rounded,
                   size: 32,
                   color: idx <= rating
-                      ? const Color(0xFFFDAF40)
+                      ? const Color(0xFF111111)
                       : const Color(0xFFDEDEDE),
                 ),
               );
@@ -139,7 +139,7 @@ class _ReviewSubmissionScreenState
                       Navigator.of(context).pop(true);
                     },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFDAF40),
+                backgroundColor: const Color(0xFF111111),
                 foregroundColor: const Color(0xFFFFFBF5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),

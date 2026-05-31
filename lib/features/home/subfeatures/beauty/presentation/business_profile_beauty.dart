@@ -363,7 +363,7 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                           width: 24,
                           height: 24,
                           colorFilter: const ColorFilter.mode(
-                            Color(0xFFFDAF40),
+                            Color(0xFF111111),
                             BlendMode.srcIn,
                           ),
                         ),
@@ -382,7 +382,7 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                           width: 24,
                           height: 24,
                           colorFilter: const ColorFilter.mode(
-                            Color(0xFFFDAF40),
+                            Color(0xFF111111),
                             BlendMode.srcIn,
                           ),
                         ),
@@ -683,7 +683,7 @@ class BusinessProfileBeautyScreen extends ConsumerWidget {
                           width: 24,
                           height: 24,
                           colorFilter: const ColorFilter.mode(
-                            Color(0xFFFDAF40),
+                            Color(0xFF111111),
                             BlendMode.srcIn,
                           ),
                         ),

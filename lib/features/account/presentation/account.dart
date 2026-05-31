@@ -288,7 +288,7 @@ class AccountScreen extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFFFDAF40),
+                  color: Color(0xFF111111),
                 ),
               ),
             ),
@@ -606,9 +606,9 @@ class AccountScreen extends ConsumerWidget {
       height: 56,
       margin: const EdgeInsets.only(bottom: 8, top: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
+        color: const Color(0xFF111111).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
+        border: Border.all(color: const Color(0xFF111111), width: 1.5),
       ),
       child: Material(
         color: Colors.transparent,
@@ -620,7 +620,7 @@ class AccountScreen extends ConsumerWidget {
             children: [
               const Icon(
                 Icons.notifications_active,
-                color: Color(0xFFFDAF40),
+                color: Color(0xFF111111),
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -629,7 +629,7 @@ class AccountScreen extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFFFDAF40),
+                  color: Color(0xFF111111),
                 ),
               ),
             ],
