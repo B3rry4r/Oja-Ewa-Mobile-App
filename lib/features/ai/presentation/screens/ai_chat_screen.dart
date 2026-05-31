@@ -28,7 +28,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
   // App consistent colors
   static const _backgroundColor = Color(0xFFFFFBF5);
   static const _cardColor = Color(0xFFF5E0CE);
-  static const _primaryColor = Color(0xFFFDAF40);
+  static const _primaryColor = Color(0xFF111111);
   static const _textDark = Color(0xFF241508);
   static const _textSecondary = Color(0xFF777F84);
 
@@ -102,7 +102,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 'Cultural AI Assistant',
                 style: TextStyle(
                   fontSize: 22,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: _textDark,
                 ),
@@ -139,7 +138,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                         'Unable to get response. Please try again.',
                         style: TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Campton',
                           color: _textDark,
                         ),
                       ),
@@ -180,7 +178,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: _textDark,
             ),
@@ -192,7 +189,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               color: _textSecondary,
               height: 1.5,
             ),
@@ -206,7 +202,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
               'Try asking me:',
               style: TextStyle(
                 fontSize: 14,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
                 color: _textDark,
               ),
@@ -252,7 +247,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                 suggestion,
                 style: const TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Campton',
                   color: _textDark,
                 ),
               ),
@@ -337,7 +331,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                     message.content,
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       color: isUser ? Colors.white : _textDark,
                       height: 1.4,
                     ),
@@ -376,7 +369,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                             suggestion,
                             style: const TextStyle(
                               fontSize: 12,
-                              fontFamily: 'Campton',
                               color: _primaryColor,
                             ),
                           ),
@@ -474,7 +466,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                   product.name,
                   style: const TextStyle(
                     fontSize: 11,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w500,
                     color: _textDark,
                   ),
@@ -486,7 +477,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                   '₦${product.price.toStringAsFixed(0)}',
                   style: const TextStyle(
                     fontSize: 11,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: _primaryColor,
                   ),
@@ -586,13 +576,11 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
                   hintText: 'Ask about Nigerian fashion...',
                   hintStyle: TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Campton',
                     color: Color(0xFFCCCCCC),
                   ),
                 ),
                 style: const TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   color: _textDark,
                 ),
               ),

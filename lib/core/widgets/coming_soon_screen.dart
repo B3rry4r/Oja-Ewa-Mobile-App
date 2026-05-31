@@ -25,7 +25,6 @@ class ComingSoonScreen extends StatelessWidget {
                 title,
                 style: TextStyle(
                   fontSize: 22,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: colors.textPrimary,
                 ),

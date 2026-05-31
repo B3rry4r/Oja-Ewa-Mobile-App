@@ -157,7 +157,6 @@ class _SchoolBusinessDetailsScreenState
             'School Type',
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               color: context.appColors.textSecondary,
             ),
           ),
@@ -175,7 +174,6 @@ class _SchoolBusinessDetailsScreenState
             'Classes offered',
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               color: context.appColors.textSecondary,
             ),
           ),
@@ -212,20 +210,20 @@ class _SchoolBusinessDetailsScreenState
           _buildCheckTile(
             value: _declarationAuthorizeVerification,
             label:
-                'I authorize Ojaewa to verify this information with third parties.',
+                'I authorize WAWUBeauty to verify this information with third parties.',
             onChanged: (value) =>
                 setState(() => _declarationAuthorizeVerification = value),
           ),
           _buildCheckTile(
             value: _authorizeSettlementAccount,
-            label: 'I authorize Ojaewa to open a settlement account for me.',
+            label: 'I authorize WAWUBeauty to open a settlement account for me.',
             onChanged: (value) =>
                 setState(() => _authorizeSettlementAccount = value),
           ),
           _buildCheckTile(
             value: _acceptPartnerBankTerms,
             label:
-                'I accept Ojaewa partner bank terms of service and corporate account agreement.',
+                'I accept WAWUBeauty partner bank terms of service and corporate account agreement.',
             onChanged: (value) =>
                 setState(() => _acceptPartnerBankTerms = value),
           ),
@@ -352,7 +350,6 @@ class _SchoolBusinessDetailsScreenState
       title,
       style: TextStyle(
         fontSize: 16,
-        fontFamily: 'Campton',
         fontWeight: FontWeight.w700,
         color: colors.textPrimary,
       ),
@@ -599,7 +596,6 @@ class _SchoolBusinessDetailsScreenState
           maxLength: maxLength,
           inputFormatters: inputFormatters,
           style: TextStyle(
-            fontFamily: 'Campton',
             fontSize: 16,
             color: colors.textPrimary,
           ),
@@ -743,11 +739,11 @@ class _SchoolBusinessDetailsScreenState
         width: double.infinity,
         height: 57,
         decoration: BoxDecoration(
-          color: const Color(0xFFFDAF40),
+          color: const Color(0xFF111111),
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
+              color: const Color(0xFF111111).withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
@@ -759,7 +755,6 @@ class _SchoolBusinessDetailsScreenState
             style: TextStyle(
               color: Color(0xFFFFFBF5),
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -777,7 +772,7 @@ class _SchoolBusinessDetailsScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: colors.textSecondary, fontSize: 13, fontFamily: 'Campton')),
+        Text(label, style: TextStyle(color: colors.textSecondary, fontSize: 13, )),
         const SizedBox(height: 6),
         GestureDetector(
           onTap: onTap,
@@ -795,7 +790,6 @@ class _SchoolBusinessDetailsScreenState
                     value,
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       color: value == 'Select Country' ? colors.textTertiary : colors.textPrimary,
                     ),
                   ),

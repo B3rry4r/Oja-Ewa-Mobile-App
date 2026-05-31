@@ -32,7 +32,6 @@ class SimpleSortSheet extends ConsumerWidget {
               'Sort',
               style: TextStyle(
                 fontSize: 20,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w700,
                 color: colors.textPrimary,
               ),
@@ -43,7 +42,6 @@ class SimpleSortSheet extends ConsumerWidget {
                 title: Text(
                   opt.label,
                   style: TextStyle(
-                    fontFamily: 'Campton',
                     color: colors.textPrimary,
                   ),
                 ),

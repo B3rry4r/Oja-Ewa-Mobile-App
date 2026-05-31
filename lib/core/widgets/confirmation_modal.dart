@@ -62,7 +62,7 @@ class ConfirmationModal extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: colors.surfaceElevated,
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(24),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -72,10 +72,10 @@ class ConfirmationModal extends StatelessWidget {
                   title,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 33,
+                    fontSize: 24,
                     fontWeight: FontWeight.w700,
                     color: colors.textPrimary,
-                    fontFamily: 'Campton',
+                    letterSpacing: -0.36,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -86,7 +86,6 @@ class ConfirmationModal extends StatelessWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
                     color: colors.textSecondary,
-                    fontFamily: 'Campton',
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -99,7 +98,7 @@ class ConfirmationModal extends StatelessWidget {
                           height: 57,
                           decoration: BoxDecoration(
                             color: colors.surface,
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: colors.border),
                           ),
                           child: Center(
@@ -109,7 +108,6 @@ class ConfirmationModal extends StatelessWidget {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: colors.textSecondary,
-                                fontFamily: 'Campton',
                               ),
                             ),
                           ),
@@ -127,7 +125,7 @@ class ConfirmationModal extends StatelessWidget {
                           height: 57,
                           decoration: BoxDecoration(
                             color: colors.accent,
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
                                 color: colors.shadow,
@@ -143,7 +141,6 @@ class ConfirmationModal extends StatelessWidget {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: colors.onAccent,
-                                fontFamily: 'Campton',
                               ),
                             ),
                           ),

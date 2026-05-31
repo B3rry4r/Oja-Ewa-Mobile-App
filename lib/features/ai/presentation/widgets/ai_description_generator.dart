@@ -106,7 +106,7 @@ class _AiDescriptionGeneratorState
       decoration: BoxDecoration(
         color: const Color(0xFFFFF8F1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFFDAF40).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFF111111).withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,12 +122,12 @@ class _AiDescriptionGeneratorState
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFDAF40).withOpacity(0.2),
+                      color: const Color(0xFF111111).withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.auto_awesome,
-                      color: Color(0xFFFDAF40),
+                      color: Color(0xFF111111),
                       size: 20,
                     ),
                   ),
@@ -140,7 +140,6 @@ class _AiDescriptionGeneratorState
                           'AI Description Generator',
                           style: TextStyle(
                             fontSize: 14,
-                            fontFamily: 'Campton',
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF241508),
                           ),
@@ -149,7 +148,6 @@ class _AiDescriptionGeneratorState
                           'Generate culturally-rich product descriptions',
                           style: TextStyle(
                             fontSize: 12,
-                            fontFamily: 'Campton',
                             color: const Color(0xFF241508).withOpacity(0.6),
                           ),
                         ),
@@ -227,7 +225,6 @@ class _AiDescriptionGeneratorState
                               state.error ?? '',
                               style: const TextStyle(
                                 fontSize: 12,
-                                fontFamily: 'Campton',
                                 color: Color(0xFFE57373),
                               ),
                             ),
@@ -244,7 +241,7 @@ class _AiDescriptionGeneratorState
                     child: ElevatedButton.icon(
                       onPressed: state.isLoading ? null : _generateDescription,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFDAF40),
+                        backgroundColor: const Color(0xFF111111),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
@@ -269,7 +266,6 @@ class _AiDescriptionGeneratorState
                             : 'Generate Description',
                         style: const TextStyle(
                           fontSize: 14,
-                          fontFamily: 'Campton',
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -281,7 +277,6 @@ class _AiDescriptionGeneratorState
                     'The AI will create a description using Nigerian fashion terminology and cultural context.',
                     style: TextStyle(
                       fontSize: 11,
-                      fontFamily: 'Campton',
                       color: const Color(0xFF241508).withOpacity(0.5),
                     ),
                     textAlign: TextAlign.center,
@@ -308,7 +303,6 @@ class _AiDescriptionGeneratorState
           '$label: ',
           style: const TextStyle(
             fontSize: 12,
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w500,
             color: Color(0xFF777F84),
           ),
@@ -318,7 +312,6 @@ class _AiDescriptionGeneratorState
             value,
             style: TextStyle(
               fontSize: 12,
-              fontFamily: 'Campton',
               color: isComplete
                   ? const Color(0xFF241508)
                   : const Color(0xFFCCCCCC),

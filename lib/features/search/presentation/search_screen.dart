@@ -6,8 +6,10 @@ import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
 import 'package:ojaewa/features/product_detail/presentation/product_detail_screen.dart';
 import 'package:ojaewa/features/search/presentation/controllers/search_controller.dart';
@@ -97,24 +99,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              height: 49,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              height: 52,
+              padding: const EdgeInsets.symmetric(horizontal: 18),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: colors.border),
-                color: colors.surface,
+                borderRadius: BorderRadius.circular(WBRadius.input),
+                color: WBColors.surfaceInput,
               ),
               child: Row(
                 children: [
-                  SvgPicture.asset(
-                    AppIcons.search,
-                    width: 20,
-                    height: 20,
-                    colorFilter: ColorFilter.mode(
-                      colors.textTertiary,
-                      BlendMode.srcIn,
-                    ),
-                  ),
+                  const WBIcon(WBIconName.search, size: 20),
                   const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
@@ -124,15 +117,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       onSubmitted: (_) => _performSearch(),
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Campton',
                         color: colors.textPrimary,
                       ),
                       decoration: InputDecoration(
                         filled: false,
-                        hintText: 'Search Ojá-Ẹwà',
+                        hintText: 'Search WAWUBeauty',
                         hintStyle: TextStyle(
                           fontSize: 16,
-                          fontFamily: 'Campton',
                           color: colors.textTertiary,
                         ),
                         isCollapsed: true,
@@ -178,38 +169,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 itemBuilder: (context, index) {
                   final type = _categoryTypes[index];
                   final isSelected = _selectedCategoryType == type['key'];
-                  return GestureDetector(
+                  return WBTag(
+                    label: type['label']!,
+                    active: isSelected,
                     onTap: () {
                       setState(() => _selectedCategoryType = type['key']!);
                       if (_searchController.text.trim().isNotEmpty) {
                         _performSearch();
                       }
                     },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? const Color(0xFFFDAF40)
-                            : Colors.transparent,
-                        border: Border.all(
-                          color: isSelected ? colors.accent : colors.border,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Center(
-                        child: Text(
-                          type['label']!,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'Campton',
-                            fontWeight: FontWeight.w500,
-                            color: isSelected
-                                ? colors.onAccent
-                                : colors.textSecondary,
-                          ),
-                        ),
-                      ),
-                    ),
                   );
                 },
               ),
@@ -227,7 +195,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           : _buildSearchResults(results),
                       loading: () => const Center(
                         child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Color(0xFFFDAF40)),
+                          valueColor:
+                              AlwaysStoppedAnimation(WBColors.surfaceDark),
                         ),
                       ),
                       error: (e, _) => Center(
@@ -246,7 +215,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 'Something went wrong',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  fontFamily: 'Campton',
                                   fontWeight: FontWeight.w600,
                                   color: colors.textPrimary,
                                 ),
@@ -257,7 +225,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  fontFamily: 'Campton',
                                   color: colors.textSecondary,
                                 ),
                               ),
@@ -268,7 +235,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                   'Try Again',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    fontFamily: 'Campton',
                                     fontWeight: FontWeight.w600,
                                     color: colors.accent,
                                   ),
@@ -309,7 +275,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             name.toString(),
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
           ),
@@ -323,31 +288,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   Widget _buildEmptyState() {
-    final colors = context.appColors;
     final hasSearched = ref.read(searchResultsProvider).hasValue;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset(
-            AppIcons.search,
-            width: 60,
-            height: 60,
-            colorFilter: ColorFilter.mode(colors.borderStrong, BlendMode.srcIn),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            hasSearched
-                ? 'No results found'
-                : 'Search for products & businesses',
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: 'Campton',
-              color: colors.textSecondary,
-            ),
-          ),
-        ],
-      ),
+    return WBEmptyState(
+      illustration: WBEmptyIllustration.noProducts,
+      label: hasSearched ? 'No results found' : 'Search WAWUBeauty',
+      sub: hasSearched
+          ? 'Try a different term or category.'
+          : 'Find products, brands and shops across the marketplace.',
     );
   }
 

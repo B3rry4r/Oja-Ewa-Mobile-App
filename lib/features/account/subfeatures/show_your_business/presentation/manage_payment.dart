@@ -37,7 +37,6 @@ class _ManagePaymentScreenState extends ConsumerState<ManagePaymentScreen> {
               'platform if you dont renew',
               style: TextStyle(
                 fontSize: 16,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textSecondary,
                 height: 1.5,
@@ -52,7 +51,6 @@ class _ManagePaymentScreenState extends ConsumerState<ManagePaymentScreen> {
               dropdownColor: colors.surface,
               style: TextStyle(
                 color: colors.textPrimary,
-                fontFamily: 'Campton',
               ),
               items: const [
                 DropdownMenuItem(value: 'basic', child: Text('Basic')),
@@ -71,7 +69,6 @@ class _ManagePaymentScreenState extends ConsumerState<ManagePaymentScreen> {
               dropdownColor: colors.surface,
               style: TextStyle(
                 color: colors.textPrimary,
-                fontFamily: 'Campton',
               ),
               items: const [
                 DropdownMenuItem(value: 'monthly', child: Text('Monthly')),
@@ -123,7 +120,6 @@ class _ManagePaymentScreenState extends ConsumerState<ManagePaymentScreen> {
                     style: TextStyle(
                       color: colors.onAccent,
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
                     ),
                   ),

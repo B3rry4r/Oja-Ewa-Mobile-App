@@ -227,7 +227,6 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
           style: TextStyle(
             fontSize: 33,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Campton',
             color: colors.textPrimary,
           ),
         ),
@@ -237,7 +236,6 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -255,7 +253,6 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            fontFamily: 'Campton',
             color: colors.textPrimary,
           ),
         ),
@@ -293,7 +290,6 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
-              fontFamily: 'Campton',
               color: isMet ? const Color(0xFF4CAF50) : colors.textTertiary,
             ),
           ),
@@ -312,7 +308,6 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textTertiary,
           ),
         ),
@@ -347,7 +342,6 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
                       color: colors.textPrimary,
                     ),
                     decoration: InputDecoration(
@@ -390,7 +384,6 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textTertiary,
           ),
         ),
@@ -425,7 +418,6 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
                       color: colors.textPrimary,
                     ),
                     decoration: InputDecoration(
@@ -478,7 +470,6 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: _passwordsMatch
                 ? const Color(0xFF4CAF50)
                 : const Color(0xFFF44336),
@@ -519,7 +510,6 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'Campton',
                 color: _isPasswordValid
                     ? colors.onAccent
                     : colors.onAccent.withValues(alpha: 0.6),

@@ -4,8 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
-import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
 import '../controllers/auth_controller.dart';
@@ -63,10 +64,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       padding: const EdgeInsets.only(left: 14, top: 24, right: 14),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: HeaderIconButton(
-          asset: AppIcons.back,
-          iconColor: context.appColors.textPrimary,
-          onTap: () {
+        child: WBBackChip(
+          onPressed: () {
             final navigator = Navigator.of(context);
             if (navigator.canPop()) {
               navigator.pop();
@@ -144,129 +143,48 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Widget _buildWelcomeIcon() {
-    return SizedBox(
-      width: 118,
-      height: 28,
-      child: SvgPicture.asset(
-        AppIcons.brandMarkWhite,
-        fit: BoxFit.contain,
-        colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-      ),
-    );
+    return const WBWordmark(height: 26);
   }
 
   Widget _buildWelcomeText() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Welcome Back!',
-          style: TextStyle(
-            fontSize: 33,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Campton',
-            color: context.appColors.textPrimary,
-          ),
-        ),
+        Text('Welcome Back!', style: WBTypography.hero.copyWith(fontSize: 30)),
         const SizedBox(height: 8),
         Text(
           'Let\'s sign in',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
-            color: context.appColors.textSecondary,
-          ),
+          style: WBTypography.body.copyWith(color: WBColors.fgSecondary),
         ),
       ],
     );
   }
 
   Widget _buildEmailInput() {
-    final colors = context.appColors;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Email',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
-            color: colors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: 8),
-        _buildInputShell(
-          icon: Icons.email_outlined,
-          child: TextField(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
-              color: colors.textPrimary,
-            ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: 'Enter your email',
-              hintStyle: TextStyle(color: colors.textTertiary),
-            ),
-          ),
-        ),
-      ],
+    return WBInput(
+      label: 'Email',
+      placeholder: 'Enter your email',
+      controller: _emailController,
+      keyboardType: TextInputType.emailAddress,
     );
   }
 
   Widget _buildPasswordInput() {
-    final colors = context.appColors;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Password',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
-            color: colors.textSecondary,
-          ),
+    return WBInput(
+      label: 'Password',
+      placeholder: 'Type your password',
+      controller: _passwordController,
+      obscureText: _obscurePassword,
+      trailing: GestureDetector(
+        onTap: () => setState(() => _obscurePassword = !_obscurePassword),
+        child: Icon(
+          _obscurePassword
+              ? Icons.visibility_outlined
+              : Icons.visibility_off_outlined,
+          size: 20,
+          color: WBColors.fgSecondary,
         ),
-        const SizedBox(height: 8),
-        _buildInputShell(
-          icon: Icons.lock_outline_rounded,
-          trailing: IconButton(
-            onPressed: () {
-              setState(() {
-                _obscurePassword = !_obscurePassword;
-              });
-            },
-            icon: Icon(
-              _obscurePassword
-                  ? Icons.visibility_outlined
-                  : Icons.visibility_off_outlined,
-              size: 20,
-              color: colors.textSecondary,
-            ),
-          ),
-          child: TextField(
-            controller: _passwordController,
-            obscureText: _obscurePassword,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
-              color: colors.textPrimary,
-            ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: 'Type your password',
-              hintStyle: TextStyle(color: colors.textTertiary),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -288,7 +206,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
-                fontFamily: 'Campton',
                 color: colors.textSecondary,
               ),
             ),
@@ -337,7 +254,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textPrimary,
           ),
         ),
@@ -346,53 +262,13 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Widget _buildSignInButton() {
-    final colors = context.appColors;
     final auth = ref.watch(authFlowControllerProvider);
-
-    return Container(
-      width: double.infinity,
-      height: 57,
-      decoration: BoxDecoration(
-        color: colors.accent,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadow,
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(18),
-          onTap: () {
-            // Handle sign in
-            _handleSignIn();
-          },
-          child: Center(
-            child: auth.isLoading
-                ? SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: colors.onAccent,
-                    ),
-                  )
-                : Text(
-                    'Sign in',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Campton',
-                      color: colors.onAccent,
-                    ),
-                  ),
-          ),
-        ),
-      ),
+    return WBButton(
+      label: 'Sign in',
+      fullWidth: true,
+      size: WBButtonSize.lg,
+      loading: auth.isLoading,
+      onPressed: _handleSignIn,
     );
   }
 
@@ -408,7 +284,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              fontFamily: 'Campton',
               color: colors.textTertiary,
             ),
           ),
@@ -478,7 +353,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'Campton',
                   color: colors.textPrimary,
                 ),
               ),
@@ -509,7 +383,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
                       color: colors.textTertiary,
                     ),
                   ),
@@ -518,7 +391,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'Campton',
                       color: colors.accent,
                     ),
                   ),
@@ -540,7 +412,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields'),
-          backgroundColor: Color(0xFFFDAF40),
+          backgroundColor: WBColors.statusWarning,
         ),
       );
       return;
@@ -560,45 +432,4 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     }
   }
 
-  Widget _buildInputShell({
-    required IconData icon,
-    required Widget child,
-    Widget? trailing,
-  }) {
-    final colors = context.appColors;
-    return Container(
-      height: 58,
-      decoration: BoxDecoration(
-        color: colors.surfaceElevated,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colors.border),
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadow,
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        child: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: colors.accentSoft,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 18, color: colors.accent),
-            ),
-            const SizedBox(width: 14),
-            Expanded(child: child),
-            if (trailing != null) ...[const SizedBox(width: 8), trailing],
-          ],
-        ),
-      ),
-    );
-  }
 }

@@ -23,7 +23,6 @@ class SelectionBottomSheet {
                 title: Text(
                   o,
                   style: TextStyle(
-                    fontFamily: 'Campton',
                     fontSize: 16,
                     color: colors.textPrimary,
                   ),

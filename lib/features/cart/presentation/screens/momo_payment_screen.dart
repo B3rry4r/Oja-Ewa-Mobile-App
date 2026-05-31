@@ -157,7 +157,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
                           color: colors.textPrimary,
-                          fontFamily: 'Campton',
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -168,7 +167,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
                           color: colors.textSecondary,
-                          fontFamily: 'Campton',
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -196,7 +194,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                       color: colors.textPrimary,
-                                      fontFamily: 'Campton',
                                     ),
                                   ),
                                 ),
@@ -216,12 +213,12 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                               child: Container(
                                 height: 57,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFDAF40),
+                                  color: const Color(0xFF111111),
                                   borderRadius: BorderRadius.circular(8),
                                   boxShadow: [
                                     BoxShadow(
                                       color: const Color(
-                                        0xFFFDAF40,
+                                        0xFF111111,
                                       ).withValues(alpha: 0.4),
                                       blurRadius: 16,
                                       offset: const Offset(0, 8),
@@ -235,7 +232,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                       color: Color(0xFFFFFBF5),
-                                      fontFamily: 'Campton',
                                     ),
                                   ),
                                 ),
@@ -317,7 +313,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
             fontSize: 24,
             fontWeight: FontWeight.w700,
             color: colors.textPrimary,
-            fontFamily: 'Campton',
           ),
         ),
         const SizedBox(height: 16),
@@ -327,7 +322,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
           style: TextStyle(
             fontSize: 16,
             color: colors.textSecondary,
-            fontFamily: 'Campton',
           ),
         ),
         const SizedBox(height: 32),
@@ -335,7 +329,7 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
           width: 40,
           height: 40,
           child: CircularProgressIndicator(
-            color: Color(0xFFFDAF40),
+            color: Color(0xFF111111),
             strokeWidth: 3,
           ),
         ),
@@ -346,7 +340,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
             style: TextStyle(
               fontSize: 14,
               color: colors.textTertiary,
-              fontFamily: 'Campton',
             ),
           ),
         ],
@@ -379,7 +372,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
             fontSize: 24,
             fontWeight: FontWeight.w700,
             color: colors.textPrimary,
-            fontFamily: 'Campton',
           ),
         ),
         const SizedBox(height: 16),
@@ -389,7 +381,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
           style: TextStyle(
             fontSize: 16,
             color: colors.textSecondary,
-            fontFamily: 'Campton',
           ),
         ),
       ],
@@ -417,7 +408,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
             fontSize: 24,
             fontWeight: FontWeight.w700,
             color: colors.textPrimary,
-            fontFamily: 'Campton',
           ),
         ),
         const SizedBox(height: 16),
@@ -427,7 +417,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
           style: TextStyle(
             fontSize: 16,
             color: colors.textSecondary,
-            fontFamily: 'Campton',
           ),
         ),
         const SizedBox(height: 32),
@@ -437,7 +426,7 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
             width: double.infinity,
             height: 57,
             decoration: BoxDecoration(
-              color: const Color(0xFFFDAF40),
+              color: const Color(0xFF111111),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Center(
@@ -447,7 +436,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFFFFFBF5),
-                  fontFamily: 'Campton',
                 ),
               ),
             ),
@@ -482,7 +470,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
             fontSize: 24,
             fontWeight: FontWeight.w700,
             color: colors.textPrimary,
-            fontFamily: 'Campton',
           ),
         ),
         const SizedBox(height: 16),
@@ -492,7 +479,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
           style: TextStyle(
             fontSize: 16,
             color: colors.textSecondary,
-            fontFamily: 'Campton',
           ),
         ),
         const SizedBox(height: 32),
@@ -514,7 +500,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: colors.textPrimary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                   ),
@@ -533,7 +518,7 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                 child: Container(
                   height: 57,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFDAF40),
+                    color: const Color(0xFF111111),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Center(
@@ -543,7 +528,6 @@ class _MoMoPaymentScreenState extends ConsumerState<MoMoPaymentScreen> {
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFFFFFBF5),
-                        fontFamily: 'Campton',
                       ),
                     ),
                   ),

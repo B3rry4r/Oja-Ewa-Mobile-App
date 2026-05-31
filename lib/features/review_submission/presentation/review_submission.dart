@@ -49,7 +49,6 @@ class _ReviewSubmissionScreenState
           Text(
             'Rating',
             style: TextStyle(
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               fontSize: 22,
               color: colors.textPrimary,
@@ -66,7 +65,7 @@ class _ReviewSubmissionScreenState
                   Icons.star_rate_rounded,
                   size: 32,
                   color: idx <= rating
-                      ? const Color(0xFFFDAF40)
+                      ? const Color(0xFF111111)
                       : const Color(0xFFDEDEDE),
                 ),
               );
@@ -76,7 +75,6 @@ class _ReviewSubmissionScreenState
           Text(
             'Headline',
             style: TextStyle(
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               fontSize: 14,
               color: colors.textSecondary,
@@ -98,7 +96,6 @@ class _ReviewSubmissionScreenState
           Text(
             'Description',
             style: TextStyle(
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               fontSize: 14,
               color: colors.textSecondary,
@@ -142,7 +139,7 @@ class _ReviewSubmissionScreenState
                       Navigator.of(context).pop(true);
                     },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFDAF40),
+                backgroundColor: const Color(0xFF111111),
                 foregroundColor: const Color(0xFFFFFBF5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),

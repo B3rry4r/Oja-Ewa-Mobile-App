@@ -3,78 +3,103 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/adverts/domain/advert.dart';
 import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
-import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/features/adverts/presentation/controllers/adverts_controller.dart';
+import 'package:ojaewa/features/search/presentation/search_screen.dart';
 
 import '../../../app/router/app_router.dart';
+
+/// Beauty-flavoured hero taglines, mirroring WAWUBasket's randomised hero.
+const List<({String accent, String muted})> _beautyTaglines = [
+  (accent: 'Glow up.', muted: 'Shop African beauty'),
+  (accent: 'Look good.', muted: 'Feel the culture'),
+  (accent: 'Fresh drops.', muted: 'Curated for you'),
+  (accent: 'Beauty meets craft.', muted: 'Discover makers'),
+  (accent: 'Your style.', muted: 'Pan-African market'),
+];
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
+  static Widget _padded(Widget child) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: child,
+      );
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          color: colors.background,
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              isDark ? colors.surface : colors.surfaceSecondary,
-              colors.background,
-            ],
-          ),
+      backgroundColor: WBColors.bgPrimary,
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.only(top: 12, bottom: 140),
+          children: [
+            _padded(_buildHeader(context)),
+            const SizedBox(height: 22),
+            _padded(const WBRandomTagline(pairs: _beautyTaglines)),
+            const SizedBox(height: 22),
+            _padded(_buildSearchBar(context)),
+            const SizedBox(height: 22),
+            _padded(_buildServicesRow(context)),
+            const SizedBox(height: 24),
+            _buildAdvertsOrFallback(context, ref),
+            const SizedBox(height: 28),
+            _padded(
+              Text(
+                'Shop by category',
+                style: WBTypography.section.copyWith(fontWeight: FontWeight.w600),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _buildCategoryGrid(context),
+            ),
+          ],
         ),
-        child: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              _buildHeader(context),
-              const SizedBox(height: 16),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildAdvertsOrFallback(context, ref),
-                      const SizedBox(height: 24),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        child: _buildServicesRow(context),
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.only(
-                          top: 12,
-                          left: 16,
-                          right: 16,
-                          bottom: 32,
-                        ),
-                        child: _buildCategoryGrid(context),
-                      ),
-                      const SizedBox(height: AppBottomNavBar.height),
-                    ],
-                  ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const SearchScreen()),
+      ),
+      child: Container(
+        height: 52,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        decoration: BoxDecoration(
+          color: WBColors.bgSecondary,
+          borderRadius: BorderRadius.circular(WBRadius.input),
+        ),
+        child: Row(
+          children: [
+            const WBIcon(WBIconName.search, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Search products, brands & shops',
+                overflow: TextOverflow.ellipsis,
+                style: WBTypography.body.copyWith(
+                  color: WBColors.fgPlaceholder,
+                  fontSize: 16,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -87,24 +112,7 @@ class HomeScreen extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Brand Logo with text (PNG for correct colors)
-          Theme.of(context).brightness == Brightness.dark
-              ? SvgPicture.asset(
-                  AppIcons.brandMarkWhite,
-                  width: 98,
-                  height: 22,
-                  fit: BoxFit.contain,
-                  colorFilter: const ColorFilter.mode(
-                    Colors.white,
-                    BlendMode.srcIn,
-                  ),
-                )
-              : Image.asset(
-                  'assets/app_icon/logo2.png',
-                  width: 98,
-                  height: 22,
-                  fit: BoxFit.contain,
-                ),
+          const WBWordmark(height: 24),
 
           // Header Icons
           Row(
@@ -171,10 +179,9 @@ class HomeScreen extends ConsumerWidget {
                             child: Text(
                               unreadCount > 99 ? '99+' : unreadCount.toString(),
                               style: const TextStyle(
-                                color: Color(0xFF111111),
+                                color: Colors.white,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
-                                fontFamily: 'Campton',
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -247,15 +254,14 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildPromoCardsSection(BuildContext context) {
-    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: AspectRatio(
         aspectRatio: _AdvertFadeCarousel.aspectRatio,
         child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: colors.accent,
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
+          decoration: const BoxDecoration(
+            color: WBColors.surfaceDark,
+            borderRadius: BorderRadius.all(Radius.circular(WBRadius.card)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -265,11 +271,9 @@ class HomeScreen extends ConsumerWidget {
               children: [
                 Text(
                   'Discover curated drops',
-                  style: TextStyle(
-                    fontSize: 22,
+                  style: WBTypography.section.copyWith(
+                    color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    color: colors.textPrimary,
-                    fontFamily: 'Campton',
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -277,11 +281,9 @@ class HomeScreen extends ConsumerWidget {
                   'Fashion, beauty, art, education, and hardware in one marketplace.',
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 14,
+                  style: WBTypography.secondary.copyWith(
+                    color: Colors.white.withValues(alpha: 0.85),
                     height: 1.35,
-                    color: colors.textPrimary,
-                    fontFamily: 'Campton',
                   ),
                 ),
               ],
@@ -474,7 +476,6 @@ class HomeScreen extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12.8,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
                 color: colors.textPrimary,
                 height: 1.15,
@@ -488,7 +489,6 @@ class HomeScreen extends ConsumerWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 10.6,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textSecondary,
                 height: 1.28,

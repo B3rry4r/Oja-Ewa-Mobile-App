@@ -58,7 +58,6 @@ class _BrandBusinessDetailsScreenState
             "About Business",
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -203,7 +202,6 @@ class _BrandBusinessDetailsScreenState
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 10,
-            fontFamily: 'Campton',
             color: isActive ? colors.textPrimary : colors.textSecondary,
             fontWeight: isActive ? FontWeight.w500 : FontWeight.w400,
           ),
@@ -231,7 +229,6 @@ class _BrandBusinessDetailsScreenState
         TextField(
           controller: controller,
           style: TextStyle(
-            fontFamily: 'Campton',
             fontSize: 16,
             color: colors.textPrimary,
           ),
@@ -469,11 +466,11 @@ class _BrandBusinessDetailsScreenState
         width: double.infinity,
         height: 57,
         decoration: BoxDecoration(
-          color: const Color(0xFFFDAF40),
+          color: const Color(0xFF111111),
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withValues(alpha: 0.4),
+              color: const Color(0xFF111111).withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
@@ -485,7 +482,6 @@ class _BrandBusinessDetailsScreenState
             style: TextStyle(
               color: Color(0xFFFFFBF5),
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
             ),
           ),

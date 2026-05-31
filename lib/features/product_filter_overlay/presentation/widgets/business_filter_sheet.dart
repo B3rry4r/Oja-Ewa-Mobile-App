@@ -28,7 +28,6 @@ class BusinessFilterSheet extends ConsumerWidget {
                     'Filter',
                     style: TextStyle(
                       fontSize: 20,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w700,
                       color: colors.textPrimary,
                     ),
@@ -86,7 +85,6 @@ class BusinessFilterSheet extends ConsumerWidget {
                     style: TextStyle(
                       color: colors.onAccent,
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -113,7 +111,6 @@ class BusinessFilterSheet extends ConsumerWidget {
           label,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -135,7 +132,6 @@ class BusinessFilterSheet extends ConsumerWidget {
             controller: ctrl,
             style: TextStyle(
               color: colors.textPrimary,
-              fontFamily: 'Campton',
               fontSize: 15,
             ),
             decoration: InputDecoration(

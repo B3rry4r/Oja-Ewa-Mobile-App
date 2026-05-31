@@ -42,7 +42,6 @@ class PaymentMethodSheet extends StatelessWidget {
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
                   color: colors.textPrimary,
-                  fontFamily: 'Campton',
                 ),
               ),
               const SizedBox(height: 8),
@@ -51,7 +50,6 @@ class PaymentMethodSheet extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   color: colors.textTertiary,
-                  fontFamily: 'Campton',
                 ),
               ),
               const SizedBox(height: 24),
@@ -123,7 +121,6 @@ class _PaymentMethodOption extends StatelessWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: colors.textPrimary,
-                      fontFamily: 'Campton',
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -132,7 +129,6 @@ class _PaymentMethodOption extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       color: colors.textTertiary,
-                      fontFamily: 'Campton',
                     ),
                   ),
                 ],

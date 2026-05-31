@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
-import 'package:ojaewa/app/theme/app_theme_colors.dart';
-import 'package:ojaewa/core/widgets/image_placeholder.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
 
 /// Shared product card used across the app.
 ///
-/// This design is extracted from the Product Details "You may also like" section
-/// and replaces the older default product card.
+/// Re-skinned to the WAWUBasket design system (floating white card, soft
+/// shadow, rounded image, bold price, dark action button). The constructor is
+/// unchanged so every existing call-site keeps working.
 class ProductCard extends StatelessWidget {
   const ProductCard({
     super.key,
@@ -30,126 +31,108 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
-    final imageColor = Color(product.imageColor ?? 0xFFD9D9D9);
+    final hasImage =
+        product.imageUrl != null && product.imageUrl!.trim().isNotEmpty;
 
-    final Widget content = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          height: 152,
-          decoration: BoxDecoration(
-            color: imageColor,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              if (product.imageUrl != null &&
-                  product.imageUrl!.trim().isNotEmpty)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    product.imageUrl!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(color: imageColor),
-                  ),
-                ),
-              if (product.imageUrl == null || product.imageUrl!.trim().isEmpty)
-                const Center(
-                  child: AppImagePlaceholder(
-                    width: 96,
-                    height: 96,
-                    borderRadius: 0,
-                    backgroundColor: Colors.transparent,
-                  ),
-                ),
-              Positioned(
-                right: 12,
-                bottom: 12,
-                child: GestureDetector(
-                  onTap: onFavoriteTap,
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: colors.accent,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      Icons.shopping_bag_outlined,
-                      size: 20,
-                      color: colors.onAccent,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+    final Widget content = GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: WBColors.surfaceCard,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: WBShadows.card,
         ),
-        const SizedBox(height: 8),
-        Text(
-          product.title,
-          style: TextStyle(
-            fontSize: 16,
-            color: colors.textPrimary,
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w400,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          product.priceLabel,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: colors.textPrimary,
-            fontFamily: 'Campton',
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 4),
-        Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 12,
-              height: 12,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFDB80),
-                shape: BoxShape.circle,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Stack(
+                children: [
+                  AspectRatio(
+                    aspectRatio: 1,
+                    child: hasImage
+                        ? WBNetworkImage(url: product.imageUrl!)
+                        : Container(color: WBColors.bgSoft),
+                  ),
+                  Positioned(
+                    right: 8,
+                    bottom: 8,
+                    child: GestureDetector(
+                      onTap: onFavoriteTap,
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: const BoxDecoration(
+                          color: WBColors.surfaceDark,
+                          shape: BoxShape.circle,
+                          boxShadow: WBShadows.card,
+                        ),
+                        alignment: Alignment.center,
+                        child: const WBIcon(
+                          WBIconName.basket,
+                          size: 16,
+                          color: Colors.white,
+                          strokeWidth: 1.6,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(height: 10),
             Text(
-              product.rating.toStringAsFixed(1),
-              style: TextStyle(
-                fontSize: 12,
-                color: colors.textPrimary,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w400,
+              product.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: WBTypography.body.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                height: 1.25,
+                color: WBColors.fgHeader,
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(height: 6),
             Text(
-              '(${product.reviewCount})',
-              style: TextStyle(
-                fontSize: 10,
-                color: colors.textSecondary,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w400,
+              product.priceLabel,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: WBTypography.body.copyWith(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: WBColors.fgHeader,
               ),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const WBIcon(WBIconName.star, size: 13, color: WBColors.fgHeader),
+                const SizedBox(width: 4),
+                Text(
+                  product.rating.toStringAsFixed(1),
+                  style: WBTypography.caption.copyWith(
+                    fontSize: 12,
+                    color: WBColors.fgHeader,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '(${product.reviewCount})',
+                  style: WBTypography.caption.copyWith(
+                    fontSize: 11,
+                    color: WBColors.fgSecondary,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-      ],
+      ),
     );
 
-    return GestureDetector(
-      onTap: onTap,
-      child: width == null ? content : SizedBox(width: width, child: content),
-    );
+    return width == null ? content : SizedBox(width: width, child: content);
   }
 }

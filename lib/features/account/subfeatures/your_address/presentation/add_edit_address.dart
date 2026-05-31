@@ -177,7 +177,6 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
           label,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             color: colors.textTertiary,
           ),
         ),
@@ -224,7 +223,6 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
           label,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             color: colors.textTertiary,
           ),
         ),
@@ -257,7 +255,6 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                     value,
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
                       color: colors.textPrimary,
                     ),
@@ -285,7 +282,6 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
           'Make Default Address',
           style: TextStyle(
             fontSize: 16,
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w600,
             color: colors.textPrimary,
           ),
@@ -364,7 +360,6 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                     text,
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
                       color: colors.onAccent,
                     ),
@@ -403,7 +398,6 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                 'Delete Address',
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: Colors.redAccent,
                 ),

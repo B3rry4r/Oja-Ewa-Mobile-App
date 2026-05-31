@@ -81,7 +81,6 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
         Text(
           'Change Size',
           style: TextStyle(
-            fontFamily: 'Campton',
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: colors.textPrimary,
@@ -110,7 +109,6 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
         Text(
           'Agbada in Vogue', // Corrected "Voue" typo from IR
           style: TextStyle(
-            fontFamily: 'Campton',
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: colors.textSecondary,
@@ -120,7 +118,6 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
         Text(
           'by Jenny Stitches',
           style: TextStyle(
-            fontFamily: 'Campton',
             fontSize: 12,
             fontWeight: FontWeight.w400,
             color: colors.textSecondary,
@@ -138,7 +135,6 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
         Text(
           'Size',
           style: TextStyle(
-            fontFamily: 'Campton',
             fontSize: 12,
             fontWeight: FontWeight.w400,
             color: colors.textPrimary,
@@ -151,7 +147,6 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
           child: Text(
             'View Size Chart',
             style: TextStyle(
-              fontFamily: 'Campton',
               fontSize: 10,
               fontWeight: FontWeight.w400,
               color: colors.textTertiary,
@@ -183,7 +178,6 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
             child: Text(
               size,
               style: TextStyle(
-                fontFamily: 'Campton',
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: isSelected ? colors.onAccent : colors.textPrimary,
@@ -220,7 +214,6 @@ class _SizeSelectionBottomSheetState extends State<SizeSelectionBottomSheet> {
             child: Text(
               'Update Size',
               style: TextStyle(
-                fontFamily: 'Campton',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: colors.onAccent,

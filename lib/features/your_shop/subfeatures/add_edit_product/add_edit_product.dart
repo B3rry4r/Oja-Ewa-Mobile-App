@@ -208,7 +208,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             'Shipping Dimensions (Optional)',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: context.appColors.textPrimary,
             ),
@@ -275,7 +274,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           'Product Image',
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -310,7 +308,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   hasImage ? 'Image selected' : 'Tap to upload image',
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     color: hasImage
                         ? const Color(0xFF4CAF50)
                         : colors.textPrimary,
@@ -321,7 +318,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   'JPG, PNG (max 5MB)',
                   style: TextStyle(
                     fontSize: 12,
-                    fontFamily: 'Campton',
                     color: colors.textSecondary,
                   ),
                 ),
@@ -348,7 +344,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           label,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -365,14 +360,12 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             keyboardType: keyboardType,
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(
                 fontSize: 16,
-                fontFamily: 'Campton',
                 color: colors.textTertiary,
               ),
               border: InputBorder.none,
@@ -398,7 +391,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           'Category',
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -439,7 +431,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     displayName,
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       color: hasCategory
                           ? colors.textPrimary
                           : colors.textTertiary,
@@ -498,7 +489,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           label,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -531,7 +521,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     value?.isNotEmpty == true ? value! : 'Select $label',
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       color: value?.isNotEmpty == true
                           ? colors.textPrimary
                           : colors.textTertiary,
@@ -558,7 +547,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           'Available Sizes',
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -593,7 +581,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     size,
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w500,
                       color: isSelected ? colors.onAccent : colors.textPrimary,
                     ),
@@ -616,7 +603,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           'Processing Time',
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -644,7 +630,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                       'Normal',
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w500,
                         color: _processingTimeType == 'normal'
                             ? colors.onAccent
@@ -678,7 +663,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                       'Quick Quick',
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w500,
                         color: _processingTimeType == 'quick_quick'
                             ? colors.onAccent
@@ -734,7 +718,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   isEditing ? 'Update Product' : 'Add Product',
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: colors.onAccent,
                   ),

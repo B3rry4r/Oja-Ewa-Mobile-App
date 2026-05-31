@@ -28,7 +28,6 @@ class NotificationDetailScreen extends StatelessWidget {
                   : 'Notification',
               style: TextStyle(
                 fontSize: 24,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w700,
                 color: colors.textPrimary,
               ),
@@ -41,7 +40,6 @@ class NotificationDetailScreen extends StatelessWidget {
                 _formatDate(notification.createdAt!),
                 style: TextStyle(
                   fontSize: 12,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
                   color: colors.textSecondary,
                 ),
@@ -54,7 +52,6 @@ class NotificationDetailScreen extends StatelessWidget {
               notification.body,
               style: TextStyle(
                 fontSize: 16,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textPrimary,
                 height: 1.6,

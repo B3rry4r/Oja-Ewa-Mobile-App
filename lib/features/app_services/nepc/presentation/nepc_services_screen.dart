@@ -187,7 +187,7 @@ class _NepcServicesScreenState extends ConsumerState<NepcServicesScreen> {
             _Field(
               controller: _businessNameController,
               label: 'Business name',
-              hint: 'Oja Ewa Exports Ltd',
+              hint: 'WAWUBeauty Exports Ltd',
             ),
             const SizedBox(height: 12),
             _Field(
@@ -711,7 +711,7 @@ class _UploadCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(width: 18, height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFDAF40))),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF111111))),
                       SizedBox(width: 10),
                       Text('Uploading...', style: TextStyle(fontSize: 13)),
                     ],
@@ -746,7 +746,7 @@ class _UploadCard extends StatelessWidget {
               fit: BoxFit.cover,
               loadingBuilder: (ctx, child, prog) => prog == null ? child
                   : Container(height: 110, color: colors.surface,
-                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFDAF40)))),
+                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF111111)))),
               errorBuilder: (ctx, e, st) => Container(
                 height: 60,
                 decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(12)),

@@ -23,7 +23,7 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
   // App consistent colors
   static const _backgroundColor = Color(0xFFFFFBF5);
   static const _cardColor = Color(0xFFF5E0CE);
-  static const _primaryColor = Color(0xFFFDAF40);
+  static const _primaryColor = Color(0xFF111111);
   static const _textDark = Color(0xFF241508);
   static const _textSecondary = Color(0xFF777F84);
 
@@ -87,7 +87,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                 'Style Profile Created!',
                 style: TextStyle(
                   fontSize: 18,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: _textDark,
                 ),
@@ -99,7 +98,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Campton',
                   color: _textSecondary,
                   height: 1.4,
                 ),
@@ -129,7 +127,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
@@ -150,7 +147,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                     'Back to Home',
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       color: _textSecondary,
                     ),
                   ),
@@ -182,7 +178,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                 'Discover Your Style',
                 style: TextStyle(
                   fontSize: 22,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: _textDark,
                 ),
@@ -202,7 +197,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                         'Question ${currentStep + 1} of $totalSteps',
                         style: const TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Campton',
                           fontWeight: FontWeight.w500,
                           color: _textSecondary,
                         ),
@@ -211,7 +205,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                         '${((currentStep + 1) / totalSteps * 100).toInt()}%',
                         style: const TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Campton',
                           fontWeight: FontWeight.w600,
                           color: _primaryColor,
                         ),
@@ -297,7 +290,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14,
-                              fontFamily: 'Campton',
                               fontWeight: FontWeight.w600,
                               color: _textDark,
                             ),
@@ -317,7 +309,7 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                                   SnackBar(
                                     content: const Text(
                                       'Please select an option',
-                                      style: TextStyle(fontFamily: 'Campton'),
+                                      style: TextStyle(),
                                     ),
                                     backgroundColor: _primaryColor,
                                     behavior: SnackBarBehavior.floating,
@@ -366,7 +358,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                                     'Submitting...',
                                     style: TextStyle(
                                       fontSize: 14,
-                                      fontFamily: 'Campton',
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
                                     ),
@@ -380,7 +371,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   fontSize: 14,
-                                  fontFamily: 'Campton',
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
                                 ),
@@ -409,7 +399,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
             question.question,
             style: const TextStyle(
               fontSize: 22,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: _textDark,
               height: 1.3,
@@ -421,7 +410,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
               'Select all that apply',
               style: TextStyle(
                 fontSize: 14,
-                fontFamily: 'Campton',
                 color: _textSecondary,
               ),
             ),
@@ -482,7 +470,6 @@ class _StyleDnaQuizScreenState extends ConsumerState<StyleDnaQuizScreen> {
                           option,
                           style: TextStyle(
                             fontSize: 16,
-                            fontFamily: 'Campton',
                             fontWeight: isSelected
                                 ? FontWeight.w600
                                 : FontWeight.w400,

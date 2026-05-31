@@ -33,7 +33,6 @@ class AppPageScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final body = Padding(
       padding: padding,
       child: Column(
@@ -70,17 +69,7 @@ class AppPageScaffold extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: DecoratedBox(
-          decoration: BoxDecoration(
-            color: colors.background,
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                isDark ? colors.surface : colors.surfaceSecondary,
-                colors.background,
-              ],
-            ),
-          ),
+          decoration: BoxDecoration(color: colors.background),
           child: SafeArea(
             bottom: false,
             child: Column(

@@ -187,7 +187,6 @@ class _AppShellState extends ConsumerState<AppShell> {
             'Start Selling',
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
             ),
           ),

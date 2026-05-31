@@ -3,7 +3,7 @@ description: "A new Flutter project."
 
 publish_to: 'none'
 
-version: 1.0.3+40
+version: 1.0.4+40
 
 environment:
   sdk: '>=3.9.0 <4.0.0'
@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.0.3
+  google_fonts: ^6.2.1
   dio: ^5.9.0
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
@@ -78,25 +79,7 @@ flutter:
     - assets/icons/
     - assets/icons/new_icons/
     - assets/app_icon/
+    - assets/empty_states/
 
-  fonts:
-    - family: Campton
-      fonts:
-        - asset: assets/fonts/CamptonThin.otf
-          weight: 100
-        - asset: assets/fonts/CamptonExtraLight.otf
-          weight: 200
-        - asset: assets/fonts/CamptonLight.otf
-          weight: 300
-        - asset: assets/fonts/CamptonBook.otf
-          weight: 400
-        - asset: assets/fonts/CamptonMedium.otf
-          weight: 500
-        - asset: assets/fonts/CamptonSemiBold.otf
-          weight: 600
-        - asset: assets/fonts/CamptonBold.otf
-          weight: 700
-        - asset: assets/fonts/CamptonExtraBold.otf
-          weight: 800
-        - asset: assets/fonts/CamptonBlack.otf
-          weight: 900
+  # Typography is Albert Sans, loaded at runtime via google_fonts (WAWUBeauty
+  # design system). The legacy Campton font bundle has been removed.

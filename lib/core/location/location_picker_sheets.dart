@@ -97,7 +97,6 @@ class _CountryPickerSheetState extends ConsumerState<CountryPickerSheet> {
                   Text(
                     'Select Country',
                     style: TextStyle(
-                      fontFamily: 'Campton',
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       color: colors.textPrimary,
@@ -164,7 +163,6 @@ class _CountryPickerSheetState extends ConsumerState<CountryPickerSheet> {
                       child: Text(
                         'No countries found',
                         style: TextStyle(
-                          fontFamily: 'Campton',
                           color: colors.textTertiary,
                         ),
                       ),
@@ -186,7 +184,6 @@ class _CountryPickerSheetState extends ConsumerState<CountryPickerSheet> {
                         title: Text(
                           country.name,
                           style: TextStyle(
-                            fontFamily: 'Campton',
                             fontSize: 16,
                             color: colors.textPrimary,
                           ),
@@ -227,14 +224,12 @@ class _CountryPickerSheetState extends ConsumerState<CountryPickerSheet> {
               controller: _searchController,
               onChanged: (value) => setState(() => _searchQuery = value),
               style: TextStyle(
-                fontFamily: 'Campton',
                 fontSize: 16,
                 color: colors.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: 'Search country...',
                 hintStyle: TextStyle(
-                  fontFamily: 'Campton',
                   color: colors.textTertiary,
                 ),
                 border: InputBorder.none,
@@ -342,7 +337,6 @@ class _StatePickerSheetState extends ConsumerState<StatePickerSheet> {
                   Text(
                     'Select State',
                     style: TextStyle(
-                      fontFamily: 'Campton',
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       color: colors.textPrimary,
@@ -402,7 +396,6 @@ class _StatePickerSheetState extends ConsumerState<StatePickerSheet> {
                       child: Text(
                         'No states found',
                         style: TextStyle(
-                          fontFamily: 'Campton',
                           color: colors.textTertiary,
                         ),
                       ),
@@ -420,7 +413,6 @@ class _StatePickerSheetState extends ConsumerState<StatePickerSheet> {
                         title: Text(
                           state.name,
                           style: TextStyle(
-                            fontFamily: 'Campton',
                             fontSize: 16,
                             color: colors.textPrimary,
                           ),
@@ -461,14 +453,12 @@ class _StatePickerSheetState extends ConsumerState<StatePickerSheet> {
               controller: _searchController,
               onChanged: (value) => setState(() => _searchQuery = value),
               style: TextStyle(
-                fontFamily: 'Campton',
                 fontSize: 16,
                 color: colors.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: 'Search state...',
                 hintStyle: TextStyle(
-                  fontFamily: 'Campton',
                   color: colors.textTertiary,
                 ),
                 border: InputBorder.none,
@@ -583,7 +573,6 @@ class _CityPickerSheetState extends ConsumerState<CityPickerSheet> {
                   Text(
                     'Select City/LGA',
                     style: TextStyle(
-                      fontFamily: 'Campton',
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       color: colors.textPrimary,
@@ -645,7 +634,6 @@ class _CityPickerSheetState extends ConsumerState<CityPickerSheet> {
                       child: Text(
                         'No cities found',
                         style: TextStyle(
-                          fontFamily: 'Campton',
                           color: colors.textTertiary,
                         ),
                       ),
@@ -663,7 +651,6 @@ class _CityPickerSheetState extends ConsumerState<CityPickerSheet> {
                         title: Text(
                           city,
                           style: TextStyle(
-                            fontFamily: 'Campton',
                             fontSize: 16,
                             color: colors.textPrimary,
                           ),
@@ -704,14 +691,12 @@ class _CityPickerSheetState extends ConsumerState<CityPickerSheet> {
               controller: _searchController,
               onChanged: (value) => setState(() => _searchQuery = value),
               style: TextStyle(
-                fontFamily: 'Campton',
                 fontSize: 16,
                 color: colors.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: 'Search city...',
                 hintStyle: TextStyle(
-                  fontFamily: 'Campton',
                   color: colors.textTertiary,
                 ),
                 border: InputBorder.none,
@@ -823,7 +808,6 @@ class _CountryCodePickerSheetState
                   Text(
                     'Select Country Code',
                     style: TextStyle(
-                      fontFamily: 'Campton',
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       color: colors.textPrimary,
@@ -891,7 +875,6 @@ class _CountryCodePickerSheetState
                       child: Text(
                         'No country codes found',
                         style: TextStyle(
-                          fontFamily: 'Campton',
                           color: colors.textTertiary,
                         ),
                       ),
@@ -914,7 +897,6 @@ class _CountryCodePickerSheetState
                         title: Text(
                           country.name,
                           style: TextStyle(
-                            fontFamily: 'Campton',
                             fontSize: 16,
                             color: colors.textPrimary,
                           ),
@@ -922,7 +904,6 @@ class _CountryCodePickerSheetState
                         subtitle: Text(
                           country.dialCode,
                           style: TextStyle(
-                            fontFamily: 'Campton',
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: colors.accent,
@@ -964,14 +945,12 @@ class _CountryCodePickerSheetState
               controller: _searchController,
               onChanged: (value) => setState(() => _searchQuery = value),
               style: TextStyle(
-                fontFamily: 'Campton',
                 fontSize: 16,
                 color: colors.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: 'Search country or code...',
                 hintStyle: TextStyle(
-                  fontFamily: 'Campton',
                   color: colors.textTertiary,
                 ),
                 border: InputBorder.none,

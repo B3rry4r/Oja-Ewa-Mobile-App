@@ -109,7 +109,6 @@ class _SetReferralCodeSheetState extends ConsumerState<SetReferralCodeSheet> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'Campton',
                   color: colors.textPrimary,
                 ),
               ),
@@ -122,7 +121,6 @@ class _SetReferralCodeSheetState extends ConsumerState<SetReferralCodeSheet> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  fontFamily: 'Campton',
                   color: colors.textTertiary,
                   height: 1.5,
                 ),
@@ -159,7 +157,6 @@ class _SetReferralCodeSheetState extends ConsumerState<SetReferralCodeSheet> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textTertiary,
           ),
         ),
@@ -189,7 +186,6 @@ class _SetReferralCodeSheetState extends ConsumerState<SetReferralCodeSheet> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
                       color: colors.textPrimary,
                     ),
                     decoration: InputDecoration(
@@ -248,7 +244,6 @@ class _SetReferralCodeSheetState extends ConsumerState<SetReferralCodeSheet> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'Campton',
                       color: colors.onAccent,
                     ),
                   ),
@@ -278,7 +273,6 @@ class _SetReferralCodeSheetState extends ConsumerState<SetReferralCodeSheet> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'Campton',
                 color: colors.textSecondary,
               ),
             ),

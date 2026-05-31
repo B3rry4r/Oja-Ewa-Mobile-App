@@ -28,7 +28,7 @@ class _PersonalizedRecommendationsScreenState
   // App consistent colors
   static const _backgroundColor = Color(0xFFFFFBF5);
   static const _cardColor = Color(0xFFF5E0CE);
-  static const _primaryColor = Color(0xFFFDAF40);
+  static const _primaryColor = Color(0xFF111111);
   static const _textDark = Color(0xFF241508);
   static const _textSecondary = Color(0xFF777F84);
 
@@ -56,7 +56,6 @@ class _PersonalizedRecommendationsScreenState
                 'For You',
                 style: TextStyle(
                   fontSize: 22,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: _textDark,
                 ),
@@ -179,7 +178,6 @@ class _PersonalizedRecommendationsScreenState
                   'Your Style DNA',
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
@@ -204,7 +202,6 @@ class _PersonalizedRecommendationsScreenState
             profile.styleProfile,
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               color: Colors.white.withOpacity(0.9),
               height: 1.4,
             ),
@@ -229,7 +226,6 @@ class _PersonalizedRecommendationsScreenState
                     style,
                     style: const TextStyle(
                       fontSize: 12,
-                      fontFamily: 'Campton',
                       color: Colors.white,
                     ),
                   ),
@@ -270,7 +266,6 @@ class _PersonalizedRecommendationsScreenState
             'Discover Your Style DNA',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: _textDark,
             ),
@@ -281,7 +276,6 @@ class _PersonalizedRecommendationsScreenState
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
-              fontFamily: 'Campton',
               color: _textSecondary,
               height: 1.4,
             ),
@@ -314,7 +308,6 @@ class _PersonalizedRecommendationsScreenState
                     'Take Style Quiz',
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
@@ -365,7 +358,6 @@ class _PersonalizedRecommendationsScreenState
                   label,
                   style: TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Campton',
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                     color: isSelected ? Colors.white : _textSecondary,
                   ),
@@ -434,7 +426,6 @@ class _PersonalizedRecommendationsScreenState
               'Unable to load recommendations',
               style: TextStyle(
                 fontSize: 16,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
                 color: _textDark,
               ),
@@ -445,7 +436,6 @@ class _PersonalizedRecommendationsScreenState
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                fontFamily: 'Campton',
                 color: _textSecondary,
               ),
             ),
@@ -470,7 +460,6 @@ class _PersonalizedRecommendationsScreenState
                   'Retry',
                   style: TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: _primaryColor,
                   ),
@@ -506,7 +495,6 @@ class _PersonalizedRecommendationsScreenState
               'No recommendations yet',
               style: TextStyle(
                 fontSize: 16,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
                 color: _textDark,
               ),
@@ -517,7 +505,6 @@ class _PersonalizedRecommendationsScreenState
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                fontFamily: 'Campton',
                 color: _textSecondary,
               ),
             ),

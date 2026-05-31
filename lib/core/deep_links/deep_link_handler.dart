@@ -398,7 +398,7 @@ if (uri.host == 'nepc') {
                     width: 40,
                     height: 40,
                     child: CircularProgressIndicator(
-                      color: Color(0xFFFDAF40),
+                      color: Color(0xFF111111),
                       strokeWidth: 3,
                     ),
                   ),
@@ -410,7 +410,6 @@ if (uri.host == 'nepc') {
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: colors.textPrimary,
-                      fontFamily: 'Campton',
                     ),
                   ),
                 ],
@@ -467,7 +466,6 @@ if (uri.host == 'nepc') {
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: colors.textPrimary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -478,7 +476,6 @@ if (uri.host == 'nepc') {
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: colors.textSecondary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -507,7 +504,6 @@ if (uri.host == 'nepc') {
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: colors.textPrimary,
-                                    fontFamily: 'Campton',
                                   ),
                                 ),
                               ),
@@ -528,12 +524,12 @@ if (uri.host == 'nepc') {
                             child: Container(
                               height: 57,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFDAF40),
+                                color: const Color(0xFF111111),
                                 borderRadius: BorderRadius.circular(8),
                                 boxShadow: [
                                   BoxShadow(
                                     color: const Color(
-                                      0xFFFDAF40,
+                                      0xFF111111,
                                     ).withValues(alpha: 0.4),
                                     blurRadius: 16,
                                     offset: const Offset(0, 8),
@@ -547,7 +543,6 @@ if (uri.host == 'nepc') {
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFFFFFBF5),
-                                    fontFamily: 'Campton',
                                   ),
                                 ),
                               ),
@@ -612,7 +607,6 @@ if (uri.host == 'nepc') {
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: colors.textPrimary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -623,7 +617,6 @@ if (uri.host == 'nepc') {
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: colors.textSecondary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -639,12 +632,12 @@ if (uri.host == 'nepc') {
                         width: double.infinity,
                         height: 57,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40),
+                          color: const Color(0xFF111111),
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(
-                                0xFFFDAF40,
+                                0xFF111111,
                               ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
@@ -658,7 +651,6 @@ if (uri.host == 'nepc') {
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFFFFFBF5),
-                              fontFamily: 'Campton',
                             ),
                           ),
                         ),
@@ -720,7 +712,6 @@ if (uri.host == 'nepc') {
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: colors.textPrimary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -731,7 +722,6 @@ if (uri.host == 'nepc') {
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: colors.textSecondary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -747,12 +737,12 @@ if (uri.host == 'nepc') {
                         width: double.infinity,
                         height: 57,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40),
+                          color: const Color(0xFF111111),
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(
-                                0xFFFDAF40,
+                                0xFF111111,
                               ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
@@ -766,7 +756,6 @@ if (uri.host == 'nepc') {
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFFFFFBF5),
-                              fontFamily: 'Campton',
                             ),
                           ),
                         ),
@@ -828,7 +817,6 @@ if (uri.host == 'nepc') {
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: colors.textPrimary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -839,7 +827,6 @@ if (uri.host == 'nepc') {
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: colors.textSecondary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -855,12 +842,12 @@ if (uri.host == 'nepc') {
                         width: double.infinity,
                         height: 57,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40),
+                          color: const Color(0xFF111111),
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(
-                                0xFFFDAF40,
+                                0xFF111111,
                               ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
@@ -874,7 +861,6 @@ if (uri.host == 'nepc') {
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFFFFFBF5),
-                              fontFamily: 'Campton',
                             ),
                           ),
                         ),
@@ -936,7 +922,6 @@ if (uri.host == 'nepc') {
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: colors.textPrimary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -947,7 +932,6 @@ if (uri.host == 'nepc') {
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: colors.textSecondary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -957,12 +941,12 @@ if (uri.host == 'nepc') {
                         width: double.infinity,
                         height: 57,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40),
+                          color: const Color(0xFF111111),
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(
-                                0xFFFDAF40,
+                                0xFF111111,
                               ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
@@ -976,7 +960,6 @@ if (uri.host == 'nepc') {
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFFFFFBF5),
-                              fontFamily: 'Campton',
                             ),
                           ),
                         ),
@@ -1038,7 +1021,6 @@ if (uri.host == 'nepc') {
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: colors.textPrimary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -1049,7 +1031,6 @@ if (uri.host == 'nepc') {
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: colors.textSecondary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -1059,12 +1040,12 @@ if (uri.host == 'nepc') {
                         width: double.infinity,
                         height: 57,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40),
+                          color: const Color(0xFF111111),
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(
-                                0xFFFDAF40,
+                                0xFF111111,
                               ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
@@ -1078,7 +1059,6 @@ if (uri.host == 'nepc') {
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFFFFFBF5),
-                              fontFamily: 'Campton',
                             ),
                           ),
                         ),

@@ -1,11 +1,12 @@
 // onboarding_screen.dart
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:video_player/video_player.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/app/router/app_router.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -77,17 +78,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       left: 0,
                       right: 0,
                       bottom: 18,
-                      child: Center(
-                        child: SvgPicture.asset(
-                          AppIcons.brandMarkWhite,
-                          width: 132,
-                          height: 30,
-                          fit: BoxFit.contain,
-                          colorFilter: const ColorFilter.mode(
-                            Colors.white,
-                            BlendMode.srcIn,
-                          ),
-                        ),
+                      child: const Center(
+                        child: WBWordmark(height: 30, color: Colors.white),
                       ),
                     ),
                   ],
@@ -125,61 +117,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildHeadline(BuildContext context) {
-    final colors = context.appColors;
     return Text(
       'The Pan-African\nBeauty Market',
-      style: TextStyle(
-        fontSize: 22.5,
-        fontWeight: FontWeight.w700,
-        fontFamily: 'Campton',
-        color: colors.textPrimary,
-        height: 1.2,
-      ),
+      style: WBTypography.page.copyWith(fontWeight: FontWeight.w700, height: 1.2),
     );
   }
 
   Widget _buildActionButtons(BuildContext context) {
-    final colors = context.appColors;
     return Column(
       children: [
-        SizedBox(
-          width: double.infinity,
-          height: 52,
-          child: ElevatedButton(
-            onPressed: () =>
-                Navigator.of(context).pushNamed(AppRoutes.createAccount),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFDAF40),
-              foregroundColor: colors.onAccent,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-              ),
-              textStyle: const TextStyle(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Campton',
-              ),
-            ),
-            child: const Text('Create account'),
-          ),
+        WBButton(
+          label: 'Create account',
+          fullWidth: true,
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.createAccount),
         ),
         const SizedBox(height: 8),
         Row(
           children: [
             Expanded(
-              child: _secondaryButton(
-                context: context,
+              child: WBButton(
                 label: 'Sign in',
-                onTap: () => Navigator.of(context).pushNamed(AppRoutes.signIn),
+                fullWidth: true,
+                variant: WBButtonVariant.secondary,
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.signIn),
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: _secondaryButton(
-                context: context,
+              child: WBButton(
                 label: 'Guest',
-                onTap: () => Navigator.of(
+                fullWidth: true,
+                variant: WBButtonVariant.secondary,
+                onPressed: () => Navigator.of(
                   context,
                 ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false),
               ),
@@ -190,53 +161,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _secondaryButton({
-    required BuildContext context,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    final colors = context.appColors;
-    return SizedBox(
-      width: double.infinity,
-      height: 48,
-      child: OutlinedButton(
-        onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          backgroundColor: colors.surfaceElevated,
-          foregroundColor: colors.textPrimary,
-          side: BorderSide(color: colors.border, width: 1.2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 11.5,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Campton',
-          ),
-        ),
-        child: Text(label),
-      ),
-    );
-  }
-
   Widget _buildTermsAndPrivacy(BuildContext context) {
-    final colors = context.appColors;
     return Center(
       child: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
-          style: TextStyle(
-            fontSize: 11,
-            fontFamily: 'Campton',
-            color: colors.textSecondary,
+          style: WBTypography.caption.copyWith(
+            color: WBColors.fgSecondary,
             height: 1.4,
           ),
           children: [
-            const TextSpan(text: "By continuing you agree to ojà-ewà's\n"),
+            const TextSpan(text: "By continuing you agree to WAWUBeauty's\n"),
             TextSpan(
               text: 'Terms of Service',
-              style: const TextStyle(
-                color: Color(0xFFFDAF40),
+              style: WBTypography.caption.copyWith(
+                color: WBColors.fgHeader,
+                fontWeight: FontWeight.w600,
                 decoration: TextDecoration.underline,
               ),
               recognizer: TapGestureRecognizer()
@@ -246,8 +186,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             const TextSpan(text: ' and '),
             TextSpan(
               text: 'Privacy Policy',
-              style: const TextStyle(
-                color: Color(0xFFFDAF40),
+              style: WBTypography.caption.copyWith(
+                color: WBColors.fgHeader,
+                fontWeight: FontWeight.w600,
                 decoration: TextDecoration.underline,
               ),
               recognizer: TapGestureRecognizer()

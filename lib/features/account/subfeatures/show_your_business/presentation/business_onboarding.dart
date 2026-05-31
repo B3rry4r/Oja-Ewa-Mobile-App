@@ -44,12 +44,11 @@ class BusinessOnboardingScreen extends ConsumerWidget {
           const SizedBox(height: 16),
 
           Text(
-            "Share your Business Heritage on Ojá-Ẹwà",
+            "Share your Business Heritage on WAWUBeauty",
             style: TextStyle(
               fontSize: 33,
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
-              fontFamily: 'Campton',
             ),
           ),
           const SizedBox(height: 8),
@@ -59,7 +58,6 @@ class BusinessOnboardingScreen extends ConsumerWidget {
               fontSize: 16,
               fontWeight: FontWeight.w400,
               color: colors.textSecondary,
-              fontFamily: 'Campton',
             ),
           ),
 
@@ -78,7 +76,6 @@ class BusinessOnboardingScreen extends ConsumerWidget {
                     fontSize: 33,
                     fontWeight: FontWeight.w600,
                     color: colors.textPrimary,
-                    fontFamily: 'Campton',
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -90,7 +87,7 @@ class BusinessOnboardingScreen extends ConsumerWidget {
                 _buildStepRow(
                   context,
                   "2",
-                  "Wait for Ojá-Ẹwà to approve your details",
+                  "Wait for WAWUBeauty to approve your details",
                 ),
                 _buildStepRow(
                   context,
@@ -136,7 +133,6 @@ class BusinessOnboardingScreen extends ConsumerWidget {
               color: colors.onAccent,
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
             ),
           ),
         ),
@@ -180,7 +176,6 @@ class BusinessOnboardingScreen extends ConsumerWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
                 color: colors.textPrimary,
-                fontFamily: 'Campton',
               ),
             ),
           ),

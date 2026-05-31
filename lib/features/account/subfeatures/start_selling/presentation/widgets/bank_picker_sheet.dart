@@ -86,7 +86,6 @@ class _BankPickerSheetState extends ConsumerState<BankPickerSheet> {
                   Text(
                     'Select Bank',
                     style: TextStyle(
-                      fontFamily: 'Campton',
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       color: colors.textPrimary,
@@ -146,7 +145,6 @@ class _BankPickerSheetState extends ConsumerState<BankPickerSheet> {
                       child: Text(
                         'No banks found',
                         style: TextStyle(
-                          fontFamily: 'Campton',
                           color: colors.textTertiary,
                         ),
                       ),
@@ -165,7 +163,6 @@ class _BankPickerSheetState extends ConsumerState<BankPickerSheet> {
                         title: Text(
                           bank.name,
                           style: TextStyle(
-                            fontFamily: 'Campton',
                             fontSize: 16,
                             color: colors.textPrimary,
                           ),
@@ -210,14 +207,12 @@ class _BankPickerSheetState extends ConsumerState<BankPickerSheet> {
               controller: _searchController,
               onChanged: (value) => setState(() => _searchQuery = value),
               style: TextStyle(
-                fontFamily: 'Campton',
                 fontSize: 16,
                 color: colors.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: 'Search bank...',
                 hintStyle: TextStyle(
-                  fontFamily: 'Campton',
                   color: colors.textTertiary,
                 ),
                 border: InputBorder.none,

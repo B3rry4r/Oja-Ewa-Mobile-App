@@ -138,13 +138,13 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
             _ServiceField(
               controller: _firstChoiceController,
               label: 'First choice name',
-              hint: 'Oja Ewa Ventures',
+              hint: 'WAWUBeauty Ventures',
             ),
             const SizedBox(height: 12),
             _ServiceField(
               controller: _secondChoiceController,
               label: 'Second choice name',
-              hint: 'Oja Ewa Creative Hub',
+              hint: 'WAWUBeauty Creative Hub',
             ),
             const SizedBox(height: 12),
             _ServiceField(
@@ -313,7 +313,7 @@ class _CacServicesScreenState extends ConsumerState<CacServicesScreen> {
           activeColor: colors.accent,
           checkColor: colors.onAccent,
           title: Text(
-            'I acknowledge that a name availability search will be conducted before submission. If the proposed business name is rejected by the CAC, I hereby authorize Ojaewa to make necessary modifications including adding, removing, or rearranging words to the name and resubmit it on my behalf to ensure successful registration and approval.',
+            'I acknowledge that a name availability search will be conducted before submission. If the proposed business name is rejected by the CAC, I hereby authorize WAWUBeauty to make necessary modifications including adding, removing, or rearranging words to the name and resubmit it on my behalf to ensure successful registration and approval.',
             style: TextStyle(
               color: colors.textPrimary,
               fontSize: 14,
@@ -547,7 +547,7 @@ class _UploadCard extends StatelessWidget {
                 ? const Row(
                     children: [
                       SizedBox(width: 16, height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFDAF40))),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF111111))),
                       SizedBox(width: 10),
                       Text('Uploading...', style: TextStyle(fontSize: 13)),
                     ],
@@ -587,7 +587,7 @@ class _UploadCard extends StatelessWidget {
               loadingBuilder: (ctx, child, prog) =>
                   prog == null ? child
                   : Container(height: 110, color: colors.surface,
-                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFDAF40)))),
+                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF111111)))),
               errorBuilder: (ctx, e, st) => Container(
                 height: 60,
                 decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(12)),

@@ -4,8 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
-import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
 import '../controllers/auth_controller.dart';
@@ -63,7 +64,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill all fields and agree to terms'),
-          backgroundColor: Color(0xFFFDAF40),
+          backgroundColor: WBColors.statusWarning,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -156,10 +157,8 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Widget _buildBackButton() {
-    return HeaderIconButton(
-      asset: AppIcons.back,
-      iconColor: context.appColors.textPrimary,
-      onTap: () {
+    return WBBackChip(
+      onPressed: () {
         final navigator = Navigator.of(context);
         if (navigator.canPop()) {
           navigator.pop();
@@ -188,15 +187,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           const SizedBox(height: 20),
 
           // Title
-          Text(
-            'Create Account',
-            style: TextStyle(
-              fontSize: 33,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
-              color: colors.textPrimary,
-            ),
-          ),
+          Text('Create Account', style: WBTypography.hero.copyWith(fontSize: 30)),
 
           const SizedBox(height: 20),
 
@@ -230,7 +221,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
-              fontFamily: 'Campton',
               color: colors.textSecondary,
             ),
           ),
@@ -271,15 +261,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Widget _buildWelcomeIcon() {
-    return SizedBox(
-      width: 118,
-      height: 28,
-      child: SvgPicture.asset(
-        AppIcons.brandMarkWhite,
-        fit: BoxFit.contain,
-        colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-      ),
-    );
+    return const WBWordmark(height: 26);
   }
 
   Widget _buildFirstNameInput() {
@@ -292,7 +274,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -304,7 +285,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -328,7 +308,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -340,7 +319,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -364,7 +342,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -377,7 +354,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -401,7 +377,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -438,7 +413,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
-                          fontFamily: 'Campton',
                           color: colors.textPrimary,
                         ),
                       ),
@@ -447,7 +421,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                         'Code',
                         style: TextStyle(
                           fontSize: 15,
-                          fontFamily: 'Campton',
                           color: colors.textTertiary,
                         ),
                       ),
@@ -468,7 +441,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    fontFamily: 'Campton',
                     color: colors.textPrimary,
                   ),
                   decoration: InputDecoration(
@@ -495,7 +467,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -527,7 +498,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -586,7 +556,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
-                    fontFamily: 'Campton',
                     color: colors.textPrimary,
                     height: 1.4,
                   ),
@@ -601,7 +570,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'Campton',
                         color: colors.accent,
                       ),
                     ),
@@ -616,54 +584,13 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Widget _buildCreateAccountButton() {
-    final colors = context.appColors;
-    return Container(
-      width: double.infinity,
-      height: 57,
-      decoration: BoxDecoration(
-        color: _isFormValid
-            ? colors.accent
-            : colors.accent.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: _isFormValid
-            ? [
-                BoxShadow(
-                  color: colors.shadow,
-                  blurRadius: 16,
-                  offset: const Offset(0, 8),
-                ),
-              ]
-            : null,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(18),
-          onTap: (_isFormValid && !_auth.isLoading) ? _createAccount : null,
-          child: Center(
-            child: _auth.isLoading
-                ? SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: colors.onAccent,
-                    ),
-                  )
-                : Text(
-                    'Create Account',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Campton',
-                      color: _isFormValid
-                          ? colors.onAccent
-                          : colors.onAccent.withValues(alpha: 0.6),
-                    ),
-                  ),
-          ),
-        ),
-      ),
+    return WBButton(
+      label: 'Create Account',
+      fullWidth: true,
+      size: WBButtonSize.lg,
+      disabled: !_isFormValid,
+      loading: _auth.isLoading,
+      onPressed: _createAccount,
     );
   }
 
@@ -679,7 +606,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              fontFamily: 'Campton',
               color: colors.textTertiary,
             ),
           ),
@@ -721,7 +647,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'Campton',
                   color: colors.textPrimary,
                 ),
               ),
@@ -742,7 +667,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -755,7 +679,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -787,7 +710,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
                       color: colors.textTertiary,
                     ),
                   ),
@@ -796,7 +718,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'Campton',
                       color: colors.accent,
                     ),
                   ),
@@ -815,35 +736,22 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
     Widget? trailing,
     Color? borderColor,
   }) {
-    final colors = context.appColors;
     return Container(
-      height: 58,
+      height: 52,
       decoration: BoxDecoration(
-        color: colors.surfaceElevated,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: borderColor ?? colors.border, width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadow,
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        color: WBColors.surfaceInput,
+        borderRadius: BorderRadius.circular(WBRadius.input),
+        border: Border.all(
+          color: borderColor ?? Colors.transparent,
+          width: 1,
+        ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: colors.accentSoft,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 18, color: colors.accent),
-            ),
-            const SizedBox(width: 14),
+            Icon(icon, size: 20, color: WBColors.fgPlaceholder),
+            const SizedBox(width: 12),
             Expanded(child: child),
             if (trailing != null) ...[const SizedBox(width: 8), trailing],
           ],

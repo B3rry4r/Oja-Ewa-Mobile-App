@@ -51,7 +51,6 @@ class TrackingOrderScreen extends ConsumerWidget {
               '#$orderId',
               style: TextStyle(
                 fontSize: 14,
-                fontFamily: 'Campton',
                 color: colors.textSecondary,
               ),
             ),
@@ -225,7 +224,6 @@ class TrackingOrderScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
           ),
@@ -257,7 +255,6 @@ class TrackingOrderScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
           ),
@@ -267,7 +264,6 @@ class TrackingOrderScreen extends ConsumerWidget {
               shipment.subtitle!,
               style: TextStyle(
                 fontSize: 12,
-                fontFamily: 'Campton',
                 color: colors.textSecondary,
               ),
             ),
@@ -316,7 +312,6 @@ class TrackingOrderScreen extends ConsumerWidget {
                       'Copy',
                       style: TextStyle(
                         fontSize: 10,
-                        fontFamily: 'Campton',
                         color: colors.textSecondary,
                       ),
                     ),
@@ -345,7 +340,6 @@ class TrackingOrderScreen extends ConsumerWidget {
           label,
           style: TextStyle(
             fontSize: 10,
-            fontFamily: 'Campton',
             color: labelColor,
           ),
         ),
@@ -354,7 +348,6 @@ class TrackingOrderScreen extends ConsumerWidget {
           value,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             color: colors.textPrimary,
           ),
         ),
@@ -404,7 +397,6 @@ class TrackingOrderScreen extends ConsumerWidget {
                 step.title,
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   color: step.textColor,
                   fontWeight: FontWeight.w400,
                 ),
@@ -415,7 +407,6 @@ class TrackingOrderScreen extends ConsumerWidget {
                   step.timestamp,
                   style: TextStyle(
                     fontSize: 12,
-                    fontFamily: 'Campton',
                     color: step.timeColor,
                   ),
                 ),
@@ -591,7 +582,7 @@ List<TimelineStep> _timelineFromStages(
       timestamp: timestamp,
       isCompleted: isActive,
       isCurrent: isActive,
-      dotColor: isActive ? const Color(0xFFFDAF40) : const Color(0xFF494949),
+      dotColor: isActive ? const Color(0xFF111111) : const Color(0xFF494949),
       textColor: isActive ? const Color(0xFFF7F7F7) : const Color(0xFFBEBEBE),
       timeColor: isActive ? const Color(0xFFA0A0A0) : const Color(0xFF6B6B6B),
     );
@@ -677,7 +668,7 @@ TimelineStep _timelineStepShared(
     timestamp: isCompleted ? 'Completed' : '—',
     isCompleted: isCompleted,
     isCurrent: isCurrent,
-    dotColor: isCompleted ? const Color(0xFFFDAF40) : const Color(0xFFE9E9E9),
+    dotColor: isCompleted ? const Color(0xFF111111) : const Color(0xFFE9E9E9),
     textColor: isCompleted ? const Color(0xFFF7F7F7) : const Color(0xFFBEBEBE),
     timeColor: isCompleted ? const Color(0xFFA0A0A0) : const Color(0xFF6B6B6B),
   );

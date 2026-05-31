@@ -145,7 +145,6 @@ class BlogDetailScreen extends ConsumerWidget {
                             dateText,
                             style: TextStyle(
                               fontSize: 10,
-                              fontFamily: 'Campton',
                               fontWeight: FontWeight.w400,
                               color: colors.textSecondary,
                             ),
@@ -155,7 +154,6 @@ class BlogDetailScreen extends ConsumerWidget {
                             post.title,
                             style: TextStyle(
                               fontSize: 20,
-                              fontFamily: 'Campton',
                               fontWeight: FontWeight.w700,
                               color: colors.textPrimary,
                               height: 1.2,
@@ -192,7 +190,6 @@ class BlogDetailScreen extends ConsumerWidget {
       content.isEmpty ? 'No content' : content,
       style: TextStyle(
         fontSize: 16,
-        fontFamily: 'Campton',
         fontWeight: FontWeight.w400,
         color: context.appColors.textPrimary,
         height: 1.6,

@@ -9,6 +9,7 @@ import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 
 import '../domain/blog_post.dart';
 import 'controllers/blog_controller.dart';
@@ -27,7 +28,6 @@ class _BlogScreenState extends ConsumerState<BlogScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
     final recent = ref.watch(blogRealtimeProvider);
     final favorites = ref.watch(blogFavoritesProvider);
 
@@ -78,16 +78,14 @@ class _BlogScreenState extends ConsumerState<BlogScreen> {
             ),
             data: (items) {
               if (items.isEmpty) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24),
-                  child: Center(
-                    child: Text(
-                      _showFavorites
-                          ? 'No favorite posts yet.'
-                          : 'No posts found.',
-                      style: TextStyle(color: colors.textSecondary),
-                    ),
-                  ),
+                return WBEmptyState(
+                  illustration: WBEmptyIllustration.noProducts,
+                  label: _showFavorites
+                      ? 'No favorite posts yet'
+                      : 'No posts found',
+                  sub: _showFavorites
+                      ? 'Posts you favourite will appear here.'
+                      : 'Check back soon for new stories.',
                 );
               }
 
@@ -128,7 +126,6 @@ class _BlogScreenState extends ConsumerState<BlogScreen> {
           label,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
             color: active ? colors.onAccent : colors.textPrimary,
           ),
@@ -187,7 +184,6 @@ class _BlogPostCard extends ConsumerWidget {
                   post.title,
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: colors.textPrimary,
                     height: 1.2,
@@ -202,7 +198,6 @@ class _BlogPostCard extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
                     color: colors.textSecondary,
                     height: 1.35,
@@ -213,7 +208,6 @@ class _BlogPostCard extends ConsumerWidget {
                   post.createdAt?.toIso8601String().split('T').first ?? '',
                   style: TextStyle(
                     fontSize: 10,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
                     color: colors.textTertiary,
                   ),

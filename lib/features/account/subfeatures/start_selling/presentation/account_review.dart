@@ -76,7 +76,6 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textPrimary,
                 height: 1.5,
@@ -130,7 +129,6 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Campton',
                     color: colors.textPrimary,
                   ),
                 ),
@@ -139,14 +137,13 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'At Ojá-Ẹwà your trust is our foundation. Every product on Ojá-Ẹwà must pass our verification for authenticity and craftsmanship.\n\n'
+            'At WAWUBeauty your trust is our foundation. Every product on WAWUBeauty must pass our verification for authenticity and craftsmanship.\n\n'
             'We guarantee: If a newly registered brand/product fails our review and does not meet our published Quality Standards, its registration fee will be fully refunded.\n\n'
             'We invest in your success by ensuring only excellence reaches our marketplace.\n\n'
             'Based on who you be, we ensure what you sell is worthy.\n\n'
-            'The Ojá-Ẹwà Team',
+            'The WAWUBeauty Team',
             style: TextStyle(
               fontSize: 13,
-              fontFamily: 'Campton',
               color: colors.textSecondary,
               height: 1.5,
             ),
@@ -193,7 +190,6 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
                     color: colors.onAccent,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Campton',
                   ),
                 ),
         ),
@@ -229,7 +225,6 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
               color: colors.onAccent,
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
             ),
           ),
         ),

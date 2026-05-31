@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
@@ -45,29 +46,11 @@ class AccountScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           profile.when(
-            loading: () => const Text(
-              'Hello',
-              style: TextStyle(
-                fontSize: 33,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            error: (e, st) => const Text(
-              'Hello',
-              style: TextStyle(
-                fontSize: 33,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            loading: () => Text('Hello', style: WBTypography.hero.copyWith(fontSize: 30)),
+            error: (e, st) => Text('Hello', style: WBTypography.hero.copyWith(fontSize: 30)),
             data: (u) => Text(
               'Hello ${u?.fullName ?? 'Guest'}',
-              style: const TextStyle(
-                fontSize: 33,
-                fontFamily: 'Campton',
-                fontWeight: FontWeight.w600,
-              ),
+              style: WBTypography.hero.copyWith(fontSize: 30),
             ),
           ),
 
@@ -99,7 +82,7 @@ class AccountScreen extends ConsumerWidget {
           ],
 
           const SizedBox(height: 24),
-          _buildSectionHeader(context, 'Ojá-Ẹwà Business'),
+          _buildSectionHeader(context, 'WAWUBeauty Business'),
           _buildBusinessList(context, ref),
 
           const SizedBox(height: 24),
@@ -120,7 +103,6 @@ class AccountScreen extends ConsumerWidget {
         text,
         style: TextStyle(
           fontSize: 14,
-          fontFamily: 'Campton',
           fontWeight: FontWeight.w400,
           color: colors.textTertiary,
         ),
@@ -171,7 +153,6 @@ class AccountScreen extends ConsumerWidget {
                     label,
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
                       color: colors.textPrimary,
                     ),
@@ -254,7 +235,6 @@ class AccountScreen extends ConsumerWidget {
                   hasBadge ? _badgeLabel(badge) : 'No verification badge yet',
                   style: TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: colors.textPrimary,
                   ),
@@ -266,7 +246,6 @@ class AccountScreen extends ConsumerWidget {
                       : 'Create your seller profile first, then apply for a badge.',
                   style: TextStyle(
                     fontSize: 12,
-                    fontFamily: 'Campton',
                     color: colors.textSecondary,
                   ),
                 ),
@@ -278,7 +257,6 @@ class AccountScreen extends ConsumerWidget {
                         : 'Product upload limit: $uploadLimit',
                     style: TextStyle(
                       fontSize: 12,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w500,
                       color: colors.textTertiary,
                     ),
@@ -295,9 +273,8 @@ class AccountScreen extends ConsumerWidget {
                 'View badges',
                 style: TextStyle(
                   fontSize: 12,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFFFDAF40),
+                  color: Color(0xFF111111),
                 ),
               ),
             ),
@@ -458,7 +435,6 @@ class AccountScreen extends ConsumerWidget {
                         isLoggedIn ? 'Sign Out' : 'Sign In',
                         style: TextStyle(
                           fontSize: 16,
-                          fontFamily: 'Campton',
                           fontWeight: FontWeight.w400,
                           color: isLoggedIn
                               ? const Color(0xFFFF8A80)
@@ -555,7 +531,6 @@ class AccountScreen extends ConsumerWidget {
                     'Delete Account',
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
                       color: isDarkMode
                           ? const Color(0xFFFF8A80)
@@ -617,9 +592,9 @@ class AccountScreen extends ConsumerWidget {
       height: 56,
       margin: const EdgeInsets.only(bottom: 8, top: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
+        color: const Color(0xFF111111).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFFDAF40), width: 1.5),
+        border: Border.all(color: const Color(0xFF111111), width: 1.5),
       ),
       child: Material(
         color: Colors.transparent,
@@ -631,7 +606,7 @@ class AccountScreen extends ConsumerWidget {
             children: [
               const Icon(
                 Icons.notifications_active,
-                color: Color(0xFFFDAF40),
+                color: Color(0xFF111111),
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -639,9 +614,8 @@ class AccountScreen extends ConsumerWidget {
                 'Send Test Notification',
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFFFDAF40),
+                  color: Color(0xFF111111),
                 ),
               ),
             ],

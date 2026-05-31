@@ -67,7 +67,6 @@ class _SchoolRegistrationFormScreenState
               'Fill in your details to continue',
               style: TextStyle(
                 fontSize: 16,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textPrimary,
               ),
@@ -176,7 +175,6 @@ class _SchoolRegistrationFormScreenState
           label,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
             color: colors.textSecondary,
           ),
@@ -210,7 +208,6 @@ class _SchoolRegistrationFormScreenState
                     value,
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
                       color: colors.textPrimary,
                     ),
@@ -242,7 +239,6 @@ class _SchoolRegistrationFormScreenState
           label,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
             color: colors.textSecondary,
           ),
@@ -265,7 +261,6 @@ class _SchoolRegistrationFormScreenState
             controller: controller,
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               color: colors.textPrimary,
             ),
@@ -273,7 +268,6 @@ class _SchoolRegistrationFormScreenState
               hintText: placeholder,
               hintStyle: TextStyle(
                 fontSize: 16,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textTertiary,
               ),
@@ -304,7 +298,6 @@ class _SchoolRegistrationFormScreenState
           'Phone Number',
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
             color: colors.textSecondary,
           ),
@@ -353,7 +346,6 @@ class _SchoolRegistrationFormScreenState
                         _selectedCountryCode,
                         style: TextStyle(
                           fontSize: 16,
-                          fontFamily: 'Campton',
                           fontWeight: FontWeight.w400,
                           color: colors.textPrimary,
                         ),
@@ -382,7 +374,6 @@ class _SchoolRegistrationFormScreenState
                   ],
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
                     color: colors.textPrimary,
                   ),
@@ -390,7 +381,6 @@ class _SchoolRegistrationFormScreenState
                     hintText: '8167654354',
                     hintStyle: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
                       color: colors.textTertiary,
                     ),
@@ -458,7 +448,6 @@ class _SchoolRegistrationFormScreenState
                 'Make Payment',
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: colors.onAccent,
                 ),
@@ -552,7 +541,6 @@ class _SchoolRegistrationFormScreenState
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: colors.textPrimary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -563,7 +551,6 @@ class _SchoolRegistrationFormScreenState
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: colors.textSecondary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -578,14 +565,12 @@ class _SchoolRegistrationFormScreenState
                         keyboardType: TextInputType.emailAddress,
                         style: TextStyle(
                           fontSize: 16,
-                          fontFamily: 'Campton',
                           color: colors.textPrimary,
                         ),
                         decoration: InputDecoration(
                           hintText: 'email@example.com',
                           hintStyle: TextStyle(
                             fontSize: 16,
-                            fontFamily: 'Campton',
                             color: colors.textTertiary,
                           ),
                           border: InputBorder.none,
@@ -616,7 +601,6 @@ class _SchoolRegistrationFormScreenState
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: colors.textSecondary,
-                                    fontFamily: 'Campton',
                                   ),
                                 ),
                               ),
@@ -652,7 +636,6 @@ class _SchoolRegistrationFormScreenState
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: colors.onAccent,
-                                    fontFamily: 'Campton',
                                   ),
                                 ),
                               ),
@@ -723,7 +706,6 @@ class _SchoolRegistrationFormScreenState
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: colors.textPrimary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -736,7 +718,6 @@ class _SchoolRegistrationFormScreenState
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: colors.textSecondary,
-                        fontFamily: 'Campton',
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -766,7 +747,6 @@ class _SchoolRegistrationFormScreenState
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: colors.onAccent,
-                              fontFamily: 'Campton',
                             ),
                           ),
                         ),
@@ -816,12 +796,12 @@ class _SchoolRegistrationFormScreenState
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40).withValues(alpha: 0.1),
+                          color: const Color(0xFF111111).withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.payment,
-                          color: Color(0xFFFDAF40),
+                          color: Color(0xFF111111),
                           size: 32,
                         ),
                       ),
@@ -833,7 +813,6 @@ class _SchoolRegistrationFormScreenState
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
                           color: colors.textPrimary,
-                          fontFamily: 'Campton',
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -844,7 +823,6 @@ class _SchoolRegistrationFormScreenState
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
                           color: colors.textSecondary,
-                          fontFamily: 'Campton',
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -876,7 +854,6 @@ class _SchoolRegistrationFormScreenState
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: colors.onAccent,
-                                fontFamily: 'Campton',
                               ),
                             ),
                           ),

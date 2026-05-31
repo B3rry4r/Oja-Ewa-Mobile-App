@@ -1,11 +1,10 @@
 // splash_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
-import 'package:ojaewa/app/theme/app_theme_colors.dart';
-import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import '../../../../core/auth/auth_controller.dart';
 import '../../../../core/auth/auth_state.dart';
 
@@ -61,68 +60,38 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
     return Scaffold(
-      backgroundColor: colors.background,
+      backgroundColor: WBColors.bgPrimary,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildBrandLogo(),
+            const WBWMark(size: 96),
+            const SizedBox(height: 24),
+            const WBWordmark(height: 30),
             const SizedBox(height: 48),
-            _buildLoadingIndicator(context),
+            _buildLoadingIndicator(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBrandLogo() {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        // Large outline logo in the background
-        Opacity(
-          opacity: 0.12,
-          child: Image.asset(
-            AppImages.logoOutline,
-            width: 280,
-            height: 280,
-            fit: BoxFit.contain,
-          ),
-        ),
-        SvgPicture.asset(
-          AppIcons.brandMarkWhite,
-          width: 200,
-          height: 46,
-          fit: BoxFit.contain,
-          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLoadingIndicator(BuildContext context) {
-    final colors = context.appColors;
+  Widget _buildLoadingIndicator() {
     return Column(
       children: [
-        SizedBox(
-          width: 40,
-          height: 40,
+        const SizedBox(
+          width: 36,
+          height: 36,
           child: CircularProgressIndicator(
-            strokeWidth: 2,
-            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFDAF40)),
+            strokeWidth: 2.4,
+            valueColor: AlwaysStoppedAnimation<Color>(WBColors.surfaceDark),
           ),
         ),
         const SizedBox(height: 20),
         Text(
           'Loading...',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
-            color: colors.textSecondary,
-          ),
+          style: WBTypography.secondary.copyWith(color: WBColors.fgSecondary),
         ),
       ],
     );

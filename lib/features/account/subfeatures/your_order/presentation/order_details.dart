@@ -134,7 +134,6 @@ class OrderDetailsScreen extends ConsumerWidget {
             'Order Information',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -150,7 +149,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 'Ordered on',
                 style: TextStyle(
                   fontSize: 10,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
                   color: colors.textSecondary,
                 ),
@@ -160,7 +158,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 orderedOn,
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
                   color: colors.textPrimary,
                 ),
@@ -181,7 +178,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                     'Order Number',
                     style: TextStyle(
                       fontSize: 10,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
                       color: colors.textSecondary,
                     ),
@@ -191,7 +187,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                     orderNumber,
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
                       color: colors.textPrimary,
                     ),
@@ -222,7 +217,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                     'Copy',
                     style: TextStyle(
                       fontSize: 10,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
                       color: colors.textSecondary,
                     ),
@@ -241,7 +235,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 'Status',
                 style: TextStyle(
                   fontSize: 10,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
                   color: colors.textSecondary,
                 ),
@@ -251,7 +244,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 statusLabel,
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
                   color: colors.textPrimary,
                 ),
@@ -280,7 +272,6 @@ class OrderDetailsScreen extends ConsumerWidget {
             'Shipping to',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -294,7 +285,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 : shippingTo,
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               color: colors.textPrimary,
               height: 1.5,
@@ -322,7 +312,6 @@ class OrderDetailsScreen extends ConsumerWidget {
             'Items in Order',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -383,7 +372,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 item.product.name,
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
                   color: colors.textPrimary,
                 ),
@@ -395,7 +383,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 formatPriceFx(price, currency),
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: colors.textPrimary,
                 ),
@@ -411,7 +398,6 @@ class OrderDetailsScreen extends ConsumerWidget {
               '-',
               style: TextStyle(
                 fontSize: 10,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textSecondary,
               ),
@@ -423,7 +409,6 @@ class OrderDetailsScreen extends ConsumerWidget {
               'X${item.quantity}',
               style: TextStyle(
                 fontSize: 10,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textSecondary,
               ),
@@ -456,7 +441,6 @@ class OrderDetailsScreen extends ConsumerWidget {
             'Shipments',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -492,7 +476,6 @@ class OrderDetailsScreen extends ConsumerWidget {
           '$provider • $serviceName',
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w600,
             color: colors.textPrimary,
           ),
@@ -502,7 +485,6 @@ class OrderDetailsScreen extends ConsumerWidget {
           'Status: $status',
           style: TextStyle(
             fontSize: 13,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -511,7 +493,6 @@ class OrderDetailsScreen extends ConsumerWidget {
           'Shipping Fee: ${formatPriceFx(shipment.shippingFee ?? 0, order.currency)}',
           style: TextStyle(
             fontSize: 13,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -521,7 +502,6 @@ class OrderDetailsScreen extends ConsumerWidget {
             'Return deadline: ${DateFormat('MMM d, yyyy h:mm a').format(shipment.returnDeadlineAt!.toLocal())}',
             style: TextStyle(
               fontSize: 13,
-              fontFamily: 'Campton',
               color: colors.textSecondary,
             ),
           ),
@@ -535,7 +515,6 @@ class OrderDetailsScreen extends ConsumerWidget {
               'Reason: ${returnRequest.reason}',
               style: TextStyle(
                 fontSize: 13,
-                fontFamily: 'Campton',
                 color: colors.textSecondary,
               ),
             ),
@@ -545,7 +524,6 @@ class OrderDetailsScreen extends ConsumerWidget {
               'Rejection: ${returnRequest.rejectionReason}',
               style: TextStyle(
                 fontSize: 13,
-                fontFamily: 'Campton',
                 color: colors.textSecondary,
               ),
             ),
@@ -562,7 +540,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 'Open return label',
                 style: TextStyle(
                   fontSize: 13,
-                  fontFamily: 'Campton',
                   color: colors.accent,
                   decoration: TextDecoration.underline,
                 ),
@@ -575,7 +552,6 @@ class OrderDetailsScreen extends ConsumerWidget {
               'Return tracking: ${returnRequest.buyerReturnTrackingNumber}',
               style: TextStyle(
                 fontSize: 13,
-                fontFamily: 'Campton',
                 color: colors.textSecondary,
               ),
             ),
@@ -586,7 +562,6 @@ class OrderDetailsScreen extends ConsumerWidget {
               'Approved. Use the return label to send the item back, then tap below once it has been handed to the courier.',
               style: TextStyle(
                 fontSize: 13,
-                fontFamily: 'Campton',
                 color: colors.textSecondary,
               ),
             ),
@@ -626,7 +601,6 @@ class OrderDetailsScreen extends ConsumerWidget {
             'Tracking Number: ${shipment.trackingNumber}',
             style: TextStyle(
               fontSize: 13,
-              fontFamily: 'Campton',
               color: colors.textSecondary,
             ),
           ),
@@ -683,7 +657,6 @@ class OrderDetailsScreen extends ConsumerWidget {
         config.label,
         style: TextStyle(
           fontSize: 12,
-          fontFamily: 'Campton',
           fontWeight: FontWeight.w600,
           color: config.foreground,
         ),
@@ -835,7 +808,6 @@ class OrderDetailsScreen extends ConsumerWidget {
             'Payment Details',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -849,7 +821,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                   'Payment Reference',
                   style: TextStyle(
                     fontSize: 10,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
                     color: colors.textSecondary,
                   ),
@@ -860,7 +831,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                     textAlign: TextAlign.right,
                     style: TextStyle(
                       fontSize: 10,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w700,
                       color: colors.textPrimary,
                     ),
@@ -877,7 +847,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 'Subtotal',
                 style: TextStyle(
                   fontSize: 10,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
                   color: colors.textSecondary,
                 ),
@@ -886,7 +855,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 formatPriceFx(subtotal < 0 ? 0 : subtotal, currency),
                 style: TextStyle(
                   fontSize: 10,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w700,
                   color: colors.textPrimary,
                 ),
@@ -901,7 +869,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 'Shipping',
                 style: TextStyle(
                   fontSize: 10,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
                   color: colors.textSecondary,
                 ),
@@ -910,7 +877,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 formatPriceFx(deliveryFee ?? 0, currency),
                 style: TextStyle(
                   fontSize: 10,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w700,
                   color: colors.textPrimary,
                 ),
@@ -926,7 +892,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                   'Payment Status',
                   style: TextStyle(
                     fontSize: 10,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
                     color: colors.textSecondary,
                   ),
@@ -935,7 +900,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                   paymentStatus,
                   style: TextStyle(
                     fontSize: 10,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
                     color: colors.textPrimary,
                   ),
@@ -951,7 +915,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 'Total Price',
                 style: TextStyle(
                   fontSize: 10,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
                   color: colors.textSecondary,
                 ),
@@ -960,7 +923,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                 formatPriceFx(total, currency),
                 style: TextStyle(
                   fontSize: 10,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w700,
                   color: colors.textPrimary,
                 ),
@@ -985,7 +947,6 @@ class OrderDetailsScreen extends ConsumerWidget {
                       'Rate: 1 ${currency} = ${formatPrice(exchangeRate)} NGN  •  NGN equivalent: ${formatPrice(originalAmountNgn)}',
                       style: TextStyle(
                         fontSize: 11,
-                        fontFamily: 'Campton',
                         color: colors.textSecondary,
                       ),
                     ),

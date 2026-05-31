@@ -104,7 +104,6 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
                     color: colors.textPrimary,
-                    fontFamily: 'Campton',
                   ),
                 ),
                 if (badge != null) ...[
@@ -163,7 +162,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
           Icon(Icons.search, color: colors.textTertiary, size: 20),
           const SizedBox(width: 12),
           Text(
-            "search Ojá-Ẹwà",
+            "search WAWUBeauty",
             style: TextStyle(color: colors.textTertiary, fontSize: 16),
           ),
         ],
@@ -437,12 +436,12 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFFDAF40), Color(0xFFFFCC80)],
+            colors: [Color(0xFF111111), Color(0xFF2E2E2E)],
           ),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFDAF40).withValues(alpha: 0.3),
+              color: const Color(0xFF111111).withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -467,7 +466,6 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
                     'AI Analytics',
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
@@ -477,7 +475,6 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
                     'Smart inventory & trend predictions',
                     style: TextStyle(
                       fontSize: 12,
-                      fontFamily: 'Campton',
                       color: Colors.white70,
                     ),
                   ),

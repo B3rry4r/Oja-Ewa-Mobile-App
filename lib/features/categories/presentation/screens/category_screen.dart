@@ -103,7 +103,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             textAlign: TextAlign.center,
@@ -114,7 +113,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              fontFamily: 'Campton',
               color: colors.textSecondary,
               height: 1.4,
             ),
@@ -180,7 +178,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
-                fontFamily: 'Campton',
                 color: colors.textSecondary,
               ),
             ),
@@ -235,7 +232,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'Campton',
                       color: colors.textPrimary,
                     ),
                   ),
@@ -298,7 +294,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  fontFamily: 'Campton',
                   color: colors.textPrimary,
                 ),
               ),

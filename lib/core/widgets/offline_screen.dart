@@ -30,7 +30,6 @@ class OfflineScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Campton',
                     color: colors.textPrimary,
                   ),
                   textAlign: TextAlign.center,
@@ -40,7 +39,6 @@ class OfflineScreen extends StatelessWidget {
                   'Connect to the internet to continue. We\'ll refresh automatically when you\'re back online.',
                   style: TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Campton',
                     color: colors.textTertiary,
                   ),
                   textAlign: TextAlign.center,
@@ -64,7 +62,6 @@ class OfflineScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'Campton',
                     ),
                   ),
                 ),

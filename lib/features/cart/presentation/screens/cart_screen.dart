@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/features/cart/domain/cart.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
 
@@ -36,6 +38,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final hasError = ref.watch(cartProvider).hasError && cart == null;
 
     return AppPageScaffold(
+      title: 'Cart',
       showActions: false,
       bottomBar: _CheckoutSection(cart: cart),
       child: isInitialLoading
@@ -43,7 +46,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           : hasError
           ? const Center(child: Text('Failed to load cart'))
           : cart == null
-          ? const Center(child: Text('Your cart is empty.'))
+          ? const WBEmptyState(
+              illustration: WBEmptyIllustration.noProducts,
+              label: 'Your cart is empty',
+              sub: 'Browse the marketplace and add items to your cart.',
+            )
           : _CartBody(cart: cart),
     );
   }
@@ -58,17 +65,10 @@ class _CartBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     if (cart.items.isEmpty) {
-      return Center(
-        child: Text(
-          'Your cart is empty.',
-          style: TextStyle(
-            fontSize: 16,
-            fontFamily: 'Campton',
-            fontWeight: FontWeight.w400,
-            color: colors.textPrimary,
-          ),
-          textAlign: TextAlign.center,
-        ),
+      return const WBEmptyState(
+        illustration: WBEmptyIllustration.noProducts,
+        label: 'Your cart is empty',
+        sub: 'Browse the marketplace and add items to your cart.',
       );
     }
 
@@ -254,7 +254,6 @@ class _CartRow extends ConsumerWidget {
                         cartItem.processingTimeLabel!,
                         style: TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Campton',
                           color: colors.textSecondary,
                           height: 1.0,
                         ),
@@ -511,41 +510,14 @@ class _CheckoutSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              GestureDetector(
-                onTap: isEmpty
-                    ? null
-                    : () {
-                        Navigator.of(
-                          context,
-                        ).pushNamed(AppRoutes.orderConfirmation);
-                      },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  decoration: BoxDecoration(
-                    color: isEmpty ? colors.borderStrong : colors.accent,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: isEmpty
-                        ? null
-                        : [
-                            BoxShadow(
-                              color: colors.accent.withValues(alpha: 0.3),
-                              blurRadius: 16,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Checkout',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: colors.onAccent,
-                      ),
-                    ),
-                  ),
-                ),
+              WBButton(
+                label: 'Checkout',
+                fullWidth: true,
+                size: WBButtonSize.lg,
+                disabled: isEmpty,
+                onPressed: () {
+                  Navigator.of(context).pushNamed(AppRoutes.orderConfirmation);
+                },
               ),
               const SizedBox(height: 16),
             ],

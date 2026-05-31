@@ -51,7 +51,6 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 Text(
                   'Reset password',
                   style: TextStyle(
-                    fontFamily: 'Campton',
                     fontSize: 33,
                     fontWeight: FontWeight.w600,
                     height: 1.2,
@@ -66,7 +65,6 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 Text(
                   'Enter your registered email',
                   style: TextStyle(
-                    fontFamily: 'Campton',
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     height: 1.3,
@@ -234,7 +232,6 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
               : Text(
                   'Send code',
                   style: TextStyle(
-                    fontFamily: 'Campton',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     height: 1.2,

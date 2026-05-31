@@ -200,7 +200,6 @@ class _VerificationCodeScreenState
           style: TextStyle(
             fontSize: 33,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Campton',
             color: colors.textPrimary,
           ),
         ),
@@ -210,7 +209,6 @@ class _VerificationCodeScreenState
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
             height: 1.4,
           ),
@@ -236,7 +234,6 @@ class _VerificationCodeScreenState
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -289,7 +286,6 @@ class _VerificationCodeScreenState
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textTertiary,
           ),
         ),
@@ -306,7 +302,6 @@ class _VerificationCodeScreenState
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  fontFamily: 'Campton',
                   color: colors.accent,
                 ),
               ),
@@ -350,7 +345,6 @@ class _VerificationCodeScreenState
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'Campton',
                 color: isComplete
                     ? colors.onAccent
                     : colors.onAccent.withValues(alpha: 0.6),

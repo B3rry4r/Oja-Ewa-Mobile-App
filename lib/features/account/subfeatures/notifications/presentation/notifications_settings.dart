@@ -199,7 +199,6 @@ class _NotificationsSettingsScreenState
               'Allow Push Notifications',
               style: TextStyle(
                 fontSize: 16,
-                fontFamily: 'Campton',
                 color: colors.textPrimary,
               ),
             ),

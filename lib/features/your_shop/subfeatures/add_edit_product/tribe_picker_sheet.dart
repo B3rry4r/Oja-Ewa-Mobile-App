@@ -47,7 +47,6 @@ class TribePickerSheet extends StatelessWidget {
                         'Select tribe',
                         style: TextStyle(
                           fontSize: 20,
-                          fontFamily: 'Campton',
                           fontWeight: FontWeight.w600,
                           color: colors.textPrimary,
                         ),
@@ -94,7 +93,6 @@ class TribePickerSheet extends StatelessWidget {
                             t,
                             style: TextStyle(
                               fontSize: 16,
-                              fontFamily: 'Campton',
                               fontWeight: FontWeight.w400,
                               color: colors.textPrimary,
                             ),

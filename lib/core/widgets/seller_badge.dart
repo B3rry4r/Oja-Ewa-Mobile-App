@@ -108,7 +108,6 @@ class SellerBadge extends StatelessWidget {
               fontSize: 11,
               fontWeight: FontWeight.w500,
               color: fg,
-              fontFamily: 'Campton',
             ),
           ),
         ],
