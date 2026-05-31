@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -243,51 +245,114 @@ class _OrderConfirmationScreenState
         children: [
           Text(
             'Shipping Options',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: colors.textPrimary,
-            ),
+            style: WBTypography.section.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 12),
-          LinearProgressIndicator(color: colors.accent),
+          // Skeleton cards while fetching couriers (clearer than a thin bar).
+          for (var i = 0; i < 2; i++) ...[
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: WBColors.surfaceCard,
+                borderRadius: BorderRadius.circular(WBRadius.card),
+                boxShadow: WBShadows.card,
+              ),
+              child: Row(
+                children: [
+                  const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation(WBColors.surfaceDark),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(height: 12, width: 140, decoration: BoxDecoration(color: WBColors.bgSoft, borderRadius: BorderRadius.circular(6))),
+                        const SizedBox(height: 8),
+                        Container(height: 10, width: 90, decoration: BoxDecoration(color: WBColors.bgSoft, borderRadius: BorderRadius.circular(6))),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          Text(
+            'Fetching delivery options…',
+            style: WBTypography.caption.copyWith(color: WBColors.fgSecondary),
+          ),
         ],
       ),
-      error: (error, _) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Shipping Options',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: colors.textPrimary,
+      error: (error, _) {
+        final raw = error.toString();
+        final msg = raw.length > 200 ? '${raw.substring(0, 200)}…' : raw;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Shipping Options',
+              style: WBTypography.section.copyWith(fontWeight: FontWeight.w700),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Failed to load shipping options: $error',
-            style: const TextStyle(color: Color(0xFFB3261E)),
-          ),
-          const SizedBox(height: 8),
-          TextButton.icon(
-            onPressed: () {
-              final req = ref.read(logisticsQuoteRequestProvider(selectedAddress));
-              if (req != null) {
-                ref.invalidate(logisticsQuotesProvider(req));
-              }
-            },
-            icon: const Icon(Icons.refresh, size: 18),
-            label: const Text('Retry'),
-            style: TextButton.styleFrom(
-              foregroundColor: colors.accent,
-              padding: EdgeInsets.zero,
-              minimumSize: const Size(0, 32),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0x14EF4444),
+                borderRadius: BorderRadius.circular(WBRadius.card),
+                border: Border.all(color: const Color(0x33EF4444)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.error_outline,
+                          size: 18, color: WBColors.statusErrorFg),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          "Couldn't load delivery options",
+                          style: WBTypography.body.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: WBColors.statusErrorFg,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    msg,
+                    style: WBTypography.caption.copyWith(
+                      color: WBColors.statusErrorFg,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  WBButton(
+                    label: 'Retry',
+                    icon: WBIconName.arrowRight,
+                    size: WBButtonSize.sm,
+                    variant: WBButtonVariant.danger,
+                    onPressed: () {
+                      final req = ref
+                          .read(logisticsQuoteRequestProvider(selectedAddress));
+                      if (req != null) {
+                        ref.invalidate(logisticsQuotesProvider(req));
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
       data: (groups) {
         _syncSelectedQuotes(groups);
 

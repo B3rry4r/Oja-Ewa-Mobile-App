@@ -67,16 +67,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   void _performSearch() {
     final query = _searchController.text.trim();
-    if (query.isEmpty) return;
+    final hasCategory = _selectedCategoryType != 'all';
+    // Allow browsing by category alone (tap a chip) even with no typed query.
+    if (query.isEmpty && !hasCategory) return;
 
     _focusNode.unfocus();
     ref
         .read(searchResultsProvider.notifier)
         .search(
           query: query,
-          categoryType: _selectedCategoryType == 'all'
-              ? null
-              : _selectedCategoryType,
+          categoryType: hasCategory ? _selectedCategoryType : null,
         );
   }
 
@@ -174,7 +174,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     active: isSelected,
                     onTap: () {
                       setState(() => _selectedCategoryType = type['key']!);
-                      if (_searchController.text.trim().isNotEmpty) {
+                      // Tapping a category browses it immediately (no typing
+                      // required); 'All' with no query just clears results.
+                      if (type['key'] == 'all' &&
+                          _searchController.text.trim().isEmpty) {
+                        ref.read(searchResultsProvider.notifier).clear();
+                      } else {
                         _performSearch();
                       }
                     },
