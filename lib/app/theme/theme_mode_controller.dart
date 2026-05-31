@@ -8,5 +8,5 @@ final appThemeModeProvider =
 
 class AppThemeModeController extends Notifier<ThemeMode> {
   @override
-  ThemeMode build() => ThemeMode.dark;
+  ThemeMode build() => ThemeMode.light;
 }

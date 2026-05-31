@@ -34,39 +34,31 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
   final Color iconBackground;
   final Color shadow;
 
+  /// WAWUBeauty monochrome light palette, bridged onto the legacy
+  /// [AppThemeColors] field names so every screen still reading
+  /// `context.appColors` inherits the WAWUBasket look without per-screen
+  /// changes. `accent` maps to the near-black primary-action surface, and
+  /// `onAccent` flips to white accordingly.
   static const light = AppThemeColors(
-    background: Color(0xFFF7F4EF),
-    surface: Color(0xFFFFFFFF),
-    surfaceSecondary: Color(0xFFF1ECE4),
-    surfaceElevated: Color(0xFFFFFFFF),
-    textPrimary: Color(0xFF111111),
-    textSecondary: Color(0xFF4C4C4C),
-    textTertiary: Color(0xFF7A7A7A),
-    border: Color(0xFFE0DED9),
-    borderStrong: Color(0xFFB9B3A9),
-    accent: Color(0xFFFDAF40),
-    accentSoft: Color(0xFFFFE4B8),
-    onAccent: Color(0xFF111111),
+    background: Color(0xFFFFFFFF), // WBColors.bgPrimary
+    surface: Color(0xFFFFFFFF), // WBColors.surfaceCard
+    surfaceSecondary: Color(0xFFF7F7F7), // WBColors.bgSecondary
+    surfaceElevated: Color(0xFFFFFFFF), // WBColors.surfaceCard
+    textPrimary: Color(0xFF1A1A1A), // WBColors.fgHeader
+    textSecondary: Color(0xFF4A4A4A), // WBColors.fgSecondary
+    textTertiary: Color(0xFF7A7A7A), // WBColors.fgPlaceholder
+    border: Color(0xFFE4E4E4), // WBColors.bgDivider
+    borderStrong: Color(0xFFD4D4D4), // WBColors.borderFilled
+    accent: Color(0xFF111111), // WBColors.surfaceDark
+    accentSoft: Color(0xFFEFEFEF), // WBColors.bgSoft
+    onAccent: Color(0xFFFFFFFF),
     iconBackground: Color(0xFFFFFFFF),
-    shadow: Color(0x14000000),
+    shadow: Color(0x0A000000), // soft single-layer shadow
   );
 
-  static const dark = AppThemeColors(
-    background: Color(0xFF050505),
-    surface: Color(0xFF111111),
-    surfaceSecondary: Color(0xFF181818),
-    surfaceElevated: Color(0xFF1D1D1D),
-    textPrimary: Color(0xFFF7F7F7),
-    textSecondary: Color(0xFFD0D0D0),
-    textTertiary: Color(0xFFA0A0A0),
-    border: Color(0xFF2A2A2A),
-    borderStrong: Color(0xFF494949),
-    accent: Color(0xFFFDAF40),
-    accentSoft: Color(0xFF4B3210),
-    onAccent: Color(0xFF111111),
-    iconBackground: Color(0xFF141414),
-    shadow: Color(0x66000000),
-  );
+  /// Dark intentionally mirrors [light]: WAWUBeauty is a light-mode-first
+  /// app, so even if a dark path is requested the UI stays monochrome light.
+  static const dark = light;
 
   @override
   AppThemeColors copyWith({

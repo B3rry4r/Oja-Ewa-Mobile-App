@@ -1,54 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app_theme_colors.dart';
+import '../../core/theme/wb_theme_exports.dart';
 
 /// App-wide theming.
 ///
-/// Keep this file stable and build on it over time (color scheme, typography,
-/// component themes, etc).
+/// WAWUBeauty is a light-mode-first, monochrome app that mirrors the
+/// WAWUBasket design system. Both [light] and [dark] return the same light
+/// theme so the app never renders a dark surface, regardless of the requested
+/// [ThemeMode]. The legacy [AppThemeColors] extension is still attached so
+/// screens reading `context.appColors` keep working.
 abstract class AppTheme {
-  static ThemeData light() {
+  static ThemeData light() => _build();
+  static ThemeData dark() => _build();
+
+  static ThemeData _build() {
     const colors = AppThemeColors.light;
-    final colorScheme = const ColorScheme(
-      brightness: Brightness.light,
-      primary: Color(0xFFFDAF40),
-      onPrimary: Color(0xFF111111),
-      secondary: Color(0xFFFDAF40),
-      onSecondary: Color(0xFF111111),
-      error: Color(0xFFB3261E),
-      onError: Colors.white,
-      surface: Color(0xFFFFFFFF),
-      onSurface: Color(0xFF111111),
-    );
-
     final base = ThemeData(
       useMaterial3: true,
-      fontFamily: 'Campton',
       brightness: Brightness.light,
-      colorScheme: colorScheme,
-      scaffoldBackgroundColor: colors.background,
-      dividerColor: colors.border,
+      scaffoldBackgroundColor: WBColors.bgPrimary,
+      primaryColor: WBColors.surfaceDark,
+      dividerColor: WBColors.bgDivider,
       extensions: const [colors],
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: Color(0xFFFDAF40),
+      colorScheme: const ColorScheme.light(
+        primary: WBColors.surfaceDark,
+        onPrimary: Colors.white,
+        secondary: WBColors.fgHeader,
+        onSecondary: Colors.white,
+        surface: WBColors.surfaceCard,
+        onSurface: WBColors.fgPrimary,
+        error: WBColors.statusError,
+        onError: Colors.white,
       ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
+      textTheme: GoogleFonts.albertSansTextTheme().apply(
+        bodyColor: WBColors.fgPrimary,
+        displayColor: WBColors.fgHeader,
+      ),
+      splashFactory: InkRipple.splashFactory,
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: WBColors.surfaceDark,
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: WBColors.bgPrimary,
+        foregroundColor: WBColors.fgHeader,
         elevation: 0,
         scrolledUnderElevation: 0,
+        centerTitle: true,
+        titleTextStyle: WBTypography.cardTitle,
       ),
       cardTheme: CardThemeData(
-        color: colors.surface,
+        color: WBColors.surfaceCard,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: false,
-        hintStyle: TextStyle(color: colors.textTertiary),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(WBRadius.card),
         ),
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        filled: false,
+        hintStyle: TextStyle(color: WBColors.fgPlaceholder),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: InputBorder.none,
         enabledBorder: InputBorder.none,
         focusedBorder: InputBorder.none,
@@ -58,111 +70,36 @@ abstract class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: colors.textPrimary,
-          side: BorderSide(color: colors.border),
+          foregroundColor: WBColors.fgHeader,
+          side: const BorderSide(color: WBColors.borderFilled),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(WBRadius.button),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: colors.accent,
-          foregroundColor: colors.onAccent,
+          backgroundColor: WBColors.surfaceDark,
+          foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(WBRadius.button),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         ),
+      ),
+      textSelectionTheme: const TextSelectionThemeData(
+        cursorColor: WBColors.fgHeader,
+        selectionColor: Color(0x33111111),
+        selectionHandleColor: WBColors.fgHeader,
       ),
     );
 
     return base.copyWith(
       textTheme: base.textTheme.apply(
-        bodyColor: colors.textPrimary,
-        displayColor: colors.textPrimary,
-      ),
-    );
-  }
-
-  static ThemeData dark() {
-    const colors = AppThemeColors.dark;
-    final colorScheme = const ColorScheme(
-      brightness: Brightness.dark,
-      primary: Color(0xFFFDAF40),
-      onPrimary: Color(0xFF111111),
-      secondary: Color(0xFFFDAF40),
-      onSecondary: Color(0xFF111111),
-      error: Color(0xFFF2B8B5),
-      onError: Color(0xFF601410),
-      surface: Color(0xFF111111),
-      onSurface: Color(0xFFF7F7F7),
-    );
-
-    final base = ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      fontFamily: 'Campton',
-      colorScheme: colorScheme,
-      scaffoldBackgroundColor: colors.background,
-      dividerColor: colors.border,
-      extensions: const [colors],
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: Color(0xFFFDAF40),
-      ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-      ),
-      cardTheme: CardThemeData(
-        color: colors.surface,
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: false,
-        hintStyle: TextStyle(color: colors.textTertiary),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-        border: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        focusedBorder: InputBorder.none,
-        disabledBorder: InputBorder.none,
-        errorBorder: InputBorder.none,
-        focusedErrorBorder: InputBorder.none,
-      ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: colors.textPrimary,
-          side: BorderSide(color: colors.border),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: colors.accent,
-          foregroundColor: colors.onAccent,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-        ),
-      ),
-    );
-
-    return base.copyWith(
-      textTheme: base.textTheme.apply(
-        bodyColor: colors.textPrimary,
-        displayColor: colors.textPrimary,
+        bodyColor: WBColors.fgPrimary,
+        displayColor: WBColors.fgHeader,
       ),
     );
   }
