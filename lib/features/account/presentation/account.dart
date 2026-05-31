@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
@@ -45,26 +46,11 @@ class AccountScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           profile.when(
-            loading: () => const Text(
-              'Hello',
-              style: TextStyle(
-                fontSize: 33,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            error: (e, st) => const Text(
-              'Hello',
-              style: TextStyle(
-                fontSize: 33,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            loading: () => Text('Hello', style: WBTypography.hero.copyWith(fontSize: 30)),
+            error: (e, st) => Text('Hello', style: WBTypography.hero.copyWith(fontSize: 30)),
             data: (u) => Text(
               'Hello ${u?.fullName ?? 'Guest'}',
-              style: const TextStyle(
-                fontSize: 33,
-                fontWeight: FontWeight.w600,
-              ),
+              style: WBTypography.hero.copyWith(fontSize: 30),
             ),
           ),
 
