@@ -375,7 +375,7 @@ class PusherListeners {
       title: 'Cart Synced',
       message: 'Your cart has been updated ($itemsCount items)',
       icon: Icons.shopping_cart,
-      backgroundColor: const Color(0xFFFDAF40),
+      backgroundColor: const Color(0xFF111111),
       onTap: () {
         Navigator.of(context).popUntil((route) => route.isFirst);
       },
@@ -394,7 +394,7 @@ class PusherListeners {
       InAppNotification.show(
         context,
         title: '🎉 Seller Account Approved!',
-        message: '$businessName is now live on Ojaewa!',
+        message: '$businessName is now live on WAWUBeauty!',
         icon: Icons.celebration,
         backgroundColor: const Color(0xFF28A745),
         onTap: () {
@@ -461,7 +461,7 @@ class PusherListeners {
       title: '🛍️ New Order Received!',
       message: 'Order #$orderId from $buyerName',
       icon: Icons.notifications_active,
-      backgroundColor: const Color(0xFFFDAF40),
+      backgroundColor: const Color(0xFF111111),
       onTap: () {
         Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
       },

@@ -16,8 +16,8 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 /// Android notification channel for high-importance foreground notifications
 const AndroidNotificationChannel _channel = AndroidNotificationChannel(
   'ojaewa_high_importance_channel',
-  'Ojaewa Notifications',
-  description: 'This channel is used for important Ojaewa notifications.',
+  'WAWUBeauty Notifications',
+  description: 'This channel is used for important WAWUBeauty notifications.',
   importance: Importance.max,
   playSound: true,
   enableVibration: true,

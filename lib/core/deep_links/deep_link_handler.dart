@@ -398,7 +398,7 @@ if (uri.host == 'nepc') {
                     width: 40,
                     height: 40,
                     child: CircularProgressIndicator(
-                      color: Color(0xFFFDAF40),
+                      color: Color(0xFF111111),
                       strokeWidth: 3,
                     ),
                   ),
@@ -524,12 +524,12 @@ if (uri.host == 'nepc') {
                             child: Container(
                               height: 57,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFDAF40),
+                                color: const Color(0xFF111111),
                                 borderRadius: BorderRadius.circular(8),
                                 boxShadow: [
                                   BoxShadow(
                                     color: const Color(
-                                      0xFFFDAF40,
+                                      0xFF111111,
                                     ).withValues(alpha: 0.4),
                                     blurRadius: 16,
                                     offset: const Offset(0, 8),
@@ -632,12 +632,12 @@ if (uri.host == 'nepc') {
                         width: double.infinity,
                         height: 57,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40),
+                          color: const Color(0xFF111111),
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(
-                                0xFFFDAF40,
+                                0xFF111111,
                               ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
@@ -737,12 +737,12 @@ if (uri.host == 'nepc') {
                         width: double.infinity,
                         height: 57,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40),
+                          color: const Color(0xFF111111),
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(
-                                0xFFFDAF40,
+                                0xFF111111,
                               ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
@@ -842,12 +842,12 @@ if (uri.host == 'nepc') {
                         width: double.infinity,
                         height: 57,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40),
+                          color: const Color(0xFF111111),
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(
-                                0xFFFDAF40,
+                                0xFF111111,
                               ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
@@ -941,12 +941,12 @@ if (uri.host == 'nepc') {
                         width: double.infinity,
                         height: 57,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40),
+                          color: const Color(0xFF111111),
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(
-                                0xFFFDAF40,
+                                0xFF111111,
                               ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
@@ -1040,12 +1040,12 @@ if (uri.host == 'nepc') {
                         width: double.infinity,
                         height: 57,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFDAF40),
+                          color: const Color(0xFF111111),
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(
-                                0xFFFDAF40,
+                                0xFF111111,
                               ).withValues(alpha: 0.4),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
