@@ -137,11 +137,11 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'At Ojá-Ẹwà your trust is our foundation. Every product on Ojá-Ẹwà must pass our verification for authenticity and craftsmanship.\n\n'
+            'At WAWUBeauty your trust is our foundation. Every product on WAWUBeauty must pass our verification for authenticity and craftsmanship.\n\n'
             'We guarantee: If a newly registered brand/product fails our review and does not meet our published Quality Standards, its registration fee will be fully refunded.\n\n'
             'We invest in your success by ensuring only excellence reaches our marketplace.\n\n'
             'Based on who you be, we ensure what you sell is worthy.\n\n'
-            'The Ojá-Ẹwà Team',
+            'The WAWUBeauty Team',
             style: TextStyle(
               fontSize: 13,
               color: colors.textSecondary,

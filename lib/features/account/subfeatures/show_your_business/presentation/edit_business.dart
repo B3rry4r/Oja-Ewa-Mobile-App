@@ -190,19 +190,19 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 'Business Name',
-                'Oja Ewa Academy',
+                'WAWUBeauty Academy',
                 controller: _businessNameController,
               ),
               const SizedBox(height: 16),
               _buildTextField(
                 'Legal Business Name',
-                'Oja Ewa Academy Ltd',
+                'WAWUBeauty Academy Ltd',
                 controller: _legalBusinessNameController,
               ),
               const SizedBox(height: 16),
               _buildTextField(
                 'Trading Name',
-                'Oja Ewa Academy',
+                'WAWUBeauty Academy',
                 controller: _tradingNameController,
               ),
               const SizedBox(height: 16),
@@ -437,21 +437,21 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
               _buildCheckTile(
                 value: _declarationAuthorizeVerification,
                 label:
-                    'I authorize Ojaewa to verify this information with third parties.',
+                    'I authorize WAWUBeauty to verify this information with third parties.',
                 onChanged: (value) =>
                     setState(() => _declarationAuthorizeVerification = value),
               ),
               _buildCheckTile(
                 value: _authorizeSettlementAccount,
                 label:
-                    'I authorize Ojaewa to open a settlement account for me.',
+                    'I authorize WAWUBeauty to open a settlement account for me.',
                 onChanged: (value) =>
                     setState(() => _authorizeSettlementAccount = value),
               ),
               _buildCheckTile(
                 value: _acceptPartnerBankTerms,
                 label:
-                    'I accept Ojaewa partner bank terms of service and corporate account agreement.',
+                    'I accept WAWUBeauty partner bank terms of service and corporate account agreement.',
                 onChanged: (value) =>
                     setState(() => _acceptPartnerBankTerms = value),
               ),

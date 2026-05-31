@@ -96,7 +96,7 @@ class AccountScreen extends ConsumerWidget {
           ],
 
           const SizedBox(height: 24),
-          _buildSectionHeader(context, 'Ojá-Ẹwà Business'),
+          _buildSectionHeader(context, 'WAWUBeauty Business'),
           _buildBusinessList(context, ref),
 
           const SizedBox(height: 24),

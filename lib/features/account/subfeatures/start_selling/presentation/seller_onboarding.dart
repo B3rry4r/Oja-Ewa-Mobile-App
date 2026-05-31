@@ -63,7 +63,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
           const SizedBox(height: 32),
 
           Text(
-            'Sell on Ojá-Ẹwà',
+            'Sell on WAWUBeauty',
             style: TextStyle(
               fontSize: 33,
               fontWeight: FontWeight.w600,
@@ -74,7 +74,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
           const SizedBox(height: 16),
 
           Text(
-            'Tell your Story on Ojá-Ẹwà. Where makers build their legacy. List your work, tell your story, reach the world.',
+            'Tell your Story on WAWUBeauty. Where makers build their legacy. List your work, tell your story, reach the world.',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w400,
@@ -140,11 +140,11 @@ class SellerOnboardingScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'At Ojá-Ẹwà your trust is our foundation. Every product on Ojá-Ẹwà must pass our verification for authenticity and craftsmanship.\n\n'
+            'At WAWUBeauty your trust is our foundation. Every product on WAWUBeauty must pass our verification for authenticity and craftsmanship.\n\n'
             'We guarantee: If a newly registered brand/product fails our review and does not meet our published Quality Standards, its registration fee will be fully refunded.\n\n'
             'We invest in your success by ensuring only excellence reaches our marketplace.\n\n'
             'Based on who you be, we ensure what you sell is worthy.\n\n'
-            'The Ojá-Ẹwà Team',
+            'The WAWUBeauty Team',
             style: TextStyle(
               fontSize: 13,
               color: colors.textSecondary,
@@ -165,7 +165,7 @@ class SellerOnboardingScreen extends ConsumerWidget {
       ),
       HowItWorksStep(
         number: '2',
-        description: 'Wait for Ojá-Ẹwà to approve your details',
+        description: 'Wait for WAWUBeauty to approve your details',
       ),
       HowItWorksStep(
         number: '3',

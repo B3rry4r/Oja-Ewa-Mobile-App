@@ -162,7 +162,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
           Icon(Icons.search, color: colors.textTertiary, size: 20),
           const SizedBox(width: 12),
           Text(
-            "search Ojá-Ẹwà",
+            "search WAWUBeauty",
             style: TextStyle(color: colors.textTertiary, fontSize: 16),
           ),
         ],

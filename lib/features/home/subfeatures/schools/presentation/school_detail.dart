@@ -643,7 +643,7 @@ class SchoolDetailScreen extends ConsumerWidget {
             const SizedBox(height: 8),
 
             Text(
-              'Register via Ojá-Ẹwà and have access to sell or showcase on Ojá-Ẹwà after graduation without payment or Register via the school website without the above benefit',
+              'Register via WAWUBeauty and have access to sell or showcase on WAWUBeauty after graduation without payment or Register via the school website without the above benefit',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
@@ -654,7 +654,7 @@ class SchoolDetailScreen extends ConsumerWidget {
 
             const SizedBox(height: 16),
 
-            // Register via Ojá-Ẹwà Button
+            // Register via WAWUBeauty Button
             SizedBox(
               width: double.infinity,
               height: 57,
@@ -677,7 +677,7 @@ class SchoolDetailScreen extends ConsumerWidget {
                   shadowColor: colors.accent.withValues(alpha: 0.3),
                 ),
                 child: Text(
-                  'Register via Ojá-Ẹwà',
+                  'Register via WAWUBeauty',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

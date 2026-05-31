@@ -44,7 +44,7 @@ class BusinessOnboardingScreen extends ConsumerWidget {
           const SizedBox(height: 16),
 
           Text(
-            "Share your Business Heritage on Ojá-Ẹwà",
+            "Share your Business Heritage on WAWUBeauty",
             style: TextStyle(
               fontSize: 33,
               fontWeight: FontWeight.w600,
@@ -87,7 +87,7 @@ class BusinessOnboardingScreen extends ConsumerWidget {
                 _buildStepRow(
                   context,
                   "2",
-                  "Wait for Ojá-Ẹwà to approve your details",
+                  "Wait for WAWUBeauty to approve your details",
                 ),
                 _buildStepRow(
                   context,

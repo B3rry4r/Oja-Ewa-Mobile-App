@@ -187,7 +187,7 @@ class _NepcServicesScreenState extends ConsumerState<NepcServicesScreen> {
             _Field(
               controller: _businessNameController,
               label: 'Business name',
-              hint: 'Oja Ewa Exports Ltd',
+              hint: 'WAWUBeauty Exports Ltd',
             ),
             const SizedBox(height: 12),
             _Field(

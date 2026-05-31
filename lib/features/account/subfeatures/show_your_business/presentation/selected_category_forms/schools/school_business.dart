@@ -210,20 +210,20 @@ class _SchoolBusinessDetailsScreenState
           _buildCheckTile(
             value: _declarationAuthorizeVerification,
             label:
-                'I authorize Ojaewa to verify this information with third parties.',
+                'I authorize WAWUBeauty to verify this information with third parties.',
             onChanged: (value) =>
                 setState(() => _declarationAuthorizeVerification = value),
           ),
           _buildCheckTile(
             value: _authorizeSettlementAccount,
-            label: 'I authorize Ojaewa to open a settlement account for me.',
+            label: 'I authorize WAWUBeauty to open a settlement account for me.',
             onChanged: (value) =>
                 setState(() => _authorizeSettlementAccount = value),
           ),
           _buildCheckTile(
             value: _acceptPartnerBankTerms,
             label:
-                'I accept Ojaewa partner bank terms of service and corporate account agreement.',
+                'I accept WAWUBeauty partner bank terms of service and corporate account agreement.',
             onChanged: (value) =>
                 setState(() => _acceptPartnerBankTerms = value),
           ),

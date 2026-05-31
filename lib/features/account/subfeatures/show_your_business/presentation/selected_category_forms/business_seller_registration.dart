@@ -224,19 +224,19 @@ class _BusinessSellerRegistrationScreenState
           const SizedBox(height: 16),
           _buildTextInput(
             'Business Name',
-            'Oja Ewa Academy',
+            'WAWUBeauty Academy',
             controller: _businessNameController,
           ),
           const SizedBox(height: 16),
           _buildTextInput(
             'Legal Business Name',
-            'Oja Ewa Academy Ltd',
+            'WAWUBeauty Academy Ltd',
             controller: _legalBusinessNameController,
           ),
           const SizedBox(height: 16),
           _buildTextInput(
             'Trading Name',
-            'Oja Ewa Academy',
+            'WAWUBeauty Academy',
             controller: _tradingNameController,
           ),
           const SizedBox(height: 16),
