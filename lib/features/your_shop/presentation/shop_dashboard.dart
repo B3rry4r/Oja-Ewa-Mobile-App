@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/widgets/seller_badge.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
@@ -142,28 +144,23 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
   }
 
   Widget _buildSearchBar() {
-    final colors = context.appColors;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 18),
       decoration: BoxDecoration(
-        color: colors.surfaceElevated,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colors.border),
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadow.withValues(alpha: 0.18),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: WBColors.surfaceInput,
+        borderRadius: BorderRadius.circular(WBRadius.input),
       ),
       child: Row(
         children: [
-          Icon(Icons.search, color: colors.textTertiary, size: 20),
+          const WBIcon(WBIconName.search, size: 20),
           const SizedBox(width: 12),
           Text(
-            "search WAWUBeauty",
-            style: TextStyle(color: colors.textTertiary, fontSize: 16),
+            'Search your shop',
+            style: WBTypography.body.copyWith(
+              color: WBColors.fgPlaceholder,
+              fontSize: 16,
+            ),
           ),
         ],
       ),
@@ -211,18 +208,11 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: colors.surfaceElevated,
+            color: WBColors.surfaceCard,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: colors.border),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow.withValues(alpha: 0.18),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            boxShadow: WBShadows.card,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

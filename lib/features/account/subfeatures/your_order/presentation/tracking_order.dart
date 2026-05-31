@@ -582,9 +582,9 @@ List<TimelineStep> _timelineFromStages(
       timestamp: timestamp,
       isCompleted: isActive,
       isCurrent: isActive,
-      dotColor: isActive ? const Color(0xFF111111) : const Color(0xFF494949),
-      textColor: isActive ? const Color(0xFFF7F7F7) : const Color(0xFFBEBEBE),
-      timeColor: isActive ? const Color(0xFFA0A0A0) : const Color(0xFF6B6B6B),
+      dotColor: isActive ? const Color(0xFF111111) : const Color(0xFFE4E4E4),
+      textColor: isActive ? const Color(0xFF1A1A1A) : const Color(0xFFA0A0A0),
+      timeColor: const Color(0xFF7A7A7A),
     );
   }).toList();
 
@@ -668,8 +668,8 @@ TimelineStep _timelineStepShared(
     timestamp: isCompleted ? 'Completed' : '—',
     isCompleted: isCompleted,
     isCurrent: isCurrent,
-    dotColor: isCompleted ? const Color(0xFF111111) : const Color(0xFFE9E9E9),
-    textColor: isCompleted ? const Color(0xFFF7F7F7) : const Color(0xFFBEBEBE),
-    timeColor: isCompleted ? const Color(0xFFA0A0A0) : const Color(0xFF6B6B6B),
+    dotColor: isCompleted ? const Color(0xFF111111) : const Color(0xFFE4E4E4),
+    textColor: isCompleted ? const Color(0xFF1A1A1A) : const Color(0xFFA0A0A0),
+    timeColor: const Color(0xFF7A7A7A),
   );
 }
