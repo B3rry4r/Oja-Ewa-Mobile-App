@@ -1,17 +1,16 @@
-// profile_screen.dart
+// account.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import 'package:ojaewa/app/theme/app_theme_colors.dart';
-import 'package:ojaewa/core/theme/wb_theme_exports.dart';
-import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
-import 'package:ojaewa/core/resources/app_assets.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
+import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
+import 'package:ojaewa/features/account/domain/user_profile.dart';
 import 'package:ojaewa/features/account/presentation/controllers/profile_controller.dart';
+import 'package:ojaewa/features/account/presentation/widgets/account_menu.dart';
 import 'package:ojaewa/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/account/subfeatures/show_your_business/presentation/controllers/business_status_controller.dart';
@@ -21,6 +20,7 @@ import 'package:ojaewa/core/widgets/confirmation_modal.dart';
 import 'package:ojaewa/core/widgets/seller_badge.dart';
 import 'package:ojaewa/features/auth/data/auth_repository_impl.dart';
 import 'package:ojaewa/features/notifications/data/notifications_repository_impl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -38,160 +38,198 @@ class AccountScreen extends ConsumerWidget {
         ).pushNamedAndRemoveUntil(AppRoutes.onboarding, (r) => false);
       }
     });
-    return AppPageScaffold(
-      showBack: false,
-      includeBottomNavSpacing: true,
-      scrollable: true,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          profile.when(
-            loading: () => Text('Hello', style: WBTypography.hero.copyWith(fontSize: 30)),
-            error: (e, st) => Text('Hello', style: WBTypography.hero.copyWith(fontSize: 30)),
-            data: (u) => Text(
-              'Hello ${u?.fullName ?? 'Guest'}',
-              style: WBTypography.hero.copyWith(fontSize: 30),
-            ),
-          ),
 
-          const SizedBox(height: 24),
-          _buildSectionHeader(context, 'Profile'),
-          _buildMenuItem(
-            context: context,
+    return Scaffold(
+      backgroundColor: WBColors.bgPrimary,
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 140),
+          children: [
+            _AccountHeader(profile: profile.value),
+            const SizedBox(height: 24),
+            for (final section in _sections(context, ref)) ...[
+              AccountMenuSectionCard(section: section),
+              const SizedBox(height: 12),
+            ],
+            if (isLoggedIn) ...[
+              _buildBadgeStatusCard(context, ref),
+              const SizedBox(height: 12),
+            ],
+            if (_isTestUser(ref)) ...[
+              _buildTestNotificationButton(context, ref),
+              const SizedBox(height: 12),
+            ],
+            AccountMenuSectionCard(
+              section: _destructiveSection(context, ref, isLoggedIn),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<AccountMenuSection> _sections(BuildContext context, WidgetRef ref) {
+    final isSellerApproved = ref.watch(isSellerApprovedProvider);
+    final hasApprovedBusiness = ref.watch(hasApprovedBusinessProvider);
+    void go(String route) => Navigator.of(context).pushNamed(route);
+
+    return [
+      AccountMenuSection(
+        title: 'Account',
+        rows: [
+          AccountMenuRow(
             iconAsset: AppIcons.editYourProfile,
             label: 'Edit your profile',
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.editProfile),
+            sub: 'Name, photo and contact details',
+            onTap: () => go(AppRoutes.editProfile),
           ),
-
-          const SizedBox(height: 24),
-          _buildSectionHeader(context, 'Orders'),
-          _buildMenuItem(
-            context: context,
+          AccountMenuRow(
             iconAsset: AppIcons.yourOrders,
             label: 'Your orders',
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.orders),
+            sub: 'Track and review past orders',
+            onTap: () => go(AppRoutes.orders),
           ),
-
-          const SizedBox(height: 24),
-          _buildSectionHeader(context, 'Settings'),
-          _buildSettingsList(context, ref),
-
-          if (isLoggedIn) ...[
-            const SizedBox(height: 16),
-            _buildBadgeStatusCard(context, ref),
-          ],
-
-          const SizedBox(height: 24),
-          _buildSectionHeader(context, 'WAWUBeauty Business'),
-          _buildBusinessList(context, ref),
-
-          const SizedBox(height: 24),
-          _buildSectionHeader(context, 'Support'),
-          _buildSupportList(context, ref, isLoggedIn: isLoggedIn),
-
-          const SizedBox(height: 16),
+          AccountMenuRow(
+            iconAsset: AppIcons.yourAddress,
+            label: 'Your addresses',
+            sub: 'Delivery locations',
+            onTap: () => go(AppRoutes.addresses),
+          ),
+          AccountMenuRow(
+            iconAsset: AppIcons.notification,
+            label: 'Notifications',
+            sub: 'Push and email preferences',
+            onTap: () => go(AppRoutes.notificationsSettings),
+          ),
+          AccountMenuRow(
+            iconAsset: AppIcons.password,
+            label: 'Password',
+            sub: 'Change your password',
+            onTap: () => go(AppRoutes.changePassword),
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSectionHeader(BuildContext context, String text) {
-    final colors = context.appColors;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          color: colors.textTertiary,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMenuItem({
-    required BuildContext context,
-    required String iconAsset,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    final colors = context.appColors;
-    return Container(
-      height: 48,
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: colors.accentSoft,
-                      shape: BoxShape.circle,
-                    ),
-                    alignment: Alignment.center,
-                    child: SvgPicture.asset(
-                      iconAsset,
-                      width: 16,
-                      height: 16,
-                      colorFilter: ColorFilter.mode(
-                        colors.textPrimary,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: colors.textPrimary,
-                    ),
-                  ),
-                ],
-              ),
-              Icon(Icons.chevron_right, size: 20, color: colors.textPrimary),
-            ],
+      AccountMenuSection(
+        title: 'WAWUBeauty Business',
+        rows: [
+          AccountMenuRow(
+            iconAsset: AppIcons.startSelling,
+            label: 'Start selling',
+            sub: 'List your products and reach buyers',
+            onTap: () => go(
+              isSellerApproved
+                  ? AppRoutes.yourShopDashboard
+                  : AppRoutes.sellerOnboarding,
+            ),
           ),
-        ),
+          AccountMenuRow(
+            iconAsset: AppIcons.showYourBusiness,
+            label: 'Show your business',
+            sub: 'Your heritage and brand story',
+            onTap: () => go(
+              hasApprovedBusiness
+                  ? AppRoutes.businessSettings
+                  : AppRoutes.businessOnboarding,
+            ),
+          ),
+        ],
       ),
-    );
+      AccountMenuSection(
+        title: 'Support',
+        rows: [
+          AccountMenuRow(
+            iconAsset: AppIcons.emailUs,
+            label: 'Email us',
+            onTap: () => _handleEmailUs(context, ref),
+          ),
+          AccountMenuRow(
+            iconAsset: AppIcons.privacyPolicy,
+            label: 'Privacy Policy',
+            onTap: () => go(AppRoutes.privacyPolicy),
+          ),
+          AccountMenuRow(
+            iconAsset: AppIcons.termsOfService,
+            label: 'Terms of Service',
+            onTap: () => go(AppRoutes.termsOfService),
+          ),
+          AccountMenuRow(
+            iconAsset: AppIcons.faq,
+            label: 'FAQ',
+            onTap: () => go(AppRoutes.faq),
+          ),
+          AccountMenuRow(
+            iconAsset: AppIcons.connectToUs,
+            label: 'Connect to us',
+            onTap: () => go(AppRoutes.connectToUs),
+          ),
+        ],
+      ),
+    ];
   }
 
-  Widget _buildSettingsList(BuildContext context, WidgetRef ref) {
-    return Column(
-      children: [
-        _buildMenuItem(
-          context: context,
-          iconAsset: AppIcons.yourAddress,
-          label: 'Your Addresses',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.addresses),
-        ),
-        _buildMenuItem(
-          context: context,
-          iconAsset: AppIcons.notification,
-          label: 'Notifications',
-          onTap: () =>
-              Navigator.of(context).pushNamed(AppRoutes.notificationsSettings),
-        ),
-        _buildMenuItem(
-          context: context,
-          iconAsset: AppIcons.password,
-          label: 'Password',
-          onTap: () =>
-              Navigator.of(context).pushNamed(AppRoutes.changePassword),
+  AccountMenuSection _destructiveSection(
+    BuildContext context,
+    WidgetRef ref,
+    bool isLoggedIn,
+  ) {
+    return AccountMenuSection(
+      title: '',
+      rows: [
+        if (isLoggedIn)
+          AccountMenuRow(
+            iconAsset: AppIcons.signOut,
+            label: 'Delete Account',
+            danger: true,
+            onTap: () {
+              ConfirmationModal.show(
+                context,
+                title: 'Delete Account',
+                message:
+                    'Are you sure you want to permanently delete your account? '
+                    'This action cannot be undone. All your data, orders, and '
+                    'profile information will be permanently removed.',
+                confirmLabel: 'Delete Account',
+                cancelLabel: 'Cancel',
+                onConfirm: () => _handleDeleteAccount(context, ref),
+              );
+            },
+          ),
+        AccountMenuRow(
+          iconAsset: AppIcons.signOut,
+          label: isLoggedIn ? 'Sign Out' : 'Sign In',
+          danger: isLoggedIn,
+          onTap: () => _handleAuthAction(context, ref, isLoggedIn),
         ),
       ],
     );
+  }
+
+  Future<void> _handleAuthAction(
+    BuildContext context,
+    WidgetRef ref,
+    bool isLoggedIn,
+  ) async {
+    if (!isLoggedIn) {
+      Navigator.of(context).pushNamed(AppRoutes.signIn);
+      return;
+    }
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+    try {
+      await ref.read(authFlowControllerProvider.notifier).logout();
+      if (!context.mounted) return;
+      Navigator.of(context).pop(); // close loader
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.onboarding, (r) => false);
+    } catch (_) {
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+    }
   }
 
   Widget _buildBadgeStatusCard(BuildContext context, WidgetRef ref) {
@@ -199,7 +237,7 @@ class AccountScreen extends ConsumerWidget {
     final sellerStatus = ref.watch(sellerStatusProvider);
     final badge = (sellerStatus?.badge ?? '').trim();
     final hasBadge = badge.isNotEmpty;
-    final hasSellerProfile = sellerStatus?.id != null;
+    final hasSellerProfile = sellerStatus != null;
     final uploadLimit = sellerStatus?.productUploadLimit;
     final canUploadMoreProducts = sellerStatus?.canUploadMoreProducts;
     final badgeColor = _badgeColor(badge, colors);
@@ -208,21 +246,21 @@ class AccountScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colors.border),
+        color: WBColors.surfaceCard,
+        borderRadius: BorderRadius.circular(WBRadius.card),
+        boxShadow: WBShadows.card,
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: hasBadge ? badgeColor : colors.borderStrong,
-              borderRadius: BorderRadius.circular(8),
+              color: hasBadge ? badgeColor : WBColors.bgSoft,
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               hasBadge ? Icons.verified : Icons.workspace_premium_outlined,
-              color: hasBadge ? badgeIconColor : Colors.white,
+              color: hasBadge ? badgeIconColor : WBColors.fgHeader,
               size: 18,
             ),
           ),
@@ -233,10 +271,9 @@ class AccountScreen extends ConsumerWidget {
               children: [
                 Text(
                   hasBadge ? _badgeLabel(badge) : 'No verification badge yet',
-                  style: TextStyle(
-                    fontSize: 14,
+                  style: WBTypography.body.copyWith(
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -244,9 +281,8 @@ class AccountScreen extends ConsumerWidget {
                   hasSellerProfile
                       ? 'Badges strengthen trust on your seller profile and unlock stronger selling privileges.'
                       : 'Create your seller profile first, then apply for a badge.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colors.textSecondary,
+                  style: WBTypography.caption.copyWith(
+                    color: WBColors.fgSecondary,
                   ),
                 ),
                 if (hasSellerProfile && uploadLimit != null) ...[
@@ -255,10 +291,9 @@ class AccountScreen extends ConsumerWidget {
                     canUploadMoreProducts == false
                         ? 'Product upload limit: $uploadLimit reached'
                         : 'Product upload limit: $uploadLimit',
-                    style: TextStyle(
-                      fontSize: 12,
+                    style: WBTypography.caption.copyWith(
                       fontWeight: FontWeight.w500,
-                      color: colors.textTertiary,
+                      color: WBColors.fgPlaceholder,
                     ),
                   ),
                 ],
@@ -266,17 +301,12 @@ class AccountScreen extends ConsumerWidget {
             ),
           ),
           if (!hasBadge)
-            TextButton(
+            WBButton(
+              label: 'View',
+              size: WBButtonSize.sm,
+              variant: WBButtonVariant.secondary,
               onPressed: () =>
                   Navigator.of(context).pushNamed(AppRoutes.badgeVerifications),
-              child: const Text(
-                'View badges',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF111111),
-                ),
-              ),
             ),
         ],
       ),
@@ -291,176 +321,7 @@ class AccountScreen extends ConsumerWidget {
 
   Color _badgeIconColor(String badge) => SellerBadge.foregroundFor(badge);
 
-  Widget _buildBusinessList(BuildContext context, WidgetRef ref) {
-    final isSellerApproved = ref.watch(isSellerApprovedProvider);
-    final hasApprovedBusiness = ref.watch(hasApprovedBusinessProvider);
-
-    return Column(
-      children: [
-        _buildMenuItem(
-          context: context,
-          iconAsset: AppIcons.startSelling,
-          label: 'Start selling',
-          onTap: () => Navigator.of(context).pushNamed(
-            isSellerApproved
-                ? AppRoutes.yourShopDashboard
-                : AppRoutes.sellerOnboarding,
-          ),
-        ),
-        _buildMenuItem(
-          context: context,
-          iconAsset: AppIcons.showYourBusiness,
-          label: 'Show your business',
-          onTap: () => Navigator.of(context).pushNamed(
-            hasApprovedBusiness
-                ? AppRoutes.businessSettings
-                : AppRoutes.businessOnboarding,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSupportList(
-    BuildContext context,
-    WidgetRef ref, {
-    required bool isLoggedIn,
-  }) {
-    final colors = context.appColors;
-    return Column(
-      children: [
-        _buildMenuItem(
-          context: context,
-          iconAsset: AppIcons.emailUs,
-          label: 'Email Us',
-          onTap: () => _handleEmailUs(context, ref),
-        ),
-        _buildMenuItem(
-          context: context,
-          iconAsset: AppIcons.privacyPolicy,
-          label: 'Privacy Policy',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.privacyPolicy),
-        ),
-        _buildMenuItem(
-          context: context,
-          iconAsset: AppIcons.termsOfService,
-          label: 'Terms of Service',
-          onTap: () =>
-              Navigator.of(context).pushNamed(AppRoutes.termsOfService),
-        ),
-        _buildMenuItem(
-          context: context,
-          iconAsset: AppIcons.faq,
-          label: 'FAQ',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.faq),
-        ),
-        _buildMenuItem(
-          context: context,
-          iconAsset: AppIcons.connectToUs,
-          label: 'Connect to us',
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.connectToUs),
-        ),
-
-        // Test notification button (only for test users)
-        if (_isTestUser(ref)) _buildTestNotificationButton(context, ref),
-
-        // Delete Account — only shown when logged in
-        if (isLoggedIn) _buildDeleteAccountButton(context, ref),
-
-        // Sign Out or Sign In based on auth state
-        Container(
-          height: 48,
-          margin: const EdgeInsets.only(bottom: 8),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () async {
-                if (isLoggedIn) {
-                  // Logout flow
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (_) =>
-                        const Center(child: CircularProgressIndicator()),
-                  );
-                  try {
-                    await ref
-                        .read(authFlowControllerProvider.notifier)
-                        .logout();
-                    if (!context.mounted) return;
-                    Navigator.of(context).pop(); // close loader
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      AppRoutes.onboarding,
-                      (r) => false,
-                    );
-                  } catch (_) {
-                    if (!context.mounted) return;
-                    Navigator.of(context).pop();
-                  }
-                } else {
-                  // Navigate to sign in
-                  Navigator.of(context).pushNamed(AppRoutes.signIn);
-                }
-              },
-              borderRadius: BorderRadius.circular(8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          color: isLoggedIn
-                              ? const Color(0xFF8B1E1E).withValues(alpha: 0.18)
-                              : colors.accentSoft,
-                          shape: BoxShape.circle,
-                        ),
-                        alignment: Alignment.center,
-                        child: SvgPicture.asset(
-                          AppIcons.signOut,
-                          width: 16,
-                          height: 16,
-                          colorFilter: ColorFilter.mode(
-                            isLoggedIn
-                                ? const Color(0xFFFF8A80)
-                                : colors.textPrimary,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        isLoggedIn ? 'Sign Out' : 'Sign In',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: isLoggedIn
-                              ? const Color(0xFFFF8A80)
-                              : colors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Icon(
-                    Icons.chevron_right,
-                    size: 20,
-                    color: isLoggedIn
-                        ? const Color(0xFFFF8A80)
-                        : colors.textPrimary,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Future<void> _handleEmailUs(BuildContext context, WidgetRef ref) async {
-    // Try to get email from connect info, fallback to default
     String email = 'support@ojaewa.com';
     try {
       final connectInfo = await ref.read(connectInfoProvider.future);
@@ -479,78 +340,6 @@ class AccountScreen extends ConsumerWidget {
         AppSnackbars.showError(context, 'Could not open email app');
       }
     }
-  }
-
-  Widget _buildDeleteAccountButton(BuildContext context, WidgetRef ref) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      height: 48,
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            ConfirmationModal.show(
-              context,
-              title: 'Delete Account',
-              message:
-                  'Are you sure you want to permanently delete your account? '
-                  'This action cannot be undone. All your data, orders, and '
-                  'profile information will be permanently removed.',
-              confirmLabel: 'Delete Account',
-              cancelLabel: 'Cancel',
-              onConfirm: () => _handleDeleteAccount(context, ref),
-            );
-          },
-          borderRadius: BorderRadius.circular(8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: isDarkMode
-                          ? const Color(0xFF8B1E1E).withValues(alpha: 0.18)
-                          : const Color(0xFFF7E5E5),
-                      shape: BoxShape.circle,
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.delete_forever_outlined,
-                      size: 16,
-                      color: isDarkMode
-                          ? const Color(0xFFFF8A80)
-                          : const Color(0xFFD32F2F),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Delete Account',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: isDarkMode
-                          ? const Color(0xFFFF8A80)
-                          : const Color(0xFFD32F2F),
-                    ),
-                  ),
-                ],
-              ),
-              Icon(
-                Icons.chevron_right,
-                size: 20,
-                color: isDarkMode
-                    ? const Color(0xFFFF8A80)
-                    : const Color(0xFFD32F2F),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   Future<void> _handleDeleteAccount(BuildContext context, WidgetRef ref) async {
@@ -580,84 +369,136 @@ class AccountScreen extends ConsumerWidget {
   bool _isTestUser(WidgetRef ref) {
     final profile = ref.watch(userProfileProvider).value;
     final email = profile?.email ?? '';
-    // Show test button for these test emails
     return email == 'test@user.com' ||
         email == 'test@ojaewa.com' ||
         email.startsWith('test+');
   }
 
-  /// Build test notification button (only visible for test users)
   Widget _buildTestNotificationButton(BuildContext context, WidgetRef ref) {
-    return Container(
-      height: 56,
-      margin: const EdgeInsets.only(bottom: 8, top: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF111111).withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF111111), width: 1.5),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _sendTestNotification(context, ref),
-          borderRadius: BorderRadius.circular(8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.notifications_active,
-                color: Color(0xFF111111),
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Send Test Notification',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF111111),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return WBButton(
+      label: 'Send Test Notification',
+      fullWidth: true,
+      variant: WBButtonVariant.secondary,
+      onPressed: () => _sendTestNotification(context, ref),
     );
   }
 
-  /// Send test notification via backend
   Future<void> _sendTestNotification(
     BuildContext context,
     WidgetRef ref,
   ) async {
     try {
-      // Show loading
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (_) => const Center(child: CircularProgressIndicator()),
       );
-
-      // Call backend to send test notification
       final notificationsApi = ref.read(notificationsRepositoryProvider);
       await notificationsApi.sendTestNotification();
-
-      // Hide loading
       if (!context.mounted) return;
       Navigator.of(context).pop();
-
-      // Show success message
       AppSnackbars.showSuccess(
         context,
         'Test notification sent! Check your device.',
       );
     } catch (e) {
-      // Hide loading
       if (!context.mounted) return;
       Navigator.of(context).pop();
-
-      // Show error
       AppSnackbars.showError(context, 'Failed to send test notification: $e');
     }
+  }
+}
+
+/// WAWUBasket-style account header: avatar + name + email + edit button.
+class _AccountHeader extends StatelessWidget {
+  const _AccountHeader({required this.profile});
+  final UserProfile? profile;
+
+  String get _initials {
+    final name = (profile?.fullName ?? '').trim();
+    if (name.isEmpty) return '?';
+    final parts = name.split(' ').where((p) => p.isNotEmpty).toList();
+    if (parts.length >= 2) {
+      return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    }
+    return parts.first[0].toUpperCase();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final name = (profile?.fullName ?? '').trim();
+    final email = (profile?.email ?? '').trim();
+    final avatarUrl = profile?.avatarUrl;
+
+    return Row(
+      children: [
+        Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: WBColors.bgDivider, width: 1.5),
+          ),
+          child: ClipOval(
+            child: avatarUrl != null && avatarUrl.isNotEmpty
+                ? WBNetworkImage(url: avatarUrl)
+                : Container(
+                    color: WBColors.surfaceDark,
+                    alignment: Alignment.center,
+                    child: Text(
+                      _initials,
+                      style: WBTypography.hero.copyWith(
+                        fontSize: 22,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name.isNotEmpty ? name : 'Guest',
+                style: WBTypography.cardTitle.copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (email.isNotEmpty) ...[
+                const SizedBox(height: 3),
+                Text(
+                  email,
+                  style: WBTypography.caption.copyWith(
+                    color: WBColors.fgSecondary,
+                    fontSize: 13,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ],
+          ),
+        ),
+        GestureDetector(
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.editProfile),
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: const BoxDecoration(
+              color: WBColors.bgSoft,
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: const WBIcon(WBIconName.more, size: 16, color: WBColors.fgHeader),
+          ),
+        ),
+      ],
+    );
   }
 }
