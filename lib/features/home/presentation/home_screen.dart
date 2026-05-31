@@ -13,57 +13,93 @@ import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/adverts/domain/advert.dart';
 import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
-import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/features/adverts/presentation/controllers/adverts_controller.dart';
+import 'package:ojaewa/features/search/presentation/search_screen.dart';
 
 import '../../../app/router/app_router.dart';
 
+/// Beauty-flavoured hero taglines, mirroring WAWUBasket's randomised hero.
+const List<({String accent, String muted})> _beautyTaglines = [
+  (accent: 'Glow up.', muted: 'Shop African beauty'),
+  (accent: 'Look good.', muted: 'Feel the culture'),
+  (accent: 'Fresh drops.', muted: 'Curated for you'),
+  (accent: 'Beauty meets craft.', muted: 'Discover makers'),
+  (accent: 'Your style.', muted: 'Pan-African market'),
+];
+
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
+
+  static Widget _padded(Widget child) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: child,
+      );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: WBColors.bgPrimary,
-      body: DecoratedBox(
-        decoration: const BoxDecoration(color: WBColors.bgPrimary),
-        child: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              _buildHeader(context),
-              const SizedBox(height: 16),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildAdvertsOrFallback(context, ref),
-                      const SizedBox(height: 24),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        child: _buildServicesRow(context),
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.only(
-                          top: 12,
-                          left: 16,
-                          right: 16,
-                          bottom: 32,
-                        ),
-                        child: _buildCategoryGrid(context),
-                      ),
-                      const SizedBox(height: AppBottomNavBar.height),
-                    ],
-                  ),
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.only(top: 12, bottom: 140),
+          children: [
+            _padded(_buildHeader(context)),
+            const SizedBox(height: 22),
+            _padded(const WBRandomTagline(pairs: _beautyTaglines)),
+            const SizedBox(height: 22),
+            _padded(_buildSearchBar(context)),
+            const SizedBox(height: 22),
+            _padded(_buildServicesRow(context)),
+            const SizedBox(height: 24),
+            _buildAdvertsOrFallback(context, ref),
+            const SizedBox(height: 28),
+            _padded(
+              Text(
+                'Shop by category',
+                style: WBTypography.section.copyWith(fontWeight: FontWeight.w600),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _buildCategoryGrid(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const SearchScreen()),
+      ),
+      child: Container(
+        height: 52,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        decoration: BoxDecoration(
+          color: WBColors.bgSecondary,
+          borderRadius: BorderRadius.circular(WBRadius.input),
+        ),
+        child: Row(
+          children: [
+            const WBIcon(WBIconName.search, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Search products, brands & shops',
+                overflow: TextOverflow.ellipsis,
+                style: WBTypography.body.copyWith(
+                  color: WBColors.fgPlaceholder,
+                  fontSize: 16,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,12 +1,14 @@
 // wishlist_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 
 import 'package:ojaewa/core/widgets/product_card.dart';
 import '../../product_detail/presentation/product_detail_screen.dart';
@@ -139,121 +141,41 @@ class WishlistScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyStateContent(BuildContext context) {
-    final colors = context.appColors;
     return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 420),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          decoration: BoxDecoration(
-            color: colors.surfaceElevated,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: colors.border),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow.withValues(alpha: 0.12),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgPicture.asset(
+              WBEmptyIllustration.noProducts,
+              width: 200,
+              height: 200,
+              fit: BoxFit.contain,
+              placeholderBuilder: (_) =>
+                  const SizedBox(width: 200, height: 200),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Nothing saved yet',
+              style: WBTypography.section.copyWith(fontWeight: FontWeight.w600),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Products you save will show up here for quick access later.',
+              style: WBTypography.secondary.copyWith(
+                color: WBColors.fgSecondary,
+                height: 1.5,
               ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildEmptyStateIllustration(colors),
-              const SizedBox(height: 28),
-              _buildEmptyStateMessages(colors),
-              const SizedBox(height: 28),
-              _buildKeepShoppingButton(colors),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyStateIllustration(AppThemeColors colors) {
-    return Center(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 132,
-            height: 132,
-            decoration: BoxDecoration(
-              color: colors.accentSoft,
-              shape: BoxShape.circle,
+              textAlign: TextAlign.center,
             ),
-          ),
-          Container(
-            width: 96,
-            height: 96,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: colors.surface,
-              border: Border.all(color: colors.border),
+            const SizedBox(height: 28),
+            WBButton(
+              label: 'Keep Shopping',
+              onPressed: onKeepShoppingPressed ?? _defaultKeepShoppingPressed,
             ),
-            child: Icon(Icons.favorite_border, size: 54, color: colors.accent),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyStateMessages(AppThemeColors colors) {
-    return Column(
-      children: [
-        Text(
-          'Nothing saved yet',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w600,
-            color: colors.textPrimary,
-            height: 1.2,
-          ),
-          textAlign: TextAlign.center,
-        ),
-
-        SizedBox(height: 12),
-
-        Text(
-          'Products you save will show up here for quick access later.',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            color: colors.textSecondary,
-            height: 1.45,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildKeepShoppingButton(AppThemeColors colors) {
-    return Center(
-      child: SizedBox(
-        width: 220,
-        height: 54,
-        child: ElevatedButton(
-          onPressed: onKeepShoppingPressed ?? _defaultKeepShoppingPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colors.accent,
-            foregroundColor: colors.onAccent,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-          ),
-          child: const Text(
-            'Keep Shopping',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          ],
         ),
       ),
     );
