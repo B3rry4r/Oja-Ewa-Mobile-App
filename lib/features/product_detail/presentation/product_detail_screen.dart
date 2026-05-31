@@ -9,8 +9,10 @@ import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/info_bottom_sheet.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/core/widgets/seller_badge.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
@@ -840,53 +842,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
           child: Row(
             children: [
               // Quantity selector
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: colors.border),
-                ),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        if (quantity > 1) setState(() => quantity--);
-                      },
-                      child: Icon(
-                        Icons.remove,
-                        color: colors.textPrimary,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-                    Text(
-                      '$quantity',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: colors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-                    GestureDetector(
-                      onTap: () => setState(() => quantity++),
-                      child: Icon(
-                        Icons.add,
-                        color: colors.textPrimary,
-                        size: 20,
-                      ),
-                    ),
-                  ],
-                ),
+              WBQtyStepper(
+                value: quantity,
+                onChanged: (v) => setState(() => quantity = v),
               ),
-              const SizedBox(width: 16),
-              // Add to bag button (tap area)
+              const SizedBox(width: 14),
+              // Add to bag button
               Expanded(
-                child: GestureDetector(
-                  onTap: () async {
+                child: WBButton(
+                  label: 'Add to Bag',
+                  fullWidth: true,
+                  onPressed: () async {
                     // Use the processing time type from the product details
                     final details = ref
                         .read(productDetailsProvider(widget.productId))
@@ -916,33 +882,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                       );
                     }
                   },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    decoration: BoxDecoration(
-                      color: colors.accent,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: colors.accent.withValues(alpha: 0.3),
-                          blurRadius: 16,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Add to Bag',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: colors.onAccent,
-                        ),
-                      ),
-                    ),
-                  ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               // Price
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -950,15 +892,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 children: [
                   Text(
                     priceLabel,
-                    style: TextStyle(
-                      fontSize: 20,
+                    style: WBTypography.section.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: colors.textPrimary,
                     ),
                   ),
                   Text(
-                    'Delivery calculated at checkout',
-                    style: TextStyle(fontSize: 10, color: colors.textTertiary),
+                    'At checkout',
+                    style: WBTypography.caption.copyWith(
+                      color: WBColors.fgPlaceholder,
+                      fontSize: 10,
+                    ),
                   ),
                 ],
               ),
