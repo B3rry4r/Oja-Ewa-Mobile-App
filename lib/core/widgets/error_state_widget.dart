@@ -128,7 +128,7 @@ class LoadingStateWidget extends StatelessWidget {
             const Expanded(
               child: Center(
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFDAF40)),
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF111111)),
                 ),
               ),
             ),
