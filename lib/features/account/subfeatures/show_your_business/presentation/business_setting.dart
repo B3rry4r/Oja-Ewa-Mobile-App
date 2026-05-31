@@ -9,6 +9,7 @@ import 'package:ojaewa/features/home/subfeatures/beauty/presentation/business_pr
 import 'package:ojaewa/features/home/subfeatures/music/presentation/music_artist_profile.dart';
 
 import '../../../../../app/router/app_router.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 
 class BusinessSettingsScreen extends ConsumerWidget {
   const BusinessSettingsScreen({super.key});
@@ -99,9 +100,10 @@ class BusinessSettingsScreen extends ConsumerWidget {
       ),
       data: (businesses) {
         if (businesses.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-            child: Text('No business profiles yet.'),
+          return const WBEmptyState(
+            illustration: WBEmptyIllustration.noProducts,
+            label: 'No business profiles yet',
+            sub: 'Your registered businesses will appear here.',
           );
         }
 

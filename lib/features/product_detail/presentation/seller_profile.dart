@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/core/widgets/seller_badge.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
 import 'package:ojaewa/features/sellers/presentation/controllers/public_seller_controller.dart';
@@ -247,7 +248,11 @@ class SellerProfileScreen extends ConsumerWidget {
                         .toList();
 
                     if (items.isEmpty) {
-                      return const Text('No products yet');
+                      return const WBEmptyState(
+                        illustration: WBEmptyIllustration.noProducts,
+                        label: 'No products yet',
+                        sub: 'This shop hasn\'t listed anything yet.',
+                      );
                     }
 
                     return Column(
