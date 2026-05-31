@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
@@ -69,34 +70,11 @@ class NotificationsScreen extends ConsumerWidget {
 
                     data: (items) {
                       if (items.isEmpty) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(vertical: 48),
-                          child: Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'You have no notifications',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w700,
-                                    color: colors.textPrimary,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'We\'ll let you know when something important happens.',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    color: colors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                        return const WBEmptyState(
+                          illustration: WBEmptyIllustration.noOrders,
+                          label: 'You have no notifications',
+                          sub:
+                              'We\'ll let you know when something important happens.',
                         );
                       }
 
