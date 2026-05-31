@@ -3,11 +3,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/theme/wb_theme_exports.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/adverts/domain/advert.dart';
@@ -23,22 +24,10 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: WBColors.bgPrimary,
       body: DecoratedBox(
-        decoration: BoxDecoration(
-          color: colors.background,
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              isDark ? colors.surface : colors.surfaceSecondary,
-              colors.background,
-            ],
-          ),
-        ),
+        decoration: const BoxDecoration(color: WBColors.bgPrimary),
         child: SafeArea(
           bottom: false,
           child: Column(
@@ -87,24 +76,7 @@ class HomeScreen extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Brand Logo with text (PNG for correct colors)
-          Theme.of(context).brightness == Brightness.dark
-              ? SvgPicture.asset(
-                  AppIcons.brandMarkWhite,
-                  width: 98,
-                  height: 22,
-                  fit: BoxFit.contain,
-                  colorFilter: const ColorFilter.mode(
-                    Colors.white,
-                    BlendMode.srcIn,
-                  ),
-                )
-              : Image.asset(
-                  'assets/app_icon/logo2.png',
-                  width: 98,
-                  height: 22,
-                  fit: BoxFit.contain,
-                ),
+          const WBWordmark(height: 24),
 
           // Header Icons
           Row(
@@ -171,7 +143,7 @@ class HomeScreen extends ConsumerWidget {
                             child: Text(
                               unreadCount > 99 ? '99+' : unreadCount.toString(),
                               style: const TextStyle(
-                                color: Color(0xFF111111),
+                                color: Colors.white,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -246,15 +218,14 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildPromoCardsSection(BuildContext context) {
-    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: AspectRatio(
         aspectRatio: _AdvertFadeCarousel.aspectRatio,
         child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: colors.accent,
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
+          decoration: const BoxDecoration(
+            color: WBColors.surfaceDark,
+            borderRadius: BorderRadius.all(Radius.circular(WBRadius.card)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -264,10 +235,9 @@ class HomeScreen extends ConsumerWidget {
               children: [
                 Text(
                   'Discover curated drops',
-                  style: TextStyle(
-                    fontSize: 22,
+                  style: WBTypography.section.copyWith(
+                    color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -275,10 +245,9 @@ class HomeScreen extends ConsumerWidget {
                   'Fashion, beauty, art, education, and hardware in one marketplace.',
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 14,
+                  style: WBTypography.secondary.copyWith(
+                    color: Colors.white.withValues(alpha: 0.85),
                     height: 1.35,
-                    color: colors.textPrimary,
                   ),
                 ),
               ],
