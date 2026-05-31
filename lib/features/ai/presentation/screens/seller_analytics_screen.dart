@@ -70,7 +70,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                 'AI Analytics',
                 style: TextStyle(
                   fontSize: 22,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: _textDark,
                 ),
@@ -103,12 +102,10 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   ),
                   labelStyle: const TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                   ),
                   unselectedLabelStyle: const TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
                   ),
                   tabs: const [
@@ -177,7 +174,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   label,
                   style: TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Campton',
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                     color: isSelected ? Colors.white : _textSecondary,
                   ),
@@ -214,7 +210,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               'Unable to load analytics',
               style: TextStyle(
                 fontSize: 18,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
                 color: _textDark,
               ),
@@ -225,7 +220,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                fontFamily: 'Campton',
                 color: _textSecondary,
               ),
             ),
@@ -248,7 +242,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   'Retry',
                   style: TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: _primaryColor,
                   ),
@@ -314,7 +307,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                 title,
                 style: const TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: _textDark,
                 ),
@@ -351,7 +343,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                 '$rank',
                 style: TextStyle(
                   fontSize: 12,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: rank <= 3 ? Colors.white : _textSecondary,
                 ),
@@ -364,7 +355,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               item.name,
               style: const TextStyle(
                 fontSize: 14,
-                fontFamily: 'Campton',
                 color: _textDark,
               ),
             ),
@@ -385,7 +375,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   '${item.growth!.abs().toStringAsFixed(0)}%',
                   style: TextStyle(
                     fontSize: 12,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w500,
                     color: isPositive
                         ? const Color(0xFF4CAF50)
@@ -421,7 +410,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                     title,
                     style: const TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
                       color: _textDark,
                     ),
@@ -438,7 +426,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   prediction.period,
                   style: const TextStyle(
                     fontSize: 10,
-                    fontFamily: 'Campton',
                     color: _textSecondary,
                   ),
                 ),
@@ -470,7 +457,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                       prediction.insights!.first,
                       style: const TextStyle(
                         fontSize: 12,
-                        fontFamily: 'Campton',
                         color: _textDark,
                         height: 1.4,
                       ),
@@ -498,7 +484,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                 item.item,
                 style: const TextStyle(
                   fontSize: 13,
-                  fontFamily: 'Campton',
                   color: _textDark,
                 ),
               ),
@@ -506,7 +491,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                 '${(item.confidence * 100).toInt()}%',
                 style: const TextStyle(
                   fontSize: 12,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: _primaryColor,
                 ),
@@ -569,7 +553,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   forecast.productName,
                   style: const TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: _textDark,
                   ),
@@ -598,7 +581,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                         'Restock',
                         style: TextStyle(
                           fontSize: 10,
-                          fontFamily: 'Campton',
                           fontWeight: FontWeight.w600,
                           color: Color(0xFFE57373),
                         ),
@@ -631,7 +613,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                       forecast.recommendation!,
                       style: const TextStyle(
                         fontSize: 13,
-                        fontFamily: 'Campton',
                         color: _textDark,
                         height: 1.4,
                       ),
@@ -653,7 +634,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                       : "Low"}',
                   style: const TextStyle(
                     fontSize: 13,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: _textDark,
                   ),
@@ -692,7 +672,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   'Confidence: ',
                   style: TextStyle(
                     fontSize: 12,
-                    fontFamily: 'Campton',
                     color: _textSecondary,
                   ),
                 ),
@@ -700,7 +679,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                   '${(forecast.confidence! * 100).toInt()}%',
                   style: const TextStyle(
                     fontSize: 12,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: _primaryColor,
                   ),
@@ -721,7 +699,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
             value.toString(),
             style: TextStyle(
               fontSize: 18,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: color,
             ),
@@ -731,7 +708,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
             label,
             style: const TextStyle(
               fontSize: 10,
-              fontFamily: 'Campton',
               color: _textSecondary,
             ),
           ),
@@ -755,7 +731,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               label,
               style: const TextStyle(
                 fontSize: 12,
-                fontFamily: 'Campton',
                 color: _textSecondary,
               ),
             ),
@@ -764,7 +739,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
               value,
               style: const TextStyle(
                 fontSize: 18,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
                 color: _textDark,
               ),
@@ -790,7 +764,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
             'Market Position',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: _textDark,
             ),
@@ -805,7 +778,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                       'Top ${comparison.percentile.toInt()}%',
                       style: const TextStyle(
                         fontSize: 24,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF4CAF50),
                       ),
@@ -814,7 +786,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                       'of sellers',
                       style: TextStyle(
                         fontSize: 12,
-                        fontFamily: 'Campton',
                         color: _textSecondary,
                       ),
                     ),
@@ -829,7 +800,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                       comparison.trend ?? 'Stable',
                       style: const TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
                         color: _primaryColor,
                       ),
@@ -838,7 +808,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                       'trend',
                       style: TextStyle(
                         fontSize: 12,
-                        fontFamily: 'Campton',
                         color: _textSecondary,
                       ),
                     ),
@@ -867,7 +836,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
             'Top Products',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: _textDark,
             ),
@@ -892,7 +860,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                         '${index + 1}',
                         style: const TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Campton',
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
@@ -905,7 +872,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                       product.name,
                       style: const TextStyle(
                         fontSize: 14,
-                        fontFamily: 'Campton',
                         color: _textDark,
                       ),
                     ),
@@ -914,7 +880,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                     '${product.sales} sold',
                     style: const TextStyle(
                       fontSize: 12,
-                      fontFamily: 'Campton',
                       color: _textSecondary,
                     ),
                   ),
@@ -947,7 +912,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                 'AI Suggestions',
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: _textDark,
                 ),
@@ -975,7 +939,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
                           suggestion,
                           style: const TextStyle(
                             fontSize: 13,
-                            fontFamily: 'Campton',
                             color: _textDark,
                             height: 1.4,
                           ),
@@ -1008,7 +971,6 @@ class _SellerAnalyticsScreenState extends ConsumerState<SellerAnalyticsScreen>
             message,
             style: const TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               color: _textSecondary,
             ),
           ),

@@ -76,7 +76,6 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textPrimary,
                 height: 1.5,
@@ -130,7 +129,6 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Campton',
                     color: colors.textPrimary,
                   ),
                 ),
@@ -146,7 +144,6 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
             'The Ojá-Ẹwà Team',
             style: TextStyle(
               fontSize: 13,
-              fontFamily: 'Campton',
               color: colors.textSecondary,
               height: 1.5,
             ),
@@ -193,7 +190,6 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
                     color: colors.onAccent,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Campton',
                   ),
                 ),
         ),
@@ -229,7 +225,6 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
               color: colors.onAccent,
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
             ),
           ),
         ),

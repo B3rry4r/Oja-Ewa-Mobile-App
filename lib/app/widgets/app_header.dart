@@ -110,7 +110,6 @@ class AppHeader extends ConsumerWidget {
                             color: colors.onAccent,
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
-                            fontFamily: 'Campton',
                           ),
                           textAlign: TextAlign.center,
                         ),

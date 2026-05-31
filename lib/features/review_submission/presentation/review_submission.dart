@@ -49,7 +49,6 @@ class _ReviewSubmissionScreenState
           Text(
             'Rating',
             style: TextStyle(
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               fontSize: 22,
               color: colors.textPrimary,
@@ -76,7 +75,6 @@ class _ReviewSubmissionScreenState
           Text(
             'Headline',
             style: TextStyle(
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               fontSize: 14,
               color: colors.textSecondary,
@@ -98,7 +96,6 @@ class _ReviewSubmissionScreenState
           Text(
             'Description',
             style: TextStyle(
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               fontSize: 14,
               color: colors.textSecondary,

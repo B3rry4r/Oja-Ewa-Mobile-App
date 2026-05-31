@@ -74,7 +74,6 @@ class _CategoryTreePickerContentState
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
                       color: colors.textPrimary,
                     ),
@@ -97,7 +96,6 @@ class _CategoryTreePickerContentState
                       node.name,
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Campton',
                         color: colors.textPrimary,
                       ),
                     ),

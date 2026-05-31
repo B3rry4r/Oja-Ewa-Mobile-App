@@ -164,7 +164,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           style: TextStyle(
             fontSize: 33,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Campton',
             color: context.appColors.textPrimary,
           ),
         ),
@@ -174,7 +173,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: context.appColors.textSecondary,
           ),
         ),
@@ -192,7 +190,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -205,7 +202,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -229,7 +225,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -256,7 +251,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -288,7 +282,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
-                fontFamily: 'Campton',
                 color: colors.textSecondary,
               ),
             ),
@@ -337,7 +330,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textPrimary,
           ),
         ),
@@ -386,7 +378,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'Campton',
                       color: colors.onAccent,
                     ),
                   ),
@@ -408,7 +399,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              fontFamily: 'Campton',
               color: colors.textTertiary,
             ),
           ),
@@ -478,7 +468,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'Campton',
                   color: colors.textPrimary,
                 ),
               ),
@@ -509,7 +498,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
                       color: colors.textTertiary,
                     ),
                   ),
@@ -518,7 +506,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'Campton',
                       color: colors.accent,
                     ),
                   ),

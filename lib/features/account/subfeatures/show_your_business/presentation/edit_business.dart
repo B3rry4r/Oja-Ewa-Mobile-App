@@ -682,7 +682,6 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
         fontSize: 16,
         fontWeight: FontWeight.w700,
         color: colors.textPrimary,
-        fontFamily: 'Campton',
       ),
     );
   }
@@ -707,7 +706,6 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
           style: TextStyle(
             color: colors.textSecondary,
             fontSize: 14,
-            fontFamily: 'Campton',
           ),
         ),
         const SizedBox(height: 8),
@@ -755,7 +753,6 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
           style: TextStyle(
             color: colors.textSecondary,
             fontSize: 14,
-            fontFamily: 'Campton',
           ),
         ),
         const SizedBox(height: 8),
@@ -1250,7 +1247,6 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
             style: TextStyle(
               color: Color(0xFFFFFBF5),
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
             ),
           ),

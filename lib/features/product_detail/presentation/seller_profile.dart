@@ -74,7 +74,6 @@ class SellerProfileScreen extends ConsumerWidget {
                             seller.businessName,
                             style: TextStyle(
                               fontSize: 20,
-                              fontFamily: 'Campton',
                               fontWeight: FontWeight.w700,
                               color: colors.textPrimary,
                             ),
@@ -89,7 +88,6 @@ class SellerProfileScreen extends ConsumerWidget {
                               location,
                               style: TextStyle(
                                 fontSize: 12,
-                                fontFamily: 'Campton',
                                 fontWeight: FontWeight.w400,
                                 color: colors.textSecondary,
                               ),
@@ -110,7 +108,6 @@ class SellerProfileScreen extends ConsumerWidget {
                                 (seller.avgRating ?? 0).toString(),
                                 style: TextStyle(
                                   fontSize: 12,
-                                  fontFamily: 'Campton',
                                   fontWeight: FontWeight.w700,
                                   color: colors.textPrimary,
                                 ),
@@ -120,7 +117,6 @@ class SellerProfileScreen extends ConsumerWidget {
                                 '(${seller.totalReviews ?? 0})',
                                 style: TextStyle(
                                   fontSize: 10,
-                                  fontFamily: 'Campton',
                                   fontWeight: FontWeight.w400,
                                   color: colors.textSecondary,
                                 ),
@@ -152,7 +148,6 @@ class SellerProfileScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       color: colors.textPrimary,
                     ),
                   ),
@@ -161,7 +156,6 @@ class SellerProfileScreen extends ConsumerWidget {
                     seller.businessEmail!,
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       color: colors.textPrimary,
                     ),
                   ),
@@ -174,7 +168,6 @@ class SellerProfileScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       color: colors.textPrimary,
                     ),
                   ),
@@ -183,7 +176,6 @@ class SellerProfileScreen extends ConsumerWidget {
                     seller.businessPhoneNumber!,
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       color: colors.textPrimary,
                     ),
                   ),
@@ -197,7 +189,6 @@ class SellerProfileScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       color: colors.textPrimary,
                     ),
                   ),
@@ -207,7 +198,6 @@ class SellerProfileScreen extends ConsumerWidget {
                       'Instagram: ${seller.instagram}',
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: 'Campton',
                         color: colors.textPrimary,
                       ),
                     ),
@@ -216,7 +206,6 @@ class SellerProfileScreen extends ConsumerWidget {
                       'Facebook: ${seller.facebook}',
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: 'Campton',
                         color: colors.textPrimary,
                       ),
                     ),
@@ -228,7 +217,6 @@ class SellerProfileScreen extends ConsumerWidget {
                   'More from this seller',
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: colors.textPrimary,
                   ),

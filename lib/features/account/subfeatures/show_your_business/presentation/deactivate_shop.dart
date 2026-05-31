@@ -31,7 +31,6 @@ class DeactivateShopScreen extends ConsumerWidget {
               'Deactivate your shop',
               style: TextStyle(
                 fontSize: 20,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w700,
                 color: colors.textPrimary,
               ),
@@ -41,7 +40,6 @@ class DeactivateShopScreen extends ConsumerWidget {
               'This will hide your business from customers until you reactivate it.',
               style: TextStyle(
                 fontSize: 14,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textSecondary,
               ),
@@ -91,7 +89,6 @@ class DeactivateShopScreen extends ConsumerWidget {
                       color: colors.onAccent,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'Campton',
                     ),
                   ),
                 ),

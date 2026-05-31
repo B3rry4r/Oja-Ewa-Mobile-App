@@ -38,7 +38,6 @@ class BusinessDetailsScreen extends ConsumerWidget {
                 'Sign in to view business profiles',
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: colors.textPrimary,
                 ),
@@ -48,7 +47,6 @@ class BusinessDetailsScreen extends ConsumerWidget {
                 'Create an account to access full business details.',
                 style: TextStyle(
                   fontSize: 13,
-                  fontFamily: 'Campton',
                   color: colors.textSecondary,
                 ),
               ),

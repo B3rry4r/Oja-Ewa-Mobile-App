@@ -78,7 +78,6 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                             'Order #${order.id}',
                             style: TextStyle(
                               fontSize: 10,
-                              fontFamily: 'Campton',
                               fontWeight: FontWeight.w400,
                               color: colors.textSecondary,
                             ),
@@ -98,7 +97,6 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                                 statusLabel,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  fontFamily: 'Campton',
                                   fontWeight: FontWeight.w700,
                                   color: colors.textPrimary,
                                 ),
@@ -151,7 +149,6 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                                 itemCount,
                                 style: TextStyle(
                                   fontSize: 10,
-                                  fontFamily: 'Campton',
                                   fontWeight: FontWeight.w400,
                                   color: colors.textSecondary,
                                 ),
@@ -160,7 +157,6 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                                 'Total: $totalAmount',
                                 style: TextStyle(
                                   fontSize: 10,
-                                  fontFamily: 'Campton',
                                   fontWeight: FontWeight.w400,
                                   color: colors.textSecondary,
                                 ),
@@ -194,7 +190,6 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                                         'Review',
                                         style: TextStyle(
                                           fontSize: 14,
-                                          fontFamily: 'Campton',
                                           fontWeight: FontWeight.w500,
                                           color: colors.accent,
                                         ),
@@ -224,7 +219,6 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                                       'Track',
                                       style: TextStyle(
                                         fontSize: 14,
-                                        fontFamily: 'Campton',
                                         fontWeight: FontWeight.w500,
                                         color: colors.onAccent,
                                       ),

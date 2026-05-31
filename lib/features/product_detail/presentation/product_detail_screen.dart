@@ -204,7 +204,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                           text: TextSpan(
                             style: TextStyle(
                               fontSize: 12,
-                              fontFamily: 'Campton',
                               color: colors.textSecondary,
                             ),
                             children: [
@@ -299,7 +298,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                             content: Text(
                               (details?.description ?? ''),
                               style: TextStyle(
-                                fontFamily: 'Campton',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
                                 color: colors.textSecondary,

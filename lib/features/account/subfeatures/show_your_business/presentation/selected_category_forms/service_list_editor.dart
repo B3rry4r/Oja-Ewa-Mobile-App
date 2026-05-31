@@ -54,7 +54,6 @@ class _ServiceListEditorState extends State<ServiceListEditor> {
               child: Text(
                 'Add service',
                 style: TextStyle(
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: colors.onAccent,
                 ),
@@ -130,7 +129,6 @@ class _TextBox extends StatelessWidget {
         TextField(
           onChanged: onChanged,
           style: TextStyle(
-            fontFamily: 'Campton',
             fontSize: 16,
             color: colors.textPrimary,
           ),

@@ -193,7 +193,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 33,
               fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
           ),
@@ -230,7 +229,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
-              fontFamily: 'Campton',
               color: colors.textSecondary,
             ),
           ),
@@ -292,7 +290,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -304,7 +301,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -328,7 +324,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -340,7 +335,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -364,7 +358,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -377,7 +370,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -401,7 +393,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -438,7 +429,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
-                          fontFamily: 'Campton',
                           color: colors.textPrimary,
                         ),
                       ),
@@ -447,7 +437,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                         'Code',
                         style: TextStyle(
                           fontSize: 15,
-                          fontFamily: 'Campton',
                           color: colors.textTertiary,
                         ),
                       ),
@@ -468,7 +457,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    fontFamily: 'Campton',
                     color: colors.textPrimary,
                   ),
                   decoration: InputDecoration(
@@ -495,7 +483,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -527,7 +514,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -586,7 +572,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
-                    fontFamily: 'Campton',
                     color: colors.textPrimary,
                     height: 1.4,
                   ),
@@ -601,7 +586,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'Campton',
                         color: colors.accent,
                       ),
                     ),
@@ -655,7 +639,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'Campton',
                       color: _isFormValid
                           ? colors.onAccent
                           : colors.onAccent.withValues(alpha: 0.6),
@@ -679,7 +662,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              fontFamily: 'Campton',
               color: colors.textTertiary,
             ),
           ),
@@ -721,7 +703,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'Campton',
                   color: colors.textPrimary,
                 ),
               ),
@@ -742,7 +723,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -755,7 +735,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -787,7 +766,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
-                      fontFamily: 'Campton',
                       color: colors.textTertiary,
                     ),
                   ),
@@ -796,7 +774,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'Campton',
                       color: colors.accent,
                     ),
                   ),

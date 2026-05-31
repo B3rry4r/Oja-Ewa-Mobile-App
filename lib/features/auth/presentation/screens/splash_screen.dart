@@ -120,7 +120,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),

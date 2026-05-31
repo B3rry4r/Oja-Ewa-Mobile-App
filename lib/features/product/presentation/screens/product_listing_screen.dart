@@ -321,7 +321,6 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
               style: TextStyle(
                 color: colors.textSecondary,
                 fontSize: 14,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -479,7 +478,6 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                 'No products match your filters',
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   color: Theme.of(
                     context,
                   ).extension<AppThemeColors>()!.textSecondary,
@@ -725,7 +723,6 @@ class _ActionButton extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 14,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: isActive ? colors.onAccent : colors.textPrimary,
               ),
@@ -778,7 +775,6 @@ class _CategoryPills extends StatelessWidget {
                   pill,
                   style: TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
                     color: isSelected ? colors.onAccent : colors.textPrimary,
                   ),

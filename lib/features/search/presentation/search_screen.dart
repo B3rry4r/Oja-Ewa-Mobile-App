@@ -124,7 +124,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       onSubmitted: (_) => _performSearch(),
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Campton',
                         color: colors.textPrimary,
                       ),
                       decoration: InputDecoration(
@@ -132,7 +131,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         hintText: 'Search Ojá-Ẹwà',
                         hintStyle: TextStyle(
                           fontSize: 16,
-                          fontFamily: 'Campton',
                           color: colors.textTertiary,
                         ),
                         isCollapsed: true,
@@ -201,7 +199,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           type['label']!,
                           style: TextStyle(
                             fontSize: 14,
-                            fontFamily: 'Campton',
                             fontWeight: FontWeight.w500,
                             color: isSelected
                                 ? colors.onAccent
@@ -246,7 +243,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 'Something went wrong',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  fontFamily: 'Campton',
                                   fontWeight: FontWeight.w600,
                                   color: colors.textPrimary,
                                 ),
@@ -257,7 +253,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  fontFamily: 'Campton',
                                   color: colors.textSecondary,
                                 ),
                               ),
@@ -268,7 +263,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                   'Try Again',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    fontFamily: 'Campton',
                                     fontWeight: FontWeight.w600,
                                     color: colors.accent,
                                   ),
@@ -309,7 +303,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             name.toString(),
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
           ),
@@ -342,7 +335,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 : 'Search for products & businesses',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               color: colors.textSecondary,
             ),
           ),

@@ -86,7 +86,6 @@ class AddressesScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
           ),
@@ -99,7 +98,6 @@ class AddressesScreen extends ConsumerWidget {
                   '${address.phone}\n${address.addressLine}, ${address.city}, ${address.state},\n${address.country} ${address.postCode}',
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     color: colors.textSecondary,
                     height: 1.5,
                   ),
@@ -141,7 +139,6 @@ class AddressesScreen extends ConsumerWidget {
                   address.isDefault ? 'Default Address' : 'Address',
                   style: TextStyle(
                     fontSize: 12,
-                    fontFamily: 'Campton',
                     color: colors.textSecondary,
                   ),
                 ),
@@ -182,7 +179,6 @@ class AddressesScreen extends ConsumerWidget {
                         'Edit',
                         style: TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Campton',
                           color: colors.textSecondary,
                         ),
                       ),
@@ -209,7 +205,6 @@ class AddressesScreen extends ConsumerWidget {
             'No saved address',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -219,7 +214,6 @@ class AddressesScreen extends ConsumerWidget {
             'Add an address to make checkout faster.',
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               color: colors.textTertiary,
             ),
@@ -268,7 +262,6 @@ class AddressesScreen extends ConsumerWidget {
               'Add New Address',
               style: TextStyle(
                 fontSize: 16,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
                 color: colors.onAccent,
               ),

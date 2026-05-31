@@ -79,7 +79,6 @@ class _BusinessAccountReviewScreenState
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textPrimary,
                 height: 1.5,
@@ -134,7 +133,6 @@ class _BusinessAccountReviewScreenState
                     color: colors.onAccent,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Campton',
                   ),
                 ),
         ),
@@ -170,7 +168,6 @@ class _BusinessAccountReviewScreenState
               color: colors.onAccent,
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
             ),
           ),
         ),

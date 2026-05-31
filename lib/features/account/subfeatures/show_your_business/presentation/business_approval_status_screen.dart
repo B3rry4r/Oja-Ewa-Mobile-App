@@ -61,7 +61,6 @@ class BusinessApprovalStatusScreen extends ConsumerWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
                     color: colors.textPrimary,
                   ),
@@ -72,7 +71,6 @@ class BusinessApprovalStatusScreen extends ConsumerWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
                     color: colors.textSecondary,
                     height: 1.4,
@@ -85,7 +83,6 @@ class BusinessApprovalStatusScreen extends ConsumerWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       color: colors.textTertiary,
                     ),
                   ),

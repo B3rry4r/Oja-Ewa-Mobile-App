@@ -53,7 +53,6 @@ class _BeautyBusinessDetailsScreenState
             "About Business",
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -294,7 +293,6 @@ class _BeautyBusinessDetailsScreenState
           child: TextField(
             controller: controller,
             style: TextStyle(
-              fontFamily: 'Campton',
               fontSize: 16,
               color: colors.textPrimary,
             ),

@@ -157,7 +157,6 @@ class _SchoolBusinessDetailsScreenState
             'School Type',
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               color: context.appColors.textSecondary,
             ),
           ),
@@ -175,7 +174,6 @@ class _SchoolBusinessDetailsScreenState
             'Classes offered',
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               color: context.appColors.textSecondary,
             ),
           ),
@@ -352,7 +350,6 @@ class _SchoolBusinessDetailsScreenState
       title,
       style: TextStyle(
         fontSize: 16,
-        fontFamily: 'Campton',
         fontWeight: FontWeight.w700,
         color: colors.textPrimary,
       ),
@@ -599,7 +596,6 @@ class _SchoolBusinessDetailsScreenState
           maxLength: maxLength,
           inputFormatters: inputFormatters,
           style: TextStyle(
-            fontFamily: 'Campton',
             fontSize: 16,
             color: colors.textPrimary,
           ),
@@ -759,7 +755,6 @@ class _SchoolBusinessDetailsScreenState
             style: TextStyle(
               color: Color(0xFFFFFBF5),
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -777,7 +772,7 @@ class _SchoolBusinessDetailsScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: colors.textSecondary, fontSize: 13, fontFamily: 'Campton')),
+        Text(label, style: TextStyle(color: colors.textSecondary, fontSize: 13, )),
         const SizedBox(height: 6),
         GestureDetector(
           onTap: onTap,
@@ -795,7 +790,6 @@ class _SchoolBusinessDetailsScreenState
                     value,
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       color: value == 'Select Country' ? colors.textTertiary : colors.textPrimary,
                     ),
                   ),

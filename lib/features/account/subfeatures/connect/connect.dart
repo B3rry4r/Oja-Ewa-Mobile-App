@@ -60,7 +60,6 @@ class ConnectToUsScreen extends ConsumerWidget {
             'Contact Us',
             style: TextStyle(
               fontWeight: FontWeight.w700,
-              fontFamily: 'Campton',
               fontSize: 18,
               color: colors.textPrimary,
             ),
@@ -136,7 +135,6 @@ class ConnectToUsScreen extends ConsumerWidget {
                   Text(
                     label,
                     style: TextStyle(
-                      fontFamily: 'Campton',
                       fontSize: 12,
                       color: colors.textSecondary,
                     ),
@@ -145,7 +143,6 @@ class ConnectToUsScreen extends ConsumerWidget {
                   Text(
                     value,
                     style: TextStyle(
-                      fontFamily: 'Campton',
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: colors.textPrimary,

@@ -128,7 +128,6 @@ class _BlogScreenState extends ConsumerState<BlogScreen> {
           label,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
             color: active ? colors.onAccent : colors.textPrimary,
           ),
@@ -187,7 +186,6 @@ class _BlogPostCard extends ConsumerWidget {
                   post.title,
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: colors.textPrimary,
                     height: 1.2,
@@ -202,7 +200,6 @@ class _BlogPostCard extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
                     color: colors.textSecondary,
                     height: 1.35,
@@ -213,7 +210,6 @@ class _BlogPostCard extends ConsumerWidget {
                   post.createdAt?.toIso8601String().split('T').first ?? '',
                   style: TextStyle(
                     fontSize: 10,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
                     color: colors.textTertiary,
                   ),

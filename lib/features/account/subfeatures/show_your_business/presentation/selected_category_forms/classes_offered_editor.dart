@@ -52,7 +52,6 @@ class _ClassesOfferedEditorState extends State<ClassesOfferedEditor> {
               child: Text(
                 'Add class',
                 style: TextStyle(
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: colors.onAccent,
                 ),
@@ -128,7 +127,6 @@ class _TextBox extends StatelessWidget {
         TextField(
           onChanged: onChanged,
           style: TextStyle(
-            fontFamily: 'Campton',
             fontSize: 16,
             color: colors.textPrimary,
           ),

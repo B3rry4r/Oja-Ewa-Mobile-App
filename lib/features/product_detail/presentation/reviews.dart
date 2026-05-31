@@ -233,7 +233,6 @@ class _FilterChip extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               color: selected ? colors.onAccent : colors.textPrimary,
             ),

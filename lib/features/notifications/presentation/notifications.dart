@@ -79,7 +79,6 @@ class NotificationsScreen extends ConsumerWidget {
                                   'You have no notifications',
                                   style: TextStyle(
                                     fontSize: 20,
-                                    fontFamily: 'Campton',
                                     fontWeight: FontWeight.w700,
                                     color: colors.textPrimary,
                                   ),
@@ -91,7 +90,6 @@ class NotificationsScreen extends ConsumerWidget {
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 14,
-                                    fontFamily: 'Campton',
                                     fontWeight: FontWeight.w400,
                                     color: colors.textSecondary,
                                   ),
@@ -192,7 +190,6 @@ class NotificationsScreen extends ConsumerWidget {
                     title,
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: isUnread ? FontWeight.w600 : FontWeight.w500,
                       color: colors.textPrimary,
                     ),
@@ -204,7 +201,6 @@ class NotificationsScreen extends ConsumerWidget {
                       body,
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
                         color: isUnread
                             ? colors.textPrimary
@@ -221,7 +217,6 @@ class NotificationsScreen extends ConsumerWidget {
                     timeAgo,
                     style: TextStyle(
                       fontSize: 12,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w400,
                       color: colors.textTertiary,
                     ),

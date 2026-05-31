@@ -107,7 +107,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                   title,
                   style: TextStyle(
                     fontSize: 20,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
                     color: colors.textPrimary,
                     height: 1.2,
@@ -133,7 +132,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                       '4.0',
                       style: TextStyle(
                         fontSize: 12,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
                         color: colors.textPrimary,
                       ),
@@ -143,7 +141,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                       '(8)',
                       style: TextStyle(
                         fontSize: 10,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
                         color: colors.textTertiary,
                       ),
@@ -182,7 +179,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
             'Description',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -192,7 +188,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
             description,
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               color: colors.textSecondary,
               height: 1.5,
@@ -240,7 +235,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
             'Initiative Details',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -295,7 +289,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
           label,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
             color: colors.textSecondary,
           ),
@@ -305,7 +298,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
           value,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w500,
             color: colors.textPrimary,
           ),
@@ -359,7 +351,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                   'Reviews ($reviewCount)',
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: colors.textPrimary,
                   ),
@@ -371,7 +362,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                       avgRating,
                       style: TextStyle(
                         fontSize: 12,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w700,
                         color: colors.textPrimary,
                       ),
@@ -451,7 +441,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
               name,
               style: TextStyle(
                 fontSize: 12,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textSecondary,
               ),
@@ -460,7 +449,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
               date,
               style: TextStyle(
                 fontSize: 10,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textTertiary,
               ),
@@ -493,7 +481,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
             title,
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w500,
               color: colors.textPrimary,
             ),
@@ -508,7 +495,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
             review,
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               color: colors.textSecondary,
               height: 1.5,
@@ -557,7 +543,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
                   'Learn More',
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: colors.onAccent,
                   ),
@@ -582,14 +567,13 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
         title: Text(
           'Course Information',
           style: TextStyle(
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w600,
             color: colors.textPrimary,
           ),
         ),
         content: Text(
           'Would you like to enroll in this course or get more details?',
-          style: TextStyle(fontFamily: 'Campton', color: colors.textSecondary),
+          style: TextStyle(color: colors.textSecondary),
         ),
         actions: [
           TextButton(
@@ -599,7 +583,6 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
             child: Text(
               'Cancel',
               style: TextStyle(
-                fontFamily: 'Campton',
                 color: colors.textSecondary,
               ),
             ),
@@ -617,7 +600,7 @@ class SustainabilityCourseDetailScreen extends ConsumerWidget {
             ),
             child: Text(
               'Enroll Now',
-              style: TextStyle(fontFamily: 'Campton', color: colors.onAccent),
+              style: TextStyle(color: colors.onAccent),
             ),
           ),
         ],

@@ -95,7 +95,6 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
                 hintStyle: TextStyle(
                   color: colors.textTertiary,
                   fontSize: 16,
-                  fontFamily: 'Campton',
                 ),
                 border: InputBorder.none,
               ),
@@ -144,7 +143,6 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
           style: TextStyle(
             color: isSelected ? colors.onAccent : colors.textPrimary,
             fontSize: 14,
-            fontFamily: 'Campton',
           ),
         ),
       ),
@@ -325,7 +323,6 @@ class _OrderRow extends StatelessWidget {
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 10,
-                      fontFamily: 'Campton',
                     ),
                   ),
                 ),
@@ -359,7 +356,6 @@ class _Cell extends StatelessWidget {
             color: isHeader
                 ? context.appColors.textTertiary
                 : context.appColors.textPrimary.withValues(alpha: 0.97),
-            fontFamily: 'Campton',
           ),
           overflow: TextOverflow.ellipsis,
         ),

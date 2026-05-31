@@ -40,7 +40,6 @@ class BusinessSettingsScreen extends ConsumerWidget {
             "Your Business",
             style: TextStyle(
               fontSize: 33,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -74,7 +73,6 @@ class BusinessSettingsScreen extends ConsumerWidget {
                     color: colors.onAccent,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Campton',
                   ),
                 ),
               ),
@@ -156,7 +154,6 @@ class BusinessSettingsScreen extends ConsumerWidget {
                       b.businessName,
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
                         color: colors.textPrimary,
                       ),
@@ -175,7 +172,6 @@ class BusinessSettingsScreen extends ConsumerWidget {
                       chipText,
                       style: TextStyle(
                         fontSize: 12,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
                         color: chipFg,
                       ),
@@ -315,7 +311,6 @@ class BusinessSettingsScreen extends ConsumerWidget {
         label,
         style: TextStyle(
           fontSize: 16,
-          fontFamily: 'Campton',
           fontWeight: FontWeight.w400,
           color: isDestructive ? Colors.red : Colors.black,
         ),

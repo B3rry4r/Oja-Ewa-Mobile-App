@@ -63,7 +63,6 @@ class _CartBody extends StatelessWidget {
           'Your cart is empty.',
           style: TextStyle(
             fontSize: 16,
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
             color: colors.textPrimary,
           ),
@@ -254,7 +253,6 @@ class _CartRow extends ConsumerWidget {
                         cartItem.processingTimeLabel!,
                         style: TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Campton',
                           color: colors.textSecondary,
                           height: 1.0,
                         ),

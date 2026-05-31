@@ -115,7 +115,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                   artistName,
                   style: TextStyle(
                     fontSize: 20,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
                     color: colors.textPrimary,
                     height: 1.2,
@@ -141,7 +140,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                       '4.0',
                       style: TextStyle(
                         fontSize: 12,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
                         color: colors.textPrimary,
                       ),
@@ -151,7 +149,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                       '(8)',
                       style: TextStyle(
                         fontSize: 10,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
                         color: colors.textTertiary,
                       ),
@@ -190,7 +187,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
             'Biography',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -200,7 +196,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
             biography,
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               color: colors.textSecondary,
               height: 1.5,
@@ -240,7 +235,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
             'Contact Details',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -326,7 +320,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                 title,
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w500,
                   color: colors.textPrimary,
                 ),
@@ -336,7 +329,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                 content,
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
                   color: colors.textSecondary,
                   height: 1.5,
@@ -352,7 +344,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                         actionText,
                         style: TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Campton',
                           fontWeight: FontWeight.w700,
                           color: colors.textSecondary,
                         ),
@@ -404,7 +395,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
             'Social Links',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -508,7 +498,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                   platform,
                   style: TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w500,
                     color: colors.textPrimary,
                   ),
@@ -518,7 +507,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                   handle,
                   style: TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
                     color: colors.accent,
                   ),
@@ -579,7 +567,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                   'Reviews ($reviewCount)',
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: colors.textPrimary,
                   ),
@@ -591,7 +578,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                       avgRating,
                       style: TextStyle(
                         fontSize: 12,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w700,
                         color: colors.textPrimary,
                       ),
@@ -671,7 +657,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
               name,
               style: TextStyle(
                 fontSize: 12,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textSecondary,
               ),
@@ -680,7 +665,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
               date,
               style: TextStyle(
                 fontSize: 10,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textTertiary,
               ),
@@ -713,7 +697,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
             title,
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w500,
               color: colors.textPrimary,
             ),
@@ -728,7 +711,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
             review,
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               color: colors.textSecondary,
               height: 1.5,
@@ -776,7 +758,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                       'Call',
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
                         color: colors.accent,
                       ),
@@ -815,7 +796,6 @@ class MusicArtistProfileScreen extends ConsumerWidget {
                       'Whatsapp',
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
                         color: colors.onAccent,
                       ),

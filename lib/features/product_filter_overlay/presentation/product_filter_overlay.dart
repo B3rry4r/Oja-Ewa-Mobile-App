@@ -50,7 +50,6 @@ class ProductFilterOverlay extends StatelessWidget {
           Text(
             'Filter By',
             style: TextStyle(
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               fontSize: 20,
               color: colors.textPrimary,
@@ -80,7 +79,6 @@ class ProductFilterOverlay extends StatelessWidget {
                 Text(
                   'men',
                   style: TextStyle(
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w400,
                     fontSize: 16,
                     color: colors.textPrimary,
@@ -121,7 +119,6 @@ class ProductFilterOverlay extends StatelessWidget {
           Text(
             'Category',
             style: TextStyle(
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               fontSize: 16,
               color: colors.textPrimary,
@@ -160,7 +157,6 @@ class ProductFilterOverlay extends StatelessWidget {
           Text(
             'Price Range',
             style: TextStyle(
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               fontSize: 16,
               color: colors.textPrimary,
@@ -214,7 +210,6 @@ class ProductFilterOverlay extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-          fontFamily: 'Campton',
           fontWeight: FontWeight.w400,
           fontSize: 14,
           color: isActive ? colors.onAccent : colors.textPrimary,
@@ -235,7 +230,6 @@ class ProductFilterOverlay extends StatelessWidget {
           Text(
             'Reviews',
             style: TextStyle(
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               fontSize: 16,
               color: colors.textPrimary,
@@ -276,7 +270,6 @@ class ProductFilterOverlay extends StatelessWidget {
           Text(
             ratingRange,
             style: TextStyle(
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               fontSize: 14,
               color: colors.textPrimary,
@@ -307,7 +300,6 @@ class ProductFilterOverlay extends StatelessWidget {
               child: Text(
                 'Clear Filters',
                 style: TextStyle(
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
                   color: colors.accent,
@@ -329,7 +321,6 @@ class ProductFilterOverlay extends StatelessWidget {
               child: Text(
                 'Apply',
                 style: TextStyle(
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
                   color: colors.onAccent,

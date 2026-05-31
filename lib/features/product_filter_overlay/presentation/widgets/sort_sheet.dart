@@ -119,7 +119,6 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
             'Sort By',
             style: TextStyle(
               fontSize: 20,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -196,7 +195,6 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
                       option.label,
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Campton',
                         fontWeight: isSelected
                             ? FontWeight.w600
                             : FontWeight.w400,
@@ -234,7 +232,6 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
                 'Clear Filters',
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: colors.accent,
                 ),
@@ -262,7 +259,6 @@ class _SortOverlayState extends ConsumerState<SortOverlay> {
                 'Show Results',
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: colors.onAccent,
                 ),

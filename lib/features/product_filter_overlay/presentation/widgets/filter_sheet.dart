@@ -207,7 +207,6 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                 option,
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
                   color: isSelected ? colors.onAccent : colors.textPrimary,
                 ),
@@ -235,7 +234,6 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                 formatPrice(currentRange.start.toInt()),
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Campton',
                   color: colors.textPrimary,
                 ),
               ),
@@ -243,7 +241,6 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                 formatPrice(currentRange.end.toInt()),
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Campton',
                   color: colors.textPrimary,
                 ),
               ),
@@ -277,7 +274,6 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
             'Filter By',
             style: TextStyle(
               fontSize: 20,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -302,7 +298,6 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
         title,
         style: TextStyle(
           fontSize: 16,
-          fontFamily: 'Campton',
           fontWeight: FontWeight.w600,
           color: colors.textPrimary,
         ),
@@ -341,7 +336,6 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                 'Clear Filters',
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: colors.accent,
                 ),
@@ -396,7 +390,6 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                 'Show Results',
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: colors.onAccent,
                 ),

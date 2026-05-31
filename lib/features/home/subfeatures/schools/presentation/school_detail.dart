@@ -110,7 +110,6 @@ class SchoolDetailScreen extends ConsumerWidget {
                   schoolName,
                   style: TextStyle(
                     fontSize: 20,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w700,
                     color: colors.textPrimary,
                     height: 1.2,
@@ -136,7 +135,6 @@ class SchoolDetailScreen extends ConsumerWidget {
                       '4.0',
                       style: TextStyle(
                         fontSize: 12,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
                         color: colors.textPrimary,
                       ),
@@ -146,7 +144,6 @@ class SchoolDetailScreen extends ConsumerWidget {
                       '(8)',
                       style: TextStyle(
                         fontSize: 10,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
                         color: colors.textTertiary,
                       ),
@@ -185,7 +182,6 @@ class SchoolDetailScreen extends ConsumerWidget {
             'School Biography',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -195,7 +191,6 @@ class SchoolDetailScreen extends ConsumerWidget {
             biography,
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               color: colors.textSecondary,
               height: 1.5,
@@ -230,7 +225,6 @@ class SchoolDetailScreen extends ConsumerWidget {
             'Classes',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -248,7 +242,6 @@ class SchoolDetailScreen extends ConsumerWidget {
                       classItem.name,
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w400,
                         color: colors.textSecondary,
                         height: 1.4,
@@ -261,7 +254,6 @@ class SchoolDetailScreen extends ConsumerWidget {
                       classItem.duration!,
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
                         color: colors.accent,
                       ),
@@ -304,7 +296,6 @@ class SchoolDetailScreen extends ConsumerWidget {
             'Contact Details',
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -384,7 +375,6 @@ class SchoolDetailScreen extends ConsumerWidget {
                 title,
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w500,
                   color: colors.textPrimary,
                 ),
@@ -394,7 +384,6 @@ class SchoolDetailScreen extends ConsumerWidget {
                 content,
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
                   color: colors.textSecondary,
                   height: 1.6,
@@ -447,7 +436,6 @@ class SchoolDetailScreen extends ConsumerWidget {
                       'Reviews ($reviewCount)',
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Campton',
                         fontWeight: FontWeight.w600,
                         color: colors.textPrimary,
                       ),
@@ -459,7 +447,6 @@ class SchoolDetailScreen extends ConsumerWidget {
                           avgRating,
                           style: TextStyle(
                             fontSize: 12,
-                            fontFamily: 'Campton',
                             fontWeight: FontWeight.w700,
                             color: colors.textPrimary,
                           ),
@@ -559,7 +546,6 @@ class SchoolDetailScreen extends ConsumerWidget {
               name,
               style: TextStyle(
                 fontSize: 12,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textSecondary,
               ),
@@ -568,7 +554,6 @@ class SchoolDetailScreen extends ConsumerWidget {
               date,
               style: TextStyle(
                 fontSize: 10,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textTertiary,
               ),
@@ -601,7 +586,6 @@ class SchoolDetailScreen extends ConsumerWidget {
             title,
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w500,
               color: colors.textPrimary,
             ),
@@ -616,7 +600,6 @@ class SchoolDetailScreen extends ConsumerWidget {
             review,
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               color: colors.textPrimary,
               height: 1.5,
@@ -652,7 +635,6 @@ class SchoolDetailScreen extends ConsumerWidget {
               'Register',
               style: TextStyle(
                 fontSize: 20,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w700,
                 color: colors.textPrimary,
               ),
@@ -664,7 +646,6 @@ class SchoolDetailScreen extends ConsumerWidget {
               'Register via Ojá-Ẹwà and have access to sell or showcase on Ojá-Ẹwà after graduation without payment or Register via the school website without the above benefit',
               style: TextStyle(
                 fontSize: 14,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w400,
                 color: colors.textSecondary,
                 height: 1.5,
@@ -699,7 +680,6 @@ class SchoolDetailScreen extends ConsumerWidget {
                   'Register via Ojá-Ẹwà',
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: colors.onAccent,
                   ),
@@ -728,7 +708,6 @@ class SchoolDetailScreen extends ConsumerWidget {
                   'Visit School',
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Campton',
                     fontWeight: FontWeight.w600,
                     color: colors.accent,
                   ),

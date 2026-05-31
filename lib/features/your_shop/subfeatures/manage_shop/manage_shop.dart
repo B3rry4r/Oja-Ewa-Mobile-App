@@ -76,7 +76,6 @@ class ManageShopScreen extends ConsumerWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: titleColor ?? colors.textPrimary,
-                fontFamily: 'Campton',
               ),
             ),
             Icon(Icons.arrow_forward_ios, size: 16, color: colors.textTertiary),

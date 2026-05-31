@@ -63,7 +63,6 @@ class _MusicBusinessDetailsScreenState
             "About Business",
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -81,7 +80,6 @@ class _MusicBusinessDetailsScreenState
             "Select Category",
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               color: colors.textSecondary,
             ),
           ),
@@ -168,7 +166,6 @@ class _MusicBusinessDetailsScreenState
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 10,
-            fontFamily: 'Campton',
             color: isActive ? colors.textPrimary : colors.textSecondary,
             fontWeight: isActive ? FontWeight.w500 : FontWeight.w400,
           ),
@@ -213,7 +210,6 @@ class _MusicBusinessDetailsScreenState
                   style: TextStyle(
                     color: colors.textPrimary,
                     fontSize: 15,
-                    fontFamily: 'Campton',
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                   ),
                 ),
@@ -298,7 +294,6 @@ class _MusicBusinessDetailsScreenState
         TextField(
           controller: controller,
           style: TextStyle(
-            fontFamily: 'Campton',
             fontSize: 16,
             color: colors.textPrimary,
           ),
@@ -449,7 +444,6 @@ class _MusicBusinessDetailsScreenState
             style: TextStyle(
               color: colors.onAccent,
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.bold,
             ),
           ),

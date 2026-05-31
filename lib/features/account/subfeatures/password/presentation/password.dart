@@ -142,7 +142,6 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
           label,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             color: colors.textTertiary,
           ),
         ),
@@ -168,7 +167,6 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       hintText: 'Type your password',
                       hintStyle: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Campton',
                         color: colors.textTertiary,
                       ),
                     ),
@@ -226,7 +224,6 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     'Save Password',
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),

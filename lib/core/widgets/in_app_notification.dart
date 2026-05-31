@@ -170,7 +170,6 @@ class _InAppNotificationWidgetState extends State<_InAppNotificationWidget>
                                 color: Colors.white,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                fontFamily: 'Campton',
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -179,7 +178,6 @@ class _InAppNotificationWidgetState extends State<_InAppNotificationWidget>
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.9),
                                 fontSize: 13,
-                                fontFamily: 'Campton',
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,

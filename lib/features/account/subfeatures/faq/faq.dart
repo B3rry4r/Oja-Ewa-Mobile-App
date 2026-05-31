@@ -69,7 +69,6 @@ class _FaqsScreenState extends ConsumerState<FaqsScreen> {
                                 'No matching FAQs found',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  fontFamily: 'Campton',
                                   color: colors.textSecondary,
                                 ),
                               ),
@@ -121,7 +120,6 @@ class _FaqsScreenState extends ConsumerState<FaqsScreen> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
               color: colors.textPrimary,
             ),
           ),
@@ -208,7 +206,6 @@ class _FaqsScreenState extends ConsumerState<FaqsScreen> {
             'No matching FAQs found',
             style: TextStyle(
               fontSize: 18,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
             ),
@@ -219,7 +216,6 @@ class _FaqsScreenState extends ConsumerState<FaqsScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Campton',
               color: colors.textSecondary,
             ),
           ),
@@ -239,7 +235,6 @@ class _FaqsScreenState extends ConsumerState<FaqsScreen> {
               'Ask AI Assistant',
               style: TextStyle(
                 fontSize: 14,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -285,7 +280,6 @@ class _FaqsScreenState extends ConsumerState<FaqsScreen> {
                     'Can\'t find what you\'re looking for?',
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
                       color: colors.textPrimary,
                     ),
@@ -294,7 +288,6 @@ class _FaqsScreenState extends ConsumerState<FaqsScreen> {
                     'Ask our AI Assistant for help',
                     style: TextStyle(
                       fontSize: 12,
-                      fontFamily: 'Campton',
                       color: colors.textSecondary,
                     ),
                   ),
@@ -344,7 +337,6 @@ class _FaqAccordionState extends State<_FaqAccordion> {
                     widget.question,
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
                       color: colors.textPrimary,
                     ),
@@ -375,7 +367,6 @@ class _FaqAccordionState extends State<_FaqAccordion> {
                 widget.answer,
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w400,
                   color: colors.textSecondary,
                   height: 1.5,

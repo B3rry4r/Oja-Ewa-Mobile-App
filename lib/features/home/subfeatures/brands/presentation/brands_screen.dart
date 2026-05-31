@@ -150,7 +150,6 @@ class BrandsScreen extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'Campton',
                           color: colors.textPrimary,
                         ),
                       ),
@@ -217,7 +216,6 @@ class BrandsScreen extends ConsumerWidget {
                                       child.name,
                                       style: TextStyle(
                                         fontSize: 15,
-                                        fontFamily: 'Campton',
                                         color: colors.textPrimary,
                                       ),
                                     ),

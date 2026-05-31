@@ -148,7 +148,6 @@ class PasswordResetSuccessScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 33,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Campton',
             color: colors.textPrimary,
             height: 1.2,
           ),
@@ -165,7 +164,6 @@ class PasswordResetSuccessScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              fontFamily: 'Campton',
               color: colors.textSecondary,
               height: 1.5,
             ),
@@ -216,7 +214,6 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'Campton',
                   color: colors.textPrimary,
                 ),
               ),
@@ -258,7 +255,6 @@ class PasswordResetSuccessScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
-              fontFamily: 'Campton',
               color: colors.textTertiary,
               height: 1.4,
             ),
@@ -302,7 +298,6 @@ class PasswordResetSuccessScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'Campton',
                 color: colors.onAccent,
               ),
             ),

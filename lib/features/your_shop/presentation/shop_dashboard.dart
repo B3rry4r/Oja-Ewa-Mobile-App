@@ -104,7 +104,6 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
                     color: colors.textPrimary,
-                    fontFamily: 'Campton',
                   ),
                 ),
                 if (badge != null) ...[
@@ -467,7 +466,6 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
                     'AI Analytics',
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
@@ -477,7 +475,6 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
                     'Smart inventory & trend predictions',
                     style: TextStyle(
                       fontSize: 12,
-                      fontFamily: 'Campton',
                       color: Colors.white70,
                     ),
                   ),

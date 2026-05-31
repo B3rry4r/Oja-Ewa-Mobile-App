@@ -131,7 +131,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       style: TextStyle(
         fontSize: 22.5,
         fontWeight: FontWeight.w700,
-        fontFamily: 'Campton',
         color: colors.textPrimary,
         height: 1.2,
       ),
@@ -158,7 +157,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               textStyle: const TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'Campton',
               ),
             ),
             child: const Text('Create account'),
@@ -211,7 +209,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           textStyle: const TextStyle(
             fontSize: 11.5,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Campton',
           ),
         ),
         child: Text(label),
@@ -227,7 +224,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         text: TextSpan(
           style: TextStyle(
             fontSize: 11,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
             height: 1.4,
           ),

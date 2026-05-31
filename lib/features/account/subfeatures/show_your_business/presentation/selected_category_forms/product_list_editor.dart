@@ -48,7 +48,6 @@ class _ProductListEditorState extends State<ProductListEditor> {
               child: Text(
                 'Add product',
                 style: TextStyle(
-                  fontFamily: 'Campton',
                   fontWeight: FontWeight.w600,
                   color: colors.onAccent,
                 ),
@@ -85,7 +84,6 @@ class _ProductRow extends StatelessWidget {
             initialValue: value,
             onChanged: onChanged,
             style: TextStyle(
-              fontFamily: 'Campton',
               fontSize: 16,
               color: colors.textPrimary,
             ),

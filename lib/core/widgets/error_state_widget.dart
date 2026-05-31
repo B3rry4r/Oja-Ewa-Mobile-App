@@ -64,7 +64,6 @@ class ErrorStateWidget extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
-                          fontFamily: 'Campton',
                           fontWeight: FontWeight.w500,
                           color: colors.textPrimary,
                         ),
@@ -89,7 +88,6 @@ class ErrorStateWidget extends StatelessWidget {
                             'Try Again',
                             style: TextStyle(
                               fontSize: 16,
-                              fontFamily: 'Campton',
                               fontWeight: FontWeight.w600,
                             ),
                           ),

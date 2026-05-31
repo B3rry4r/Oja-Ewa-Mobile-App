@@ -45,8 +45,8 @@ class InfoBottomSheet extends StatelessWidget {
           decoration: BoxDecoration(
             color: colors.surfaceElevated,
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
+              topLeft: Radius.circular(32),
+              topRight: Radius.circular(32),
             ),
           ),
           child: SafeArea(
@@ -76,7 +76,6 @@ class InfoBottomSheet extends StatelessWidget {
                       Text(
                         title,
                         style: TextStyle(
-                          fontFamily: 'Campton',
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                           color: colors.textPrimary,

@@ -49,7 +49,6 @@ class WriteReviewScreen extends StatelessWidget {
                 '100 characters required',
                 style: TextStyle(
                   fontSize: 10,
-                  fontFamily: 'Campton',
                   color: colors.textTertiary.withValues(alpha: 0.8),
                 ),
               ),
@@ -75,7 +74,6 @@ class WriteReviewScreen extends StatelessWidget {
           'Rating',
           style: TextStyle(
             fontSize: 22,
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w600,
             color: colors.textPrimary,
           ),
@@ -124,7 +122,6 @@ class WriteReviewScreen extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
           ),
         ),
@@ -153,7 +150,6 @@ class WriteReviewScreen extends StatelessWidget {
                   child: TextField(
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       color: colors.textPrimary,
                       fontWeight: FontWeight.w400,
                     ),
@@ -161,7 +157,6 @@ class WriteReviewScreen extends StatelessWidget {
                       hintText: hintText,
                       hintStyle: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Campton',
                         color: colors.textTertiary,
                       ),
                       border: InputBorder.none,
@@ -204,7 +199,6 @@ class WriteReviewScreen extends StatelessWidget {
               'Submit Review',
               style: TextStyle(
                 fontSize: 16,
-                fontFamily: 'Campton',
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),

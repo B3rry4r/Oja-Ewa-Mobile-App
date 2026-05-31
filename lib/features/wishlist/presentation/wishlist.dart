@@ -209,7 +209,6 @@ class WishlistScreen extends ConsumerWidget {
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Campton',
             color: colors.textPrimary,
             height: 1.2,
           ),
@@ -223,7 +222,6 @@ class WishlistScreen extends ConsumerWidget {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w400,
-            fontFamily: 'Campton',
             color: colors.textSecondary,
             height: 1.45,
           ),
@@ -254,7 +252,6 @@ class WishlistScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
             ),
           ),
         ),

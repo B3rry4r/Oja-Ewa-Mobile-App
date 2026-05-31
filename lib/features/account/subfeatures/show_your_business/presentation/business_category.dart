@@ -50,7 +50,6 @@ class _BusinessCategoryScreenState
               fontSize: 22,
               fontWeight: FontWeight.w600,
               color: colors.textPrimary,
-              fontFamily: 'Campton',
             ),
           ),
           const SizedBox(height: 24),
@@ -110,7 +109,6 @@ class _BusinessCategoryScreenState
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
                 color: isSelected ? colors.background : colors.textPrimary,
-                fontFamily: 'Campton',
               ),
             ),
             const SizedBox(height: 12),
@@ -122,7 +120,6 @@ class _BusinessCategoryScreenState
                 color: isSelected
                     ? colors.background.withValues(alpha: 0.8)
                     : colors.textSecondary,
-                fontFamily: 'Campton',
               ),
             ),
           ],
@@ -198,7 +195,6 @@ class _BusinessCategoryScreenState
               color: colors.onAccent,
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'Campton',
             ),
           ),
         ),

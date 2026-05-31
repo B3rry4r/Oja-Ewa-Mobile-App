@@ -120,7 +120,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           label,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'Campton',
             fontWeight: FontWeight.w400,
             color: colors.textSecondary,
           ),
@@ -150,7 +149,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             ),
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'Campton',
               fontWeight: FontWeight.w400,
               color: colors.textPrimary,
             ),
@@ -225,7 +223,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     'Save Changes',
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Campton',
                       fontWeight: FontWeight.w600,
                       color: colors.onAccent,
                     ),
