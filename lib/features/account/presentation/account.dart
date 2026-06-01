@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/core/i18n/l10n_ext.dart';
-import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
@@ -81,37 +80,37 @@ class AccountScreen extends ConsumerWidget {
         title: l.accountSectionAccount,
         rows: [
           AccountMenuRow(
-            iconAsset: AppIcons.editYourProfile,
+            icon: WBIconName.user,
             label: l.accountEditProfile,
             sub: l.accountEditProfileSub,
             onTap: () => go(AppRoutes.editProfile),
           ),
           AccountMenuRow(
-            iconAsset: AppIcons.yourOrders,
+            icon: WBIconName.basket,
             label: l.accountYourOrders,
             sub: l.accountYourOrdersSub,
             onTap: () => go(AppRoutes.orders),
           ),
           AccountMenuRow(
-            iconAsset: AppIcons.yourAddress,
+            icon: WBIconName.pin,
             label: l.accountAddresses,
             sub: l.accountAddressesSub,
             onTap: () => go(AppRoutes.addresses),
           ),
           AccountMenuRow(
-            iconAsset: AppIcons.notification,
+            icon: WBIconName.bell,
             label: l.accountNotifications,
             sub: l.accountNotificationsSub,
             onTap: () => go(AppRoutes.notificationsSettings),
           ),
           AccountMenuRow(
-            iconAsset: AppIcons.password,
+            icon: WBIconName.lock,
             label: l.accountPassword,
             sub: l.accountPasswordSub,
             onTap: () => go(AppRoutes.changePassword),
           ),
           AccountMenuRow(
-            iconAsset: AppIcons.connectToUs,
+            icon: WBIconName.globe,
             label: l.languageTitle,
             sub: l.languageSubtitle,
             onTap: () => go(AppRoutes.language),
@@ -122,7 +121,7 @@ class AccountScreen extends ConsumerWidget {
         title: l.accountSectionBusiness,
         rows: [
           AccountMenuRow(
-            iconAsset: AppIcons.startSelling,
+            icon: WBIconName.store,
             label: l.accountStartSelling,
             sub: l.accountStartSellingSub,
             onTap: () => go(
@@ -132,7 +131,7 @@ class AccountScreen extends ConsumerWidget {
             ),
           ),
           AccountMenuRow(
-            iconAsset: AppIcons.showYourBusiness,
+            icon: WBIconName.store,
             label: l.accountShowBusiness,
             sub: l.accountShowBusinessSub,
             onTap: () => go(
@@ -147,27 +146,27 @@ class AccountScreen extends ConsumerWidget {
         title: l.accountSectionSupport,
         rows: [
           AccountMenuRow(
-            iconAsset: AppIcons.emailUs,
+            icon: WBIconName.message,
             label: l.accountEmailUs,
             onTap: () => _handleEmailUs(context, ref),
           ),
           AccountMenuRow(
-            iconAsset: AppIcons.privacyPolicy,
+            icon: WBIconName.shield,
             label: l.accountPrivacy,
             onTap: () => go(AppRoutes.privacyPolicy),
           ),
           AccountMenuRow(
-            iconAsset: AppIcons.termsOfService,
+            icon: WBIconName.doc,
             label: l.accountTerms,
             onTap: () => go(AppRoutes.termsOfService),
           ),
           AccountMenuRow(
-            iconAsset: AppIcons.faq,
+            icon: WBIconName.help,
             label: l.accountFaq,
             onTap: () => go(AppRoutes.faq),
           ),
           AccountMenuRow(
-            iconAsset: AppIcons.connectToUs,
+            icon: WBIconName.phone,
             label: l.accountConnect,
             onTap: () => go(AppRoutes.connectToUs),
           ),
@@ -187,7 +186,7 @@ class AccountScreen extends ConsumerWidget {
       rows: [
         if (isLoggedIn)
           AccountMenuRow(
-            iconAsset: AppIcons.signOut,
+            icon: WBIconName.trash,
             label: l.accountDelete,
             danger: true,
             onTap: () {
@@ -205,7 +204,7 @@ class AccountScreen extends ConsumerWidget {
             },
           ),
         AccountMenuRow(
-          iconAsset: AppIcons.signOut,
+          icon: WBIconName.logout,
           label: isLoggedIn ? l.authSignOut : l.authSignIn,
           danger: isLoggedIn,
           onTap: () => _handleAuthAction(context, ref, isLoggedIn),

@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/core/i18n/l10n_ext.dart';
-import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
+import 'package:ojaewa/core/widgets/wb_icon.dart';
 
 /// Floating dark-pill bottom navigation, matching the WAWUBasket design
 /// system. The active tab inflates into a white capsule with a small inner
 /// dark icon disc and a label; the swap is fully animated.
 ///
 /// Keeps the original [currentIndex]/[onTap] contract so [AppShell] is
-/// unchanged. Uses the app's existing SVG tab icons (Blog has no WB icon
-/// equivalent) rendered in the WB monochrome style.
+/// unchanged. Uses the WB line-icon set.
 class AppBottomNavBar extends StatelessWidget {
   static const double height = 70;
   const AppBottomNavBar({
@@ -26,12 +24,12 @@ class AppBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
-    final items = <({String asset, String label})>[
-      (asset: AppIcons.home, label: l.navHome),
-      (asset: AppIcons.search, label: l.navSearch),
-      (asset: AppIcons.wishlist, label: l.navWishlist),
-      (asset: AppIcons.blog, label: l.navBlog),
-      (asset: AppIcons.account, label: l.navAccount),
+    final items = <({WBIconName icon, String label})>[
+      (icon: WBIconName.home, label: l.navHome),
+      (icon: WBIconName.search, label: l.navSearch),
+      (icon: WBIconName.heart, label: l.navWishlist),
+      (icon: WBIconName.book, label: l.navBlog),
+      (icon: WBIconName.user, label: l.navAccount),
     ];
     final bottomInset = MediaQuery.of(context).padding.bottom;
     return Padding(
@@ -54,7 +52,7 @@ class AppBottomNavBar extends StatelessWidget {
           children: [
             for (var i = 0; i < items.length; i++)
               _NavSlot(
-                asset: items[i].asset,
+                icon: items[i].icon,
                 label: items[i].label,
                 active: i == currentIndex,
                 onTap: () => onTap(i),
@@ -68,13 +66,13 @@ class AppBottomNavBar extends StatelessWidget {
 
 class _NavSlot extends StatelessWidget {
   const _NavSlot({
-    required this.asset,
+    required this.icon,
     required this.label,
     required this.active,
     required this.onTap,
   });
 
-  final String asset;
+  final WBIconName icon;
   final String label;
   final bool active;
   final VoidCallback onTap;
@@ -106,14 +104,12 @@ class _NavSlot extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
-              child: SvgPicture.asset(
-                asset,
-                width: active ? 15 : 20,
-                height: active ? 15 : 20,
-                colorFilter: ColorFilter.mode(
-                  active ? Colors.white : Colors.white.withValues(alpha: 0.85),
-                  BlendMode.srcIn,
-                ),
+              child: WBIcon(
+                icon,
+                size: active ? 15 : 20,
+                color: active
+                    ? Colors.white
+                    : Colors.white.withValues(alpha: 0.85),
               ),
             ),
             ClipRect(

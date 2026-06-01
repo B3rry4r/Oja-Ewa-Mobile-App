@@ -32,6 +32,15 @@ enum WBIconName {
   phone,
   message,
   card,
+  book,
+  lock,
+  globe,
+  store,
+  shield,
+  doc,
+  help,
+  trash,
+  logout,
 }
 
 class WBIcon extends StatelessWidget {
@@ -295,6 +304,131 @@ class _WBIconPainter extends CustomPainter {
         );
         canvas.drawRRect(rect, stroke);
         canvas.drawLine(const Offset(2.5, 9), const Offset(21.5, 9), stroke);
+      case WBIconName.book:
+        final pages = Path()
+          ..moveTo(12, 6.5)
+          ..lineTo(5, 5)
+          ..lineTo(5, 18.5)
+          ..lineTo(12, 20)
+          ..lineTo(19, 18.5)
+          ..lineTo(19, 5)
+          ..lineTo(12, 6.5)
+          ..close();
+        canvas.drawPath(pages, stroke);
+        canvas.drawLine(const Offset(12, 6.5), const Offset(12, 20), stroke);
+      case WBIconName.lock:
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            const Rect.fromLTWH(5, 10.5, 14, 10),
+            const Radius.circular(2.5),
+          ),
+          stroke,
+        );
+        canvas.drawArc(
+          const Rect.fromLTWH(8, 5.5, 8, 9),
+          math.pi,
+          math.pi,
+          false,
+          stroke,
+        );
+        canvas.drawCircle(const Offset(12, 15), 1.4, fill);
+      case WBIconName.globe:
+        canvas.drawCircle(const Offset(12, 12), 9, stroke);
+        canvas.drawLine(const Offset(3, 12), const Offset(21, 12), stroke);
+        final meridian = Path()
+          ..moveTo(12, 3)
+          ..cubicTo(7, 7, 7, 17, 12, 21)
+          ..cubicTo(17, 17, 17, 7, 12, 3)
+          ..close();
+        canvas.drawPath(meridian, stroke);
+      case WBIconName.store:
+        final roof = Path()
+          ..moveTo(4, 9)
+          ..lineTo(5.5, 5)
+          ..lineTo(18.5, 5)
+          ..lineTo(20, 9)
+          ..close();
+        canvas.drawPath(roof, stroke);
+        final body = Path()
+          ..moveTo(5, 9)
+          ..lineTo(5, 20)
+          ..lineTo(19, 20)
+          ..lineTo(19, 9);
+        canvas.drawPath(body, stroke);
+        final door = Path()
+          ..moveTo(10, 20)
+          ..lineTo(10, 14.5)
+          ..lineTo(14, 14.5)
+          ..lineTo(14, 20);
+        canvas.drawPath(door, stroke);
+      case WBIconName.shield:
+        final s = Path()
+          ..moveTo(12, 3)
+          ..lineTo(19, 6)
+          ..lineTo(19, 11)
+          ..cubicTo(19, 16, 15.5, 19.5, 12, 21)
+          ..cubicTo(8.5, 19.5, 5, 16, 5, 11)
+          ..lineTo(5, 6)
+          ..close();
+        canvas.drawPath(s, stroke);
+        final check = Path()
+          ..moveTo(9, 11.5)
+          ..lineTo(11.2, 13.7)
+          ..lineTo(15, 9.5);
+        canvas.drawPath(check, stroke);
+      case WBIconName.doc:
+        final outline = Path()
+          ..moveTo(6, 3)
+          ..lineTo(14, 3)
+          ..lineTo(18, 7)
+          ..lineTo(18, 21)
+          ..lineTo(6, 21)
+          ..close();
+        canvas.drawPath(outline, stroke);
+        final fold = Path()
+          ..moveTo(14, 3)
+          ..lineTo(14, 7)
+          ..lineTo(18, 7);
+        canvas.drawPath(fold, stroke);
+        canvas.drawLine(const Offset(9, 12), const Offset(15, 12), stroke);
+        canvas.drawLine(const Offset(9, 16), const Offset(15, 16), stroke);
+      case WBIconName.help:
+        canvas.drawCircle(const Offset(12, 12), 9, stroke);
+        final q = Path()
+          ..moveTo(9.3, 9.5)
+          ..cubicTo(9.3, 7, 14.7, 7, 14.7, 10)
+          ..cubicTo(14.7, 12.2, 12, 12.2, 12, 14.5);
+        canvas.drawPath(q, stroke);
+        canvas.drawCircle(const Offset(12, 17.2), 1.1, fill);
+      case WBIconName.trash:
+        canvas.drawLine(const Offset(4, 7), const Offset(20, 7), stroke);
+        final handle = Path()
+          ..moveTo(9, 7)
+          ..lineTo(9, 4.8)
+          ..lineTo(15, 4.8)
+          ..lineTo(15, 7);
+        canvas.drawPath(handle, stroke);
+        final can = Path()
+          ..moveTo(6, 7)
+          ..lineTo(7, 20)
+          ..lineTo(17, 20)
+          ..lineTo(18, 7);
+        canvas.drawPath(can, stroke);
+        canvas.drawLine(const Offset(10, 10.5), const Offset(10, 16.5), stroke);
+        canvas.drawLine(const Offset(14, 10.5), const Offset(14, 16.5), stroke);
+      case WBIconName.logout:
+        final frame = Path()
+          ..moveTo(14, 4)
+          ..lineTo(6, 4)
+          ..lineTo(6, 20)
+          ..lineTo(14, 20);
+        canvas.drawPath(frame, stroke);
+        canvas.drawLine(const Offset(10, 12), const Offset(21, 12), stroke);
+        final head = Path()
+          ..moveTo(17, 8)
+          ..lineTo(21, 12)
+          ..lineTo(17, 16);
+        canvas.drawPath(head, stroke);
     }
     canvas.restore();
   }

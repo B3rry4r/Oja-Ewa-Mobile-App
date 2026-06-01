@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/wb_icon.dart';
 
 /// One row inside an [AccountMenuSection] — a 36-square icon tile + label +
 /// optional sub-text + chevron. Mirrors the WAWUBasket account menu, using the
-/// app's SVG icon assets. `danger` paints the tile/label red (sign-out, delete).
+/// WB line-icon set. `danger` paints the tile/label red (sign-out, delete).
 class AccountMenuRow {
   const AccountMenuRow({
-    required this.iconAsset,
+    required this.icon,
     required this.label,
     required this.onTap,
     this.sub,
@@ -17,7 +16,7 @@ class AccountMenuRow {
     this.danger = false,
   });
 
-  final String iconAsset;
+  final WBIconName icon;
   final String label;
   final String? sub;
   final VoidCallback onTap;
@@ -101,12 +100,7 @@ class _MenuRowView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               alignment: Alignment.center,
-              child: SvgPicture.asset(
-                spec.iconAsset,
-                width: 17,
-                height: 17,
-                colorFilter: ColorFilter.mode(fg, BlendMode.srcIn),
-              ),
+              child: WBIcon(spec.icon, size: 17, color: fg),
             ),
             const SizedBox(width: 14),
             Expanded(
