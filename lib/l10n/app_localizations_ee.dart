@@ -341,4 +341,91 @@ class AppLocalizationsEe extends AppLocalizations {
 
   @override
   String get languageSubtitle => 'Tia gbe si nàdi be yeazã le WAWUBeauty dzi.';
+
+  @override
+  String get productSize => 'Lolõme';
+
+  @override
+  String get productViewSizeChart => 'Kpɔ size chart';
+
+  @override
+  String get productProcessingTime => 'Ɣeyiɣi si wòawɔ';
+
+  @override
+  String get productSelectPackage => 'Tia wò package ƒomevi';
+
+  @override
+  String get productDescription => 'Nuŋlɔɖi';
+
+  @override
+  String get productReturnPolicy => 'Nugbugbɔ ƒe ɖoɖo';
+
+  @override
+  String get productAboutSeller => 'Nudzrala ŋuti';
+
+  @override
+  String get productYouMayLike => 'Àlɔ̃ esiawo hã';
+
+  @override
+  String get productContactSeller => 'Do ka na nudzrala';
+
+  @override
+  String get productUnableToLoad => 'Womete ŋu kɔ nu ŋuti nyawo o';
+
+  @override
+  String get productAddedToCart => 'Wotsɔe de kotoku me';
+
+  @override
+  String get productFailedToCart => 'Metsɔe de kotoku me o';
+
+  @override
+  String get checkoutTitle => 'Nudɔdɔ ƒe kpeɖodzi';
+
+  @override
+  String get checkoutAddAddress => 'Taflatse tsɔ nutsɔtsɔ teƒe kpe eŋu';
+
+  @override
+  String get checkoutShippingAddress => 'Nutsɔtsɔ teƒe';
+
+  @override
+  String get checkoutNoAddress => 'Womietia teƒe aɖeke haɖe o';
+
+  @override
+  String get checkoutAddAddressBtn => 'Tsɔ teƒe kpe eŋu';
+
+  @override
+  String get checkoutItems => 'Nuwo';
+
+  @override
+  String get checkoutOrderSummary => 'Nudɔdɔ ƒe nuƒoƒu';
+
+  @override
+  String get checkoutDeliveryFee => 'Nutsɔtsɔ ƒe fe';
+
+  @override
+  String get checkoutTotal => 'Katã';
+
+  @override
+  String get checkoutPlaceOrder => 'Dɔ nua';
+
+  @override
+  String get sellerShopTitle => 'Wò fiase';
+
+  @override
+  String get sellerOrdersInProcess => 'Nudɔdɔ siwo le wɔwɔm';
+
+  @override
+  String get sellerManageShop => 'Kpɔ fiase dzi';
+
+  @override
+  String get sellerProducts => 'Adzɔnuwo';
+
+  @override
+  String get sellerOrders => 'Nudɔdɔwo';
+
+  @override
+  String get sellerView => 'Kpɔ';
+
+  @override
+  String get sellerSearchShop => 'Di le wò fiase me';
 }

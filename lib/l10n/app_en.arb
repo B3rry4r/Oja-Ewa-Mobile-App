@@ -1,12 +1,10 @@
 {
   "@@locale": "en",
-
   "navHome": "Home",
   "navSearch": "Search",
   "navWishlist": "Wishlist",
   "navBlog": "Blog",
   "navAccount": "Account",
-
   "commonRetry": "Retry",
   "commonCancel": "Cancel",
   "commonSave": "Save",
@@ -19,7 +17,6 @@
   "commonLoading": "Loading...",
   "commonTryAgain": "Try Again",
   "commonViewAll": "View All",
-
   "authWelcomeBack": "Welcome Back!",
   "authLetsSignIn": "Let's sign in",
   "authSignIn": "Sign in",
@@ -50,12 +47,10 @@
   "onboardingTermsOfService": "Terms of Service",
   "onboardingAnd": " and ",
   "onboardingPrivacy": "Privacy Policy",
-
   "homeShopByCategory": "Shop by category",
   "homeSearchHint": "Search products, brands & shops",
   "homeDiscoverTitle": "Discover curated drops",
   "homeDiscoverSub": "Fashion, beauty, art, education, and hardware in one marketplace.",
-
   "searchTitle": "Search",
   "searchHint": "Search WAWUBeauty",
   "searchNoResults": "No results found",
@@ -66,7 +61,6 @@
   "catTextiles": "Textiles",
   "catBeauty": "Afro Beauty",
   "catShoesBags": "Shoes & Bags",
-
   "cartTitle": "Cart",
   "cartEmpty": "Your cart is empty",
   "cartEmptySub": "Browse the marketplace and add items to your cart.",
@@ -75,19 +69,16 @@
   "cartDeliveryNote": "Delivery fee calculated at checkout",
   "cartAddToBag": "Add to Bag",
   "cartAtCheckout": "At checkout",
-
   "wishlistTitle": "Wishlist",
   "wishlistEmpty": "Nothing saved yet",
   "wishlistEmptySub": "Products you save will show up here for quick access later.",
   "wishlistKeepShopping": "Keep Shopping",
-
   "ordersTitle": "Your orders",
   "ordersEmpty": "No orders yet",
   "ordersEmptySub": "Your orders will show up here once you check out.",
   "shippingOptions": "Shipping Options",
   "shippingLoading": "Fetching delivery options…",
   "shippingError": "Couldn't load delivery options",
-
   "accountGuest": "Guest",
   "accountEditProfile": "Edit your profile",
   "accountEditProfileSub": "Name, photo and contact details",
@@ -112,14 +103,41 @@
   "accountFaq": "FAQ",
   "accountConnect": "Connect to us",
   "accountDelete": "Delete Account",
-
   "blogNoFavorites": "No favorite posts yet",
   "blogNoFavoritesSub": "Posts you favourite will appear here.",
   "blogNoPosts": "No posts found",
   "blogNoPostsSub": "Check back soon for new stories.",
   "notificationsEmpty": "You have no notifications",
   "notificationsEmptySub": "We'll let you know when something important happens.",
-
   "languageTitle": "Language",
-  "languageSubtitle": "Choose the language you'd like to use across WAWUBeauty."
+  "languageSubtitle": "Choose the language you'd like to use across WAWUBeauty.",
+  "productSize": "Size",
+  "productViewSizeChart": "View Size Chart",
+  "productProcessingTime": "Processing Time",
+  "productSelectPackage": "Select your package type",
+  "productDescription": "Description",
+  "productReturnPolicy": "Return Policy",
+  "productAboutSeller": "About Seller",
+  "productYouMayLike": "You may also like",
+  "productContactSeller": "Contact seller",
+  "productUnableToLoad": "Unable to load product details",
+  "productAddedToCart": "Added to cart",
+  "productFailedToCart": "Failed to add to cart",
+  "checkoutTitle": "Order confirmation",
+  "checkoutAddAddress": "Please add a delivery address",
+  "checkoutShippingAddress": "Shipping Address",
+  "checkoutNoAddress": "No address selected yet",
+  "checkoutAddAddressBtn": "Add address",
+  "checkoutItems": "Items",
+  "checkoutOrderSummary": "Order Summary",
+  "checkoutDeliveryFee": "Delivery Fee",
+  "checkoutTotal": "Total",
+  "checkoutPlaceOrder": "Place Order",
+  "sellerShopTitle": "Your Shop",
+  "sellerOrdersInProcess": "Orders in Process",
+  "sellerManageShop": "Manage Shop",
+  "sellerProducts": "Products",
+  "sellerOrders": "Orders",
+  "sellerView": "View",
+  "sellerSearchShop": "Search your shop"
 }

@@ -1,12 +1,10 @@
 {
   "@@locale": "ar",
-
   "navHome": "الرئيسية",
   "navSearch": "بحث",
   "navWishlist": "المفضلة",
   "navBlog": "المدونة",
   "navAccount": "الحساب",
-
   "commonRetry": "إعادة المحاولة",
   "commonCancel": "إلغاء",
   "commonSave": "حفظ",
@@ -19,7 +17,6 @@
   "commonLoading": "جارٍ التحميل...",
   "commonTryAgain": "إعادة المحاولة",
   "commonViewAll": "عرض الكل",
-
   "authWelcomeBack": "مرحبًا بعودتك!",
   "authLetsSignIn": "لنسجّل الدخول",
   "authSignIn": "تسجيل الدخول",
@@ -50,12 +47,10 @@
   "onboardingTermsOfService": "شروط الخدمة",
   "onboardingAnd": " و",
   "onboardingPrivacy": "سياسة الخصوصية",
-
   "homeShopByCategory": "التسوق حسب الفئة",
   "homeSearchHint": "ابحث عن المنتجات والعلامات والمتاجر",
   "homeDiscoverTitle": "اكتشف أحدث المنتجات",
   "homeDiscoverSub": "الأزياء والجمال والفن والتعليم والأدوات في سوق واحد.",
-
   "searchTitle": "بحث",
   "searchHint": "ابحث في WAWUBeauty",
   "searchNoResults": "لا توجد نتائج",
@@ -66,7 +61,6 @@
   "catTextiles": "المنسوجات",
   "catBeauty": "جمال أفريقي",
   "catShoesBags": "أحذية وحقائب",
-
   "cartTitle": "السلة",
   "cartEmpty": "سلتك فارغة",
   "cartEmptySub": "تصفّح السوق وأضف عناصر إلى سلتك.",
@@ -75,19 +69,16 @@
   "cartDeliveryNote": "يتم احتساب رسوم التوصيل عند الدفع",
   "cartAddToBag": "أضف إلى السلة",
   "cartAtCheckout": "عند الدفع",
-
   "wishlistTitle": "المفضلة",
   "wishlistEmpty": "لا شيء محفوظ بعد",
   "wishlistEmptySub": "ستظهر المنتجات التي تحفظها هنا للوصول السريع لاحقًا.",
   "wishlistKeepShopping": "مواصلة التسوق",
-
   "ordersTitle": "طلباتك",
   "ordersEmpty": "لا توجد طلبات بعد",
   "ordersEmptySub": "ستظهر طلباتك هنا بعد إتمام الدفع.",
   "shippingOptions": "خيارات الشحن",
   "shippingLoading": "جارٍ جلب خيارات التوصيل…",
   "shippingError": "تعذّر تحميل خيارات التوصيل",
-
   "accountGuest": "زائر",
   "accountEditProfile": "تعديل ملفك الشخصي",
   "accountEditProfileSub": "الاسم والصورة وبيانات الاتصال",
@@ -112,14 +103,41 @@
   "accountFaq": "الأسئلة الشائعة",
   "accountConnect": "تواصل معنا",
   "accountDelete": "حذف الحساب",
-
   "blogNoFavorites": "لا توجد منشورات مفضلة بعد",
   "blogNoFavoritesSub": "ستظهر المنشورات التي تفضّلها هنا.",
   "blogNoPosts": "لا توجد منشورات",
   "blogNoPostsSub": "تحقّق لاحقًا من القصص الجديدة.",
   "notificationsEmpty": "ليس لديك إشعارات",
   "notificationsEmptySub": "سنخبرك عند حدوث شيء مهم.",
-
   "languageTitle": "اللغة",
-  "languageSubtitle": "اختر اللغة التي تريد استخدامها في WAWUBeauty."
+  "languageSubtitle": "اختر اللغة التي تريد استخدامها في WAWUBeauty.",
+  "productSize": "المقاس",
+  "productViewSizeChart": "عرض دليل المقاسات",
+  "productProcessingTime": "وقت التجهيز",
+  "productSelectPackage": "اختر نوع الطرد",
+  "productDescription": "الوصف",
+  "productReturnPolicy": "سياسة الإرجاع",
+  "productAboutSeller": "عن البائع",
+  "productYouMayLike": "قد يعجبك أيضًا",
+  "productContactSeller": "تواصل مع البائع",
+  "productUnableToLoad": "تعذّر تحميل تفاصيل المنتج",
+  "productAddedToCart": "تمت الإضافة إلى السلة",
+  "productFailedToCart": "فشل في الإضافة إلى السلة",
+  "checkoutTitle": "تأكيد الطلب",
+  "checkoutAddAddress": "يرجى إضافة عنوان التوصيل",
+  "checkoutShippingAddress": "عنوان الشحن",
+  "checkoutNoAddress": "لم يتم اختيار عنوان بعد",
+  "checkoutAddAddressBtn": "إضافة عنوان",
+  "checkoutItems": "العناصر",
+  "checkoutOrderSummary": "ملخص الطلب",
+  "checkoutDeliveryFee": "رسوم التوصيل",
+  "checkoutTotal": "الإجمالي",
+  "checkoutPlaceOrder": "إتمام الطلب",
+  "sellerShopTitle": "متجرك",
+  "sellerOrdersInProcess": "الطلبات قيد المعالجة",
+  "sellerManageShop": "إدارة المتجر",
+  "sellerProducts": "المنتجات",
+  "sellerOrders": "الطلبات",
+  "sellerView": "عرض",
+  "sellerSearchShop": "ابحث في متجرك"
 }

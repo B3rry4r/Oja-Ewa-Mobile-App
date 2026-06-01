@@ -342,4 +342,91 @@ class AppLocalizationsTw extends AppLocalizations {
   @override
   String get languageSubtitle =>
       'Yi kasa a wopɛ sɛ wode di dwuma wɔ WAWUBeauty so.';
+
+  @override
+  String get productSize => 'Kɛseɛ';
+
+  @override
+  String get productViewSizeChart => 'Hwɛ size chart';
+
+  @override
+  String get productProcessingTime => 'Berɛ a wɔde yɛ';
+
+  @override
+  String get productSelectPackage => 'Yi wo package';
+
+  @override
+  String get productDescription => 'Nkyerɛkyerɛmu';
+
+  @override
+  String get productReturnPolicy => 'Nsanahyɛ ho mmara';
+
+  @override
+  String get productAboutSeller => 'Ɔtɔnfoɔ ho';
+
+  @override
+  String get productYouMayLike => 'Ebia wobɛpɛ yeinom nso';
+
+  @override
+  String get productContactSeller => 'Frɛ ɔtɔnfoɔ';
+
+  @override
+  String get productUnableToLoad => 'Yɛantumi annya adetɔn no ho nsɛm';
+
+  @override
+  String get productAddedToCart => 'Wɔde agu bag mu';
+
+  @override
+  String get productFailedToCart => 'Antumi amfa angu bag mu';
+
+  @override
+  String get checkoutTitle => 'Order no foa so';
+
+  @override
+  String get checkoutAddAddress => 'Yɛsrɛ fa baabi a wɔde bɛkɔ ka ho';
+
+  @override
+  String get checkoutShippingAddress => 'Baabi a wɔde bɛkɔ';
+
+  @override
+  String get checkoutNoAddress => 'Wonyii baabi biara';
+
+  @override
+  String get checkoutAddAddressBtn => 'Fa baabi ka ho';
+
+  @override
+  String get checkoutItems => 'Nneɛma';
+
+  @override
+  String get checkoutOrderSummary => 'Order no mu tiawa';
+
+  @override
+  String get checkoutDeliveryFee => 'Adesoa ka';
+
+  @override
+  String get checkoutTotal => 'Nyinaa';
+
+  @override
+  String get checkoutPlaceOrder => 'Yɛ order';
+
+  @override
+  String get sellerShopTitle => 'Wo sotɔɔ';
+
+  @override
+  String get sellerOrdersInProcess => 'Order a wɔreyɛ';
+
+  @override
+  String get sellerManageShop => 'Hwɛ wo sotɔɔ so';
+
+  @override
+  String get sellerProducts => 'Nneɛma';
+
+  @override
+  String get sellerOrders => 'Nkɔso';
+
+  @override
+  String get sellerView => 'Hwɛ';
+
+  @override
+  String get sellerSearchShop => 'Hwehwɛ wo sotɔɔ mu';
 }

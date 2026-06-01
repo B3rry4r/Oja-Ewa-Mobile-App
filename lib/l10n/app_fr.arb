@@ -1,12 +1,10 @@
 {
   "@@locale": "fr",
-
   "navHome": "Accueil",
   "navSearch": "Recherche",
   "navWishlist": "Favoris",
   "navBlog": "Blog",
   "navAccount": "Compte",
-
   "commonRetry": "Réessayer",
   "commonCancel": "Annuler",
   "commonSave": "Enregistrer",
@@ -19,7 +17,6 @@
   "commonLoading": "Chargement...",
   "commonTryAgain": "Réessayer",
   "commonViewAll": "Tout voir",
-
   "authWelcomeBack": "Bon retour !",
   "authLetsSignIn": "Connectons-nous",
   "authSignIn": "Se connecter",
@@ -50,12 +47,10 @@
   "onboardingTermsOfService": "Conditions d'utilisation",
   "onboardingAnd": " et la ",
   "onboardingPrivacy": "Politique de confidentialité",
-
   "homeShopByCategory": "Acheter par catégorie",
   "homeSearchHint": "Rechercher produits, marques et boutiques",
   "homeDiscoverTitle": "Découvrez les nouveautés",
   "homeDiscoverSub": "Mode, beauté, art, éducation et matériel sur une seule place de marché.",
-
   "searchTitle": "Recherche",
   "searchHint": "Rechercher sur WAWUBeauty",
   "searchNoResults": "Aucun résultat",
@@ -66,7 +61,6 @@
   "catTextiles": "Textiles",
   "catBeauty": "Beauté Afro",
   "catShoesBags": "Chaussures et sacs",
-
   "cartTitle": "Panier",
   "cartEmpty": "Votre panier est vide",
   "cartEmptySub": "Parcourez la place de marché et ajoutez des articles à votre panier.",
@@ -75,19 +69,16 @@
   "cartDeliveryNote": "Frais de livraison calculés à la commande",
   "cartAddToBag": "Ajouter au panier",
   "cartAtCheckout": "À la commande",
-
   "wishlistTitle": "Favoris",
   "wishlistEmpty": "Rien d'enregistré",
   "wishlistEmptySub": "Les produits que vous enregistrez apparaîtront ici pour un accès rapide.",
   "wishlistKeepShopping": "Continuer mes achats",
-
   "ordersTitle": "Vos commandes",
   "ordersEmpty": "Aucune commande",
   "ordersEmptySub": "Vos commandes apparaîtront ici après le paiement.",
   "shippingOptions": "Options de livraison",
   "shippingLoading": "Recherche des options de livraison…",
   "shippingError": "Impossible de charger les options de livraison",
-
   "accountGuest": "Invité",
   "accountEditProfile": "Modifier mon profil",
   "accountEditProfileSub": "Nom, photo et coordonnées",
@@ -112,14 +103,41 @@
   "accountFaq": "FAQ",
   "accountConnect": "Contactez-nous",
   "accountDelete": "Supprimer le compte",
-
   "blogNoFavorites": "Aucun article favori",
   "blogNoFavoritesSub": "Les articles que vous aimez apparaîtront ici.",
   "blogNoPosts": "Aucun article trouvé",
   "blogNoPostsSub": "Revenez bientôt pour de nouvelles histoires.",
   "notificationsEmpty": "Vous n'avez aucune notification",
   "notificationsEmptySub": "Nous vous préviendrons lorsqu'il se passera quelque chose d'important.",
-
   "languageTitle": "Langue",
-  "languageSubtitle": "Choisissez la langue que vous souhaitez utiliser sur WAWUBeauty."
+  "languageSubtitle": "Choisissez la langue que vous souhaitez utiliser sur WAWUBeauty.",
+  "productSize": "Taille",
+  "productViewSizeChart": "Voir le guide des tailles",
+  "productProcessingTime": "Délai de préparation",
+  "productSelectPackage": "Choisissez votre type de colis",
+  "productDescription": "Description",
+  "productReturnPolicy": "Politique de retour",
+  "productAboutSeller": "À propos du vendeur",
+  "productYouMayLike": "Vous aimerez aussi",
+  "productContactSeller": "Contacter le vendeur",
+  "productUnableToLoad": "Impossible de charger les détails du produit",
+  "productAddedToCart": "Ajouté au panier",
+  "productFailedToCart": "Échec de l'ajout au panier",
+  "checkoutTitle": "Confirmation de commande",
+  "checkoutAddAddress": "Veuillez ajouter une adresse de livraison",
+  "checkoutShippingAddress": "Adresse de livraison",
+  "checkoutNoAddress": "Aucune adresse sélectionnée",
+  "checkoutAddAddressBtn": "Ajouter une adresse",
+  "checkoutItems": "Articles",
+  "checkoutOrderSummary": "Récapitulatif de la commande",
+  "checkoutDeliveryFee": "Frais de livraison",
+  "checkoutTotal": "Total",
+  "checkoutPlaceOrder": "Passer la commande",
+  "sellerShopTitle": "Votre boutique",
+  "sellerOrdersInProcess": "Commandes en cours",
+  "sellerManageShop": "Gérer la boutique",
+  "sellerProducts": "Produits",
+  "sellerOrders": "Commandes",
+  "sellerView": "Voir",
+  "sellerSearchShop": "Rechercher dans votre boutique"
 }

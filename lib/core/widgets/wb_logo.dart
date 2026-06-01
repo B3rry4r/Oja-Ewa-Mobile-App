@@ -14,7 +14,7 @@ class WBWMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.asset(
-      'assets/icons/wawu_w.png',
+      'assets/brand_icons/W.png',
       width: size,
       height: size,
       fit: BoxFit.contain,

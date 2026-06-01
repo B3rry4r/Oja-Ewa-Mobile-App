@@ -11,20 +11,21 @@ abstract class AppIcons {
   static const String blog = 'assets/icons/blog.svg';
   static const String brandMarkBlack = 'assets/icons/Black.svg';
   static const String brandMarkWhite = 'assets/icons/White.svg';
-  static const String beauty = 'assets/icons/new_icons/afro_beauty.svg';
-  static const String brands = 'assets/icons/new_icons/footwears.svg';
-  static const String market = 'assets/icons/new_icons/textiles.svg';
-  static const String music = 'assets/icons/new_icons/arts.svg';
-  static const String hardware = 'assets/icons/new_icons/hardware.svg';
-  static const String schools = 'assets/icons/new_icons/education.svg';
+  // WAWUBeauty brand category/service artwork — the exact SVG files from the
+  // brand kit, used as-is (full colour, no tint).
+  static const String beauty = 'assets/brand_icons/Afro.svg';
+  static const String brands = 'assets/brand_icons/Bag and footwear.svg';
+  static const String market = 'assets/brand_icons/Textile.svg';
+  static const String music = 'assets/brand_icons/Art Market.svg';
+  static const String hardware = 'assets/brand_icons/Hardware.svg';
+  static const String schools = 'assets/brand_icons/Education.svg';
   static const String cacRegistration = 'assets/icons/new_icons/cac_reg.PNG';
   static const String nepcRegistration = 'assets/icons/new_icons/nepc.PNG';
-  static const String adsPlacement = 'assets/icons/new_icons/ads_placement.svg';
-  static const String verifiedBadges =
-      'assets/icons/new_icons/verified_badges.svg';
+  static const String adsPlacement = 'assets/brand_icons/Advert.svg';
+  static const String verifiedBadges = 'assets/brand_icons/Batch.svg';
 
-  /// WAWUBeauty brand "W" mark (full-colour PNG from the brand kit).
-  static const String wawuW = 'assets/icons/wawu_w.png';
+  /// WAWUBeauty brand "W" mark (exact artwork from the brand kit).
+  static const String wawuW = 'assets/brand_icons/W.png';
   static const String connectToUs = 'assets/icons/connect_to_us.svg';
   static const String editYourProfile = 'assets/icons/edit_your_profile.svg';
   static const String emailUs = 'assets/icons/email_us.svg';

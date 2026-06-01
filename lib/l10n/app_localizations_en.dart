@@ -347,4 +347,91 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get languageSubtitle =>
       'Choose the language you\'d like to use across WAWUBeauty.';
+
+  @override
+  String get productSize => 'Size';
+
+  @override
+  String get productViewSizeChart => 'View Size Chart';
+
+  @override
+  String get productProcessingTime => 'Processing Time';
+
+  @override
+  String get productSelectPackage => 'Select your package type';
+
+  @override
+  String get productDescription => 'Description';
+
+  @override
+  String get productReturnPolicy => 'Return Policy';
+
+  @override
+  String get productAboutSeller => 'About Seller';
+
+  @override
+  String get productYouMayLike => 'You may also like';
+
+  @override
+  String get productContactSeller => 'Contact seller';
+
+  @override
+  String get productUnableToLoad => 'Unable to load product details';
+
+  @override
+  String get productAddedToCart => 'Added to cart';
+
+  @override
+  String get productFailedToCart => 'Failed to add to cart';
+
+  @override
+  String get checkoutTitle => 'Order confirmation';
+
+  @override
+  String get checkoutAddAddress => 'Please add a delivery address';
+
+  @override
+  String get checkoutShippingAddress => 'Shipping Address';
+
+  @override
+  String get checkoutNoAddress => 'No address selected yet';
+
+  @override
+  String get checkoutAddAddressBtn => 'Add address';
+
+  @override
+  String get checkoutItems => 'Items';
+
+  @override
+  String get checkoutOrderSummary => 'Order Summary';
+
+  @override
+  String get checkoutDeliveryFee => 'Delivery Fee';
+
+  @override
+  String get checkoutTotal => 'Total';
+
+  @override
+  String get checkoutPlaceOrder => 'Place Order';
+
+  @override
+  String get sellerShopTitle => 'Your Shop';
+
+  @override
+  String get sellerOrdersInProcess => 'Orders in Process';
+
+  @override
+  String get sellerManageShop => 'Manage Shop';
+
+  @override
+  String get sellerProducts => 'Products';
+
+  @override
+  String get sellerOrders => 'Orders';
+
+  @override
+  String get sellerView => 'View';
+
+  @override
+  String get sellerSearchShop => 'Search your shop';
 }

@@ -1,12 +1,10 @@
 {
   "@@locale": "rw",
-
   "navHome": "Ahabanza",
   "navSearch": "Shakisha",
   "navWishlist": "Ibyo ukunda",
   "navBlog": "Blog",
   "navAccount": "Konti",
-
   "commonRetry": "Ongera ugerageze",
   "commonCancel": "Hagarika",
   "commonSave": "Bika",
@@ -19,7 +17,6 @@
   "commonLoading": "Birimo gupakira...",
   "commonTryAgain": "Ongera ugerageze",
   "commonViewAll": "Reba byose",
-
   "authWelcomeBack": "Murakaza neza!",
   "authLetsSignIn": "Reka winjire",
   "authSignIn": "Injira",
@@ -50,12 +47,10 @@
   "onboardingTermsOfService": "Amabwiriza y'imikoreshereze",
   "onboardingAnd": " na ",
   "onboardingPrivacy": "Politiki y'ibanga",
-
   "homeShopByCategory": "Gura ukurikije icyiciro",
   "homeSearchHint": "Shakisha ibicuruzwa, amazina n'amaduka",
   "homeDiscoverTitle": "Menya ibishya byatoranyijwe",
   "homeDiscoverSub": "Imyambaro, ubwiza, ubugeni, uburezi n'ibikoresho mu isoko rimwe.",
-
   "searchTitle": "Shakisha",
   "searchHint": "Shakisha kuri WAWUBeauty",
   "searchNoResults": "Nta byabonetse",
@@ -66,7 +61,6 @@
   "catTextiles": "Imyenda",
   "catBeauty": "Ubwiza bwa Afurika",
   "catShoesBags": "Inkweto n'imifuka",
-
   "cartTitle": "Agatebo",
   "cartEmpty": "Agatebo kawe karimo ubusa",
   "cartEmptySub": "Reba mu isoko maze wongere ibintu mu gatebo.",
@@ -75,19 +69,16 @@
   "cartDeliveryNote": "Amafaranga yo gutwara abarwa mu kwishyura",
   "cartAddToBag": "Shyira mu gatebo",
   "cartAtCheckout": "Mu kwishyura",
-
   "wishlistTitle": "Ibyo ukunda",
   "wishlistEmpty": "Nta kintu wabitse",
   "wishlistEmptySub": "Ibicuruzwa ubitse bizagaragara hano.",
   "wishlistKeepShopping": "Komeza kugura",
-
   "ordersTitle": "Ibyo watumije",
   "ordersEmpty": "Nta byatumijwe",
   "ordersEmptySub": "Ibyo watumije bizagaragara hano nyuma yo kwishyura.",
   "shippingOptions": "Uburyo bwo kohereza",
   "shippingLoading": "Turimo gushaka uburyo bwo gutwara…",
   "shippingError": "Ntibyashobotse gufata uburyo bwo gutwara",
-
   "accountGuest": "Umushyitsi",
   "accountEditProfile": "Hindura umwirondoro",
   "accountEditProfileSub": "Izina, ifoto n'aderesi",
@@ -112,14 +103,41 @@
   "accountFaq": "Ibibazo bikunze kubazwa",
   "accountConnect": "Twandikire",
   "accountDelete": "Siba konti",
-
   "blogNoFavorites": "Nta nkuru ukunda",
   "blogNoFavoritesSub": "Inkuru ukunda zizagaragara hano.",
   "blogNoPosts": "Nta nkuru zabonetse",
   "blogNoPostsSub": "Garuka vuba urebe inkuru nshya.",
   "notificationsEmpty": "Nta menyesha ufite",
   "notificationsEmptySub": "Tuzakumenyesha igihe hari ikintu cy'ingenzi kibaye.",
-
   "languageTitle": "Ururimi",
-  "languageSubtitle": "Hitamo ururimi wifuza gukoresha kuri WAWUBeauty."
+  "languageSubtitle": "Hitamo ururimi wifuza gukoresha kuri WAWUBeauty.",
+  "productSize": "Ingano",
+  "productViewSizeChart": "Reba urutonde rw'ingano",
+  "productProcessingTime": "Igihe cyo gutegura",
+  "productSelectPackage": "Hitamo ubwoko bw'ipaki",
+  "productDescription": "Ibisobanuro",
+  "productReturnPolicy": "Politiki yo gusubiza",
+  "productAboutSeller": "Ibyerekeye umucuruzi",
+  "productYouMayLike": "Ushobora no gukunda",
+  "productContactSeller": "Vugana n'umucuruzi",
+  "productUnableToLoad": "Ntibyashobotse gufata amakuru y'igicuruzwa",
+  "productAddedToCart": "Byongewe mu gatebo",
+  "productFailedToCart": "Kwongera mu gatebo byanze",
+  "checkoutTitle": "Kwemeza icyatumijwe",
+  "checkoutAddAddress": "Ongeraho aderesi yo kugezaho",
+  "checkoutShippingAddress": "Aderesi yo kohereza",
+  "checkoutNoAddress": "Nta aderesi yatoranyijwe",
+  "checkoutAddAddressBtn": "Ongeraho aderesi",
+  "checkoutItems": "Ibintu",
+  "checkoutOrderSummary": "Incamake y'icyatumijwe",
+  "checkoutDeliveryFee": "Amafaranga yo gutwara",
+  "checkoutTotal": "Igiteranyo",
+  "checkoutPlaceOrder": "Tanga icyifuzo",
+  "sellerShopTitle": "Iduka ryawe",
+  "sellerOrdersInProcess": "Ibisabwa biri gutunganywa",
+  "sellerManageShop": "Genzura iduka",
+  "sellerProducts": "Ibicuruzwa",
+  "sellerOrders": "Ibyatumijwe",
+  "sellerView": "Reba",
+  "sellerSearchShop": "Shakisha mu iduka ryawe"
 }

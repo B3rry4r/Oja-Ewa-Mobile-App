@@ -9,6 +9,7 @@ import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/info_bottom_sheet.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
@@ -64,7 +65,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 Icon(Icons.error_outline, size: 48, color: colors.textTertiary),
                 const SizedBox(height: 12),
                 Text(
-                  'Unable to load product details',
+                  context.l10n.productUnableToLoad,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -249,7 +250,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: Text(
-                            'View Size Chart',
+                            context.l10n.productViewSizeChart,
                             style: TextStyle(
                               fontSize: 10,
                               color: colors.textSecondary,
@@ -265,7 +266,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Processing Time',
+                            context.l10n.productProcessingTime,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -274,7 +275,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Select your package type',
+                            context.l10n.productSelectPackage,
                             style: TextStyle(
                               fontSize: 12,
                               color: colors.textSecondary,
@@ -311,7 +312,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                       ),
 
                       _buildExpandableSection(
-                        'Return Policy',
+                        context.l10n.productReturnPolicy,
                         Icons.add,
                         onTap: () {},
                       ),
@@ -335,7 +336,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
                       if (isLoggedIn)
                         _buildExpandableSection(
-                          'About Seller',
+                          context.l10n.productAboutSeller,
                           Icons.add,
                           onTap: () {
                             final sellerId = details?.sellerProfileId;
@@ -353,7 +354,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
                       // You may also like
                       Text(
-                        'You may also like',
+                        context.l10n.productYouMayLike,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -555,7 +556,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
     final days = details?.processingDays;
     final type = details?.processingTimeType ?? 'normal';
-    final duration = days == null ? 'Contact seller' : '$days days';
+    final duration = days == null ? context.l10n.productContactSeller : '$days days';
     final typeLabel = type == 'quick_quick' ? 'Quick Quick' : 'Normal';
 
     return Container(
@@ -850,7 +851,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
               // Add to bag button
               Expanded(
                 child: WBButton(
-                  label: 'Add to Bag',
+                  label: context.l10n.cartAddToBag,
                   fullWidth: true,
                   onPressed: () async {
                     // Use the processing time type from the product details
@@ -872,13 +873,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
 
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Added to cart')),
+                        SnackBar(content: Text(context.l10n.productAddedToCart)),
                       );
                       Navigator.of(context).pushNamed(AppRoutes.cart);
                     } catch (e) {
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Failed to add to cart')),
+                        SnackBar(content: Text(context.l10n.productFailedToCart)),
                       );
                     }
                   },
@@ -897,7 +898,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                     ),
                   ),
                   Text(
-                    'At checkout',
+                    context.l10n.cartAtCheckout,
                     style: WBTypography.caption.copyWith(
                       color: WBColors.fgPlaceholder,
                       fontSize: 10,

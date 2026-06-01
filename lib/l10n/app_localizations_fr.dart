@@ -351,4 +351,92 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get languageSubtitle =>
       'Choisissez la langue que vous souhaitez utiliser sur WAWUBeauty.';
+
+  @override
+  String get productSize => 'Taille';
+
+  @override
+  String get productViewSizeChart => 'Voir le guide des tailles';
+
+  @override
+  String get productProcessingTime => 'Délai de préparation';
+
+  @override
+  String get productSelectPackage => 'Choisissez votre type de colis';
+
+  @override
+  String get productDescription => 'Description';
+
+  @override
+  String get productReturnPolicy => 'Politique de retour';
+
+  @override
+  String get productAboutSeller => 'À propos du vendeur';
+
+  @override
+  String get productYouMayLike => 'Vous aimerez aussi';
+
+  @override
+  String get productContactSeller => 'Contacter le vendeur';
+
+  @override
+  String get productUnableToLoad =>
+      'Impossible de charger les détails du produit';
+
+  @override
+  String get productAddedToCart => 'Ajouté au panier';
+
+  @override
+  String get productFailedToCart => 'Échec de l\'ajout au panier';
+
+  @override
+  String get checkoutTitle => 'Confirmation de commande';
+
+  @override
+  String get checkoutAddAddress => 'Veuillez ajouter une adresse de livraison';
+
+  @override
+  String get checkoutShippingAddress => 'Adresse de livraison';
+
+  @override
+  String get checkoutNoAddress => 'Aucune adresse sélectionnée';
+
+  @override
+  String get checkoutAddAddressBtn => 'Ajouter une adresse';
+
+  @override
+  String get checkoutItems => 'Articles';
+
+  @override
+  String get checkoutOrderSummary => 'Récapitulatif de la commande';
+
+  @override
+  String get checkoutDeliveryFee => 'Frais de livraison';
+
+  @override
+  String get checkoutTotal => 'Total';
+
+  @override
+  String get checkoutPlaceOrder => 'Passer la commande';
+
+  @override
+  String get sellerShopTitle => 'Votre boutique';
+
+  @override
+  String get sellerOrdersInProcess => 'Commandes en cours';
+
+  @override
+  String get sellerManageShop => 'Gérer la boutique';
+
+  @override
+  String get sellerProducts => 'Produits';
+
+  @override
+  String get sellerOrders => 'Commandes';
+
+  @override
+  String get sellerView => 'Voir';
+
+  @override
+  String get sellerSearchShop => 'Rechercher dans votre boutique';
 }

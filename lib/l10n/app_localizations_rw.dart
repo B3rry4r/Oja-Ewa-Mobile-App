@@ -346,4 +346,92 @@ class AppLocalizationsRw extends AppLocalizations {
   @override
   String get languageSubtitle =>
       'Hitamo ururimi wifuza gukoresha kuri WAWUBeauty.';
+
+  @override
+  String get productSize => 'Ingano';
+
+  @override
+  String get productViewSizeChart => 'Reba urutonde rw\'ingano';
+
+  @override
+  String get productProcessingTime => 'Igihe cyo gutegura';
+
+  @override
+  String get productSelectPackage => 'Hitamo ubwoko bw\'ipaki';
+
+  @override
+  String get productDescription => 'Ibisobanuro';
+
+  @override
+  String get productReturnPolicy => 'Politiki yo gusubiza';
+
+  @override
+  String get productAboutSeller => 'Ibyerekeye umucuruzi';
+
+  @override
+  String get productYouMayLike => 'Ushobora no gukunda';
+
+  @override
+  String get productContactSeller => 'Vugana n\'umucuruzi';
+
+  @override
+  String get productUnableToLoad =>
+      'Ntibyashobotse gufata amakuru y\'igicuruzwa';
+
+  @override
+  String get productAddedToCart => 'Byongewe mu gatebo';
+
+  @override
+  String get productFailedToCart => 'Kwongera mu gatebo byanze';
+
+  @override
+  String get checkoutTitle => 'Kwemeza icyatumijwe';
+
+  @override
+  String get checkoutAddAddress => 'Ongeraho aderesi yo kugezaho';
+
+  @override
+  String get checkoutShippingAddress => 'Aderesi yo kohereza';
+
+  @override
+  String get checkoutNoAddress => 'Nta aderesi yatoranyijwe';
+
+  @override
+  String get checkoutAddAddressBtn => 'Ongeraho aderesi';
+
+  @override
+  String get checkoutItems => 'Ibintu';
+
+  @override
+  String get checkoutOrderSummary => 'Incamake y\'icyatumijwe';
+
+  @override
+  String get checkoutDeliveryFee => 'Amafaranga yo gutwara';
+
+  @override
+  String get checkoutTotal => 'Igiteranyo';
+
+  @override
+  String get checkoutPlaceOrder => 'Tanga icyifuzo';
+
+  @override
+  String get sellerShopTitle => 'Iduka ryawe';
+
+  @override
+  String get sellerOrdersInProcess => 'Ibisabwa biri gutunganywa';
+
+  @override
+  String get sellerManageShop => 'Genzura iduka';
+
+  @override
+  String get sellerProducts => 'Ibicuruzwa';
+
+  @override
+  String get sellerOrders => 'Ibyatumijwe';
+
+  @override
+  String get sellerView => 'Reba';
+
+  @override
+  String get sellerSearchShop => 'Shakisha mu iduka ryawe';
 }

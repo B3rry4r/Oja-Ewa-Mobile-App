@@ -1,12 +1,10 @@
 {
   "@@locale": "tw",
-
   "navHome": "Fie",
   "navSearch": "Hwehwɛ",
   "navWishlist": "Nea wopɛ",
   "navBlog": "Blog",
   "navAccount": "Akawnt",
-
   "commonRetry": "San sɔ hwɛ",
   "commonCancel": "Gyae",
   "commonSave": "Kora so",
@@ -19,7 +17,6 @@
   "commonLoading": "Ɛreba...",
   "commonTryAgain": "San sɔ hwɛ",
   "commonViewAll": "Hwɛ ne nyinaa",
-
   "authWelcomeBack": "Akwaaba bio!",
   "authLetsSignIn": "Ma yɛnkɔ mu",
   "authSignIn": "Kɔ mu",
@@ -50,12 +47,10 @@
   "onboardingTermsOfService": "Som ho mmara",
   "onboardingAnd": " ne ",
   "onboardingPrivacy": "Kokoamsɛm ho nhyehyɛe",
-
   "homeShopByCategory": "Tɔ gyinasɛm so",
   "homeSearchHint": "Hwehwɛ nneɛma, edin ne sotɔɔ",
   "homeDiscoverTitle": "Hu nneɛma foforɔ",
   "homeDiscoverSub": "Ntade, ahoɔfɛ, adwinne, adesua ne adwinnade wɔ baabi koro.",
-
   "searchTitle": "Hwehwɛ",
   "searchHint": "Hwehwɛ wɔ WAWUBeauty",
   "searchNoResults": "Yɛanhu hwee",
@@ -66,7 +61,6 @@
   "catTextiles": "Ntama",
   "catBeauty": "Afrika ahoɔfɛ",
   "catShoesBags": "Mpaboa ne bag",
-
   "cartTitle": "Bag",
   "cartEmpty": "Wo bag mu da mpan",
   "cartEmptySub": "Hwehwɛ wɔ gua no so na fa nneɛma gu wo bag mu.",
@@ -75,19 +69,16 @@
   "cartDeliveryNote": "Wobɛbu deɛ ɛsom ho ka wɔ tua ka berɛ",
   "cartAddToBag": "Fa gu bag mu",
   "cartAtCheckout": "Wɔ tua ka",
-
   "wishlistTitle": "Nea wopɛ",
   "wishlistEmpty": "Wonkoraa hwee so",
   "wishlistEmptySub": "Nneɛma a wokora so bɛba ha.",
   "wishlistKeepShopping": "Kɔ so tɔ",
-
   "ordersTitle": "Wo nneɛma a woatɔ",
   "ordersEmpty": "Wonntɔɔ hwee",
   "ordersEmptySub": "Nea woatɔ bɛba ha sɛ woatua ka wie a.",
   "shippingOptions": "Deɛ wɔde bɛsoma",
   "shippingLoading": "Yɛrehwehwɛ deɛ wɔde bɛsoma…",
   "shippingError": "Yɛantumi anya deɛ wɔde bɛsoma",
-
   "accountGuest": "Ɔhɔho",
   "accountEditProfile": "Sesa wo profael",
   "accountEditProfileSub": "Din, mfonin ne nkitahodi",
@@ -112,14 +103,41 @@
   "accountFaq": "Nsɛmmisa a wɔtaa bisa",
   "accountConnect": "Frɛ yɛn",
   "accountDelete": "Yi akawnt no fi hɔ",
-
   "blogNoFavorites": "Blog a wopɛ biara nni hɔ",
   "blogNoFavoritesSub": "Blog a wopɛ bɛba ha.",
   "blogNoPosts": "Yɛanhu blog biara",
   "blogNoPostsSub": "San bra bɛhwɛ nsɛm foforɔ.",
   "notificationsEmpty": "Wonni amanneɛbɔ biara",
   "notificationsEmptySub": "Yɛbɛma woate sɛ biribi titiriw ba a.",
-
   "languageTitle": "Kasa",
-  "languageSubtitle": "Yi kasa a wopɛ sɛ wode di dwuma wɔ WAWUBeauty so."
+  "languageSubtitle": "Yi kasa a wopɛ sɛ wode di dwuma wɔ WAWUBeauty so.",
+  "productSize": "Kɛseɛ",
+  "productViewSizeChart": "Hwɛ size chart",
+  "productProcessingTime": "Berɛ a wɔde yɛ",
+  "productSelectPackage": "Yi wo package",
+  "productDescription": "Nkyerɛkyerɛmu",
+  "productReturnPolicy": "Nsanahyɛ ho mmara",
+  "productAboutSeller": "Ɔtɔnfoɔ ho",
+  "productYouMayLike": "Ebia wobɛpɛ yeinom nso",
+  "productContactSeller": "Frɛ ɔtɔnfoɔ",
+  "productUnableToLoad": "Yɛantumi annya adetɔn no ho nsɛm",
+  "productAddedToCart": "Wɔde agu bag mu",
+  "productFailedToCart": "Antumi amfa angu bag mu",
+  "checkoutTitle": "Order no foa so",
+  "checkoutAddAddress": "Yɛsrɛ fa baabi a wɔde bɛkɔ ka ho",
+  "checkoutShippingAddress": "Baabi a wɔde bɛkɔ",
+  "checkoutNoAddress": "Wonyii baabi biara",
+  "checkoutAddAddressBtn": "Fa baabi ka ho",
+  "checkoutItems": "Nneɛma",
+  "checkoutOrderSummary": "Order no mu tiawa",
+  "checkoutDeliveryFee": "Adesoa ka",
+  "checkoutTotal": "Nyinaa",
+  "checkoutPlaceOrder": "Yɛ order",
+  "sellerShopTitle": "Wo sotɔɔ",
+  "sellerOrdersInProcess": "Order a wɔreyɛ",
+  "sellerManageShop": "Hwɛ wo sotɔɔ so",
+  "sellerProducts": "Nneɛma",
+  "sellerOrders": "Nkɔso",
+  "sellerView": "Hwɛ",
+  "sellerSearchShop": "Hwehwɛ wo sotɔɔ mu"
 }

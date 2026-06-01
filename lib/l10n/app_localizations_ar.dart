@@ -344,4 +344,91 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get languageSubtitle =>
       'اختر اللغة التي تريد استخدامها في WAWUBeauty.';
+
+  @override
+  String get productSize => 'المقاس';
+
+  @override
+  String get productViewSizeChart => 'عرض دليل المقاسات';
+
+  @override
+  String get productProcessingTime => 'وقت التجهيز';
+
+  @override
+  String get productSelectPackage => 'اختر نوع الطرد';
+
+  @override
+  String get productDescription => 'الوصف';
+
+  @override
+  String get productReturnPolicy => 'سياسة الإرجاع';
+
+  @override
+  String get productAboutSeller => 'عن البائع';
+
+  @override
+  String get productYouMayLike => 'قد يعجبك أيضًا';
+
+  @override
+  String get productContactSeller => 'تواصل مع البائع';
+
+  @override
+  String get productUnableToLoad => 'تعذّر تحميل تفاصيل المنتج';
+
+  @override
+  String get productAddedToCart => 'تمت الإضافة إلى السلة';
+
+  @override
+  String get productFailedToCart => 'فشل في الإضافة إلى السلة';
+
+  @override
+  String get checkoutTitle => 'تأكيد الطلب';
+
+  @override
+  String get checkoutAddAddress => 'يرجى إضافة عنوان التوصيل';
+
+  @override
+  String get checkoutShippingAddress => 'عنوان الشحن';
+
+  @override
+  String get checkoutNoAddress => 'لم يتم اختيار عنوان بعد';
+
+  @override
+  String get checkoutAddAddressBtn => 'إضافة عنوان';
+
+  @override
+  String get checkoutItems => 'العناصر';
+
+  @override
+  String get checkoutOrderSummary => 'ملخص الطلب';
+
+  @override
+  String get checkoutDeliveryFee => 'رسوم التوصيل';
+
+  @override
+  String get checkoutTotal => 'الإجمالي';
+
+  @override
+  String get checkoutPlaceOrder => 'إتمام الطلب';
+
+  @override
+  String get sellerShopTitle => 'متجرك';
+
+  @override
+  String get sellerOrdersInProcess => 'الطلبات قيد المعالجة';
+
+  @override
+  String get sellerManageShop => 'إدارة المتجر';
+
+  @override
+  String get sellerProducts => 'المنتجات';
+
+  @override
+  String get sellerOrders => 'الطلبات';
+
+  @override
+  String get sellerView => 'عرض';
+
+  @override
+  String get sellerSearchShop => 'ابحث في متجرك';
 }

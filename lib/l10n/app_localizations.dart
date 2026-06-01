@@ -771,6 +771,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose the language you\'d like to use across WAWUBeauty.'**
   String get languageSubtitle;
+
+  /// No description provided for @productSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get productSize;
+
+  /// No description provided for @productViewSizeChart.
+  ///
+  /// In en, this message translates to:
+  /// **'View Size Chart'**
+  String get productViewSizeChart;
+
+  /// No description provided for @productProcessingTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing Time'**
+  String get productProcessingTime;
+
+  /// No description provided for @productSelectPackage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your package type'**
+  String get productSelectPackage;
+
+  /// No description provided for @productDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get productDescription;
+
+  /// No description provided for @productReturnPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Return Policy'**
+  String get productReturnPolicy;
+
+  /// No description provided for @productAboutSeller.
+  ///
+  /// In en, this message translates to:
+  /// **'About Seller'**
+  String get productAboutSeller;
+
+  /// No description provided for @productYouMayLike.
+  ///
+  /// In en, this message translates to:
+  /// **'You may also like'**
+  String get productYouMayLike;
+
+  /// No description provided for @productContactSeller.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact seller'**
+  String get productContactSeller;
+
+  /// No description provided for @productUnableToLoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load product details'**
+  String get productUnableToLoad;
+
+  /// No description provided for @productAddedToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to cart'**
+  String get productAddedToCart;
+
+  /// No description provided for @productFailedToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add to cart'**
+  String get productFailedToCart;
+
+  /// No description provided for @checkoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Order confirmation'**
+  String get checkoutTitle;
+
+  /// No description provided for @checkoutAddAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Please add a delivery address'**
+  String get checkoutAddAddress;
+
+  /// No description provided for @checkoutShippingAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipping Address'**
+  String get checkoutShippingAddress;
+
+  /// No description provided for @checkoutNoAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'No address selected yet'**
+  String get checkoutNoAddress;
+
+  /// No description provided for @checkoutAddAddressBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Add address'**
+  String get checkoutAddAddressBtn;
+
+  /// No description provided for @checkoutItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get checkoutItems;
+
+  /// No description provided for @checkoutOrderSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Order Summary'**
+  String get checkoutOrderSummary;
+
+  /// No description provided for @checkoutDeliveryFee.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery Fee'**
+  String get checkoutDeliveryFee;
+
+  /// No description provided for @checkoutTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get checkoutTotal;
+
+  /// No description provided for @checkoutPlaceOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Place Order'**
+  String get checkoutPlaceOrder;
+
+  /// No description provided for @sellerShopTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Shop'**
+  String get sellerShopTitle;
+
+  /// No description provided for @sellerOrdersInProcess.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders in Process'**
+  String get sellerOrdersInProcess;
+
+  /// No description provided for @sellerManageShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Shop'**
+  String get sellerManageShop;
+
+  /// No description provided for @sellerProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Products'**
+  String get sellerProducts;
+
+  /// No description provided for @sellerOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get sellerOrders;
+
+  /// No description provided for @sellerView.
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get sellerView;
+
+  /// No description provided for @sellerSearchShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Search your shop'**
+  String get sellerSearchShop;
 }
 
 class _AppLocalizationsDelegate

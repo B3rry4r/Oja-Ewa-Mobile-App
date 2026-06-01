@@ -1,12 +1,10 @@
 {
   "@@locale": "ee",
-
   "navHome": "Aƒe",
   "navSearch": "Di",
   "navWishlist": "Lɔlɔ̃nuwo",
   "navBlog": "Blog",
   "navAccount": "Akɔnta",
-
   "commonRetry": "Gbugbɔ te kpɔ",
   "commonCancel": "Tutu",
   "commonSave": "Dzra ɖo",
@@ -19,7 +17,6 @@
   "commonLoading": "Le ɖem...",
   "commonTryAgain": "Gbugbɔ te kpɔ",
   "commonViewAll": "Kpɔ wo katã",
-
   "authWelcomeBack": "Woezɔ gbɔ!",
   "authLetsSignIn": "Na míage ɖe eme",
   "authSignIn": "Ge ɖe eme",
@@ -50,12 +47,10 @@
   "onboardingTermsOfService": "Subɔsubɔ ƒe sewo",
   "onboardingAnd": " kple ",
   "onboardingPrivacy": "Ɣaɣla ƒe ɖoɖo",
-
   "homeShopByCategory": "Ƒle le hatsotso nu",
   "homeSearchHint": "Di nuwo, ŋkɔɖiwo kple fiasewo",
   "homeDiscoverTitle": "Kpɔ nu yeye nyuiwo",
   "homeDiscoverSub": "Atsyɔ̃ɖoɖo, atike, aɖaŋu, sukudede kple dɔwɔnuwo le asi ɖeka me.",
-
   "searchTitle": "Di",
   "searchHint": "Di le WAWUBeauty",
   "searchNoResults": "Womekpɔ naneke o",
@@ -66,7 +61,6 @@
   "catTextiles": "Avɔwo",
   "catBeauty": "Afrika atike",
   "catShoesBags": "Afɔkpa kple kotoku",
-
   "cartTitle": "Kotoku",
   "cartEmpty": "Wò kotoku le ƒuƒlu",
   "cartEmptySub": "Tsa le asi la me eye nàtsɔ nuwo de wò kotoku me.",
@@ -75,19 +69,16 @@
   "cartDeliveryNote": "Woabu nutsɔtsɔ ƒe fe ne èle fe xem",
   "cartAddToBag": "Tsɔ de kotoku me",
   "cartAtCheckout": "Le fexexe me",
-
   "wishlistTitle": "Lɔlɔ̃nuwo",
   "wishlistEmpty": "Naneke medzra ɖo haɖe o",
   "wishlistEmptySub": "Nu siwo nèdzra ɖo la adze le afi sia.",
   "wishlistKeepShopping": "Yi asiƒleƒle dzi",
-
   "ordersTitle": "Wò nudɔdɔwo",
   "ordersEmpty": "Nudɔdɔ aɖeke meli haɖe o",
   "ordersEmptySub": "Wò nudɔdɔwo adze le afi sia ne èxe fe vɔ.",
   "shippingOptions": "Nutsɔtsɔ ƒe mɔnuwo",
   "shippingLoading": "Le nutsɔtsɔ ƒe mɔnuwo dim…",
   "shippingError": "Womete ŋu kɔ nutsɔtsɔ ƒe mɔnuwo o",
-
   "accountGuest": "Amedzro",
   "accountEditProfile": "Trɔ wò profile",
   "accountEditProfileSub": "Ŋkɔ, foto kple kadodo",
@@ -112,14 +103,41 @@
   "accountFaq": "Nyabiabia siwo wobiana zi geɖe",
   "accountConnect": "Do ka kpli mí",
   "accountDelete": "Tutu akɔnta",
-
   "blogNoFavorites": "Blog lɔlɔ̃ aɖeke meli haɖe o",
   "blogNoFavoritesSub": "Blog siwo nèlɔ̃ la adze le afi sia.",
   "blogNoPosts": "Womekpɔ blog aɖeke o",
   "blogNoPostsSub": "Trɔ va kpɔ ŋutinya yeyewo.",
   "notificationsEmpty": "Nyadzɔdzɔ aɖeke meli o",
   "notificationsEmptySub": "Míana nànya ne nane vevi dzɔ.",
-
   "languageTitle": "Gbe",
-  "languageSubtitle": "Tia gbe si nàdi be yeazã le WAWUBeauty dzi."
+  "languageSubtitle": "Tia gbe si nàdi be yeazã le WAWUBeauty dzi.",
+  "productSize": "Lolõme",
+  "productViewSizeChart": "Kpɔ size chart",
+  "productProcessingTime": "Ɣeyiɣi si wòawɔ",
+  "productSelectPackage": "Tia wò package ƒomevi",
+  "productDescription": "Nuŋlɔɖi",
+  "productReturnPolicy": "Nugbugbɔ ƒe ɖoɖo",
+  "productAboutSeller": "Nudzrala ŋuti",
+  "productYouMayLike": "Àlɔ̃ esiawo hã",
+  "productContactSeller": "Do ka na nudzrala",
+  "productUnableToLoad": "Womete ŋu kɔ nu ŋuti nyawo o",
+  "productAddedToCart": "Wotsɔe de kotoku me",
+  "productFailedToCart": "Metsɔe de kotoku me o",
+  "checkoutTitle": "Nudɔdɔ ƒe kpeɖodzi",
+  "checkoutAddAddress": "Taflatse tsɔ nutsɔtsɔ teƒe kpe eŋu",
+  "checkoutShippingAddress": "Nutsɔtsɔ teƒe",
+  "checkoutNoAddress": "Womietia teƒe aɖeke haɖe o",
+  "checkoutAddAddressBtn": "Tsɔ teƒe kpe eŋu",
+  "checkoutItems": "Nuwo",
+  "checkoutOrderSummary": "Nudɔdɔ ƒe nuƒoƒu",
+  "checkoutDeliveryFee": "Nutsɔtsɔ ƒe fe",
+  "checkoutTotal": "Katã",
+  "checkoutPlaceOrder": "Dɔ nua",
+  "sellerShopTitle": "Wò fiase",
+  "sellerOrdersInProcess": "Nudɔdɔ siwo le wɔwɔm",
+  "sellerManageShop": "Kpɔ fiase dzi",
+  "sellerProducts": "Adzɔnuwo",
+  "sellerOrders": "Nudɔdɔwo",
+  "sellerView": "Kpɔ",
+  "sellerSearchShop": "Di le wò fiase me"
 }
