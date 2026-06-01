@@ -139,5 +139,13 @@
   "sellerProducts": "المنتجات",
   "sellerOrders": "الطلبات",
   "sellerView": "عرض",
-  "sellerSearchShop": "ابحث في متجرك"
+  "sellerSearchShop": "ابحث في متجرك",
+  "sellerAddProduct": "إضافة منتج",
+  "sellerOrderNo": "رقم الطلب",
+  "sellerOrderDate": "تاريخ الطلب",
+  "sellerCustomer": "العميل",
+  "sellerStatus": "الحالة",
+  "checkoutShippingStillLoading": "لا تزال خيارات الشحن قيد التحميل، يرجى الانتظار",
+  "checkoutNoShipping": "لا توجد خيارات شحن متاحة لهذه السلة",
+  "checkoutChooseShipping": "اختر خيار شحن واحدًا لكل بائع"
 }

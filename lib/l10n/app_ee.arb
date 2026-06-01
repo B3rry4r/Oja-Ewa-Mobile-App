@@ -139,5 +139,13 @@
   "sellerProducts": "Adzɔnuwo",
   "sellerOrders": "Nudɔdɔwo",
   "sellerView": "Kpɔ",
-  "sellerSearchShop": "Di le wò fiase me"
+  "sellerSearchShop": "Di le wò fiase me",
+  "sellerAddProduct": "Tsɔ adzɔnu kpe eŋu",
+  "sellerOrderNo": "Nudɔdɔ xexlẽdzesi",
+  "sellerOrderDate": "Nudɔdɔ ŋkeke",
+  "sellerCustomer": "Asisi",
+  "sellerStatus": "Nɔnɔme",
+  "checkoutShippingStillLoading": "Nutsɔtsɔ mɔnuwo gale ɖem, lala vie",
+  "checkoutNoShipping": "Nutsɔtsɔ mɔnu aɖeke meli na kotoku sia o",
+  "checkoutChooseShipping": "Tia nutsɔtsɔ mɔnu ɖeka na nudzrala ɖe sia ɖe"
 }

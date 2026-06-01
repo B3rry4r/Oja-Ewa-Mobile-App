@@ -434,4 +434,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sellerSearchShop => 'Search your shop';
+
+  @override
+  String get sellerAddProduct => 'Add Product';
+
+  @override
+  String get sellerOrderNo => 'Order No';
+
+  @override
+  String get sellerOrderDate => 'Order Date';
+
+  @override
+  String get sellerCustomer => 'Customer';
+
+  @override
+  String get sellerStatus => 'Status';
+
+  @override
+  String get checkoutShippingStillLoading =>
+      'Shipping options are still loading, please wait';
+
+  @override
+  String get checkoutNoShipping =>
+      'No shipping options available for this cart';
+
+  @override
+  String get checkoutChooseShipping =>
+      'Choose one shipping option for each seller';
 }

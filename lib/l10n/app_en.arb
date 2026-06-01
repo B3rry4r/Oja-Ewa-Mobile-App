@@ -139,5 +139,13 @@
   "sellerProducts": "Products",
   "sellerOrders": "Orders",
   "sellerView": "View",
-  "sellerSearchShop": "Search your shop"
+  "sellerSearchShop": "Search your shop",
+  "sellerAddProduct": "Add Product",
+  "sellerOrderNo": "Order No",
+  "sellerOrderDate": "Order Date",
+  "sellerCustomer": "Customer",
+  "sellerStatus": "Status",
+  "checkoutShippingStillLoading": "Shipping options are still loading, please wait",
+  "checkoutNoShipping": "No shipping options available for this cart",
+  "checkoutChooseShipping": "Choose one shipping option for each seller"
 }

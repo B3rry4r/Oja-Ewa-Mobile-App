@@ -139,5 +139,13 @@
   "sellerProducts": "Produits",
   "sellerOrders": "Commandes",
   "sellerView": "Voir",
-  "sellerSearchShop": "Rechercher dans votre boutique"
+  "sellerSearchShop": "Rechercher dans votre boutique",
+  "sellerAddProduct": "Ajouter un produit",
+  "sellerOrderNo": "N° de commande",
+  "sellerOrderDate": "Date de commande",
+  "sellerCustomer": "Client",
+  "sellerStatus": "Statut",
+  "checkoutShippingStillLoading": "Les options de livraison se chargent encore, veuillez patienter",
+  "checkoutNoShipping": "Aucune option de livraison disponible pour ce panier",
+  "checkoutChooseShipping": "Choisissez une option de livraison pour chaque vendeur"
 }

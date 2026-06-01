@@ -139,5 +139,13 @@
   "sellerProducts": "Nneɛma",
   "sellerOrders": "Nkɔso",
   "sellerView": "Hwɛ",
-  "sellerSearchShop": "Hwehwɛ wo sotɔɔ mu"
+  "sellerSearchShop": "Hwehwɛ wo sotɔɔ mu",
+  "sellerAddProduct": "Fa adetɔn ka ho",
+  "sellerOrderNo": "Order Nɔma",
+  "sellerOrderDate": "Order Da",
+  "sellerCustomer": "Adetɔni",
+  "sellerStatus": "Tebea",
+  "checkoutShippingStillLoading": "Adesoa akwan no reba, twɛn kakra",
+  "checkoutNoShipping": "Adesoa akwan biara nni hɔ ma bag yi",
+  "checkoutChooseShipping": "Yi adesoa kwan baako ma ɔtɔnfoɔ biara"
 }

@@ -428,4 +428,30 @@ class AppLocalizationsEe extends AppLocalizations {
 
   @override
   String get sellerSearchShop => 'Di le wò fiase me';
+
+  @override
+  String get sellerAddProduct => 'Tsɔ adzɔnu kpe eŋu';
+
+  @override
+  String get sellerOrderNo => 'Nudɔdɔ xexlẽdzesi';
+
+  @override
+  String get sellerOrderDate => 'Nudɔdɔ ŋkeke';
+
+  @override
+  String get sellerCustomer => 'Asisi';
+
+  @override
+  String get sellerStatus => 'Nɔnɔme';
+
+  @override
+  String get checkoutShippingStillLoading =>
+      'Nutsɔtsɔ mɔnuwo gale ɖem, lala vie';
+
+  @override
+  String get checkoutNoShipping => 'Nutsɔtsɔ mɔnu aɖeke meli na kotoku sia o';
+
+  @override
+  String get checkoutChooseShipping =>
+      'Tia nutsɔtsɔ mɔnu ɖeka na nudzrala ɖe sia ɖe';
 }

@@ -439,4 +439,31 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get sellerSearchShop => 'Rechercher dans votre boutique';
+
+  @override
+  String get sellerAddProduct => 'Ajouter un produit';
+
+  @override
+  String get sellerOrderNo => 'N° de commande';
+
+  @override
+  String get sellerOrderDate => 'Date de commande';
+
+  @override
+  String get sellerCustomer => 'Client';
+
+  @override
+  String get sellerStatus => 'Statut';
+
+  @override
+  String get checkoutShippingStillLoading =>
+      'Les options de livraison se chargent encore, veuillez patienter';
+
+  @override
+  String get checkoutNoShipping =>
+      'Aucune option de livraison disponible pour ce panier';
+
+  @override
+  String get checkoutChooseShipping =>
+      'Choisissez une option de livraison pour chaque vendeur';
 }

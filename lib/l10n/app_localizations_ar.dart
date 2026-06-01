@@ -431,4 +431,29 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sellerSearchShop => 'ابحث في متجرك';
+
+  @override
+  String get sellerAddProduct => 'إضافة منتج';
+
+  @override
+  String get sellerOrderNo => 'رقم الطلب';
+
+  @override
+  String get sellerOrderDate => 'تاريخ الطلب';
+
+  @override
+  String get sellerCustomer => 'العميل';
+
+  @override
+  String get sellerStatus => 'الحالة';
+
+  @override
+  String get checkoutShippingStillLoading =>
+      'لا تزال خيارات الشحن قيد التحميل، يرجى الانتظار';
+
+  @override
+  String get checkoutNoShipping => 'لا توجد خيارات شحن متاحة لهذه السلة';
+
+  @override
+  String get checkoutChooseShipping => 'اختر خيار شحن واحدًا لكل بائع';
 }

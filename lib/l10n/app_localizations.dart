@@ -945,6 +945,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search your shop'**
   String get sellerSearchShop;
+
+  /// No description provided for @sellerAddProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Product'**
+  String get sellerAddProduct;
+
+  /// No description provided for @sellerOrderNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Order No'**
+  String get sellerOrderNo;
+
+  /// No description provided for @sellerOrderDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Order Date'**
+  String get sellerOrderDate;
+
+  /// No description provided for @sellerCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer'**
+  String get sellerCustomer;
+
+  /// No description provided for @sellerStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get sellerStatus;
+
+  /// No description provided for @checkoutShippingStillLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipping options are still loading, please wait'**
+  String get checkoutShippingStillLoading;
+
+  /// No description provided for @checkoutNoShipping.
+  ///
+  /// In en, this message translates to:
+  /// **'No shipping options available for this cart'**
+  String get checkoutNoShipping;
+
+  /// No description provided for @checkoutChooseShipping.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose one shipping option for each seller'**
+  String get checkoutChooseShipping;
 }
 
 class _AppLocalizationsDelegate

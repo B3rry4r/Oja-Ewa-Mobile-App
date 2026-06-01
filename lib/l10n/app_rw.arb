@@ -139,5 +139,13 @@
   "sellerProducts": "Ibicuruzwa",
   "sellerOrders": "Ibyatumijwe",
   "sellerView": "Reba",
-  "sellerSearchShop": "Shakisha mu iduka ryawe"
+  "sellerSearchShop": "Shakisha mu iduka ryawe",
+  "sellerAddProduct": "Ongeraho igicuruzwa",
+  "sellerOrderNo": "Nimero y'icyatumijwe",
+  "sellerOrderDate": "Itariki y'icyatumijwe",
+  "sellerCustomer": "Umukiriya",
+  "sellerStatus": "Imimerere",
+  "checkoutShippingStillLoading": "Uburyo bwo kohereza buracyapakirwa, tegereza",
+  "checkoutNoShipping": "Nta buryo bwo kohereza buhari kuri aka gatebo",
+  "checkoutChooseShipping": "Hitamo uburyo bumwe bwo kohereza kuri buri mucuruzi"
 }

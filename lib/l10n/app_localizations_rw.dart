@@ -434,4 +434,31 @@ class AppLocalizationsRw extends AppLocalizations {
 
   @override
   String get sellerSearchShop => 'Shakisha mu iduka ryawe';
+
+  @override
+  String get sellerAddProduct => 'Ongeraho igicuruzwa';
+
+  @override
+  String get sellerOrderNo => 'Nimero y\'icyatumijwe';
+
+  @override
+  String get sellerOrderDate => 'Itariki y\'icyatumijwe';
+
+  @override
+  String get sellerCustomer => 'Umukiriya';
+
+  @override
+  String get sellerStatus => 'Imimerere';
+
+  @override
+  String get checkoutShippingStillLoading =>
+      'Uburyo bwo kohereza buracyapakirwa, tegereza';
+
+  @override
+  String get checkoutNoShipping =>
+      'Nta buryo bwo kohereza buhari kuri aka gatebo';
+
+  @override
+  String get checkoutChooseShipping =>
+      'Hitamo uburyo bumwe bwo kohereza kuri buri mucuruzi';
 }

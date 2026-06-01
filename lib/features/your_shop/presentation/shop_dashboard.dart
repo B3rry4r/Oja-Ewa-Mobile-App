@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
@@ -55,7 +56,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
     final sellerProducts = ref.watch(sellerProductsProvider);
 
     return AppPageScaffold(
-      title: 'Your Shop',
+      title: context.l10n.sellerShopTitle,
       scrollable: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +73,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
           const SizedBox(height: 16),
           const SizedBox(height: 32),
           Text(
-            "Orders in Process",
+            context.l10n.sellerOrdersInProcess,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -114,7 +115,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
                 ],
               ] else
                 Text(
-                  'Your Shop',
+                  context.l10n.sellerShopTitle,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -134,7 +135,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
               border: Border.all(color: colors.border),
             ),
             child: Text(
-              "Manage Shop",
+              context.l10n.sellerManageShop,
               style: TextStyle(fontSize: 14, color: colors.textPrimary),
             ),
           ),
@@ -156,7 +157,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
           const WBIcon(WBIconName.search, size: 20),
           const SizedBox(width: 12),
           Text(
-            'Search your shop',
+            context.l10n.sellerSearchShop,
             style: WBTypography.body.copyWith(
               color: WBColors.fgPlaceholder,
               fontSize: 16,
@@ -175,7 +176,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
     return Row(
       children: [
         _buildStatCard(
-          label: "Products",
+          label: context.l10n.sellerProducts,
           count: productsCount.toString(),
           onTap: () {
             Navigator.of(context).push(
@@ -185,7 +186,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
         ),
         const SizedBox(width: 16),
         _buildStatCard(
-          label: "Orders",
+          label: context.l10n.sellerOrders,
           count: ordersCount.toString(),
           onTap: () {
             Navigator.of(
@@ -234,7 +235,7 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
               Row(
                 children: [
                   Text(
-                    "View",
+                    context.l10n.sellerView,
                     style: TextStyle(fontSize: 10, color: colors.textPrimary),
                   ),
                   const SizedBox(width: 4),
@@ -312,19 +313,19 @@ class _ShopDashboardScreenState extends ConsumerState<ShopDashboardScreen> {
                   children: [
                     Expanded(
                       flex: 3,
-                      child: Text("Order No", style: _headerStyle(colors)),
+                      child: Text(context.l10n.sellerOrderNo, style: _headerStyle(colors)),
                     ),
                     Expanded(
                       flex: 3,
-                      child: Text("Order Date", style: _headerStyle(colors)),
+                      child: Text(context.l10n.sellerOrderDate, style: _headerStyle(colors)),
                     ),
                     Expanded(
                       flex: 3,
-                      child: Text("Customer", style: _headerStyle(colors)),
+                      child: Text(context.l10n.sellerCustomer, style: _headerStyle(colors)),
                     ),
                     Expanded(
                       flex: 2,
-                      child: Text("Status", style: _headerStyle(colors)),
+                      child: Text(context.l10n.sellerStatus, style: _headerStyle(colors)),
                     ),
                   ],
                 ),

@@ -429,4 +429,28 @@ class AppLocalizationsTw extends AppLocalizations {
 
   @override
   String get sellerSearchShop => 'Hwehwɛ wo sotɔɔ mu';
+
+  @override
+  String get sellerAddProduct => 'Fa adetɔn ka ho';
+
+  @override
+  String get sellerOrderNo => 'Order Nɔma';
+
+  @override
+  String get sellerOrderDate => 'Order Da';
+
+  @override
+  String get sellerCustomer => 'Adetɔni';
+
+  @override
+  String get sellerStatus => 'Tebea';
+
+  @override
+  String get checkoutShippingStillLoading => 'Adesoa akwan no reba, twɛn kakra';
+
+  @override
+  String get checkoutNoShipping => 'Adesoa akwan biara nni hɔ ma bag yi';
+
+  @override
+  String get checkoutChooseShipping => 'Yi adesoa kwan baako ma ɔtɔnfoɔ biara';
 }

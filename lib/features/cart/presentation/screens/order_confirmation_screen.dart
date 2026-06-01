@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
@@ -64,7 +65,7 @@ class _OrderConfirmationScreenState
         : ref.watch(logisticsQuotesProvider(logisticsRequest));
 
     return AppPageScaffold(
-      title: 'Order confirmation',
+      title: context.l10n.checkoutTitle,
       showActions: false,
       onBack: () {
         final navigator = Navigator.of(context);
@@ -86,13 +87,13 @@ class _OrderConfirmationScreenState
                 if (selectedAddress == null) {
                   AppSnackbars.showError(
                     context,
-                    'Please add a delivery address',
+                    context.l10n.checkoutAddAddress,
                   );
                   return;
                 }
 
                 if (checkoutItems.isEmpty) {
-                  AppSnackbars.showError(context, 'Your cart is empty');
+                  AppSnackbars.showError(context, context.l10n.cartEmpty);
                   return;
                 }
                 // Check error BEFORE loading: a failed request (422/502) transitions
@@ -114,7 +115,7 @@ class _OrderConfirmationScreenState
                 if (shippingQuotesAsync.isLoading) {
                   AppSnackbars.showError(
                     context,
-                    'Shipping options are still loading, please wait',
+                    context.l10n.checkoutShippingStillLoading,
                   );
                   return;
                 }
@@ -129,7 +130,7 @@ class _OrderConfirmationScreenState
                 if (quoteGroups.isEmpty) {
                   AppSnackbars.showError(
                     context,
-                    'No shipping options available for this cart',
+                    context.l10n.checkoutNoShipping,
                   );
                   return;
                 }
@@ -143,7 +144,7 @@ class _OrderConfirmationScreenState
                 if (missingQuotes.isNotEmpty) {
                   AppSnackbars.showError(
                     context,
-                    'Choose one shipping option for each seller',
+                    context.l10n.checkoutChooseShipping,
                   );
                   return;
                 }
@@ -206,7 +207,7 @@ class _OrderConfirmationScreenState
           : hasCartError
           ? const Center(child: Text('Failed to load cart'))
           : cart == null || cart.items.isEmpty
-          ? const Center(child: Text('Cart is empty'))
+          ? Center(child: Text(context.l10n.cartEmpty))
           : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 0),
               child: Column(
@@ -244,7 +245,7 @@ class _OrderConfirmationScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Shipping Options',
+            context.l10n.shippingOptions,
             style: WBTypography.section.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 12),
@@ -296,7 +297,7 @@ class _OrderConfirmationScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Shipping Options',
+              context.l10n.shippingOptions,
               style: WBTypography.section.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 12),
@@ -317,7 +318,7 @@ class _OrderConfirmationScreenState
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          "Couldn't load delivery options",
+                          context.l10n.shippingError,
                           style: WBTypography.body.copyWith(
                             fontWeight: FontWeight.w600,
                             color: WBColors.statusErrorFg,
@@ -335,7 +336,7 @@ class _OrderConfirmationScreenState
                   ),
                   const SizedBox(height: 14),
                   WBButton(
-                    label: 'Retry',
+                    label: context.l10n.commonRetry,
                     icon: WBIconName.arrowRight,
                     size: WBButtonSize.sm,
                     variant: WBButtonVariant.danger,
@@ -360,7 +361,7 @@ class _OrderConfirmationScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Shipping Options',
+              context.l10n.shippingOptions,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -493,7 +494,7 @@ class _OrderConfirmationScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Shipping Address',
+          context.l10n.checkoutShippingAddress,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
@@ -513,7 +514,7 @@ class _OrderConfirmationScreenState
               children: [
                 Expanded(
                   child: Text(
-                    'No address selected yet',
+                    context.l10n.checkoutNoAddress,
                     style: TextStyle(fontSize: 14, color: colors.textSecondary),
                   ),
                 ),
@@ -524,7 +525,7 @@ class _OrderConfirmationScreenState
                       arguments: {_returnArgKey: _returnToOrderConfirmation},
                     );
                   },
-                  child: const Text('Add address'),
+                  child: Text(context.l10n.checkoutAddAddressBtn),
                 ),
               ],
             ),
@@ -573,7 +574,7 @@ class _OrderConfirmationScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Items',
+          context.l10n.checkoutItems,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
@@ -634,7 +635,7 @@ class _OrderConfirmationScreenState
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Order Summary',
+                  context.l10n.checkoutOrderSummary,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -648,7 +649,7 @@ class _OrderConfirmationScreenState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Subtotal',
+                    context.l10n.cartSubtotal,
                     style: TextStyle(fontSize: 14, color: colors.textSecondary),
                   ),
                   Text(formatPriceFx(subtotal, currency), style: TextStyle(fontSize: 14, color: colors.textPrimary)),
@@ -660,7 +661,7 @@ class _OrderConfirmationScreenState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Delivery Fee',
+                    context.l10n.checkoutDeliveryFee,
                     style: TextStyle(fontSize: 14, color: colors.textSecondary),
                   ),
                   Text(formatPriceFx(deliveryFee, currency), style: TextStyle(fontSize: 14, color: colors.textPrimary)),
@@ -674,7 +675,7 @@ class _OrderConfirmationScreenState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Total',
+                    context.l10n.checkoutTotal,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -711,9 +712,9 @@ class _OrderConfirmationScreenState
                               strokeWidth: 2,
                             ),
                           )
-                        : const Text(
-                            'Place Order',
-                            style: TextStyle(
+                        : Text(
+                            context.l10n.checkoutPlaceOrder,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFFFFFBF5),
