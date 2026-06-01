@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
@@ -57,7 +58,7 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 28),
             _padded(
               Text(
-                'Shop by category',
+                context.l10n.homeShopByCategory,
                 style: WBTypography.section.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
@@ -91,7 +92,7 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Search products, brands & shops',
+                context.l10n.homeSearchHint,
                 overflow: TextOverflow.ellipsis,
                 style: WBTypography.body.copyWith(
                   color: WBColors.fgPlaceholder,
@@ -270,7 +271,7 @@ class HomeScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  'Discover curated drops',
+                  context.l10n.homeDiscoverTitle,
                   style: WBTypography.section.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -278,7 +279,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Fashion, beauty, art, education, and hardware in one marketplace.',
+                  context.l10n.homeDiscoverSub,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: WBTypography.secondary.copyWith(

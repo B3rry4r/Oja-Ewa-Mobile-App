@@ -5,6 +5,7 @@ import 'package:video_player/video_player.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/app/router/app_router.dart';
@@ -118,7 +119,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildHeadline(BuildContext context) {
     return Text(
-      'The Pan-African\nBeauty Market',
+      context.l10n.onboardingTitle,
       style: WBTypography.page.copyWith(fontWeight: FontWeight.w700, height: 1.2),
     );
   }
@@ -127,7 +128,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Column(
       children: [
         WBButton(
-          label: 'Create account',
+          label: context.l10n.authCreateAccount,
           fullWidth: true,
           onPressed: () =>
               Navigator.of(context).pushNamed(AppRoutes.createAccount),
@@ -137,7 +138,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           children: [
             Expanded(
               child: WBButton(
-                label: 'Sign in',
+                label: context.l10n.authSignIn,
                 fullWidth: true,
                 variant: WBButtonVariant.secondary,
                 onPressed: () =>
@@ -147,7 +148,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: WBButton(
-                label: 'Guest',
+                label: context.l10n.authGuest,
                 fullWidth: true,
                 variant: WBButtonVariant.secondary,
                 onPressed: () => Navigator.of(
@@ -171,9 +172,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             height: 1.4,
           ),
           children: [
-            const TextSpan(text: "By continuing you agree to WAWUBeauty's\n"),
+            TextSpan(text: context.l10n.onboardingTerms),
             TextSpan(
-              text: 'Terms of Service',
+              text: context.l10n.onboardingTermsOfService,
               style: WBTypography.caption.copyWith(
                 color: WBColors.fgHeader,
                 fontWeight: FontWeight.w600,
@@ -183,9 +184,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ..onTap = () =>
                     Navigator.of(context).pushNamed(AppRoutes.termsOfService),
             ),
-            const TextSpan(text: ' and '),
+            TextSpan(text: context.l10n.onboardingAnd),
             TextSpan(
-              text: 'Privacy Policy',
+              text: context.l10n.onboardingPrivacy,
               style: WBTypography.caption.copyWith(
                 color: WBColors.fgHeader,
                 fontWeight: FontWeight.w600,

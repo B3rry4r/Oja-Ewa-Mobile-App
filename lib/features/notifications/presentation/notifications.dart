@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
@@ -70,11 +71,11 @@ class NotificationsScreen extends ConsumerWidget {
 
                     data: (items) {
                       if (items.isEmpty) {
-                        return const WBEmptyState(
+                        return WBEmptyState(
                           illustration: WBEmptyIllustration.noOrders,
-                          label: 'You have no notifications',
+                          label: context.l10n.notificationsEmpty,
                           sub:
-                              'We\'ll let you know when something important happens.',
+                              context.l10n.notificationsEmptySub,
                         );
                       }
 

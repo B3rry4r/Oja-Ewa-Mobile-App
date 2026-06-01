@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
@@ -157,13 +158,13 @@ class WishlistScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Nothing saved yet',
+              context.l10n.wishlistEmpty,
               style: WBTypography.section.copyWith(fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Products you save will show up here for quick access later.',
+              context.l10n.wishlistEmptySub,
               style: WBTypography.secondary.copyWith(
                 color: WBColors.fgSecondary,
                 height: 1.5,
@@ -172,7 +173,7 @@ class WishlistScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 28),
             WBButton(
-              label: 'Keep Shopping',
+              label: context.l10n.wishlistKeepShopping,
               onPressed: onKeepShoppingPressed ?? _defaultKeepShoppingPressed,
             ),
           ],

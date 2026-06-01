@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 
@@ -22,16 +23,16 @@ class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  static const _items = <({String asset, String label})>[
-    (asset: AppIcons.home, label: 'Home'),
-    (asset: AppIcons.search, label: 'Search'),
-    (asset: AppIcons.wishlist, label: 'Wishlist'),
-    (asset: AppIcons.blog, label: 'Blog'),
-    (asset: AppIcons.account, label: 'Account'),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
+    final items = <({String asset, String label})>[
+      (asset: AppIcons.home, label: l.navHome),
+      (asset: AppIcons.search, label: l.navSearch),
+      (asset: AppIcons.wishlist, label: l.navWishlist),
+      (asset: AppIcons.blog, label: l.navBlog),
+      (asset: AppIcons.account, label: l.navAccount),
+    ];
     final bottomInset = MediaQuery.of(context).padding.bottom;
     return Padding(
       padding: EdgeInsets.fromLTRB(20, 0, 20, bottomInset + 16),
@@ -51,10 +52,10 @@ class AppBottomNavBar extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            for (var i = 0; i < _items.length; i++)
+            for (var i = 0; i < items.length; i++)
               _NavSlot(
-                asset: _items[i].asset,
-                label: _items[i].label,
+                asset: items[i].asset,
+                label: items[i].label,
                 active: i == currentIndex,
                 onTap: () => onTap(i),
               ),

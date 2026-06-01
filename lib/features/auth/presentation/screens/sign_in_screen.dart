@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
 
@@ -150,10 +151,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Welcome Back!', style: WBTypography.hero.copyWith(fontSize: 30)),
+        Text(context.l10n.authWelcomeBack, style: WBTypography.hero.copyWith(fontSize: 30)),
         const SizedBox(height: 8),
         Text(
-          'Let\'s sign in',
+          context.l10n.authLetsSignIn,
           style: WBTypography.body.copyWith(color: WBColors.fgSecondary),
         ),
       ],
@@ -162,8 +163,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
   Widget _buildEmailInput() {
     return WBInput(
-      label: 'Email',
-      placeholder: 'Enter your email',
+      label: context.l10n.authEmail,
+      placeholder: context.l10n.authEmailHint,
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
     );
@@ -171,8 +172,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
   Widget _buildPasswordInput() {
     return WBInput(
-      label: 'Password',
-      placeholder: 'Type your password',
+      label: context.l10n.authPassword,
+      placeholder: context.l10n.authPasswordHint,
       controller: _passwordController,
       obscureText: _obscurePassword,
       trailing: GestureDetector(
@@ -202,7 +203,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
             child: Text(
-              'Forgot Password?',
+              context.l10n.authForgotPassword,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
@@ -250,7 +251,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         ),
         const SizedBox(width: 16),
         Text(
-          'Remember me',
+          context.l10n.authRememberMe,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
@@ -264,7 +265,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Widget _buildSignInButton() {
     final auth = ref.watch(authFlowControllerProvider);
     return WBButton(
-      label: 'Sign in',
+      label: context.l10n.authSignIn,
       fullWidth: true,
       size: WBButtonSize.lg,
       loading: auth.isLoading,
@@ -379,7 +380,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: 'No account yet? ',
+                    text: context.l10n.authNoAccount,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
@@ -387,7 +388,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     ),
                   ),
                   TextSpan(
-                    text: 'Create account',
+                    text: context.l10n.authCreateAccount,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -410,8 +411,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     if (email.isEmpty || password.isEmpty) {
       // Show validation error
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all fields'),
+        SnackBar(
+          content: Text(context.l10n.authFillFields),
           backgroundColor: WBColors.statusWarning,
         ),
       );

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
-import 'package:ojaewa/core/theme/wb_theme_exports.dart';
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/features/cart/domain/cart.dart';
@@ -38,7 +38,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final hasError = ref.watch(cartProvider).hasError && cart == null;
 
     return AppPageScaffold(
-      title: 'Cart',
+      title: context.l10n.cartTitle,
       showActions: false,
       bottomBar: _CheckoutSection(cart: cart),
       child: isInitialLoading
@@ -46,10 +46,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           : hasError
           ? const Center(child: Text('Failed to load cart'))
           : cart == null
-          ? const WBEmptyState(
+          ? WBEmptyState(
               illustration: WBEmptyIllustration.noProducts,
-              label: 'Your cart is empty',
-              sub: 'Browse the marketplace and add items to your cart.',
+              label: context.l10n.cartEmpty,
+              sub: context.l10n.cartEmptySub,
             )
           : _CartBody(cart: cart),
     );
@@ -65,10 +65,10 @@ class _CartBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     if (cart.items.isEmpty) {
-      return const WBEmptyState(
+      return WBEmptyState(
         illustration: WBEmptyIllustration.noProducts,
-        label: 'Your cart is empty',
-        sub: 'Browse the marketplace and add items to your cart.',
+        label: context.l10n.cartEmpty,
+        sub: context.l10n.cartEmptySub,
       );
     }
 
@@ -511,7 +511,7 @@ class _CheckoutSection extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               WBButton(
-                label: 'Checkout',
+                label: context.l10n.cartCheckout,
                 fullWidth: true,
                 size: WBButtonSize.lg,
                 disabled: isEmpty,

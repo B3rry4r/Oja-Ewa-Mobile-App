@@ -9,6 +9,7 @@ import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
 
 import '../domain/blog_post.dart';
@@ -81,11 +82,11 @@ class _BlogScreenState extends ConsumerState<BlogScreen> {
                 return WBEmptyState(
                   illustration: WBEmptyIllustration.noProducts,
                   label: _showFavorites
-                      ? 'No favorite posts yet'
-                      : 'No posts found',
+                      ? context.l10n.blogNoFavorites
+                      : context.l10n.blogNoPosts,
                   sub: _showFavorites
-                      ? 'Posts you favourite will appear here.'
-                      : 'Check back soon for new stories.',
+                      ? context.l10n.blogNoFavoritesSub
+                      : context.l10n.blogNoPostsSub,
                 );
               }
 

@@ -6,6 +6,7 @@ import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_bottom_nav_bar.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
@@ -90,7 +91,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         _focusNode.hasFocus && _searchController.text.isNotEmpty;
 
     return AppPageScaffold(
-      title: 'Search',
+      title: context.l10n.searchTitle,
       showBack: false,
       includeBottomNavSpacing: true,
       child: Padding(
@@ -121,7 +122,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       ),
                       decoration: InputDecoration(
                         filled: false,
-                        hintText: 'Search WAWUBeauty',
+                        hintText: context.l10n.searchHint,
                         hintStyle: TextStyle(
                           fontSize: 16,
                           color: colors.textTertiary,
@@ -170,7 +171,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   final type = _categoryTypes[index];
                   final isSelected = _selectedCategoryType == type['key'];
                   return WBTag(
-                    label: type['label']!,
+                    label: _catLabel(context, type['key']!, type['label']!),
                     active: isSelected,
                     onTap: () {
                       setState(() => _selectedCategoryType = type['key']!);
@@ -292,14 +293,25 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
+  String _catLabel(BuildContext context, String key, String fallback) {
+    final l = context.l10n;
+    return switch (key) {
+      'all' => l.catAll,
+      'textiles' => l.catTextiles,
+      'afro_beauty_products' => l.catBeauty,
+      'shoes_bags' => l.catShoesBags,
+      _ => fallback,
+    };
+  }
+
   Widget _buildEmptyState() {
     final hasSearched = ref.read(searchResultsProvider).hasValue;
     return WBEmptyState(
       illustration: WBEmptyIllustration.noProducts,
-      label: hasSearched ? 'No results found' : 'Search WAWUBeauty',
+      label: hasSearched ? context.l10n.searchNoResults : context.l10n.searchPrompt,
       sub: hasSearched
-          ? 'Try a different term or category.'
-          : 'Find products, brands and shops across the marketplace.',
+          ? context.l10n.searchNoResultsSub
+          : context.l10n.searchPromptSub,
     );
   }
 

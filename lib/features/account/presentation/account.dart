@@ -71,59 +71,60 @@ class AccountScreen extends ConsumerWidget {
   }
 
   List<AccountMenuSection> _sections(BuildContext context, WidgetRef ref) {
+    final l = context.l10n;
     final isSellerApproved = ref.watch(isSellerApprovedProvider);
     final hasApprovedBusiness = ref.watch(hasApprovedBusinessProvider);
     void go(String route) => Navigator.of(context).pushNamed(route);
 
     return [
       AccountMenuSection(
-        title: 'Account',
+        title: l.accountSectionAccount,
         rows: [
           AccountMenuRow(
             iconAsset: AppIcons.editYourProfile,
-            label: 'Edit your profile',
-            sub: 'Name, photo and contact details',
+            label: l.accountEditProfile,
+            sub: l.accountEditProfileSub,
             onTap: () => go(AppRoutes.editProfile),
           ),
           AccountMenuRow(
             iconAsset: AppIcons.yourOrders,
-            label: 'Your orders',
-            sub: 'Track and review past orders',
+            label: l.accountYourOrders,
+            sub: l.accountYourOrdersSub,
             onTap: () => go(AppRoutes.orders),
           ),
           AccountMenuRow(
             iconAsset: AppIcons.yourAddress,
-            label: 'Your addresses',
-            sub: 'Delivery locations',
+            label: l.accountAddresses,
+            sub: l.accountAddressesSub,
             onTap: () => go(AppRoutes.addresses),
           ),
           AccountMenuRow(
             iconAsset: AppIcons.notification,
-            label: 'Notifications',
-            sub: 'Push and email preferences',
+            label: l.accountNotifications,
+            sub: l.accountNotificationsSub,
             onTap: () => go(AppRoutes.notificationsSettings),
           ),
           AccountMenuRow(
             iconAsset: AppIcons.password,
-            label: 'Password',
-            sub: 'Change your password',
+            label: l.accountPassword,
+            sub: l.accountPasswordSub,
             onTap: () => go(AppRoutes.changePassword),
           ),
           AccountMenuRow(
             iconAsset: AppIcons.connectToUs,
-            label: context.l10n.languageTitle,
-            sub: context.l10n.languageSubtitle,
+            label: l.languageTitle,
+            sub: l.languageSubtitle,
             onTap: () => go(AppRoutes.language),
           ),
         ],
       ),
       AccountMenuSection(
-        title: 'WAWUBeauty Business',
+        title: l.accountSectionBusiness,
         rows: [
           AccountMenuRow(
             iconAsset: AppIcons.startSelling,
-            label: 'Start selling',
-            sub: 'List your products and reach buyers',
+            label: l.accountStartSelling,
+            sub: l.accountStartSellingSub,
             onTap: () => go(
               isSellerApproved
                   ? AppRoutes.yourShopDashboard
@@ -132,8 +133,8 @@ class AccountScreen extends ConsumerWidget {
           ),
           AccountMenuRow(
             iconAsset: AppIcons.showYourBusiness,
-            label: 'Show your business',
-            sub: 'Your heritage and brand story',
+            label: l.accountShowBusiness,
+            sub: l.accountShowBusinessSub,
             onTap: () => go(
               hasApprovedBusiness
                   ? AppRoutes.businessSettings
@@ -143,31 +144,31 @@ class AccountScreen extends ConsumerWidget {
         ],
       ),
       AccountMenuSection(
-        title: 'Support',
+        title: l.accountSectionSupport,
         rows: [
           AccountMenuRow(
             iconAsset: AppIcons.emailUs,
-            label: 'Email us',
+            label: l.accountEmailUs,
             onTap: () => _handleEmailUs(context, ref),
           ),
           AccountMenuRow(
             iconAsset: AppIcons.privacyPolicy,
-            label: 'Privacy Policy',
+            label: l.accountPrivacy,
             onTap: () => go(AppRoutes.privacyPolicy),
           ),
           AccountMenuRow(
             iconAsset: AppIcons.termsOfService,
-            label: 'Terms of Service',
+            label: l.accountTerms,
             onTap: () => go(AppRoutes.termsOfService),
           ),
           AccountMenuRow(
             iconAsset: AppIcons.faq,
-            label: 'FAQ',
+            label: l.accountFaq,
             onTap: () => go(AppRoutes.faq),
           ),
           AccountMenuRow(
             iconAsset: AppIcons.connectToUs,
-            label: 'Connect to us',
+            label: l.accountConnect,
             onTap: () => go(AppRoutes.connectToUs),
           ),
         ],
@@ -180,13 +181,14 @@ class AccountScreen extends ConsumerWidget {
     WidgetRef ref,
     bool isLoggedIn,
   ) {
+    final l = context.l10n;
     return AccountMenuSection(
       title: '',
       rows: [
         if (isLoggedIn)
           AccountMenuRow(
             iconAsset: AppIcons.signOut,
-            label: 'Delete Account',
+            label: l.accountDelete,
             danger: true,
             onTap: () {
               ConfirmationModal.show(
@@ -204,7 +206,7 @@ class AccountScreen extends ConsumerWidget {
           ),
         AccountMenuRow(
           iconAsset: AppIcons.signOut,
-          label: isLoggedIn ? 'Sign Out' : 'Sign In',
+          label: isLoggedIn ? l.authSignOut : l.authSignIn,
           danger: isLoggedIn,
           onTap: () => _handleAuthAction(context, ref, isLoggedIn),
         ),
@@ -469,7 +471,7 @@ class _AccountHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                name.isNotEmpty ? name : 'Guest',
+                name.isNotEmpty ? name : context.l10n.accountGuest,
                 style: WBTypography.cardTitle.copyWith(
                   fontWeight: FontWeight.w600,
                   fontSize: 20,

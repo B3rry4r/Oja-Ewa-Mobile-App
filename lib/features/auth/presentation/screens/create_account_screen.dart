@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
 
@@ -62,8 +63,8 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   Future<void> _createAccount() async {
     if (!_isFormValid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill all fields and agree to terms'),
+        SnackBar(
+          content: Text(context.l10n.authFillFields),
           backgroundColor: WBColors.statusWarning,
           behavior: SnackBarBehavior.floating,
         ),
@@ -187,7 +188,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           const SizedBox(height: 20),
 
           // Title
-          Text('Create Account', style: WBTypography.hero.copyWith(fontSize: 30)),
+          Text(context.l10n.authCreateAccountTitle, style: WBTypography.hero.copyWith(fontSize: 30)),
 
           const SizedBox(height: 20),
 
@@ -217,7 +218,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
           // Password Requirement Text
           Text(
-            'Minimum of 8 characters',
+            context.l10n.authMinChars,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
@@ -270,7 +271,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'First Name',
+          context.l10n.authFirstName,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
@@ -289,7 +290,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: 'Enter your first name',
+              hintText: context.l10n.authFirstNameHint,
               hintStyle: TextStyle(color: colors.textTertiary),
             ),
           ),
@@ -304,7 +305,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Last Name',
+          context.l10n.authLastName,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
@@ -323,7 +324,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: 'Enter your last name',
+              hintText: context.l10n.authLastNameHint,
               hintStyle: TextStyle(color: colors.textTertiary),
             ),
           ),
@@ -338,7 +339,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Email',
+          context.l10n.authEmail,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
@@ -358,7 +359,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: 'Enter your email',
+              hintText: context.l10n.authEmailHint,
               hintStyle: TextStyle(color: colors.textTertiary),
             ),
           ),
@@ -373,7 +374,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Phone Number',
+          context.l10n.authPhone,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
@@ -463,7 +464,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Password',
+          context.l10n.authPassword,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
@@ -502,7 +503,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: 'Type your password',
+              hintText: context.l10n.authPasswordHint,
               hintStyle: TextStyle(color: colors.textTertiary),
             ),
           ),
@@ -585,7 +586,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
   Widget _buildCreateAccountButton() {
     return WBButton(
-      label: 'Create Account',
+      label: context.l10n.authCreateAccountTitle,
       fullWidth: true,
       size: WBButtonSize.lg,
       disabled: !_isFormValid,
@@ -663,7 +664,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Referral Code (Optional)',
+          context.l10n.authReferralOptional,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
@@ -683,7 +684,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: 'Enter referral code',
+              hintText: context.l10n.authReferralHint,
               hintStyle: TextStyle(color: colors.textTertiary),
             ),
           ),
@@ -706,7 +707,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: 'Have an account? ',
+                    text: context.l10n.authHaveAccount,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
@@ -714,7 +715,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                     ),
                   ),
                   TextSpan(
-                    text: 'Sign in',
+                    text: context.l10n.authSignIn,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
