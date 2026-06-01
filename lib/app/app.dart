@@ -8,6 +8,8 @@ import 'bootstrap/app_bootstrap.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_mode_controller.dart';
+import '../core/i18n/locale_controller.dart';
+import '../l10n/app_localizations.dart';
 import '../core/deep_links/deep_link_handler.dart';
 import '../core/network/network_providers.dart';
 import '../core/widgets/offline_screen.dart';
@@ -35,6 +37,8 @@ class _AppState extends ConsumerState<App> {
   void initState() {
     super.initState();
     ref.read(appThemeModeProvider);
+    // Load the saved language (falls back to device locale when unset).
+    LocaleController.instance.load();
     // Initialize deep link handler after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(deepLinkHandlerProvider).init(navigatorKey);
@@ -104,12 +108,17 @@ class _AppState extends ConsumerState<App> {
   Widget build(BuildContext context) {
     ref.watch(appThemeModeProvider);
 
-    return MaterialApp(
+    return ValueListenableBuilder<Locale?>(
+      valueListenable: LocaleController.instance.locale,
+      builder: (context, locale, _) => MaterialApp(
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.light(),
       themeMode: ThemeMode.light,
+      locale: locale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {
         return Consumer(
           builder: (context, ref, _) {
@@ -158,6 +167,7 @@ class _AppState extends ConsumerState<App> {
       },
       onGenerateRoute: AppRouter.onGenerateRoute,
       initialRoute: AppRoutes.splash,
+      ),
     );
   }
 }

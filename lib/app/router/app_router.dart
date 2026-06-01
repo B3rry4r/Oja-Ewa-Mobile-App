@@ -22,6 +22,7 @@ import '../../features/account/subfeatures/connect/connect.dart';
 import '../../features/account/subfeatures/faq/faq.dart';
 import '../../features/account/subfeatures/support/pdf_viewer_screen.dart';
 import '../../features/account/subfeatures/notifications/presentation/notifications_settings.dart';
+import '../../features/account/subfeatures/language/presentation/language_screen.dart';
 import '../../features/account/subfeatures/password/presentation/password.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/business_category.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/business_onboarding.dart';
@@ -99,6 +100,7 @@ abstract class AppRoutes {
   static const addEditAddress = '/add-edit-address';
   static const changePassword = '/change-password';
   static const notificationsSettings = '/notifications-settings';
+  static const language = '/language';
   static const faq = '/faq';
   static const faqLegacy = '/faq-legacy';
   static const privacyPolicy = '/privacy-policy';
@@ -298,6 +300,12 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const AuthGuard(child: NotificationsSettingsScreen()),
+        );
+
+      case AppRoutes.language:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const LanguageScreen(),
         );
 
       case AppRoutes.faq:

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
@@ -107,6 +108,12 @@ class AccountScreen extends ConsumerWidget {
             label: 'Password',
             sub: 'Change your password',
             onTap: () => go(AppRoutes.changePassword),
+          ),
+          AccountMenuRow(
+            iconAsset: AppIcons.connectToUs,
+            label: context.l10n.languageTitle,
+            sub: context.l10n.languageSubtitle,
+            onTap: () => go(AppRoutes.language),
           ),
         ],
       ),

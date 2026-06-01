@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   flutter_riverpod: ^3.0.3
   google_fonts: ^6.2.1
   dio: ^5.9.0
@@ -71,6 +73,7 @@ dev_dependencies:
 flutter:
 
   uses-material-design: true
+  generate: true
 
   assets:
     - assets/ojaewa_landng_video.mp4
