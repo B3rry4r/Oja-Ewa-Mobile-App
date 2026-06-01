@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
@@ -36,6 +37,15 @@ class HomeScreen extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: child,
       );
+
+  /// Renders a category/service artwork asset full-colour (no tint). Uses
+  /// the SVG renderer for .svg brand art and the raster loader for .png.
+  static Widget _artwork(String asset) {
+    final isSvg = asset.toLowerCase().endsWith('.svg');
+    return isSvg
+        ? SvgPicture.asset(asset, fit: BoxFit.contain)
+        : Image.asset(asset, fit: BoxFit.contain);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -358,7 +368,7 @@ class HomeScreen extends ConsumerWidget {
             SizedBox(
               width: 76,
               height: 76,
-              child: Image.asset(iconAsset, fit: BoxFit.contain),
+              child: _artwork(iconAsset),
             ),
             const SizedBox(height: 8),
             Text(
@@ -468,7 +478,7 @@ class HomeScreen extends ConsumerWidget {
             SizedBox(
               width: 90,
               height: 90,
-              child: Image.asset(iconAsset, fit: BoxFit.contain),
+              child: _artwork(iconAsset),
             ),
             const SizedBox(height: 10),
             Text(

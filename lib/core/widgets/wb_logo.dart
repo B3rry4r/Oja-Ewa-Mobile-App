@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../theme/wb_theme_exports.dart';
 
-/// Brand mark placeholder. The real WAWUBeauty artwork is supplied after the
-/// redesign; until then this renders a clean monochrome lettermark ("WB") so
-/// no screen depends on a missing asset.
+/// WAWUBeauty brand "W" mark — the full-colour artwork from the brand kit,
+/// rendered as-is (no tint). [color] is kept for API compatibility but is
+/// no longer applied now that real artwork is supplied.
 class WBWMark extends StatelessWidget {
   const WBWMark({super.key, this.size = 72, this.color = WBColors.fgHeader});
 
@@ -13,23 +13,11 @@ class WBWMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Image.asset(
+      'assets/icons/wawu_w.png',
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(size * 0.28),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        'W',
-        style: WBTypography.hero.copyWith(
-          color: Colors.white,
-          fontSize: size * 0.5,
-          fontWeight: FontWeight.w700,
-          height: 1,
-        ),
-      ),
+      fit: BoxFit.contain,
     );
   }
 }
