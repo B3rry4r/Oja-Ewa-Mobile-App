@@ -11,18 +11,18 @@ abstract class AppIcons {
   static const String blog = 'assets/icons/blog.svg';
   static const String brandMarkBlack = 'assets/icons/Black.svg';
   static const String brandMarkWhite = 'assets/icons/White.svg';
-  // WAWUBeauty brand category/service artwork — the exact SVG files from the
-  // brand kit, used as-is (full colour, no tint).
-  static const String beauty = 'assets/brand_icons/Afro.svg';
-  static const String brands = 'assets/brand_icons/Bag and footwear.svg';
-  static const String market = 'assets/brand_icons/Textile.svg';
-  static const String music = 'assets/brand_icons/Art Market.svg';
-  static const String hardware = 'assets/brand_icons/Hardware.svg';
-  static const String schools = 'assets/brand_icons/Education.svg';
+  // WAWUBeauty brand category/service artwork — the brand-kit PNGs, used
+  // as-is (full colour, no tint).
+  static const String beauty = 'assets/brand_icons/Afro.png';
+  static const String brands = 'assets/brand_icons/Bag and footwear.png';
+  static const String market = 'assets/brand_icons/Textile.png';
+  static const String music = 'assets/brand_icons/Art Market.png';
+  static const String hardware = 'assets/brand_icons/Hardware.png';
+  static const String schools = 'assets/brand_icons/Education.png';
   static const String cacRegistration = 'assets/icons/new_icons/cac_reg.PNG';
   static const String nepcRegistration = 'assets/icons/new_icons/nepc.PNG';
-  static const String adsPlacement = 'assets/brand_icons/Advert.svg';
-  static const String verifiedBadges = 'assets/brand_icons/Batch.svg';
+  static const String adsPlacement = 'assets/brand_icons/Advert.png';
+  static const String verifiedBadges = 'assets/brand_icons/Batch.png';
 
   /// WAWUBeauty brand "W" mark (exact artwork from the brand kit).
   static const String wawuW = 'assets/brand_icons/W.png';
