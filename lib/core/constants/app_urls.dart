@@ -30,6 +30,11 @@ class AppUrls {
     }
   }
 
+  static String get wawuIdBaseUrl {
+    const override = String.fromEnvironment('WAWU_ID_BASE_URL', defaultValue: '');
+    return override.isNotEmpty ? override : 'https://wawu-id-production.up.railway.app';
+  }
+
   static String get aiBaseUrl {
     if (_aiOverride.isNotEmpty) return _aiOverride;
 

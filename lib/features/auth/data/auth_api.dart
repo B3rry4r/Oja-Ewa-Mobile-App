@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../core/constants/app_urls.dart';
 import '../../../core/network/dio_error_mapper.dart';
 import 'logout_endpoints.dart';
 
@@ -9,30 +10,30 @@ class AuthApi {
 
   final Dio _dio;
 
-  Future<String> login({required String email, required String password}) async {
+  /// Authenticate against WAWU ID.
+  ///
+  /// WAWU ID returns: {"data": {"accessToken": "...", "refreshToken": "...",
+  /// "user": {...}}}. Returns both tokens keyed as 'accessToken'/'refreshToken'.
+  Future<Map<String, String>> login({
+    required String email,
+    required String password,
+  }) async {
     try {
       final res = await _dio.post(
-        '/api/login',
+        '${AppUrls.wawuIdBaseUrl}/auth/login',
         data: {
           'email': email,
           'password': password,
         },
       );
 
-      // Docs show token is returned; backend shape may be:
-      // {"token":"..."} or {"data": {"token":"..."}}
-      final data = res.data;
-      final token = _extractToken(data);
-      if (token == null || token.isEmpty) {
-        throw const FormatException('Token missing in response');
-      }
-      return token;
+      return _extractTokens(res.data);
     } catch (e) {
       throw mapDioError(e);
     }
   }
 
-  Future<String> register({
+  Future<Map<String, String>> register({
     required String firstname,
     required String lastname,
     required String email,
@@ -41,27 +42,22 @@ class AuthApi {
   }) async {
     try {
       final data = {
-        'firstname': firstname,
-        'lastname': lastname,
+        'fullName': '$firstname $lastname'.trim(),
         'email': email,
         'password': password,
       };
-      
+
       // Add referral_code if provided
       if (referralCode != null && referralCode.isNotEmpty) {
         data['referral_code'] = referralCode;
       }
 
       final res = await _dio.post(
-        '/api/register',
+        '${AppUrls.wawuIdBaseUrl}/auth/register',
         data: data,
       );
 
-      final token = _extractToken(res.data);
-      if (token == null || token.isEmpty) {
-        throw const FormatException('Token missing in response');
-      }
-      return token;
+      return _extractTokens(res.data);
     } catch (e) {
       throw mapDioError(e);
     }
@@ -79,7 +75,7 @@ class AuthApi {
   Future<void> forgotPassword({required String email}) async {
     try {
       await _dio.post(
-        '/api/password/forgot',
+        '${AppUrls.wawuIdBaseUrl}/auth/forgot-password',
         data: {'email': email},
       );
     } catch (e) {
@@ -95,7 +91,7 @@ class AuthApi {
   }) async {
     try {
       await _dio.post(
-        '/api/password/reset',
+        '${AppUrls.wawuIdBaseUrl}/auth/reset-password',
         data: {
           'email': email,
           'token': token,
@@ -165,16 +161,48 @@ class AuthApi {
   }
 }
 
+/// Pulls both tokens out of a WAWU ID response and validates the access token.
+Map<String, String> _extractTokens(dynamic data) {
+  final accessToken = _extractToken(data);
+  if (accessToken == null || accessToken.isEmpty) {
+    throw const FormatException('Token missing in response');
+  }
+  return {
+    'accessToken': accessToken,
+    'refreshToken': _extractRefreshToken(data) ?? '',
+  };
+}
+
 String? _extractToken(dynamic data) {
   if (data is Map<String, dynamic>) {
-    final direct = data['token'];
-    if (direct is String) return direct;
-
+    // WAWU ID shape: {"data": {"accessToken": "..."}}
     final nested = data['data'];
     if (nested is Map<String, dynamic>) {
+      final access = nested['accessToken'];
+      if (access is String) return access;
+
+      // Old Sanctum nested shape: {"data": {"token": "..."}}
       final t = nested['token'];
       if (t is String) return t;
     }
+
+    // Old Sanctum flat shape: {"token": "..."}
+    final direct = data['token'];
+    if (direct is String) return direct;
+  }
+  return null;
+}
+
+String? _extractRefreshToken(dynamic data) {
+  if (data is Map<String, dynamic>) {
+    final nested = data['data'];
+    if (nested is Map<String, dynamic>) {
+      final r = nested['refreshToken'];
+      if (r is String) return r;
+    }
+
+    final direct = data['refreshToken'];
+    if (direct is String) return direct;
   }
   return null;
 }

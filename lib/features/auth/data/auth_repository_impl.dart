@@ -13,8 +13,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> login({required String email, required String password}) async {
-    final token = await api.login(email: email, password: password);
-    await authController.setAccessToken(token);
+    final tokens = await api.login(email: email, password: password);
+    await authController.setTokens(
+      tokens['accessToken'] ?? '',
+      tokens['refreshToken'] ?? '',
+    );
   }
 
   @override
@@ -25,14 +28,17 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     String? referralCode,
   }) async {
-    final token = await api.register(
+    final tokens = await api.register(
       firstname: firstname,
       lastname: lastname,
       email: email,
       password: password,
       referralCode: referralCode,
     );
-    await authController.setAccessToken(token);
+    await authController.setTokens(
+      tokens['accessToken'] ?? '',
+      tokens['refreshToken'] ?? '',
+    );
   }
 
   @override
@@ -77,7 +83,8 @@ class AuthRepositoryImpl implements AuthRepository {
       idToken: idToken,
       referralCode: referralCode,
     );
-    await authController.setAccessToken(token);
+    // Google OAuth still uses the Beauty API (single token, no refresh token).
+    await authController.setTokens(token, '');
   }
 
   @override
