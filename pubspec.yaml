@@ -72,6 +72,14 @@ dev_dependencies:
 
 flutter:
 
+  # Disable Flutter's Swift Package Manager integration. This is a CocoaPods
+  # project, and on Flutter 3.44 SPM is enabled by default — its iOS build
+  # tries to resolve the Firebase plugins via SPM, where firebase_messaging
+  # and firebase_analytics pin conflicting `flutterfire` package versions and
+  # dependency resolution fails. CocoaPods resolves them fine.
+  config:
+    enable-swift-package-manager: false
+
   uses-material-design: true
   generate: true
 
