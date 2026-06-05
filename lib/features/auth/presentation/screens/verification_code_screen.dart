@@ -19,11 +19,12 @@ class VerificationCodeScreen extends ConsumerStatefulWidget {
 
 class _VerificationCodeScreenState
     extends ConsumerState<VerificationCodeScreen> {
+  // WAWU ID issues 6-digit reset codes (and the OTP_BYPASS_CODE is 6 digits).
   final List<TextEditingController> _codeControllers = List.generate(
-    4,
+    6,
     (_) => TextEditingController(),
   );
-  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   String _enteredCode = '';
 
   @override
@@ -56,7 +57,7 @@ class _VerificationCodeScreenState
   void _updateCode() {
     setState(() {
       _enteredCode = _codeControllers.map((c) => c.text).join();
-      if (_enteredCode.length == 4) {
+      if (_enteredCode.length == 6) {
         // Auto-submit or verify when all digits are entered
         _verifyCode();
       }
@@ -64,7 +65,7 @@ class _VerificationCodeScreenState
   }
 
   void _verifyCode() {
-    if (_enteredCode.length != 4) return;
+    if (_enteredCode.length != 6) return;
     final colors = context.appColors;
 
     final args = ModalRoute.of(context)?.settings.arguments;
@@ -90,7 +91,7 @@ class _VerificationCodeScreenState
     debugPrint('Resending code...');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('New code sent to your email'),
+        content: Text('New code sent to your phone'),
         backgroundColor: colors.accent,
       ),
     );
@@ -205,7 +206,7 @@ class _VerificationCodeScreenState
         ),
         const SizedBox(height: 8),
         Text(
-          'Enter the four digits sent to your email',
+          'Enter the six-digit code sent to your phone',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
@@ -221,9 +222,9 @@ class _VerificationCodeScreenState
     final colors = context.appColors;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(4, (index) {
+      children: List.generate(6, (index) {
         return SizedBox(
-          width: 60,
+          width: 46,
           height: 60,
           child: TextField(
             controller: _codeControllers[index],
@@ -254,7 +255,7 @@ class _VerificationCodeScreenState
               fillColor: colors.surface,
             ),
             onChanged: (value) {
-              if (value.isNotEmpty && index < 3) {
+              if (value.isNotEmpty && index < 5) {
                 // Auto-advance to next field
                 _focusNodes[index + 1].requestFocus();
               } else if (value.isEmpty && index > 0) {
@@ -314,7 +315,7 @@ class _VerificationCodeScreenState
 
   Widget _buildVerifyButton() {
     final colors = context.appColors;
-    final isComplete = _enteredCode.length == 4;
+    final isComplete = _enteredCode.length == 6;
 
     return Container(
       width: double.infinity,
