@@ -10,7 +10,17 @@ class AuthApi {
 
   final Dio _dio;
 
-  /// Authenticate against WAWU ID.
+  /// Authenticate against WAWU ID, with organic migration of existing Beauty
+  /// users on first login.
+  ///
+  /// Flow:
+  /// 1. Try WAWU ID. If the user already exists there, we're done.
+  /// 2. If WAWU ID doesn't know the user yet (404 / USER_NOT_IN_WAWUID),
+  ///    verify the credentials against the old Beauty auth.
+  /// 3. If Beauty accepts them, silently provision the user on WAWU ID so all
+  ///    future logins go straight through the new system.
+  /// 4. If that provisioning fails, fall back to the Beauty token so the user
+  ///    still gets in; migration is retried on the next login.
   ///
   /// WAWU ID returns: {"data": {"accessToken": "...", "refreshToken": "...",
   /// "user": {...}}}. Returns both tokens keyed as 'accessToken'/'refreshToken'.
@@ -19,18 +29,61 @@ class AuthApi {
     required String password,
   }) async {
     try {
+      // Try WAWU ID first.
       final res = await _dio.post(
         '${AppUrls.wawuIdBaseUrl}/auth/login',
-        data: {
-          'email': email,
-          'password': password,
-        },
+        data: {'identifier': email, 'password': password},
       );
-
       return _extractTokens(res.data);
     } catch (e) {
-      throw mapDioError(e);
+      // Only fall back when WAWU ID simply doesn't have this user yet. Any
+      // other failure (wrong password, network, 5xx) is a real error.
+      if (!_isUserNotInWawuId(e)) throw mapDioError(e);
+
+      // Verify credentials against the old Beauty auth.
+      final Response oldRes;
+      try {
+        oldRes = await _dio.post(
+          '/api/login',
+          data: {'email': email, 'password': password},
+        );
+      } catch (beautyError) {
+        throw mapDioError(beautyError);
+      }
+
+      // Old credentials are valid — now register silently on WAWU ID.
+      try {
+        final userData = oldRes.data['data']['user'];
+        final regRes = await _dio.post(
+          '${AppUrls.wawuIdBaseUrl}/auth/register',
+          data: {
+            'identifier': email,
+            'email': email,
+            'password': password,
+            'phone': userData['phone'] ?? '',
+            'fullName':
+                '${userData['firstname'] ?? ''} ${userData['lastname'] ?? ''}'
+                    .trim(),
+            'country': 'Nigeria',
+          },
+        );
+        return _extractTokens(regRes.data);
+      } catch (_) {
+        // Provisioning failed — return the old Beauty token as a fallback.
+        return {
+          'accessToken': _extractToken(oldRes.data) ?? '',
+          'refreshToken': '',
+        };
+      }
     }
+  }
+
+  /// True when a WAWU ID error means the account hasn't been migrated yet
+  /// (so we should try the old Beauty auth), rather than a genuine failure.
+  bool _isUserNotInWawuId(Object e) {
+    if (e is DioException && e.response?.statusCode == 404) return true;
+    final msg = e.toString();
+    return msg.contains('USER_NOT_IN_WAWUID') || msg.contains('404');
   }
 
   Future<Map<String, String>> register({
