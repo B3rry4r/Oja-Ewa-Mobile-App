@@ -91,13 +91,18 @@ class AuthApi {
     required String lastname,
     required String email,
     required String password,
+    required String phone,
+    required String country,
     String? referralCode,
   }) async {
     try {
+      // WAWU ID's RegisterDto requires a phone (min 7 chars) and a country.
       final data = {
         'fullName': '$firstname $lastname'.trim(),
         'email': email,
         'password': password,
+        'phone': phone,
+        'country': country,
       };
 
       // Add referral_code if provided
@@ -129,7 +134,8 @@ class AuthApi {
     try {
       await _dio.post(
         '${AppUrls.wawuIdBaseUrl}/auth/forgot-password',
-        data: {'email': email},
+        // WAWU ID's ForgotPasswordDto keys on `identifier` (email OR phone).
+        data: {'identifier': email},
       );
     } catch (e) {
       throw mapDioError(e);
@@ -143,13 +149,15 @@ class AuthApi {
     required String passwordConfirmation,
   }) async {
     try {
+      // WAWU ID's SMS-code reset path expects { identifier, code, newPassword }.
+      // The recovery flow delivers a Termii SMS code (forgot-password), and the
+      // verification screen forwards it here as [token].
       await _dio.post(
         '${AppUrls.wawuIdBaseUrl}/auth/reset-password',
         data: {
-          'email': email,
-          'token': token,
-          'password': password,
-          'password_confirmation': passwordConfirmation,
+          'identifier': email,
+          'code': token,
+          'newPassword': password,
         },
       );
     } catch (e) {

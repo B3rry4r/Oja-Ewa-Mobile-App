@@ -40,6 +40,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   // Phone country code - empty by default
   String _selectedCountryCode = '';
   String _selectedCountryFlag = '';
+  String _selectedCountryName = '';
 
   bool get _isFormValid =>
       _firstNameController.text.isNotEmpty &&
@@ -82,6 +83,11 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
             lastname: _lastNameController.text.trim(),
             email: _emailController.text.trim(),
             password: _passwordController.text,
+            phone:
+                '${_selectedCountryCode.isNotEmpty ? _selectedCountryCode : '+234'}${_phoneController.text.replaceAll(RegExp(r'\D'), '')}',
+            country: _selectedCountryName.isNotEmpty
+                ? _selectedCountryName
+                : 'Nigeria',
             referralCode: referralCode.isNotEmpty ? referralCode : null,
           );
 
@@ -397,6 +403,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                     setState(() {
                       _selectedCountryCode = country.dialCode;
                       _selectedCountryFlag = country.flag;
+                      _selectedCountryName = country.name;
                     });
                   }
                 },

@@ -6,6 +6,8 @@ abstract interface class AuthRepository {
     required String lastname,
     required String email,
     required String password,
+    required String phone,
+    required String country,
     String? referralCode,
   });
 

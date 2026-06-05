@@ -26,6 +26,8 @@ class AuthRepositoryImpl implements AuthRepository {
     required String lastname,
     required String email,
     required String password,
+    required String phone,
+    required String country,
     String? referralCode,
   }) async {
     final tokens = await api.register(
@@ -33,6 +35,8 @@ class AuthRepositoryImpl implements AuthRepository {
       lastname: lastname,
       email: email,
       password: password,
+      phone: phone,
+      country: country,
       referralCode: referralCode,
     );
     await authController.setTokens(

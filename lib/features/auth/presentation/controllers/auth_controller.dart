@@ -43,6 +43,8 @@ class AuthFlowController extends AsyncNotifier<void> {
     required String lastname,
     required String email,
     required String password,
+    required String phone,
+    required String country,
     String? referralCode,
   }) async {
     state = const AsyncLoading();
@@ -52,6 +54,8 @@ class AuthFlowController extends AsyncNotifier<void> {
             lastname: lastname,
             email: email,
             password: password,
+            phone: phone,
+            country: country,
             referralCode: referralCode,
           );
       state = const AsyncData(null);
