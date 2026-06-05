@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
-import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import '../../../../core/auth/auth_controller.dart';
 import '../../../../core/auth/auth_state.dart';
 
@@ -66,11 +66,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              AppImages.splashBasket,
-              height: 280,
-              fit: BoxFit.contain,
-            ),
+            const WBWordmark(height: 72),
             const SizedBox(height: 48),
             _buildLoadingIndicator(),
           ],
