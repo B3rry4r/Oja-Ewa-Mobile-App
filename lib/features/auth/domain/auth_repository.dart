@@ -13,10 +13,10 @@ abstract interface class AuthRepository {
 
   Future<void> logout();
 
-  Future<void> forgotPassword({required String email});
+  Future<void> forgotPassword({required String identifier});
 
   Future<void> resetPassword({
-    required String email,
+    required String identifier,
     required String token,
     required String password,
     required String passwordConfirmation,

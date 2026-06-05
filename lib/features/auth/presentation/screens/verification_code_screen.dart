@@ -72,7 +72,7 @@ class _VerificationCodeScreenState
     if (args is! PasswordResetArgs) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Missing email for reset flow'),
+          content: Text('Missing phone number for reset flow'),
           backgroundColor: colors.accent,
         ),
       );
@@ -81,7 +81,8 @@ class _VerificationCodeScreenState
 
     Navigator.of(context).pushNamed(
       AppRoutes.newPassword,
-      arguments: NewPasswordArgs(email: args.email, token: _enteredCode),
+      arguments:
+          NewPasswordArgs(identifier: args.identifier, token: _enteredCode),
     );
   }
 

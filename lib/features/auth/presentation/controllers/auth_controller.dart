@@ -65,10 +65,12 @@ class AuthFlowController extends AsyncNotifier<void> {
     }
   }
 
-  Future<void> forgotPassword({required String email}) async {
+  Future<void> forgotPassword({required String identifier}) async {
     state = const AsyncLoading();
     try {
-      await ref.read(authRepositoryProvider).forgotPassword(email: email);
+      await ref
+          .read(authRepositoryProvider)
+          .forgotPassword(identifier: identifier);
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -77,7 +79,7 @@ class AuthFlowController extends AsyncNotifier<void> {
   }
 
   Future<void> resetPassword({
-    required String email,
+    required String identifier,
     required String token,
     required String password,
     required String passwordConfirmation,
@@ -85,7 +87,7 @@ class AuthFlowController extends AsyncNotifier<void> {
     state = const AsyncLoading();
     try {
       await ref.read(authRepositoryProvider).resetPassword(
-            email: email,
+            identifier: identifier,
             token: token,
             password: password,
             passwordConfirmation: passwordConfirmation,

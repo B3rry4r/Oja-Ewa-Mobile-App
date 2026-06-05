@@ -99,7 +99,7 @@ class _NewPasswordScreenState extends ConsumerState<NewPasswordScreen> {
 
     try {
       await auth.resetPassword(
-        email: args.email,
+        identifier: args.identifier,
         token: args.token,
         password: _newPasswordController.text,
         passwordConfirmation: _confirmPasswordController.text,

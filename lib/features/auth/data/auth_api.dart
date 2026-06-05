@@ -130,12 +130,13 @@ class AuthApi {
     await _dio.post(userLogoutPath);
   }
 
-  Future<void> forgotPassword({required String email}) async {
+  Future<void> forgotPassword({required String identifier}) async {
     try {
       await _dio.post(
         '${AppUrls.wawuIdBaseUrl}/auth/forgot-password',
-        // WAWU ID's ForgotPasswordDto keys on `identifier` (email OR phone).
-        data: {'identifier': email},
+        // WAWU ID's ForgotPasswordDto keys on `identifier` (email OR phone);
+        // method defaults to 'sms', so a Termii code goes to the phone.
+        data: {'identifier': identifier},
       );
     } catch (e) {
       throw mapDioError(e);
@@ -143,7 +144,7 @@ class AuthApi {
   }
 
   Future<void> resetPassword({
-    required String email,
+    required String identifier,
     required String token,
     required String password,
     required String passwordConfirmation,
@@ -155,7 +156,7 @@ class AuthApi {
       await _dio.post(
         '${AppUrls.wawuIdBaseUrl}/auth/reset-password',
         data: {
-          'identifier': email,
+          'identifier': identifier,
           'code': token,
           'newPassword': password,
         },
