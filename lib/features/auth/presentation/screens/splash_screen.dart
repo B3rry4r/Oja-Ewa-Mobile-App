@@ -66,9 +66,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const WBWMark(size: 96),
-            const SizedBox(height: 24),
-            const WBWordmark(height: 30),
+            const WBWordmark(height: 72),
             const SizedBox(height: 48),
             _buildLoadingIndicator(),
           ],

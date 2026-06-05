@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
+import '../resources/app_assets.dart';
 import '../theme/wb_theme_exports.dart';
 
 /// WAWUBeauty brand "W" mark — the full-colour artwork from the brand kit,
@@ -22,25 +24,29 @@ class WBWMark extends StatelessWidget {
   }
 }
 
-/// Wordmark variant — the full WAWUBeauty lock-up. Text placeholder until the
-/// brand wordmark SVG is supplied.
+/// WAWUBeauty brand logo — the "WB" cart monogram lock-up from the brand kit.
+///
+/// Rendered from a single-colour SVG and tinted via [color] so it adapts to
+/// both light and dark surfaces. Sized by [height]; width follows the
+/// artwork's natural aspect ratio.
 class WBWordmark extends StatelessWidget {
-  const WBWordmark({super.key, this.height = 32, this.color = WBColors.fgHeader});
+  const WBWordmark({super.key, this.height = 32, this.color});
 
   final double height;
-  final Color color;
+
+  /// When null the logo renders in its native brand colour (black). Pass a
+  /// colour only to tint it for a specific surface — e.g. white on a dark hero.
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      'WAWUBeauty',
-      style: WBTypography.page.copyWith(
-        color: color,
-        fontSize: height * 0.75,
-        fontWeight: FontWeight.w700,
-        letterSpacing: -0.5,
-        height: 1,
-      ),
+    return SvgPicture.asset(
+      AppImages.wbLogo,
+      height: height,
+      fit: BoxFit.contain,
+      colorFilter:
+          color == null ? null : ColorFilter.mode(color!, BlendMode.srcIn),
+      semanticsLabel: 'WAWUBeauty',
     );
   }
 }

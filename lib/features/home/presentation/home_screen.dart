@@ -57,14 +57,14 @@ class HomeScreen extends ConsumerWidget {
           padding: const EdgeInsets.only(top: 12, bottom: 140),
           children: [
             _padded(_buildHeader(context)),
-            const SizedBox(height: 22),
+            const SizedBox(height: 20),
             _padded(const WBRandomTagline(pairs: _beautyTaglines)),
-            const SizedBox(height: 22),
+            const SizedBox(height: 20),
             _padded(_buildSearchBar(context)),
-            const SizedBox(height: 22),
-            _padded(_buildServicesRow(context)),
             const SizedBox(height: 24),
             _buildAdvertsOrFallback(context, ref),
+            const SizedBox(height: 26),
+            _buildQuickServices(context),
             const SizedBox(height: 28),
             _padded(
               Text(
@@ -123,7 +123,7 @@ class HomeScreen extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const WBWordmark(height: 24),
+          const WBWordmark(height: 30),
 
           // Header Icons
           Row(
@@ -305,6 +305,35 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+  /// Grouped "quick services" block: a labelled, soft-surface card so the four
+  /// shortcuts read as one coherent section rather than floating icons.
+  Widget _buildQuickServices(BuildContext context) {
+    final colors = context.appColors;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 10),
+            child: Text(
+              'Quick services',
+              style: WBTypography.section.copyWith(fontWeight: FontWeight.w600),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+            decoration: BoxDecoration(
+              color: colors.surfaceSecondary,
+              borderRadius: BorderRadius.circular(WBRadius.card),
+            ),
+            child: _buildServicesRow(context),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildServicesRow(BuildContext context) {
     return Row(
       children: [
@@ -313,35 +342,36 @@ class HomeScreen extends ConsumerWidget {
             context: context,
             iconAsset: AppIcons.cacRegistration,
             label: 'CAC',
+            grayscale: true,
             onTap: () => Navigator.of(context).pushNamed(AppRoutes.cacServices),
           ),
         ),
-        const SizedBox(width: 10),
         Expanded(
           child: _buildServiceShortcut(
             context: context,
             iconAsset: AppIcons.nepcRegistration,
             label: 'NEPC',
+            grayscale: true,
             onTap: () =>
                 Navigator.of(context).pushNamed(AppRoutes.nepcServices),
           ),
         ),
-        const SizedBox(width: 10),
         Expanded(
           child: _buildServiceShortcut(
             context: context,
             iconAsset: AppIcons.adsPlacement,
             label: 'Adverts',
+            iconSize: 46,
             onTap: () =>
                 Navigator.of(context).pushNamed(AppRoutes.advertPlacements),
           ),
         ),
-        const SizedBox(width: 10),
         Expanded(
           child: _buildServiceShortcut(
             context: context,
             iconAsset: AppIcons.verifiedBadges,
             label: 'Badges',
+            iconSize: 46,
             onTap: () =>
                 Navigator.of(context).pushNamed(AppRoutes.badgeVerifications),
           ),
@@ -350,25 +380,50 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+  /// Grayscale colour matrix (Rec. 709 luma) for muting the colourful service
+  /// artwork down to monochrome.
+  static const List<double> _grayscaleMatrix = <double>[
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0, 0, 0, 1, 0,
+  ];
+
   Widget _buildServiceShortcut({
     required BuildContext context,
     required String iconAsset,
     required String label,
     required VoidCallback onTap,
+    double iconSize = 56,
+    bool grayscale = false,
   }) {
     final colors = context.appColors;
+    Widget art = _artwork(iconAsset);
+    if (grayscale) {
+      art = ColorFiltered(
+        colorFilter: const ColorFilter.matrix(_grayscaleMatrix),
+        child: art,
+      );
+    }
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(20),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Fixed icon slot keeps every label on the same baseline even when
+            // individual icons differ in size.
             SizedBox(
-              width: 76,
-              height: 76,
-              child: _artwork(iconAsset),
+              height: 56,
+              child: Center(
+                child: SizedBox(
+                  width: iconSize,
+                  height: iconSize,
+                  child: art,
+                ),
+              ),
             ),
             const SizedBox(height: 8),
             Text(

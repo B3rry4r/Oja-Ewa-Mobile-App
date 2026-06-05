@@ -58,6 +58,9 @@ abstract class AppImages {
   static const String logoOutline = 'assets/icons/logo_outline.png';
 
   // assets/app_icon/*
+  /// WAWUBeauty brand logo — the "WB" cart monogram lock-up (single-colour
+  /// SVG, tintable via ColorFilter). This is the canonical in-app logo.
+  static const String wbLogo = 'assets/app_icon/wb_logo.svg';
   static const String appLogo = 'assets/app_icon/app_logo.svg';
   static const String appLogoAlt = 'assets/app_icon/app_logo_2.svg';
   static const String appIconPng = 'assets/app_icon/icon.png';
