@@ -63,6 +63,8 @@ abstract class AppImages {
   static const String wbLogo = 'assets/app_icon/wb_logo.svg';
   static const String appLogo = 'assets/app_icon/app_logo.svg';
   static const String appLogoAlt = 'assets/app_icon/app_logo_2.svg';
+  /// Splash screen hero — the WAWUBeauty grocery basket illustration.
+  static const String splashBasket = 'assets/app_icon/splash_basket.png';
   static const String appIconPng = 'assets/app_icon/icon.png';
   static const String appIconPng2 = 'assets/app_icon/icon2.png';
   static const String appBackground = 'assets/app_icon/background.png';
