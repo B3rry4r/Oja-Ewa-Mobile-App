@@ -34,13 +34,21 @@ class AuthApi {
         '${AppUrls.wawuIdBaseUrl}/auth/login',
         data: {'identifier': email, 'password': password},
       );
-      return _extractTokens(res.data);
+      final wawuToken = _extractToken(res.data);
+      if (wawuToken == null || wawuToken.isEmpty) {
+        throw const FormatException('Token missing in response');
+      }
+      // WAWU ID tokens don't authenticate the Beauty (Laravel) API — swap for a
+      // Beauty session so the rest of the app works and we aren't bounced to
+      // login after landing on home.
+      return await _exchangeWawuIdForBeautySession(wawuToken);
     } catch (e) {
       // Only fall back when WAWU ID simply doesn't have this user yet. Any
       // other failure (wrong password, network, 5xx) is a real error.
       if (!_isUserNotInWawuId(e)) throw mapDioError(e);
 
-      // Verify credentials against the old Beauty auth.
+      // Verify credentials against the old Beauty auth — this mints a Beauty
+      // (Sanctum) session directly, which is the session we keep.
       final Response oldRes;
       try {
         oldRes = await _dio.post(
@@ -50,11 +58,14 @@ class AuthApi {
       } catch (beautyError) {
         throw mapDioError(beautyError);
       }
+      final sanctum = _extractToken(oldRes.data) ?? '';
 
-      // Old credentials are valid — now register silently on WAWU ID.
+      // Best-effort: mirror the account into WAWU ID for next time. Do NOT
+      // switch the session to the WAWU ID token — the Beauty session above is
+      // what the Laravel API authenticates. Next login takes the primary path.
       try {
         final userData = oldRes.data['data']['user'];
-        final regRes = await _dio.post(
+        await _dio.post(
           '${AppUrls.wawuIdBaseUrl}/auth/register',
           data: {
             'identifier': email,
@@ -67,15 +78,25 @@ class AuthApi {
             'country': 'Nigeria',
           },
         );
-        return _extractTokens(regRes.data);
       } catch (_) {
-        // Provisioning failed — return the old Beauty token as a fallback.
-        return {
-          'accessToken': _extractToken(oldRes.data) ?? '',
-          'refreshToken': '',
-        };
+        // Mirror failed / needs OTP — retries on next login.
       }
+
+      return {'accessToken': sanctum, 'refreshToken': ''};
     }
+  }
+
+  /// Swap a WAWU ID access token for a Beauty (Sanctum) session token. Uses a
+  /// bare Dio carrying the WAWU ID bearer so the app's auth interceptor (which
+  /// would attach/overwrite with the stored token) can't interfere.
+  Future<Map<String, String>> _exchangeWawuIdForBeautySession(
+      String wawuAccessToken) async {
+    final bare = Dio(BaseOptions(
+      baseUrl: AppUrls.laravelBaseUrl,
+      headers: {'Authorization': 'Bearer $wawuAccessToken'},
+    ));
+    final res = await bare.post('/api/auth/wawu/exchange');
+    return _extractTokens(res.data); // { data: { token } } → Sanctum session
   }
 
   /// True when a WAWU ID error means the account hasn't been migrated yet
@@ -115,7 +136,12 @@ class AuthApi {
         data: data,
       );
 
-      return _extractTokens(res.data);
+      final wawuToken = _extractToken(res.data);
+      if (wawuToken == null || wawuToken.isEmpty) {
+        throw const FormatException('Token missing in response');
+      }
+      // Swap the WAWU ID token for a Beauty (Sanctum) session.
+      return await _exchangeWawuIdForBeautySession(wawuToken);
     } catch (e) {
       throw mapDioError(e);
     }
