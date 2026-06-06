@@ -186,12 +186,14 @@ All authentication endpoints for user registration, login, password management, 
 #### Request Body
 ```json
 {
-  "token": "string (required, Google ID token from frontend)"
+  "idToken": "string (required, Google ID token from frontend)",
+  "referral_code": "string (optional)"
 }
 ```
 
 #### Validation Rules
-- `token`: required|string
+- `idToken`: required|string
+- `referral_code`: nullable|string
 
 #### Success Response (200)
 ```json

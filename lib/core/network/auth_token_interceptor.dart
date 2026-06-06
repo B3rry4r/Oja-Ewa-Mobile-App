@@ -32,6 +32,9 @@ class AuthTokenInterceptor extends Interceptor {
     '/api/sellers/',
     '/api/sustainability',
 
+    // business directory (public): index, /search, /filters, /{id}
+    '/api/business/public',
+
     // school registration (public)
     '/api/school-registrations',
 

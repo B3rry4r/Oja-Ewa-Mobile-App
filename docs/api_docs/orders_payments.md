@@ -100,7 +100,34 @@ Authorization: Bearer {token}
       "product_id": 5,
       "quantity": 1
     }
-  ]
+  ],
+  "selected_quotes": [
+    {
+      "seller_profile_id": 2,
+      "quote_reference": "QUOTE_20240117_ABC123"
+    }
+  ],
+  "address_id": 7
+}
+```
+
+The shipping destination can be provided **either** as a saved `address_id`
+**or** as inline shipping fields. When `address_id` is omitted, the inline
+shipping fields are sent instead:
+
+```json
+{
+  "items": [ { "product_id": 3, "quantity": 2 } ],
+  "selected_quotes": [
+    { "seller_profile_id": 2, "quote_reference": "QUOTE_20240117_ABC123" }
+  ],
+  "shipping_name": "John Doe",
+  "shipping_phone": "+2348012345678",
+  "shipping_address": "123 Market Street",
+  "shipping_city": "Ikeja",
+  "shipping_state": "Lagos",
+  "shipping_country": "Nigeria",
+  "shipping_zip_code": "100001"
 }
 ```
 
@@ -108,6 +135,17 @@ Authorization: Bearer {token}
 - `items`: required|array|min:1
 - `items.*.product_id`: required|exists:products,id,status,approved
 - `items.*.quantity`: required|integer|min:1
+- `selected_quotes`: required|array (one entry per seller in the order)
+- `selected_quotes.*.seller_profile_id`: required|integer
+- `selected_quotes.*.quote_reference`: required|string (reference returned by the logistics quote endpoint)
+- `address_id`: nullable|integer (saved address; mutually exclusive with inline shipping fields)
+- `shipping_name`: required_without:address_id|string
+- `shipping_phone`: required_without:address_id|string
+- `shipping_address`: required_without:address_id|string
+- `shipping_city`: required_without:address_id|string
+- `shipping_state`: required_without:address_id|string
+- `shipping_country`: required_without:address_id|string
+- `shipping_zip_code`: nullable|string
 
 #### Custom Validation Messages
 - "You must include at least one item in your order"
@@ -367,12 +405,21 @@ Authorization: Bearer {token}
 #### Request Body
 ```json
 {
-  "order_id": "integer (required, exists in user's orders)"
+  "order_id": "integer (required, exists in user's orders)",
+  "callback_url": "string (optional, deep link to return to after payment)",
+  "currency": "string (optional, e.g. NGN — server derives from order shipping country if omitted)"
 }
 ```
 
 #### Validation Rules
 - `order_id`: required|integer|exists:orders,id
+- `callback_url`: nullable|string
+- `currency`: nullable|string
+
+> **Note:** The mobile client sends `callback_url` as `ojaewa://payment/callback`,
+> a custom URL scheme used to deep-link back into the app once the Paystack
+> checkout completes. If omitted, the server falls back to its configured
+> frontend payment callback page.
 
 #### Success Response (200)
 ```json
