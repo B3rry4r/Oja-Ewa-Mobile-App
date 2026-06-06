@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../auth/auth_controller.dart';
 import '../auth/auth_providers.dart';
+import '../constants/app_urls.dart';
 import '../constants/network_constants.dart';
 import '../storage/storage_providers.dart';
 
@@ -49,8 +50,22 @@ class AuthTokenInterceptor extends Interceptor {
     return false;
   }
 
+  // Host of the WAWU ID identity service. Its auth endpoints (login, register,
+  // OTP, password reset) are public, use WAWU ID's own JWT — not the Laravel
+  // token — and may be called while logged out. They must never be Laravel-
+  // token-attached nor client-blocked by this interceptor.
+  static final String _wawuIdHost = Uri.parse(AppUrls.wawuIdBaseUrl).host;
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    // Let WAWU ID requests through untouched (they target an absolute URL on a
+    // different host). Without this, a logged-out login POST is rejected with a
+    // synthetic 401 before it is ever sent.
+    if (options.uri.host == _wawuIdHost) {
+      handler.next(options);
+      return;
+    }
+
     try {
       String? token = _ref.read(accessTokenProvider);
 

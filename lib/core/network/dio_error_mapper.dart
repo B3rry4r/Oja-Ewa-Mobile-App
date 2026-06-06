@@ -8,7 +8,10 @@ AppException mapDioError(Object error) {
     final statusCode = error.response?.statusCode;
 
     if (statusCode == 401 || statusCode == 403) {
-      return const UnauthorizedException();
+      // Surface the server's reason when it gives one (e.g. WAWU ID's
+      // "Invalid credentials") instead of a blanket "Unauthorized".
+      final reason = _extractMessage(error.response?.data);
+      return UnauthorizedException(reason ?? 'Unauthorized');
     }
 
     final data = error.response?.data;
