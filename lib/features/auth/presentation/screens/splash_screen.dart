@@ -38,24 +38,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       // Listen for the next state change and navigate then.
       ref.listenManual(authControllerProvider, (_, next) {
         if (next is! AuthUnknown) {
-          _navigate(next);
+          _navigate();
         }
       }, fireImmediately: false);
       return;
     }
 
-    _navigate(authState);
+    _navigate();
   }
 
-  void _navigate(AuthState authState) {
+  void _navigate() {
     if (!mounted || _navigated) return;
     _navigated = true;
 
-    final nextRoute = authState is AuthAuthenticated
-        ? AppRoutes.home
-        : AppRoutes.onboarding;
-
-    Navigator.of(context).pushReplacementNamed(nextRoute);
+    // Guest-first launch: home is ALWAYS the post-splash destination, whether
+    // the session restored (authenticated) or not (guest). Onboarding is never
+    // the launch destination — it is reached only via the interaction gate or
+    // an explicit "Sign in" tap.
+    Navigator.of(context).pushReplacementNamed(AppRoutes.home);
   }
 
   @override

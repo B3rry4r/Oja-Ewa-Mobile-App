@@ -5,6 +5,7 @@ import '../../core/audio/audio_controller.dart';
 import '../../core/audio/audio_controls.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../../core/auth/auth_providers.dart';
+import '../../core/auth/auth_required_modal.dart';
 import '../../core/notifications/fcm_service.dart';
 import '../../core/widgets/in_app_notification.dart';
 import '../router/app_router.dart';
@@ -190,7 +191,14 @@ class _AppShellState extends ConsumerState<AppShell> {
     );
   }
 
-  void _navigateToStartSelling(BuildContext context, WidgetRef ref) {
+  Future<void> _navigateToStartSelling(BuildContext context, WidgetRef ref) async {
+    // Guest-first gate: intercept before navigating into seller onboarding,
+    // which fires authenticated requests / is AuthGuard-protected.
+    if (!await ensureSignedIn(context, ref, action: 'start selling')) {
+      return;
+    }
+    if (!context.mounted) return;
+
     final isSellerApproved = ref.read(isSellerApprovedProvider);
 
     // Check seller status and navigate accordingly

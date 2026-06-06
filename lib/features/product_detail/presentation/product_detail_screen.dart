@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
+import 'package:ojaewa/core/auth/auth_required_modal.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -174,6 +175,15 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                           ),
                           GestureDetector(
                             onTap: () async {
+                              // Guest-first gate: intercept before any
+                              // authenticated request that would 401.
+                              if (!await ensureSignedIn(
+                                context,
+                                ref,
+                                action: 'save items to your wishlist',
+                              )) {
+                                return;
+                              }
                               await ref
                                   .read(wishlistIdsProvider.notifier)
                                   .toggle(
@@ -854,6 +864,15 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                   label: context.l10n.cartAddToBag,
                   fullWidth: true,
                   onPressed: () async {
+                    // Guest-first gate: intercept before firing the
+                    // authenticated add-to-cart request that would 401.
+                    if (!await ensureSignedIn(
+                      context,
+                      ref,
+                      action: 'add items to your cart',
+                    )) {
+                      return;
+                    }
                     // Use the processing time type from the product details
                     final details = ref
                         .read(productDetailsProvider(widget.productId))

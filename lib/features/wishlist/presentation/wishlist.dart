@@ -10,6 +10,8 @@ import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
+import 'package:ojaewa/core/auth/auth_providers.dart';
+import 'package:ojaewa/app/router/app_router.dart';
 
 import 'package:ojaewa/core/widgets/product_card.dart';
 import '../../product_detail/presentation/product_detail_screen.dart';
@@ -71,7 +73,9 @@ class WishlistScreen extends ConsumerWidget {
         .toList();
 
     if (wishlistProducts.isEmpty) {
-      return _buildEmptyStateContent(context);
+      final token = ref.watch(accessTokenProvider);
+      final isGuest = token == null || token.isEmpty;
+      return _buildEmptyStateContent(context, isGuest);
     }
 
     return Column(
@@ -141,7 +145,7 @@ class WishlistScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyStateContent(BuildContext context) {
+  Widget _buildEmptyStateContent(BuildContext context, bool isGuest) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -164,7 +168,9 @@ class WishlistScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              context.l10n.wishlistEmptySub,
+              isGuest
+                  ? 'Sign in to see saved items.'
+                  : context.l10n.wishlistEmptySub,
               style: WBTypography.secondary.copyWith(
                 color: WBColors.fgSecondary,
                 height: 1.5,
@@ -172,10 +178,17 @@ class WishlistScreen extends ConsumerWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 28),
-            WBButton(
-              label: context.l10n.wishlistKeepShopping,
-              onPressed: onKeepShoppingPressed ?? _defaultKeepShoppingPressed,
-            ),
+            if (isGuest)
+              WBButton(
+                label: 'Sign in',
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.signIn),
+              )
+            else
+              WBButton(
+                label: context.l10n.wishlistKeepShopping,
+                onPressed: onKeepShoppingPressed ?? _defaultKeepShoppingPressed,
+              ),
           ],
         ),
       ),
