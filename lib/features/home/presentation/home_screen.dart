@@ -338,17 +338,18 @@ class _WawuServicesStrip extends StatefulWidget {
 }
 
 class _WawuServicesStripState extends State<_WawuServicesStrip> {
-  static const Duration _interval = Duration(milliseconds: 2600);
+  static const Duration _interval = Duration(milliseconds: 2800);
+  static const int _slots = 3; // services shown (and animating) at once
 
   Timer? _timer;
-  int _index = 0;
+  int _step = 0;
 
   @override
   void initState() {
     super.initState();
     _timer = Timer.periodic(_interval, (_) {
       if (!mounted) return;
-      setState(() => _index = (_index + 1) % _wawuServices.length);
+      setState(() => _step++);
     });
   }
 
@@ -358,61 +359,70 @@ class _WawuServicesStripState extends State<_WawuServicesStrip> {
     super.dispose();
   }
 
+  // One fading service slot. Each of the [_slots] slots shows a different
+  // service and they all advance (animate) together on every tick, cycling
+  // through the whole list.
+  Widget _slot(int i, AppThemeColors colors) {
+    final service = _wawuServices[(_step * _slots + i) % _wawuServices.length];
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => widget.onOpen(service.path),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 450),
+        transitionBuilder: (child, animation) {
+          final slide = Tween<Offset>(
+            begin: const Offset(0, 0.22),
+            end: Offset.zero,
+          ).animate(animation);
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(position: slide, child: child),
+          );
+        },
+        child: Padding(
+          key: ValueKey<String>('$i-${service.path}'),
+          padding: const EdgeInsets.symmetric(vertical: 7),
+          child: _ServiceItem(service: service, colors: colors),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final service = _wawuServices[_index];
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
       decoration: BoxDecoration(
         color: colors.surfaceSecondary,
         borderRadius: BorderRadius.circular(WBRadius.card),
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Fixed two-line WAWUAfrica brand logo.
+          // Fixed black two-row WAWUAfrica mark — opens the services home.
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () => widget.onOpen('/services'),
-            child: Image.asset(
-              AppIcons.wawuAfricaLogo,
-              height: 40,
-              fit: BoxFit.contain,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Container(
-            width: 1,
-            height: 32,
-            color: colors.accentSoft,
-          ),
-          const SizedBox(width: 14),
-          // Cycling service entry.
-          Expanded(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => widget.onOpen(service.path),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                transitionBuilder: (child, animation) {
-                  final slide = Tween<Offset>(
-                    begin: const Offset(0, 0.18),
-                    end: Offset.zero,
-                  ).animate(animation);
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(position: slide, child: child),
-                  );
-                },
-                child: _ServiceItem(
-                  key: ValueKey<String>(service.path),
-                  service: service,
-                  colors: colors,
+            child: Row(
+              children: [
+                Image.asset(
+                  AppIcons.wawuAfricaMark,
+                  height: 46,
+                  fit: BoxFit.contain,
                 ),
-              ),
+                const Spacer(),
+                Icon(Icons.arrow_outward, size: 16, color: colors.textSecondary),
+              ],
             ),
           ),
+          const SizedBox(height: 10),
+          Divider(height: 1, thickness: 1, color: colors.accentSoft),
+          const SizedBox(height: 2),
+          // Three services visible at once, all fading/cycling together.
+          for (int i = 0; i < _slots; i++) _slot(i, colors),
         ],
       ),
     );
@@ -421,7 +431,6 @@ class _WawuServicesStripState extends State<_WawuServicesStrip> {
 
 class _ServiceItem extends StatelessWidget {
   const _ServiceItem({
-    super.key,
     required this.service,
     required this.colors,
   });

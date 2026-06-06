@@ -24,6 +24,9 @@ abstract class AppIcons {
   /// WAWUAfrica two-line brand logo ("Wow Experience" lock-up).
   static const String wawuAfricaLogo = 'assets/brand_icons/wawuafrica_logo.png';
 
+  /// WAWUAfrica black two-row mark ("WAW" stacked over "Africa").
+  static const String wawuAfricaMark = 'assets/brand_icons/wawuafrica_mark.png';
+
   /// WAWUBeauty brand "W" mark (exact artwork from the brand kit).
   static const String wawuW = 'assets/brand_icons/W.png';
   static const String connectToUs = 'assets/icons/connect_to_us.svg';
