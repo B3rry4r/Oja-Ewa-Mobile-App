@@ -6,7 +6,7 @@ import '../errors/app_exception.dart';
 
 /// Handles Google OAuth sign-in on device and returns an ID token.
 ///
-/// The returned `idToken` is sent to the backend (`POST /api/auth/google`).
+/// The returned `idToken` is sent to the backend (`POST /api/oauth/google`).
 class GoogleSignInService {
   GoogleSignInService(this._googleSignIn);
 
