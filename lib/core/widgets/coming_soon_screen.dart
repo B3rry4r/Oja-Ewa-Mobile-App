@@ -38,6 +38,28 @@ class ComingSoonScreen extends StatelessWidget {
                     // Ojá-Ẹwà Logo
                     Image.asset(AppImages.comingSoon, width: 120, height: 120),
                     const SizedBox(height: 32),
+                    Text(
+                      'Coming soon',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: colors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      child: Text(
+                        '$title is not available yet. We are working on it '
+                        'and will let you know when it is ready.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: colors.textSecondary,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

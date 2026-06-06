@@ -216,7 +216,9 @@ class BusinessSettingsScreen extends ConsumerWidget {
         break;
       case 'art':
       case 'brand':
-        // Art/Brand - sustainability screen for now (under development)
+        // Art/Brand detail screens are not built yet; route to the
+        // clearly-labelled "Coming soon" placeholder rather than a
+        // misleading stand-in screen.
         Navigator.of(context).pushNamed(
           AppRoutes.sustainability,
           arguments: {'businessId': business.id},

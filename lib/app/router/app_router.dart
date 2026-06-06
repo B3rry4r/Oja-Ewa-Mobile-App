@@ -16,6 +16,7 @@ import '../../features/home/subfeatures/market/presentation/market_screen.dart';
 import '../../features/home/subfeatures/music/presentation/music_screen.dart';
 import '../../features/home/subfeatures/schools/presentation/schools_screen.dart';
 import '../../features/home/subfeatures/hardware/presentation/hardware_screen.dart';
+import '../../features/home/subfeatures/sustainability/presentation/sustainability_screen.dart';
 import '../../features/account/subfeatures/edit_profile/presentation/edit_profile.dart';
 import '../../features/account/subfeatures/your_address/presentation/add_edit_address.dart';
 import '../../features/account/subfeatures/connect/connect.dart';
@@ -240,7 +241,7 @@ abstract class AppRouter {
       case AppRoutes.sustainability:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const HardwareScreen(),
+          builder: (_) => const SustainabilityScreen(),
         );
 
       case AppRoutes.badgeVerifications:
