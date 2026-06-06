@@ -9,6 +9,10 @@ import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/ui/ui_error_message.dart';
+import 'package:ojaewa/features/wishlist/domain/wishlist_item.dart';
+import 'package:ojaewa/features/wishlist/presentation/controllers/wishlist_ids_controller.dart';
 import 'package:ojaewa/core/widgets/product_card.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
@@ -358,7 +362,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             );
           },
           onFavoriteTap: () {
-            // TODO: Add to wishlist functionality
+            final id = int.tryParse(product.id) ?? 0;
+            if (id == 0) return;
+            ref
+                .read(wishlistIdsProvider.notifier)
+                .toggle(type: WishlistableType.product, id: id)
+                .catchError((e) {
+                  if (!context.mounted) return;
+                  AppSnackbars.showError(context, UiErrorMessage.from(e));
+                });
           },
         );
       },

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/ui/ui_error_message.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -23,6 +25,8 @@ import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/busi
 import 'package:ojaewa/features/product_filter_overlay/presentation/widgets/simple_sort_sheet.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/listing_filters_controller.dart';
 import 'package:ojaewa/features/categories/presentation/controllers/business_sustainability_search_providers.dart';
+import 'package:ojaewa/features/wishlist/domain/wishlist_item.dart';
+import 'package:ojaewa/features/wishlist/presentation/controllers/wishlist_ids_controller.dart';
 
 /// Helper function to safely parse numeric values from dynamic data
 num? _parseNum(dynamic v) {
@@ -515,7 +519,21 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
                       );
                     },
                     onFavoriteTap: () {
-                      // TODO: Handle favorite toggle
+                      final id = searchProduct.id;
+                      if (id == 0) return;
+                      ref
+                          .read(wishlistIdsProvider.notifier)
+                          .toggle(
+                            type: WishlistableType.product,
+                            id: id,
+                          )
+                          .catchError((e) {
+                            if (!context.mounted) return;
+                            AppSnackbars.showError(
+                              context,
+                              UiErrorMessage.from(e),
+                            );
+                          });
                     },
                   );
                 },
