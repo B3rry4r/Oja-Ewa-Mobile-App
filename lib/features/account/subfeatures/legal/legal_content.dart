@@ -84,7 +84,7 @@ const List<LegalSection> kTermsSections = [
   ),
   LegalSection(
     '9. Contact',
-    'For any issues: support@wawubeauty.com or call 07050722222.',
+    'For any issues: support@wawubeauty.com or call 07050622222.',
   ),
 ];
 
@@ -154,7 +154,7 @@ const List<LegalSection> kPrivacySections = [
   LegalSection(
     '9. Contact',
     'Privacy questions: privacy@wawubeauty.com\n'
-        'General support: support@wawubeauty.com or 07050722222.',
+        'General support: support@wawubeauty.com or 07050622222.',
   ),
 ];
 
@@ -240,7 +240,7 @@ const List<FaqGroup> kFaqGroups = [
     ),
     FaqEntry(
       'How do I contact a real person?',
-      'Call 07050722222 or email support@wawubeauty.com. Our support hours are Monday '
+      'Call 07050622222 or email support@wawubeauty.com. Our support hours are Monday '
           'to Friday, 9 AM to 6 PM WAT.',
     ),
   ]),

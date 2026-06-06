@@ -336,12 +336,12 @@ class AccountScreen extends ConsumerWidget {
   Color _badgeIconColor(String badge) => SellerBadge.foregroundFor(badge);
 
   Future<void> _handleEmailUs(BuildContext context, WidgetRef ref) async {
-    String email = 'support@ojaewa.com';
+    String email = 'support@wawubeauty.com';
     try {
       final connectInfo = await ref.read(connectInfoProvider.future);
       email = connectInfo.email.isNotEmpty
           ? connectInfo.email
-          : 'support@ojaewa.com';
+          : 'support@wawubeauty.com';
     } catch (_) {
       // Use fallback email if API fails
     }
