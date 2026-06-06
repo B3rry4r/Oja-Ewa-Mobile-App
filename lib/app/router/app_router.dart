@@ -20,7 +20,8 @@ import '../../features/account/subfeatures/edit_profile/presentation/edit_profil
 import '../../features/account/subfeatures/your_address/presentation/add_edit_address.dart';
 import '../../features/account/subfeatures/connect/connect.dart';
 import '../../features/account/subfeatures/faq/faq.dart';
-import '../../features/account/subfeatures/support/pdf_viewer_screen.dart';
+import '../../features/account/subfeatures/legal/legal_content.dart';
+import '../../features/account/subfeatures/legal/legal_screen.dart';
 import '../../features/account/subfeatures/notifications/presentation/notifications_settings.dart';
 import '../../features/account/subfeatures/language/presentation/language_screen.dart';
 import '../../features/account/subfeatures/password/presentation/password.dart';
@@ -311,10 +312,7 @@ abstract class AppRouter {
       case AppRoutes.faq:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const PdfViewerScreen(
-            title: 'FAQ',
-            assetPath: 'assets/docs/faq.pdf',
-          ),
+          builder: (_) => const LegalFaqScreen(),
         );
 
       case AppRoutes.faqLegacy:
@@ -326,18 +324,20 @@ abstract class AppRouter {
       case AppRoutes.privacyPolicy:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const PdfViewerScreen(
+          builder: (_) => const LegalDocScreen(
             title: 'Privacy Policy',
-            assetPath: 'assets/docs/privacy_policy.pdf',
+            intro: kPrivacyIntro,
+            sections: kPrivacySections,
           ),
         );
 
       case AppRoutes.termsOfService:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const PdfViewerScreen(
+          builder: (_) => const LegalDocScreen(
             title: 'Terms of Service',
-            assetPath: 'assets/docs/terms_of_agreement.pdf',
+            intro: kTermsIntro,
+            sections: kTermsSections,
           ),
         );
 
