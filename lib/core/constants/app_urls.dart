@@ -5,10 +5,15 @@ import '../config/app_environment.dart';
 /// Configurable via dart-define `WAWUAFRICA_HUB_URL`. Used to deep-link from
 /// the home services row into the hub's service pages (EasyBuy, Insurance,
 /// Pension, etc.).
-const String wawuAfricaHubUrl = String.fromEnvironment(
-  'WAWUAFRICA_HUB_URL',
-  defaultValue: 'https://wawuafrica-new-production.up.railway.app',
-);
+// Production fallback used whenever the dart-define is absent OR resolves to an
+// empty string (e.g. the web CI passes `--dart-define=WAWUAFRICA_HUB_URL=` when
+// the secret is unset, which makes String.fromEnvironment return "" and bypass
+// `defaultValue`). Resolving at runtime guarantees a usable URL on web too.
+const String _wawuAfricaHubUrlEnv = String.fromEnvironment('WAWUAFRICA_HUB_URL', defaultValue: '');
+const String _wawuAfricaHubUrlFallback = 'https://wawuafrica-new-production.up.railway.app';
+
+String get wawuAfricaHubUrl =>
+    _wawuAfricaHubUrlEnv.isNotEmpty ? _wawuAfricaHubUrlEnv : _wawuAfricaHubUrlFallback;
 
 /// Central place for backend base URLs.
 ///

@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
@@ -34,15 +35,6 @@ class HomeScreen extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: child,
       );
-
-  /// Renders a category/service artwork asset full-colour (no tint). Uses
-  /// the SVG renderer for .svg brand art and the raster loader for .png.
-  static Widget _artwork(String asset) {
-    final isSvg = asset.toLowerCase().endsWith('.svg');
-    return isSvg
-        ? SvgPicture.asset(asset, fit: BoxFit.contain)
-        : Image.asset(asset, fit: BoxFit.contain);
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -210,146 +202,13 @@ class HomeScreen extends ConsumerWidget {
   }
 
 
-  /// Horizontal row of WAWUAfrica service shortcuts that open the WAWUAfrica
-  /// hub web platform. The first button is the WAWUAfrica brand (two-line
-  /// logo) opening the hub services home; the rest open specific services.
+  /// WAWUAfrica services promo. The two-line WAWUAfrica brand logo stays fixed
+  /// while the individual services (EasyBuy, Health Insurance, Pension, …) fade
+  /// through, so every WAWUAfrica service is surfaced from the WAWUBeauty home.
   Widget _buildWawuServicesRow(BuildContext context) {
-    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 10),
-            child: Text(
-              'WAWUAfrica services',
-              style: WBTypography.section.copyWith(fontWeight: FontWeight.w600),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
-            decoration: BoxDecoration(
-              color: colors.surfaceSecondary,
-              borderRadius: BorderRadius.circular(WBRadius.card),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildWawuServiceButton(
-                    context: context,
-                    label: 'WAWUAfrica',
-                    logoAsset: AppIcons.wawuAfricaLogo,
-                    onTap: () => _openHub(context, '/services'),
-                  ),
-                ),
-                Expanded(
-                  child: _buildWawuServiceButton(
-                    context: context,
-                    label: 'EasyBuy',
-                    icon: Icons.shopping_bag_outlined,
-                    onTap: () => _openHub(context, '/services/easybuy/apply'),
-                  ),
-                ),
-                Expanded(
-                  child: _buildWawuServiceButton(
-                    context: context,
-                    label: 'Health\nInsurance',
-                    icon: Icons.health_and_safety_outlined,
-                    soon: true,
-                    onTap: () => _openHub(context, '/services/insurance'),
-                  ),
-                ),
-                Expanded(
-                  child: _buildWawuServiceButton(
-                    context: context,
-                    label: 'Pension',
-                    icon: Icons.savings_outlined,
-                    soon: true,
-                    onTap: () => _openHub(context, '/services/pension'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWawuServiceButton({
-    required BuildContext context,
-    required String label,
-    required VoidCallback onTap,
-    String? logoAsset,
-    IconData? icon,
-    bool soon = false,
-  }) {
-    final colors = context.appColors;
-    final Widget art = logoAsset != null
-        ? Padding(
-            padding: const EdgeInsets.all(4),
-            child: _artwork(logoAsset),
-          )
-        : Icon(icon, size: 28, color: colors.textPrimary);
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                SizedBox(
-                  height: 52,
-                  width: 52,
-                  child: Center(child: art),
-                ),
-                if (soon)
-                  Positioned(
-                    right: -6,
-                    top: -4,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 5,
-                        vertical: 1,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colors.accent,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: const Text(
-                        'Soon',
-                        style: TextStyle(
-                          fontSize: 8,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 11.2,
-                fontWeight: FontWeight.w500,
-                color: colors.textPrimary,
-                height: 1.1,
-              ),
-            ),
-          ],
-        ),
-      ),
+      child: _WawuServicesStrip(onOpen: (path) => _openHub(context, path)),
     );
   }
 
@@ -402,6 +261,212 @@ class HomeScreen extends ConsumerWidget {
           iconAsset: AppIcons.hardware,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.hardware),
         ),
+      ],
+    );
+  }
+}
+
+/// A single WAWUAfrica service entry surfaced by [_WawuServicesStrip].
+class _WawuService {
+  const _WawuService({
+    required this.label,
+    required this.path,
+    required this.icon,
+    this.soon = false,
+  });
+
+  final String label;
+  final String path;
+  final IconData icon;
+  final bool soon;
+}
+
+const List<_WawuService> _wawuServices = [
+  _WawuService(
+    label: 'EasyBuy',
+    path: '/services/easybuy/apply',
+    icon: Icons.shopping_bag_outlined,
+  ),
+  _WawuService(
+    label: 'Health Insurance',
+    path: '/services/insurance',
+    icon: Icons.health_and_safety_outlined,
+    soon: true,
+  ),
+  _WawuService(
+    label: 'Pension',
+    path: '/services/pension',
+    icon: Icons.savings_outlined,
+    soon: true,
+  ),
+  _WawuService(
+    label: 'Banking',
+    path: '/services/banking',
+    icon: Icons.account_balance_outlined,
+  ),
+  _WawuService(
+    label: 'Grants & Funding',
+    path: '/services/grants',
+    icon: Icons.volunteer_activism_outlined,
+  ),
+  _WawuService(
+    label: 'CAC Registration',
+    path: '/services/cac-registration/apply',
+    icon: Icons.assignment_outlined,
+  ),
+  _WawuService(
+    label: 'NEPC Registration',
+    path: '/services/nepc-registration/apply',
+    icon: Icons.public_outlined,
+  ),
+  _WawuService(
+    label: 'Mentorship',
+    path: '/services/mentors',
+    icon: Icons.diversity_3_outlined,
+  ),
+];
+
+/// WAWUAfrica services strip: the two-line brand logo stays fixed on the left
+/// while the individual services fade/slide through automatically, cycling
+/// through every service so each is surfaced from the WAWUBeauty home.
+class _WawuServicesStrip extends StatefulWidget {
+  final void Function(String path) onOpen;
+  const _WawuServicesStrip({required this.onOpen});
+
+  @override
+  State<_WawuServicesStrip> createState() => _WawuServicesStripState();
+}
+
+class _WawuServicesStripState extends State<_WawuServicesStrip> {
+  static const Duration _interval = Duration(milliseconds: 2600);
+
+  Timer? _timer;
+  int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(_interval, (_) {
+      if (!mounted) return;
+      setState(() => _index = (_index + 1) % _wawuServices.length);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final service = _wawuServices[_index];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: colors.surfaceSecondary,
+        borderRadius: BorderRadius.circular(WBRadius.card),
+      ),
+      child: Row(
+        children: [
+          // Fixed two-line WAWUAfrica brand logo.
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => widget.onOpen('/services'),
+            child: Image.asset(
+              AppIcons.wawuAfricaLogo,
+              height: 40,
+              fit: BoxFit.contain,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Container(
+            width: 1,
+            height: 32,
+            color: colors.accentSoft,
+          ),
+          const SizedBox(width: 14),
+          // Cycling service entry.
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => widget.onOpen(service.path),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                transitionBuilder: (child, animation) {
+                  final slide = Tween<Offset>(
+                    begin: const Offset(0, 0.18),
+                    end: Offset.zero,
+                  ).animate(animation);
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(position: slide, child: child),
+                  );
+                },
+                child: _ServiceItem(
+                  key: ValueKey<String>(service.path),
+                  service: service,
+                  colors: colors,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ServiceItem extends StatelessWidget {
+  const _ServiceItem({
+    super.key,
+    required this.service,
+    required this.colors,
+  });
+
+  final _WawuService service;
+  final AppThemeColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(service.icon, size: 22, color: colors.textPrimary),
+        const SizedBox(width: 10),
+        Flexible(
+          child: Text(
+            service.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: WBTypography.body.copyWith(
+              color: colors.textPrimary,
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
+          ),
+        ),
+        if (service.soon) ...[
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: colors.accent,
+              borderRadius: BorderRadius.circular(WBRadius.pill),
+            ),
+            child: const Text(
+              'Soon',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(width: 8),
+        Icon(Icons.arrow_outward, size: 18, color: colors.textSecondary),
       ],
     );
   }
