@@ -135,6 +135,7 @@ jobs:
         MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_TOKEN }}
         MATCH_SKIP_CONFIRMATION: true
         MATCH_VERBOSE: true
+        WAWUAFRICA_HUB_URL: ${{ secrets.WAWUAFRICA_HUB_URL }}
       run: |
         cd ios
         
