@@ -1184,7 +1184,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
             await api.uploadFile(
               businessId: businessId,
               fileType: 'identity_document',
-              file: multipartFromPath(_identityDocumentPath!),
+              file: await multipartFromPathCompressed(_identityDocumentPath!),
             );
           }
           if ((_businessLogoPath ?? '').isNotEmpty &&
@@ -1192,7 +1192,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
             await api.uploadFile(
               businessId: businessId,
               fileType: 'business_logo',
-              file: multipartFromPath(_businessLogoPath!),
+              file: await multipartFromPathCompressed(_businessLogoPath!),
             );
           }
           if ((_businessCertificatesPath ?? '').isNotEmpty &&
@@ -1200,7 +1200,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
             await api.uploadFile(
               businessId: businessId,
               fileType: 'business_certificates',
-              file: multipartFromPath(_businessCertificatesPath!),
+              file: await multipartFromPathCompressed(_businessCertificatesPath!),
             );
           }
 

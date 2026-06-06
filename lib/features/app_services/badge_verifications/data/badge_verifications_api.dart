@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/core/network/dio_clients.dart';
 import 'package:ojaewa/features/app_services/shared/domain/app_service_purchase.dart';
 
+import 'package:ojaewa/core/files/multipart_utils.dart';
+
 import '../domain/badge_option.dart';
 import '../domain/badge_verification_request.dart';
 
@@ -67,7 +69,7 @@ class BadgeVerificationsApi {
     required String type,
   }) async {
     final form = FormData.fromMap({
-      'file': await MultipartFile.fromFile(filePath),
+      'file': await multipartFromPathCompressed(filePath),
       'type': type,
     });
     final response = await _dio.post(

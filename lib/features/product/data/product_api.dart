@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../core/files/multipart_utils.dart';
 import '../../../core/network/dio_error_mapper.dart';
 
 class ProductApi {
@@ -144,7 +145,7 @@ class ProductApi {
   }) async {
     try {
       final formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(filePath),
+        'file': await multipartFromPathCompressed(filePath),
       });
 
       final res = await _dio.post('/api/products/$productId/upload', data: formData);

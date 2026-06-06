@@ -303,28 +303,28 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
       if (_isLocalFilePath(draft.identityDocumentPath)) {
         await uploadRepo.upload(
           type: 'identity_document',
-          file: multipartFromPath(draft.identityDocumentPath!),
+          file: await multipartFromPathCompressed(draft.identityDocumentPath!),
         );
       }
 
       if (_isLocalFilePath(draft.businessCertificatePath)) {
         await uploadRepo.upload(
           type: 'business_certificate',
-          file: multipartFromPath(draft.businessCertificatePath!),
+          file: await multipartFromPathCompressed(draft.businessCertificatePath!),
         );
       }
 
       if (_isLocalFilePath(draft.businessLogoPath)) {
         await uploadRepo.upload(
           type: 'business_logo',
-          file: multipartFromPath(draft.businessLogoPath!),
+          file: await multipartFromPathCompressed(draft.businessLogoPath!),
         );
       }
 
       if (_isLocalFilePath(draft.authorizedSignatorySignaturePath)) {
         await uploadRepo.upload(
           type: 'authorized_signatory_signature',
-          file: multipartFromPath(draft.authorizedSignatorySignaturePath!),
+          file: await multipartFromPathCompressed(draft.authorizedSignatorySignaturePath!),
         );
       }
 

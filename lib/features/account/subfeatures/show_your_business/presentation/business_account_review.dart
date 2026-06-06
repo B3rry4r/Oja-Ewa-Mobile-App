@@ -326,7 +326,7 @@ class _BusinessAccountReviewScreenState
           await api.uploadFile(
             businessId: businessId,
             fileType: 'identity_document',
-            file: multipartFromPath(draft.identityDocumentPath!),
+            file: await multipartFromPathCompressed(draft.identityDocumentPath!),
           );
         }
 
@@ -334,7 +334,7 @@ class _BusinessAccountReviewScreenState
           await api.uploadFile(
             businessId: businessId,
             fileType: 'business_logo',
-            file: multipartFromPath(draft.businessLogoPath!),
+            file: await multipartFromPathCompressed(draft.businessLogoPath!),
           );
         }
 
@@ -346,7 +346,7 @@ class _BusinessAccountReviewScreenState
             await api.uploadFile(
               businessId: businessId,
               fileType: 'business_certificates',
-              file: multipartFromPath(path),
+              file: await multipartFromPathCompressed(path),
             );
           }
         }
