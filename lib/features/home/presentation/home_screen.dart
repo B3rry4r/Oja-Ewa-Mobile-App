@@ -248,7 +248,7 @@ class HomeScreen extends ConsumerWidget {
                     context: context,
                     label: 'EasyBuy',
                     icon: Icons.shopping_bag_outlined,
-                    onTap: () => _openHub(context, '/services'),
+                    onTap: () => _openHub(context, '/services/easybuy/apply'),
                   ),
                 ),
                 Expanded(
@@ -257,7 +257,7 @@ class HomeScreen extends ConsumerWidget {
                     label: 'Health\nInsurance',
                     icon: Icons.health_and_safety_outlined,
                     soon: true,
-                    onTap: () => _openHub(context, '/services'),
+                    onTap: () => _openHub(context, '/services/insurance'),
                   ),
                 ),
                 Expanded(
@@ -266,7 +266,7 @@ class HomeScreen extends ConsumerWidget {
                     label: 'Pension',
                     icon: Icons.savings_outlined,
                     soon: true,
-                    onTap: () => _openHub(context, '/services'),
+                    onTap: () => _openHub(context, '/services/pension'),
                   ),
                 ),
               ],
