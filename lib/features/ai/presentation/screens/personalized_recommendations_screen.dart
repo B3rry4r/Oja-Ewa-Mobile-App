@@ -4,7 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/router/app_router.dart';
 import '../../../../app/widgets/app_header.dart';
 import '../../../../core/ui/price_formatter.dart';
+import '../../../../core/ui/snackbars.dart';
+import '../../../../core/ui/ui_error_message.dart';
 import '../../../../core/widgets/product_card.dart';
+import '../../../wishlist/domain/wishlist_item.dart';
+import '../../../wishlist/presentation/controllers/wishlist_ids_controller.dart';
 import '../../../account/presentation/controllers/profile_controller.dart';
 import '../../../product/domain/product.dart';
 import '../../domain/ai_models.dart';
@@ -540,7 +544,17 @@ class _PersonalizedRecommendationsScreenState
       product: product,
       onTap: () =>
           Navigator.of(context).pushNamed('/product/${recommendation.id}'),
-      onFavoriteTap: () {},
+      onFavoriteTap: () {
+        final id = int.tryParse(product.id) ?? 0;
+        if (id == 0) return;
+        ref
+            .read(wishlistIdsProvider.notifier)
+            .toggle(type: WishlistableType.product, id: id)
+            .catchError((e) {
+              if (!context.mounted) return;
+              AppSnackbars.showError(context, UiErrorMessage.from(e));
+            });
+      },
     );
   }
 

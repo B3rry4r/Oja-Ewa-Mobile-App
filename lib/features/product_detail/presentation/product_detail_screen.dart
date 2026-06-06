@@ -4,6 +4,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/auth/auth_required_modal.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/ui/ui_error_message.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
@@ -829,7 +831,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                 ),
               );
             },
-            onFavoriteTap: () {},
+            onFavoriteTap: () {
+              final id = int.tryParse(product.id) ?? 0;
+              if (id == 0) return;
+              ref
+                  .read(wishlistIdsProvider.notifier)
+                  .toggle(type: WishlistableType.product, id: id)
+                  .catchError((e) {
+                    if (!context.mounted) return;
+                    AppSnackbars.showError(context, UiErrorMessage.from(e));
+                  });
+            },
           );
         },
       ),

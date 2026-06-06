@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
+import 'package:ojaewa/core/ui/ui_error_message.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
@@ -12,6 +14,8 @@ import 'package:ojaewa/core/widgets/seller_badge.dart';
 import 'package:ojaewa/features/product/domain/product.dart';
 import 'package:ojaewa/features/sellers/presentation/controllers/public_seller_controller.dart';
 import 'package:ojaewa/features/sellers/presentation/controllers/public_seller_products_controller.dart';
+import 'package:ojaewa/features/wishlist/domain/wishlist_item.dart';
+import 'package:ojaewa/features/wishlist/presentation/controllers/wishlist_ids_controller.dart';
 import 'package:ojaewa/features/product_detail/presentation/product_detail_screen.dart';
 
 class SellerProfileScreen extends ConsumerWidget {
@@ -282,7 +286,23 @@ class SellerProfileScreen extends ConsumerWidget {
                                   ),
                                 );
                               },
-                              onFavoriteTap: () {},
+                              onFavoriteTap: () {
+                                final id = int.tryParse(prod.id) ?? 0;
+                                if (id == 0) return;
+                                ref
+                                    .read(wishlistIdsProvider.notifier)
+                                    .toggle(
+                                      type: WishlistableType.product,
+                                      id: id,
+                                    )
+                                    .catchError((e) {
+                                      if (!context.mounted) return;
+                                      AppSnackbars.showError(
+                                        context,
+                                        UiErrorMessage.from(e),
+                                      );
+                                    });
+                              },
                             );
                           },
                         ),

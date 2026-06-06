@@ -849,10 +849,24 @@ class _CategoryItemGrid extends StatelessWidget {
         final item = items[index];
         final product = _toProduct(type, item);
 
-        return ProductCard(
-          product: product,
-          onTap: () => onTap(context, item),
-          onFavoriteTap: () {},
+        return Consumer(
+          builder: (context, ref, _) {
+            return ProductCard(
+              product: product,
+              onTap: () => onTap(context, item),
+              onFavoriteTap: () {
+                final id = int.tryParse(product.id) ?? 0;
+                if (id == 0) return;
+                ref
+                    .read(wishlistIdsProvider.notifier)
+                    .toggle(type: WishlistableType.product, id: id)
+                    .catchError((e) {
+                      if (!context.mounted) return;
+                      AppSnackbars.showError(context, UiErrorMessage.from(e));
+                    });
+              },
+            );
+          },
         );
       },
     );
