@@ -1,7 +1,6 @@
 // onboarding_screen.dart
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
@@ -10,38 +9,14 @@ import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/app/router/app_router.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
-
-  @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
-}
-
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  late VideoPlayerController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.asset(AppVideos.onboardingVideo)
-      ..initialize().then((_) {
-        setState(() {});
-        _controller.setLooping(true);
-        _controller.play();
-      });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     return Scaffold(
-      backgroundColor: colors.surfaceSecondary,
+      backgroundColor: Colors.white,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -51,36 +26,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               flex: 7,
               child: Container(
                 width: double.infinity,
+                color: Colors.white,
                 child: Stack(
                   children: [
-                    if (_controller.value.isInitialized)
-                      SizedBox.expand(
-                        child: FittedBox(
-                          fit: BoxFit.cover,
-                          clipBehavior: Clip.hardEdge,
-                          child: SizedBox(
-                            width: _controller.value.size.width,
-                            height: _controller.value.size.height,
-                            child: VideoPlayer(_controller),
-                          ),
-                        ),
-                      )
-                    else
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [colors.surfaceSecondary, colors.surfaceSecondary],
-                          ),
+                    // Brand hero: the peacock artwork, centred on white.
+                    Positioned.fill(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Image.asset(
+                          AppImages.onboardingPeacock,
+                          fit: BoxFit.contain,
                         ),
                       ),
+                    ),
                     Positioned(
                       left: 0,
                       right: 0,
                       bottom: 18,
-                      child: const Center(
-                        child: WBWordmark(height: 30, color: Colors.white),
+                      child: Center(
+                        child: WBWordmark(height: 30, color: colors.textPrimary),
                       ),
                     ),
                   ],

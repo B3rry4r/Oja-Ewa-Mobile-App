@@ -55,6 +55,8 @@ abstract class AppImages {
   static const String comingSoon = 'assets/icons/coming_soon_i.png';
   static const String onboarding = 'assets/icons/l.png';
   static const String onboardingHero = 'assets/icons/oja-ewa-onboard.PNG';
+  // Onboarding brand hero — transparent peacock artwork (shown on white).
+  static const String onboardingPeacock = 'assets/wawubeauty_landing.png';
   static const String logoOutline = 'assets/icons/logo_outline.png';
 
   // assets/app_icon/*
@@ -66,8 +68,4 @@ abstract class AppImages {
   static const String appIconPng = 'assets/app_icon/icon.png';
   static const String appIconPng2 = 'assets/app_icon/icon2.png';
   static const String appBackground = 'assets/app_icon/background.png';
-}
-
-abstract class AppVideos {
-  static const String onboardingVideo = 'assets/ojaewa_landng_video.mp4';
 }
