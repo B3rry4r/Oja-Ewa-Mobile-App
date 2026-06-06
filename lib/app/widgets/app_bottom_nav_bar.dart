@@ -28,7 +28,6 @@ class AppBottomNavBar extends StatelessWidget {
       (icon: WBIconName.home, label: l.navHome),
       (icon: WBIconName.search, label: l.navSearch),
       (icon: WBIconName.heart, label: l.navWishlist),
-      (icon: WBIconName.book, label: l.navBlog),
       (icon: WBIconName.user, label: l.navAccount),
     ];
     final bottomInset = MediaQuery.of(context).padding.bottom;

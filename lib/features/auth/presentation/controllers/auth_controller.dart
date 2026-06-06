@@ -12,7 +12,6 @@ import '../../../notifications/presentation/controllers/notifications_controller
 import '../../../wishlist/presentation/controllers/wishlist_controller.dart';
 import '../../../orders/presentation/controllers/orders_controller.dart';
 import '../../../search/presentation/controllers/search_suggestions_controller.dart';
-import '../../../blog/presentation/controllers/blog_favorites_controller.dart';
 import '../../../../core/notifications/fcm_service.dart';
 
 /// Presentation-layer controller for auth flows.
@@ -164,9 +163,6 @@ class AuthFlowController extends AsyncNotifier<void> {
 
     // Orders
     ref.invalidate(ordersProvider);
-
-    // Blog favorites are user-specific
-    ref.invalidate(blogFavoritesProvider);
 
     // Search suggestions can be personalized
     ref.invalidate(searchSuggestionsProvider);

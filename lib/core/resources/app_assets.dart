@@ -19,10 +19,10 @@ abstract class AppIcons {
   static const String music = 'assets/brand_icons/Art Market.png';
   static const String hardware = 'assets/brand_icons/Hardware.png';
   static const String schools = 'assets/brand_icons/Education.png';
-  static const String cacRegistration = 'assets/icons/new_icons/cac_reg.PNG';
-  static const String nepcRegistration = 'assets/icons/new_icons/nepc.PNG';
-  static const String adsPlacement = 'assets/brand_icons/Advert.png';
   static const String verifiedBadges = 'assets/brand_icons/Batch.png';
+
+  /// WAWUAfrica two-line brand logo ("Wow Experience" lock-up).
+  static const String wawuAfricaLogo = 'assets/brand_icons/wawuafrica_logo.png';
 
   /// WAWUBeauty brand "W" mark (exact artwork from the brand kit).
   static const String wawuW = 'assets/brand_icons/W.png';

@@ -1,5 +1,15 @@
 import '../config/app_environment.dart';
 
+/// Base URL of the WAWUAfrica hub web platform.
+///
+/// Configurable via dart-define `WAWUAFRICA_HUB_URL`. Used to deep-link from
+/// the home services row into the hub's service pages (EasyBuy, Insurance,
+/// Pension, etc.).
+const String wawuAfricaHubUrl = String.fromEnvironment(
+  'WAWUAFRICA_HUB_URL',
+  defaultValue: 'https://wawuafrica-new-production.up.railway.app',
+);
+
 /// Central place for backend base URLs.
 ///
 /// Note: These can be overridden per-environment using dart-define:

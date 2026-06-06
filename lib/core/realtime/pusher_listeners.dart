@@ -7,11 +7,9 @@ import '../../app/router/app_router.dart';
 import '../../features/cart/presentation/controllers/cart_controller.dart';
 import '../../features/cart/domain/cart.dart';
 import '../../features/orders/presentation/controllers/orders_controller.dart';
-import '../../features/blog/presentation/controllers/blog_controller.dart';
 import '../../features/your_shop/presentation/controllers/seller_orders_controller.dart';
 import '../../features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import '../../features/account/subfeatures/start_selling/domain/seller_status.dart';
-import '../../features/blog/domain/blog_post.dart';
 import '../../features/account/presentation/controllers/profile_controller.dart';
 import '../auth/auth_providers.dart';
 import '../widgets/in_app_notification.dart';
@@ -63,9 +61,6 @@ class PusherListeners {
       debugPrint('⚠️ No auth token - skipping Pusher subscriptions');
       return;
     }
-
-    // Subscribe to public channels immediately (dedup handled in subscribeToChannel)
-    _subscribeToBlogUpdates(pusher, container);
 
     // Guard: only attach ONE set of user-specific listeners per session.
     // Without this, every reconnect adds a duplicate permanent listener to the
@@ -314,30 +309,6 @@ class PusherListeners {
     }
   }
 
-  /// Subscribe to public blog updates
-  static Future<void> _subscribeToBlogUpdates(
-    PusherService pusher,
-    ProviderContainer container,
-  ) async {
-    await pusher.subscribeToChannel('blog-updates');
-
-    pusher.bindEvent('blog-updates', 'blog.published', (data) {
-      debugPrint('📝 New blog published: $data');
-      try {
-        final json = data is String ? jsonDecode(data) : data;
-        if (json is! Map<String, dynamic>) {
-          return;
-        }
-        final title = json['title'] as String?;
-        final blog = BlogPost.fromJson(json);
-        container.read(blogRealtimeProvider.notifier).addBlog(blog);
-        _showBlogUpdateNotification(title ?? blog.title);
-      } catch (e) {
-        debugPrint('Error parsing blog: $e');
-      }
-    });
-  }
-
   // In-app notification show functions
   static void _showOrderUpdateNotification(int orderId, String status) {
     final context = pusherNavigatorKey.currentContext;
@@ -468,22 +439,6 @@ class PusherListeners {
     );
   }
 
-  static void _showBlogUpdateNotification(String title) {
-    final context = pusherNavigatorKey.currentContext;
-    if (context == null) return;
-
-    InAppNotification.show(
-      context,
-      title: '📰 New Blog Post',
-      message: title,
-      icon: Icons.article,
-      backgroundColor: context.appColors.accent,
-      onTap: () {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      },
-    );
-  }
-
   /// Unsubscribe from all user channels
   static Future<void> unsubscribeAll(PusherService pusher, int? userId) async {
     if (userId != null) {
@@ -491,6 +446,5 @@ class PusherListeners {
       await pusher.unsubscribeFromChannel('private-seller.$userId');
       await pusher.unsubscribeFromChannel('private-seller.orders');
     }
-    await pusher.unsubscribeFromChannel('blog-updates');
   }
 }

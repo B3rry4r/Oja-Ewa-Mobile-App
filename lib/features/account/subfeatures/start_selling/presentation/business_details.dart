@@ -670,9 +670,8 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
     if (_isNigerianDraft(draft) && (_businessCertificatePath ?? '').isEmpty) {
       AppSnackbars.showError(
         context,
-        'Complete CAC registration before seller submission',
+        'Upload your CAC business certificate before seller submission',
       );
-      Navigator.of(context).pushNamed(AppRoutes.cacServices);
       return false;
     }
     if (!_isNigerianDraft(draft) &&

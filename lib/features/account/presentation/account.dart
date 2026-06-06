@@ -140,6 +140,12 @@ class AccountScreen extends ConsumerWidget {
                   : AppRoutes.businessOnboarding,
             ),
           ),
+          AccountMenuRow(
+            icon: WBIconName.shield,
+            label: 'Verified Badges',
+            sub: 'View and apply for seller verification badges',
+            onTap: () => go(AppRoutes.badgeVerifications),
+          ),
         ],
       ),
       AccountMenuSection(

@@ -56,9 +56,6 @@ import '../../features/your_shop/subfeatures/manage_shop/manage_shop.dart';
 import '../../features/your_shop/subfeatures/manage_shop/sub_features/delete_shop.dart';
 import '../../features/account/subfeatures/show_your_business/presentation/edit_business.dart';
 import '../../features/your_shop/subfeatures/add_edit_product/seller_category_selection.dart';
-import '../../features/app_services/cac/presentation/cac_services_screen.dart';
-import '../../features/app_services/nepc/presentation/nepc_services_screen.dart';
-import '../../features/app_services/advert_placements/presentation/advert_placements_screen.dart';
 import '../../features/app_services/badge_verifications/presentation/badge_verifications_screen.dart';
 /*
 import '../../features/ai/presentation/screens/ai_chat_screen.dart';
@@ -89,9 +86,6 @@ abstract class AppRoutes {
   static const schools = '/schools';
   static const hardware = '/hardware';
   static const sustainability = '/sustainability';
-  static const cacServices = '/services/cac-registrations';
-  static const nepcServices = '/services/nepc-registrations';
-  static const advertPlacements = '/services/advert-placements';
   static const badgeVerifications = '/services/badge-verifications';
 
   // Feature screens
@@ -247,24 +241,6 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const HardwareScreen(),
-        );
-
-      case AppRoutes.cacServices:
-        return MaterialPageRoute<void>(
-          settings: settings,
-          builder: (_) => const AuthGuard(child: CacServicesScreen()),
-        );
-
-      case AppRoutes.nepcServices:
-        return MaterialPageRoute<void>(
-          settings: settings,
-          builder: (_) => const AuthGuard(child: NepcServicesScreen()),
-        );
-
-      case AppRoutes.advertPlacements:
-        return MaterialPageRoute<void>(
-          settings: settings,
-          builder: (_) => const AuthGuard(child: AdvertPlacementsScreen()),
         );
 
       case AppRoutes.badgeVerifications:

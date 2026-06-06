@@ -11,7 +11,6 @@ import '../router/app_router.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
 import '../../features/wishlist/presentation/wishlist.dart';
-import '../../features/blog/presentation/blog.dart';
 import '../../features/account/presentation/account.dart';
 import '../widgets/app_bottom_nav_bar.dart';
 import '../../features/categories/presentation/controllers/category_controller.dart';
@@ -115,9 +114,6 @@ class _AppShellState extends ConsumerState<AppShell> {
           Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
         }
         break;
-      case 'blog':
-        setState(() => _index = 3); // Blog tab index
-        break;
       case 'seller_approval':
         Navigator.of(context).pushNamed(AppRoutes.sellerApprovalStatus);
         break;
@@ -158,7 +154,6 @@ class _AppShellState extends ConsumerState<AppShell> {
           WishlistScreen(
             onKeepShoppingPressed: () => setState(() => _index = 0),
           ),
-          const BlogScreen(),
           const AccountScreen(),
         ],
       ),

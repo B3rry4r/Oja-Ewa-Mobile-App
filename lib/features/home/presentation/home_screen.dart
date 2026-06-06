@@ -1,6 +1,3 @@
-import 'dart:async';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,15 +5,15 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
+import 'package:ojaewa/core/constants/app_urls.dart';
 import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
-import 'package:ojaewa/features/adverts/domain/advert.dart';
 import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
-import 'package:ojaewa/features/adverts/presentation/controllers/adverts_controller.dart';
+import 'package:ojaewa/features/home/presentation/widgets/orbital_categories.dart';
 import 'package:ojaewa/features/search/presentation/search_screen.dart';
 
 import '../../../app/router/app_router.dart';
@@ -62,9 +59,7 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 20),
             _padded(_buildSearchBar(context)),
             const SizedBox(height: 24),
-            _buildAdvertsOrFallback(context, ref),
-            const SizedBox(height: 26),
-            _buildQuickServices(context),
+            _buildWawuServicesRow(context),
             const SizedBox(height: 28),
             _padded(
               Text(
@@ -74,8 +69,8 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 14),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _buildCategoryGrid(context),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _buildOrbitalCategories(context),
             ),
           ],
         ),
@@ -214,100 +209,11 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAdvertsOrFallback(BuildContext context, WidgetRef ref) {
-    final advertsAsync = ref.watch(advertsByPositionProvider('banner'));
 
-    return advertsAsync.when(
-      loading: () => const _AdvertLoadingSkeleton(),
-      error: (error, stackTrace) => _buildPromoCardsSection(context),
-      data: (adverts) {
-        if (adverts.isEmpty) return _buildPromoCardsSection(context);
-
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: _AdvertFadeCarousel(
-            adverts: adverts,
-            onTap: (ad) => _handleAdvertTap(context, ad),
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _handleAdvertTap(BuildContext context, Advert ad) async {
-    final actionUrl = ad.actionUrl;
-    if (actionUrl == null || actionUrl.isEmpty) return;
-
-    if (actionUrl.startsWith('/')) {
-      if (actionUrl.contains('textiles')) {
-        Navigator.of(context).pushNamed(AppRoutes.market);
-      } else if (actionUrl.contains('beauty')) {
-        Navigator.of(context).pushNamed(AppRoutes.beauty);
-      } else if (actionUrl.contains('shoes') || actionUrl.contains('bags')) {
-        Navigator.of(context).pushNamed(AppRoutes.brands);
-      } else if (actionUrl.contains('art')) {
-        Navigator.of(context).pushNamed(AppRoutes.music);
-      } else if (actionUrl.contains('school')) {
-        Navigator.of(context).pushNamed(AppRoutes.schools);
-      } else if (actionUrl.contains('hardware') ||
-          actionUrl.contains('sustain')) {
-        Navigator.of(context).pushNamed(AppRoutes.hardware);
-      } else {
-        Navigator.of(context).pushNamed(AppRoutes.home);
-      }
-      return;
-    }
-
-    final uri = Uri.tryParse(actionUrl);
-    if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
-  }
-
-  Widget _buildPromoCardsSection(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: AspectRatio(
-        aspectRatio: _AdvertFadeCarousel.aspectRatio,
-        child: DecoratedBox(
-          decoration: const BoxDecoration(
-            color: WBColors.surfaceDark,
-            borderRadius: BorderRadius.all(Radius.circular(WBRadius.card)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  context.l10n.homeDiscoverTitle,
-                  style: WBTypography.section.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  context.l10n.homeDiscoverSub,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: WBTypography.secondary.copyWith(
-                    color: Colors.white.withValues(alpha: 0.85),
-                    height: 1.35,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Grouped "quick services" block: a labelled, soft-surface card so the four
-  /// shortcuts read as one coherent section rather than floating icons.
-  Widget _buildQuickServices(BuildContext context) {
+  /// Horizontal row of WAWUAfrica service shortcuts that open the WAWUAfrica
+  /// hub web platform. The first button is the WAWUAfrica brand (two-line
+  /// logo) opening the hub services home; the rest open specific services.
+  Widget _buildWawuServicesRow(BuildContext context) {
     final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -317,118 +223,121 @@ class HomeScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(left: 4, bottom: 10),
             child: Text(
-              'Quick services',
+              'WAWUAfrica services',
               style: WBTypography.section.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
             decoration: BoxDecoration(
               color: colors.surfaceSecondary,
               borderRadius: BorderRadius.circular(WBRadius.card),
             ),
-            child: _buildServicesRow(context),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildWawuServiceButton(
+                    context: context,
+                    label: 'WAWUAfrica',
+                    logoAsset: AppIcons.wawuAfricaLogo,
+                    onTap: () => _openHub(context, '/services'),
+                  ),
+                ),
+                Expanded(
+                  child: _buildWawuServiceButton(
+                    context: context,
+                    label: 'EasyBuy',
+                    icon: Icons.shopping_bag_outlined,
+                    onTap: () => _openHub(context, '/services/easybuy/apply'),
+                  ),
+                ),
+                Expanded(
+                  child: _buildWawuServiceButton(
+                    context: context,
+                    label: 'Health\nInsurance',
+                    icon: Icons.health_and_safety_outlined,
+                    soon: true,
+                    onTap: () => _openHub(context, '/services/insurance'),
+                  ),
+                ),
+                Expanded(
+                  child: _buildWawuServiceButton(
+                    context: context,
+                    label: 'Pension',
+                    icon: Icons.savings_outlined,
+                    soon: true,
+                    onTap: () => _openHub(context, '/services/pension'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildServicesRow(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildServiceShortcut(
-            context: context,
-            iconAsset: AppIcons.cacRegistration,
-            label: 'CAC',
-            grayscale: true,
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.cacServices),
-          ),
-        ),
-        Expanded(
-          child: _buildServiceShortcut(
-            context: context,
-            iconAsset: AppIcons.nepcRegistration,
-            label: 'NEPC',
-            grayscale: true,
-            onTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.nepcServices),
-          ),
-        ),
-        Expanded(
-          child: _buildServiceShortcut(
-            context: context,
-            iconAsset: AppIcons.adsPlacement,
-            label: 'Adverts',
-            iconSize: 46,
-            onTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.advertPlacements),
-          ),
-        ),
-        Expanded(
-          child: _buildServiceShortcut(
-            context: context,
-            iconAsset: AppIcons.verifiedBadges,
-            label: 'Badges',
-            iconSize: 46,
-            onTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.badgeVerifications),
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Grayscale colour matrix (Rec. 709 luma) for muting the colourful service
-  /// artwork down to monochrome.
-  static const List<double> _grayscaleMatrix = <double>[
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0, 0, 0, 1, 0,
-  ];
-
-  Widget _buildServiceShortcut({
+  Widget _buildWawuServiceButton({
     required BuildContext context,
-    required String iconAsset,
     required String label,
     required VoidCallback onTap,
-    double iconSize = 56,
-    bool grayscale = false,
+    String? logoAsset,
+    IconData? icon,
+    bool soon = false,
   }) {
     final colors = context.appColors;
-    Widget art = _artwork(iconAsset);
-    if (grayscale) {
-      art = ColorFiltered(
-        colorFilter: const ColorFilter.matrix(_grayscaleMatrix),
-        child: art,
-      );
-    }
+    final Widget art = logoAsset != null
+        ? Padding(
+            padding: const EdgeInsets.all(4),
+            child: _artwork(logoAsset),
+          )
+        : Icon(icon, size: 28, color: colors.textPrimary);
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(16),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Fixed icon slot keeps every label on the same baseline even when
-            // individual icons differ in size.
-            SizedBox(
-              height: 56,
-              child: Center(
-                child: SizedBox(
-                  width: iconSize,
-                  height: iconSize,
-                  child: art,
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SizedBox(
+                  height: 52,
+                  width: 52,
+                  child: Center(child: art),
                 ),
-              ),
+                if (soon)
+                  Positioned(
+                    right: -6,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.accent,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: const Text(
+                        'Soon',
+                        style: TextStyle(
+                          fontSize: 8,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 8),
             Text(
               label,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -444,422 +353,56 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCategoryGrid(BuildContext context) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 1.02,
-      children: [
-        // Market
-        _buildCategoryItem(
-          context: context,
-          title: 'Textiles',
-          description: 'Fabrics & prints',
-          color: const Color(0xFFC7853D),
+  Future<void> _openHub(BuildContext context, String path) async {
+    final uri = Uri.parse('$wawuAfricaHubUrl$path');
+    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!ok && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open WAWUAfrica')),
+      );
+    }
+  }
+
+  Widget _buildOrbitalCategories(BuildContext context) {
+    return OrbitalCategorySelector(
+      categories: [
+        OrbitalCategory(
+          id: 'textiles',
+          label: 'Textiles',
           iconAsset: AppIcons.market,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.market),
         ),
-        // Beauty
-        _buildCategoryItem(
-          context: context,
-          title: 'Afro Beauty',
-          description: 'General beauty',
-          color: const Color(0xFFAB6730),
+        OrbitalCategory(
+          id: 'afro-beauty',
+          label: 'Afro Beauty',
           iconAsset: AppIcons.beauty,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.beauty),
         ),
-        // Brands
-        _buildCategoryItem(
-          context: context,
-          title: 'Footwear/Bags',
-          description: 'Step out in style',
-          color: const Color(0xFF9F5A35),
+        OrbitalCategory(
+          id: 'footwear-bags',
+          label: 'Footwear/Bags',
           iconAsset: AppIcons.brands,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.brands),
         ),
-        // Music
-        _buildCategoryItem(
-          context: context,
-          title: 'Art Market',
-          description: 'Creatives',
-          color: const Color(0xFFCC8E5B),
+        OrbitalCategory(
+          id: 'art-market',
+          label: 'Art Market',
           iconAsset: AppIcons.music,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.music),
         ),
-        // Schools
-        _buildCategoryItem(
-          context: context,
-          title: 'Education',
-          description: 'Schools',
-          color: const Color(0xFFD39A54),
+        OrbitalCategory(
+          id: 'education',
+          label: 'Education',
           iconAsset: AppIcons.schools,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.schools),
         ),
-        // Hardware
-        _buildCategoryItem(
-          context: context,
-          title: 'Hardware',
-          description: 'Creative tools',
-          color: const Color(0xFF8C6A3A),
+        OrbitalCategory(
+          id: 'hardware',
+          label: 'Hardware',
           iconAsset: AppIcons.hardware,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.hardware),
         ),
       ],
-    );
-  }
-
-  Widget _buildCategoryItem({
-    required BuildContext context,
-    required String title,
-    required String description,
-    required Color color,
-    required String iconAsset,
-    required VoidCallback onTap,
-  }) {
-    final colors = context.appColors;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(24)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 90,
-              height: 90,
-              child: _artwork(iconAsset),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              maxLines: 1,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 12.8,
-                fontWeight: FontWeight.w600,
-                color: colors.textPrimary,
-                height: 1.15,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              description,
-              maxLines: 3,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 10.6,
-                fontWeight: FontWeight.w400,
-                color: colors.textSecondary,
-                height: 1.28,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _AdvertFadeCarousel extends StatefulWidget {
-  const _AdvertFadeCarousel({required this.adverts, required this.onTap});
-
-  static const double aspectRatio = 16 / 9;
-
-  final List<Advert> adverts;
-  final Future<void> Function(Advert advert) onTap;
-
-  @override
-  State<_AdvertFadeCarousel> createState() => _AdvertFadeCarouselState();
-}
-
-class _AdvertFadeCarouselState extends State<_AdvertFadeCarousel> {
-  Timer? _timer;
-  int _currentIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _startTimer();
-  }
-
-  @override
-  void didUpdateWidget(covariant _AdvertFadeCarousel oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.adverts.length != widget.adverts.length) {
-      _currentIndex = 0;
-      _startTimer();
-    }
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  void _startTimer() {
-    _timer?.cancel();
-    if (widget.adverts.length <= 1) return;
-
-    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
-      if (!mounted) return;
-      setState(() {
-        _currentIndex = (_currentIndex + 1) % widget.adverts.length;
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    final currentAdvert = widget.adverts[_currentIndex];
-
-    return Column(
-      children: [
-        AspectRatio(
-          aspectRatio: _AdvertFadeCarousel.aspectRatio,
-          child: GestureDetector(
-            onTap: () => widget.onTap(currentAdvert),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 700),
-              switchInCurve: Curves.easeOut,
-              switchOutCurve: Curves.easeIn,
-              transitionBuilder: (child, animation) =>
-                  FadeTransition(opacity: animation, child: child),
-              child: _AdvertBannerCard(
-                key: ValueKey(currentAdvert.id),
-                advert: currentAdvert,
-              ),
-            ),
-          ),
-        ),
-        if (widget.adverts.length > 1) ...[
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(widget.adverts.length, (index) {
-              final isActive = index == _currentIndex;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                margin: const EdgeInsets.symmetric(horizontal: 3),
-                width: isActive ? 18 : 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: isActive ? colors.textPrimary : colors.borderStrong,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              );
-            }),
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-class _AdvertLoadingSkeleton extends StatefulWidget {
-  const _AdvertLoadingSkeleton();
-
-  @override
-  State<_AdvertLoadingSkeleton> createState() => _AdvertLoadingSkeletonState();
-}
-
-class _AdvertLoadingSkeletonState extends State<_AdvertLoadingSkeleton>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    final base = colors.surfaceSecondary.withValues(alpha: 0.9);
-    final highlight = colors.surfaceElevated.withValues(alpha: 1);
-    final shimmerBand = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white.withValues(alpha: 0.14)
-        : Colors.white.withValues(alpha: 0.72);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          final slide = (_controller.value * 2) - 1;
-          return AspectRatio(
-            aspectRatio: _AdvertFadeCarousel.aspectRatio,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: colors.border),
-                gradient: LinearGradient(
-                  begin: Alignment(-1.8 + slide, -0.3),
-                  end: Alignment(0.2 + slide, 0.3),
-                  colors: [base, shimmerBand, highlight, shimmerBand, base],
-                  stops: const [0.0, 0.24, 0.5, 0.76, 1.0],
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      width: 110,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        color: colors.surfaceElevated.withValues(alpha: 0.9),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      width: 180,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: colors.surfaceElevated.withValues(alpha: 0.72),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: 140,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: colors.surfaceElevated.withValues(alpha: 0.58),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _AdvertBannerCard extends StatelessWidget {
-  const _AdvertBannerCard({super.key, required this.advert});
-
-  final Advert advert;
-
-  @override
-  Widget build(BuildContext context) {
-    final imageUrl = (advert.imageUrl ?? '').trim();
-    final hasImage = imageUrl.isNotEmpty;
-    final colors = context.appColors;
-
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: colors.surfaceSecondary,
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: hasImage
-          ? Stack(
-              fit: StackFit.expand,
-              children: [
-                _AdvertImagePlaceholder(colors: colors),
-                Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  frameBuilder:
-                      (context, child, frame, wasSynchronouslyLoaded) {
-                        if (wasSynchronouslyLoaded) return child;
-                        return AnimatedOpacity(
-                          opacity: frame == null ? 0 : 1,
-                          duration: const Duration(milliseconds: 320),
-                          curve: Curves.easeOut,
-                          child: child,
-                        );
-                      },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    final expected = loadingProgress.expectedTotalBytes;
-                    final loaded = loadingProgress.cumulativeBytesLoaded;
-                    final progress = expected == null || expected == 0
-                        ? 0.0
-                        : (loaded / expected).clamp(0.0, 1.0);
-                    final blurSigma = 16 - (progress * 14);
-                    return Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        _AdvertImagePlaceholder(colors: colors),
-                        Opacity(
-                          opacity: 0.28 + (progress * 0.5),
-                          child: ImageFiltered(
-                            imageFilter: ImageFilter.blur(
-                              sigmaX: blurSigma,
-                              sigmaY: blurSigma,
-                            ),
-                            child: child,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) =>
-                      _AdvertImagePlaceholder(colors: colors),
-                ),
-              ],
-            )
-          : const SizedBox.shrink(),
-    );
-  }
-}
-
-class _AdvertImagePlaceholder extends StatelessWidget {
-  const _AdvertImagePlaceholder({required this.colors});
-
-  final AppThemeColors colors;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            colors.surfaceSecondary,
-            colors.surfaceElevated.withValues(alpha: 0.92),
-            colors.surfaceSecondary,
-          ],
-        ),
-      ),
-      child: Center(
-        child: Container(
-          width: 72,
-          height: 72,
-          decoration: BoxDecoration(
-            color: colors.surface.withValues(alpha: 0.26),
-            shape: BoxShape.circle,
-          ),
-        ),
-      ),
     );
   }
 }

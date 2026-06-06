@@ -960,9 +960,8 @@ class _SellerRegistrationScreenState
       if (_registrationNumberController.text.trim().isEmpty) {
         AppSnackbars.showError(
           context,
-          'Complete CAC registration before seller submission',
+          'Provide your CAC registration number before seller submission',
         );
-        Navigator.of(context).pushNamed(AppRoutes.cacServices);
         return false;
       }
     }
