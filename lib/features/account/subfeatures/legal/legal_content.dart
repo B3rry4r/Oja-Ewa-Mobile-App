@@ -87,7 +87,7 @@ const List<LegalSection> kTermsSections = [
   ),
   LegalSection(
     '9. Contact',
-    'For any issues: support@wawubeauty.com or call 07050622222.',
+    'For any issues: beauty@wawuafrica.com or call 07050622222.',
   ),
 ];
 
@@ -136,7 +136,7 @@ const List<LegalSection> kPrivacySections = [
         '• Correct inaccurate information.\n'
         '• Request deletion of your data (subject to legal obligations).\n'
         '• Opt out of non-essential communications.\n\n'
-        'To exercise these rights, email privacy@wawubeauty.com.',
+        'To exercise these rights, email beauty@wawuafrica.com.',
   ),
   LegalSection(
     '6. Security',
@@ -156,8 +156,8 @@ const List<LegalSection> kPrivacySections = [
   ),
   LegalSection(
     '9. Contact',
-    'Privacy questions: privacy@wawubeauty.com\n'
-        'General support: support@wawubeauty.com or 07050622222.',
+    'Privacy questions: beauty@wawuafrica.com\n'
+        'General support: beauty@wawuafrica.com or 07050622222.',
   ),
 ];
 
@@ -233,7 +233,7 @@ const List<FaqGroup> kFaqGroups = [
   FaqGroup('Account and support', [
     FaqEntry(
       'How do I close my account?',
-      'Email support@wawubeauty.com from the email address linked to your account. We '
+      'Email beauty@wawuafrica.com from the email address linked to your account. We '
           'will process your request within 7 business days.',
     ),
     FaqEntry(
@@ -243,7 +243,7 @@ const List<FaqGroup> kFaqGroups = [
     ),
     FaqEntry(
       'How do I contact a real person?',
-      'Call 07050622222 or email support@wawubeauty.com. Our support hours are Monday '
+      'Call 07050622222 or email beauty@wawuafrica.com. Our support hours are Monday '
           'to Friday, 9 AM to 6 PM WAT.',
     ),
   ]),
