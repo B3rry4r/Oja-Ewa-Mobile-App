@@ -400,7 +400,11 @@ class _WawuServicesStripState extends State<_WawuServicesStrip> {
       ),
       // Single horizontal row: WAWUAfrica stays fixed in the first column while
       // the remaining [_slots] columns cycle through every service together.
-      child: IntrinsicHeight(
+      // Fixed height (not IntrinsicHeight, which under-measures the animating
+      // switcher and clips the "Soon" badge) reserves room for icon + 2-line
+      // label + badge so nothing is cut off as services cycle.
+      child: SizedBox(
+        height: 94,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
