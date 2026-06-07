@@ -215,9 +215,9 @@ class _OrbitalCategorySelectorState extends State<OrbitalCategorySelector>
       builder: (_, constraints) {
         final w = constraints.maxWidth;
 
-        final orbitR = (w * 0.315).clamp(116.0, 152.0);
-        final orbitD = (w * 0.200).clamp(72.0, 92.0);
-        final centerD = (w * 0.330).clamp(122.0, 156.0);
+        final orbitR = (w * 0.355).clamp(116.0, 178.0);
+        final orbitD = (w * 0.235).clamp(78.0, 110.0);
+        final centerD = (w * 0.400).clamp(134.0, 194.0);
         final totalH = 2 * orbitR + orbitD + 20.0;
         final cx = w / 2;
         final cy = orbitR + orbitD / 2 + 10.0;
