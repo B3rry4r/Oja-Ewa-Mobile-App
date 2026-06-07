@@ -255,9 +255,15 @@ class _OrbitalCategorySelectorState extends State<OrbitalCategorySelector>
                   top: cy - centerD / 2,
                   width: centerD,
                   height: centerD,
-                  child: AnimatedSwitcher(
-                    duration: WBMotion.base,
-                    child: _buildCenter(selectedCat, centerD),
+                  // The active (center) disc is tappable — fires the selected
+                  // category's navigation, since the home shows nothing inline.
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => selectedCat.onTap(),
+                    child: AnimatedSwitcher(
+                      duration: WBMotion.base,
+                      child: _buildCenter(selectedCat, centerD),
+                    ),
                   ),
                 ),
               ],
