@@ -379,10 +379,10 @@ class _WawuServicesStripState extends State<_WawuServicesStrip> {
             child: SlideTransition(position: slide, child: child),
           );
         },
-        child: Padding(
+        child: _ServiceItem(
           key: ValueKey<String>('$i-${service.path}'),
-          padding: const EdgeInsets.symmetric(vertical: 7),
-          child: _ServiceItem(service: service, colors: colors),
+          service: service,
+          colors: colors,
         ),
       ),
     );
@@ -393,37 +393,37 @@ class _WawuServicesStripState extends State<_WawuServicesStrip> {
     final colors = context.appColors;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: colors.surfaceSecondary,
         borderRadius: BorderRadius.circular(WBRadius.card),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Fixed black two-row WAWUAfrica mark — opens the services home.
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => widget.onOpen('/services'),
-            child: Row(
-              children: [
-                Image.asset(
-                  AppIcons.wawuAfricaMark,
-                  height: 46,
-                  fit: BoxFit.contain,
+      // Single horizontal row: WAWUAfrica stays fixed in the first column while
+      // the remaining [_slots] columns cycle through every service together.
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Col 1 — fixed black two-row WAWUAfrica mark, opens the services home.
+            Expanded(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => widget.onOpen('/services'),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: Image.asset(
+                    AppIcons.wawuAfricaMark,
+                    height: 40,
+                    fit: BoxFit.contain,
+                  ),
                 ),
-                const Spacer(),
-                Icon(Icons.arrow_outward, size: 16, color: colors.textSecondary),
-              ],
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Divider(height: 1, thickness: 1, color: colors.accentSoft),
-          const SizedBox(height: 2),
-          // Three services visible at once, all fading/cycling together.
-          for (int i = 0; i < _slots; i++) _slot(i, colors),
-        ],
+            VerticalDivider(width: 13, thickness: 1, color: colors.accentSoft),
+            // Cols 2..n — the cycling service slots.
+            for (int i = 0; i < _slots; i++) Expanded(child: _slot(i, colors)),
+          ],
+        ),
       ),
     );
   }
@@ -431,6 +431,7 @@ class _WawuServicesStripState extends State<_WawuServicesStrip> {
 
 class _ServiceItem extends StatelessWidget {
   const _ServiceItem({
+    super.key,
     required this.service,
     required this.colors,
   });
@@ -440,26 +441,29 @@ class _ServiceItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    // Compact, centred column item so each cycling service fits one grid slot.
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(service.icon, size: 22, color: colors.textPrimary),
-        const SizedBox(width: 10),
-        Flexible(
-          child: Text(
-            service.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: WBTypography.body.copyWith(
-              color: colors.textPrimary,
-              fontWeight: FontWeight.w600,
-              fontSize: 15,
-            ),
+        Icon(service.icon, size: 24, color: colors.textPrimary),
+        const SizedBox(height: 7),
+        Text(
+          service.label,
+          maxLines: 2,
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+          style: WBTypography.body.copyWith(
+            color: colors.textPrimary,
+            fontWeight: FontWeight.w600,
+            fontSize: 11.5,
+            height: 1.15,
           ),
         ),
         if (service.soon) ...[
-          const SizedBox(width: 8),
+          const SizedBox(height: 5),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1.5),
             decoration: BoxDecoration(
               color: colors.accent,
               borderRadius: BorderRadius.circular(WBRadius.pill),
@@ -468,14 +472,12 @@ class _ServiceItem extends StatelessWidget {
               'Soon',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 10,
+                fontSize: 9,
                 fontWeight: FontWeight.w700,
               ),
             ),
           ),
         ],
-        const SizedBox(width: 8),
-        Icon(Icons.arrow_outward, size: 18, color: colors.textSecondary),
       ],
     );
   }
