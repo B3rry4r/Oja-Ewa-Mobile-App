@@ -303,11 +303,13 @@ const List<_WawuService> _wawuServices = [
     label: 'Banking',
     path: '/services/banking',
     icon: Icons.account_balance_outlined,
+    soon: true,
   ),
   _WawuService(
     label: 'Grants & Funding',
     path: '/services/grants',
     icon: Icons.volunteer_activism_outlined,
+    soon: true,
   ),
   _WawuService(
     label: 'CAC Registration',
@@ -400,11 +402,7 @@ class _WawuServicesStripState extends State<_WawuServicesStrip> {
       ),
       // Single horizontal row: WAWUAfrica stays fixed in the first column while
       // the remaining [_slots] columns cycle through every service together.
-      // Fixed height (not IntrinsicHeight, which under-measures the animating
-      // switcher and clips the "Soon" badge) reserves room for icon + 2-line
-      // label + badge so nothing is cut off as services cycle.
-      child: SizedBox(
-        height: 94,
+      child: IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
