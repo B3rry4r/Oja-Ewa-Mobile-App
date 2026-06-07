@@ -22,6 +22,9 @@ class FaqGroup {
   final List<FaqEntry> entries;
 }
 
+/// Shown beneath each document title as the "last updated" line.
+const String kLegalEffectiveDate = 'Effective Date: June 1, 2025';
+
 const String kTermsIntro =
     'WAWUBeauty is a product of WAWUAfrica. By accessing or using the WAWUBeauty '
     'platform (website, mobile app, or related services), you agree to these Terms.';
