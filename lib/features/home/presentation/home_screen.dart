@@ -234,20 +234,6 @@ class HomeScreen extends ConsumerWidget {
           iconAsset: AppIcons.hardware,
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.hardware),
         ),
-        OrbitalCategory(
-          id: 'sustainability',
-          label: 'Sustainability',
-          iconAsset: AppIcons.market,
-          onTap: () =>
-              Navigator.of(context).pushNamed(AppRoutes.sustainability),
-        ),
-        OrbitalCategory(
-          id: 'verified-badges',
-          label: 'Verified Badges',
-          iconAsset: AppIcons.verifiedBadges,
-          onTap: () =>
-              Navigator.of(context).pushNamed(AppRoutes.badgeVerifications),
-        ),
       ],
     );
   }
