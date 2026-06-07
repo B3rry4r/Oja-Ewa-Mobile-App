@@ -11,6 +11,7 @@ import '../../core/widgets/in_app_notification.dart';
 import '../router/app_router.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
+import '../../features/services/presentation/services_screen.dart';
 import '../../features/wishlist/presentation/wishlist.dart';
 import '../../features/account/presentation/account.dart';
 import '../widgets/app_bottom_nav_bar.dart';
@@ -152,6 +153,7 @@ class _AppShellState extends ConsumerState<AppShell> {
         children: [
           const HomeScreen(),
           const SearchScreen(),
+          const ServicesScreen(),
           WishlistScreen(
             onKeepShoppingPressed: () => setState(() => _index = 0),
           ),

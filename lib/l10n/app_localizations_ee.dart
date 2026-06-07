@@ -15,6 +15,9 @@ class AppLocalizationsEe extends AppLocalizations {
   String get navSearch => 'Di';
 
   @override
+  String get navServices => 'Dɔwɔwɔwo';
+
+  @override
   String get navWishlist => 'Lɔlɔ̃nuwo';
 
   @override

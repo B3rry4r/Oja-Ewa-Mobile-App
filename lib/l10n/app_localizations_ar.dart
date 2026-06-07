@@ -15,6 +15,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navSearch => 'بحث';
 
   @override
+  String get navServices => 'الخدمات';
+
+  @override
   String get navWishlist => 'المفضلة';
 
   @override

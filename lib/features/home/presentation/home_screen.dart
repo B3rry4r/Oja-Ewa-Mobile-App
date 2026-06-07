@@ -1,12 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/header_icon_button.dart';
-import 'package:ojaewa/core/constants/app_urls.dart';
 import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/widgets/wb_widgets.dart';
@@ -50,8 +46,6 @@ class HomeScreen extends ConsumerWidget {
             _padded(const WBRandomTagline(pairs: _beautyTaglines)),
             const SizedBox(height: 20),
             _padded(_buildSearchBar(context)),
-            const SizedBox(height: 24),
-            _buildWawuServicesRow(context),
             const SizedBox(height: 28),
             _padded(
               Text(
@@ -201,27 +195,6 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-
-  /// WAWUAfrica services promo. The two-line WAWUAfrica brand logo stays fixed
-  /// while the individual services (EasyBuy, Health Insurance, Pension, …) fade
-  /// through, so every WAWUAfrica service is surfaced from the WAWUBeauty home.
-  Widget _buildWawuServicesRow(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: _WawuServicesStrip(onOpen: (path) => _openHub(context, path)),
-    );
-  }
-
-  Future<void> _openHub(BuildContext context, String path) async {
-    final uri = Uri.parse('$wawuAfricaHubUrl$path');
-    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!ok && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open WAWUAfrica')),
-      );
-    }
-  }
-
   Widget _buildOrbitalCategories(BuildContext context) {
     return OrbitalCategorySelector(
       categories: [
@@ -275,225 +248,6 @@ class HomeScreen extends ConsumerWidget {
           onTap: () =>
               Navigator.of(context).pushNamed(AppRoutes.badgeVerifications),
         ),
-      ],
-    );
-  }
-}
-
-/// A single WAWUAfrica service entry surfaced by [_WawuServicesStrip].
-class _WawuService {
-  const _WawuService({
-    required this.label,
-    required this.path,
-    required this.icon,
-    this.soon = false,
-  });
-
-  final String label;
-  final String path;
-  final IconData icon;
-  final bool soon;
-}
-
-const List<_WawuService> _wawuServices = [
-  _WawuService(
-    label: 'EasyBuy',
-    path: '/services/easybuy/apply',
-    icon: Icons.shopping_bag_outlined,
-  ),
-  _WawuService(
-    label: 'Health Insurance',
-    path: '/services/insurance',
-    icon: Icons.health_and_safety_outlined,
-    soon: true,
-  ),
-  _WawuService(
-    label: 'Pension',
-    path: '/services/pension',
-    icon: Icons.savings_outlined,
-    soon: true,
-  ),
-  _WawuService(
-    label: 'Banking',
-    path: '/services/banking',
-    icon: Icons.account_balance_outlined,
-    soon: true,
-  ),
-  _WawuService(
-    label: 'Grants & Funding',
-    path: '/services/grants',
-    icon: Icons.volunteer_activism_outlined,
-    soon: true,
-  ),
-  _WawuService(
-    label: 'CAC Registration',
-    path: '/services/cac-registration/apply',
-    icon: Icons.assignment_outlined,
-  ),
-  _WawuService(
-    label: 'NEPC Registration',
-    path: '/services/nepc-registration/apply',
-    icon: Icons.public_outlined,
-  ),
-  _WawuService(
-    label: 'Mentorship',
-    path: '/services/mentors',
-    icon: Icons.diversity_3_outlined,
-  ),
-];
-
-/// WAWUAfrica services strip: the two-line brand logo stays fixed on the left
-/// while the individual services fade/slide through automatically, cycling
-/// through every service so each is surfaced from the WAWUBeauty home.
-class _WawuServicesStrip extends StatefulWidget {
-  final void Function(String path) onOpen;
-  const _WawuServicesStrip({required this.onOpen});
-
-  @override
-  State<_WawuServicesStrip> createState() => _WawuServicesStripState();
-}
-
-class _WawuServicesStripState extends State<_WawuServicesStrip> {
-  static const Duration _interval = Duration(milliseconds: 2800);
-  static const int _slots = 3; // services shown (and animating) at once
-
-  Timer? _timer;
-  int _step = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(_interval, (_) {
-      if (!mounted) return;
-      setState(() => _step++);
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  // One fading service slot. Each of the [_slots] slots shows a different
-  // service and they all advance (animate) together on every tick, cycling
-  // through the whole list.
-  Widget _slot(int i, AppThemeColors colors) {
-    final service = _wawuServices[(_step * _slots + i) % _wawuServices.length];
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => widget.onOpen(service.path),
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 450),
-        transitionBuilder: (child, animation) {
-          final slide = Tween<Offset>(
-            begin: const Offset(0, 0.22),
-            end: Offset.zero,
-          ).animate(animation);
-          return FadeTransition(
-            opacity: animation,
-            child: SlideTransition(position: slide, child: child),
-          );
-        },
-        child: _ServiceItem(
-          key: ValueKey<String>('$i-${service.path}'),
-          service: service,
-          colors: colors,
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      decoration: BoxDecoration(
-        color: colors.surfaceSecondary,
-        borderRadius: BorderRadius.circular(WBRadius.card),
-      ),
-      // Single horizontal row: WAWUAfrica stays fixed in the first column while
-      // the remaining [_slots] columns cycle through every service together.
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Col 1 — fixed black two-row WAWUAfrica mark, opens the services home.
-            Expanded(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => widget.onOpen('/services'),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: Image.asset(
-                    AppIcons.wawuAfricaMark,
-                    height: 40,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            ),
-            VerticalDivider(width: 13, thickness: 1, color: colors.accentSoft),
-            // Cols 2..n — the cycling service slots.
-            for (int i = 0; i < _slots; i++) Expanded(child: _slot(i, colors)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ServiceItem extends StatelessWidget {
-  const _ServiceItem({
-    super.key,
-    required this.service,
-    required this.colors,
-  });
-
-  final _WawuService service;
-  final AppThemeColors colors;
-
-  @override
-  Widget build(BuildContext context) {
-    // Compact, centred column item so each cycling service fits one grid slot.
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(service.icon, size: 24, color: colors.textPrimary),
-        const SizedBox(height: 7),
-        Text(
-          service.label,
-          maxLines: 2,
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-          style: WBTypography.body.copyWith(
-            color: colors.textPrimary,
-            fontWeight: FontWeight.w600,
-            fontSize: 11.5,
-            height: 1.15,
-          ),
-        ),
-        if (service.soon) ...[
-          const SizedBox(height: 5),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1.5),
-            decoration: BoxDecoration(
-              color: colors.accent,
-              borderRadius: BorderRadius.circular(WBRadius.pill),
-            ),
-            child: const Text(
-              'Soon',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 9,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
       ],
     );
   }

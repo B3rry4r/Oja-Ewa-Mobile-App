@@ -27,6 +27,7 @@ class AppBottomNavBar extends StatelessWidget {
     final items = <({WBIconName icon, String label})>[
       (icon: WBIconName.home, label: l.navHome),
       (icon: WBIconName.search, label: l.navSearch),
+      (icon: WBIconName.store, label: l.navServices),
       (icon: WBIconName.heart, label: l.navWishlist),
       (icon: WBIconName.user, label: l.navAccount),
     ];

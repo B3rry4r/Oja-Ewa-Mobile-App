@@ -118,6 +118,12 @@ abstract class AppLocalizations {
   /// **'Search'**
   String get navSearch;
 
+  /// No description provided for @navServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get navServices;
+
   /// No description provided for @navWishlist.
   ///
   /// In en, this message translates to:
