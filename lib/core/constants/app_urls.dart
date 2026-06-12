@@ -21,6 +21,11 @@ String get wawuAfricaHubUrl =>
 /// - LARAVEL_BASE_URL
 /// - AI_BASE_URL
 class AppUrls {
+  /// Canonical WAWUAfrica legal page (Privacy Policy, Terms of Use & Consent
+  /// Framework). One source of truth on the web — opened via the browser so a
+  /// policy update never needs an app release.
+  static const String privacyPolicyUrl = 'https://wawuafrica.com/privacy';
+
   static const String _laravelOverride = String.fromEnvironment(
     'LARAVEL_BASE_URL',
     defaultValue: '',

@@ -140,10 +140,28 @@ class AuthApi {
       if (wawuToken == null || wawuToken.isEmpty) {
         throw const FormatException('Token missing in response');
       }
+      // Record privacy-policy consent on WAWU ID (the sign-up screen gates on
+      // accepting the terms) before swapping for a Beauty session.
+      await _recordPrivacyConsent(wawuToken);
       // Swap the WAWU ID token for a Beauty (Sanctum) session.
       return await _exchangeWawuIdForBeautySession(wawuToken);
     } catch (e) {
       throw mapDioError(e);
+    }
+  }
+
+  /// Records the user's consent to the current privacy-policy version on WAWU ID
+  /// (the shared ecosystem consent ledger). Uses the WAWU ID access token
+  /// directly. Best-effort — a consent-logging failure must never block sign-up.
+  Future<void> _recordPrivacyConsent(String wawuToken) async {
+    try {
+      await _dio.post(
+        '${AppUrls.wawuIdBaseUrl}/policies/privacy/accept',
+        data: {'source': 'wawubeauty'},
+        options: Options(headers: {'Authorization': 'Bearer $wawuToken'}),
+      );
+    } catch (_) {
+      // Non-fatal.
     }
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
+import 'package:ojaewa/core/constants/app_urls.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
@@ -159,7 +160,10 @@ class AccountScreen extends ConsumerWidget {
           AccountMenuRow(
             icon: WBIconName.shield,
             label: l.accountPrivacy,
-            onTap: () => go(AppRoutes.privacyPolicy),
+            onTap: () => launchUrl(
+              Uri.parse(AppUrls.privacyPolicyUrl),
+              mode: LaunchMode.externalApplication,
+            ),
           ),
           AccountMenuRow(
             icon: WBIconName.doc,

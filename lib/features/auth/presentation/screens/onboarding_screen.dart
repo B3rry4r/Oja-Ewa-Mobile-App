@@ -1,8 +1,10 @@
 // onboarding_screen.dart
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
+import 'package:ojaewa/core/constants/app_urls.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 import 'package:ojaewa/core/i18n/l10n_ext.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
@@ -145,8 +147,10 @@ class OnboardingScreen extends StatelessWidget {
                 decoration: TextDecoration.underline,
               ),
               recognizer: TapGestureRecognizer()
-                ..onTap = () =>
-                    Navigator.of(context).pushNamed(AppRoutes.termsOfService),
+                ..onTap = () => launchUrl(
+                      Uri.parse(AppUrls.privacyPolicyUrl),
+                      mode: LaunchMode.externalApplication,
+                    ),
             ),
             TextSpan(text: context.l10n.onboardingAnd),
             TextSpan(
@@ -157,8 +161,10 @@ class OnboardingScreen extends StatelessWidget {
                 decoration: TextDecoration.underline,
               ),
               recognizer: TapGestureRecognizer()
-                ..onTap = () =>
-                    Navigator.of(context).pushNamed(AppRoutes.privacyPolicy),
+                ..onTap = () => launchUrl(
+                      Uri.parse(AppUrls.privacyPolicyUrl),
+                      mode: LaunchMode.externalApplication,
+                    ),
             ),
           ],
         ),
