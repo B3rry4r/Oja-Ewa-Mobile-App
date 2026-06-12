@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/core/auth/auth_required_modal.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
@@ -432,44 +431,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailsScreen> {
                     onTap: () => Navigator.of(
                       context,
                     ).pushNamed(AppRoutes.notifications),
-                  ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () async {
-                      final box = context.findRenderObject() as RenderBox?;
-                      final sharePositionOrigin = box != null 
-                          ? box.localToGlobal(Offset.zero) & box.size 
-                          : null;
-                      
-                      final shareUrl = 'https://ojaewa.com/product/${widget.productId}';
-                      final product = ref.read(productDetailsProvider(widget.productId)).value;
-                      final title = (product?.name ?? '').trim();
-                      final text = 'Check out this product: ${title.isNotEmpty ? title : "Item"}\n$shareUrl';
-                      
-                      Share.share(
-                        text,
-                        sharePositionOrigin: sharePositionOrigin,
-                      );
-                    },
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: colors.iconBackground,
-                        border: Border.all(color: colors.border),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: colors.shadow,
-                            blurRadius: 14,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.share, size: 20),
-                    ),
                   ),
                   const SizedBox(width: 8),
                   HeaderIconButton(

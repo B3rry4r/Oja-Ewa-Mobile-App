@@ -10,7 +10,9 @@ import '../config/app_environment.dart';
 // the secret is unset, which makes String.fromEnvironment return "" and bypass
 // `defaultValue`). Resolving at runtime guarantees a usable URL on web too.
 const String _wawuAfricaHubUrlEnv = String.fromEnvironment('WAWUAFRICA_HUB_URL', defaultValue: '');
-const String _wawuAfricaHubUrlFallback = 'https://wawuafrica-new-production.up.railway.app';
+// Canonical live hub domain. Hardcoded so no GitHub/CI secret is required — the
+// dart-define still overrides it if ever set.
+const String _wawuAfricaHubUrlFallback = 'https://wawuafrica.com';
 
 String get wawuAfricaHubUrl =>
     _wawuAfricaHubUrlEnv.isNotEmpty ? _wawuAfricaHubUrlEnv : _wawuAfricaHubUrlFallback;

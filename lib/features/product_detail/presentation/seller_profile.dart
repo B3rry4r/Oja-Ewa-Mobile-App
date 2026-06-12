@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/core/ui/ui_error_message.dart';
@@ -130,16 +129,6 @@ class SellerProfileScreen extends ConsumerWidget {
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      onPressed: () {
-                        final box = context.findRenderObject() as RenderBox?;
-                        final sharePositionOrigin = box != null ? box.localToGlobal(Offset.zero) & box.size : null;
-                        final shareUrl = 'https://ojaewa.com/seller/$sellerId';
-                        Share.share('Check out this shop: ${seller.businessName}\n$shareUrl', sharePositionOrigin: sharePositionOrigin);
-                      },
-                      icon: const Icon(Icons.share, size: 24),
                     ),
                   ],
                 ), // ← Row closes here; Column children list continues below
