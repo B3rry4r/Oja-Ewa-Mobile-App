@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
+import 'package:ojaewa/core/constants/app_urls.dart';
 import 'package:ojaewa/core/files/pick_file.dart';
 import 'package:ojaewa/core/subscriptions/iap_service.dart';
 import 'package:ojaewa/core/subscriptions/subscription_constants.dart';
@@ -265,6 +268,15 @@ class _BadgeVerificationsScreenState
                           option.name,
                           style: TextStyle(color: colors.textSecondary),
                         ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _priceLabel(option),
+                          style: TextStyle(
+                            color: colors.textPrimary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                         if (option.requirements.isNotEmpty) ...[
                           const SizedBox(height: 10),
                           for (final requirement in option.requirements)
@@ -327,6 +339,11 @@ class _BadgeVerificationsScreenState
             ),
           ],
         ),
+      ),
+      const SizedBox(height: 16),
+      _SubscriptionTermsCard(
+        onTerms: _openTerms,
+        onPrivacy: _openPrivacy,
       ),
       const SizedBox(height: 16),
       SizedBox(
@@ -472,6 +489,134 @@ class _BadgeVerificationsScreenState
       default:
         return key.replaceAll('_', ' ');
     }
+  }
+
+  /// Price + billing period shown on each badge so the purchase screen
+  /// displays the subscription price and length (Apple Guideline 3.1.2(c)).
+  String _priceLabel(BadgeOption option) {
+    return '${_formatNgn(option.priceNgn)}${_billingCycleSuffix(option.billingCycle)}';
+  }
+
+  String _billingCycleSuffix(String billingCycle) {
+    switch (billingCycle.toLowerCase()) {
+      case 'yearly':
+      case 'annual':
+      case 'annually':
+        return ' / year';
+      case 'monthly':
+      case 'month':
+        return ' / month';
+      case '':
+        return '';
+      default:
+        return ' / ${billingCycle.toLowerCase()}';
+    }
+  }
+
+  String _formatNgn(num amount) {
+    final digits = amount.round().toString();
+    final buffer = StringBuffer();
+    for (var i = 0; i < digits.length; i++) {
+      if (i > 0 && (digits.length - i) % 3 == 0) buffer.write(',');
+      buffer.write(digits[i]);
+    }
+    return '₦$buffer';
+  }
+
+  void _openTerms() =>
+      Navigator.of(context).pushNamed(AppRoutes.termsOfService);
+
+  Future<void> _openPrivacy() async {
+    await launchUrl(
+      Uri.parse(AppUrls.privacyPolicyUrl),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+}
+
+/// Auto-renewable subscription disclosure + functional Terms of Use (EULA)
+/// and Privacy Policy links, shown on the purchase screen to satisfy Apple
+/// Guideline 3.1.2(c).
+class _SubscriptionTermsCard extends StatelessWidget {
+  const _SubscriptionTermsCard({
+    required this.onTerms,
+    required this.onPrivacy,
+  });
+
+  final VoidCallback onTerms;
+  final VoidCallback onPrivacy;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.surfaceSecondary,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Subscription details',
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Badges are billed as an auto-renewing yearly subscription through '
+            'your Apple ID. Payment is charged at confirmation of purchase and '
+            'renews automatically for the same price and period unless you '
+            'cancel at least 24 hours before the current period ends. You can '
+            'manage or cancel anytime in your App Store account settings.',
+            style: TextStyle(
+              color: colors.textSecondary,
+              fontSize: 12,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 16,
+            runSpacing: 8,
+            children: [
+              _LegalLink(label: 'Terms of Use (EULA)', onTap: onTerms),
+              _LegalLink(label: 'Privacy Policy', onTap: onPrivacy),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LegalLink extends StatelessWidget {
+  const _LegalLink({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return GestureDetector(
+      onTap: onTap,
+      child: Text(
+        label,
+        style: TextStyle(
+          color: colors.accent,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    );
   }
 }
 
