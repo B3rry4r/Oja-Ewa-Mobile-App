@@ -92,7 +92,7 @@ class _VerificationCodeScreenState
     debugPrint('Resending code...');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('New code sent to your phone'),
+        content: Text('New code sent to your email'),
         backgroundColor: colors.accent,
       ),
     );
@@ -207,7 +207,7 @@ class _VerificationCodeScreenState
         ),
         const SizedBox(height: 8),
         Text(
-          'Enter the six-digit code sent to your phone',
+          'Enter the six-digit code sent to your email',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
