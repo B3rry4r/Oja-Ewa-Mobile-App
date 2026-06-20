@@ -75,7 +75,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
                 // Instructions
                 Text(
-                  'Enter your registered phone number — we\'ll text you a '
+                  'Enter your registered phone number — we\'ll email you a '
                   '6-digit code.',
                   style: TextStyle(
                     fontSize: 14,
