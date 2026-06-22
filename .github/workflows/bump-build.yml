@@ -1,0 +1,36 @@
+name: Bump build number
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    # Skip our own bump commit (prevents an infinite loop).
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          # Uses BUMP_PAT if set (so the push can trigger downstream build CI),
+          # otherwise falls back to the default GITHUB_TOKEN. Works either way.
+          token: ${{ secrets.BUMP_PAT || github.token }}
+      - name: Bump pubspec build number (X.Y.Z+BUILD -> +BUILD+1)
+        run: |
+          ver=$(grep -E "^version:" pubspec.yaml | head -1 | sed -E "s/^version:[[:space:]]*//")
+          name=${ver%%+*}; build=${ver##*+}
+          [ "$name" = "$build" ] && build=0
+          new=$((build + 1))
+          sed -i -E "s/^version:.*/version: ${name}+${new}/" pubspec.yaml
+          echo "Bumped $ver -> ${name}+${new}"
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add pubspec.yaml
+          git commit -m "chore: bump build number [skip ci]" || { echo "no change"; exit 0; }
+          git push
