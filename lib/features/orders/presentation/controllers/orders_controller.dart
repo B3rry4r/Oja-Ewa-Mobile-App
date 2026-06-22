@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
+import 'package:ojaewa/features/cart/data/cart_repository_impl.dart';
+import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
 import '../../data/orders_repository_impl.dart';
 import '../../domain/logistics_models.dart';
 import '../../domain/order_models.dart';
@@ -137,6 +139,46 @@ class OrderActionsController extends AsyncNotifier<void> {
       state = const AsyncData(null);
       ref.invalidate(ordersProvider);
       return res;
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
+  }
+
+  /// Re-add a past order's items to the cart, mirroring WAWUBasket's reorder.
+  ///
+  /// The backend has no dedicated reorder endpoint, so we replay each line
+  /// through the existing cart add-item API (one product per item), then sync
+  /// the shared cart state. Returns the number of items (re)added.
+  Future<int> reorder(int orderId) async {
+    state = const AsyncLoading();
+    try {
+      final detail =
+          await ref.read(ordersRepositoryProvider).getOrderDetails(orderId);
+      final orderData = (detail['data'] is Map<String, dynamic>)
+          ? detail['data'] as Map<String, dynamic>
+          : detail;
+      final order = OrderSummary.fromJson(orderData);
+
+      final cartRepo = ref.read(cartRepositoryProvider);
+      var added = 0;
+      for (final item in order.items) {
+        if (item.productId <= 0) continue;
+        await cartRepo.addItem(
+          productId: item.productId,
+          quantity: item.quantity > 0 ? item.quantity : 1,
+          // Order items don't carry a size; backend treats '' as the default
+          // line (same as a fresh add with no size selected).
+          selectedSize: '',
+        );
+        added++;
+      }
+
+      // Sync the shared cart so the badge + cart screen reflect the new items.
+      ref.read(optimisticCartProvider.notifier).requestSync();
+      ref.invalidate(cartProvider);
+      state = const AsyncData(null);
+      return added;
     } catch (e, st) {
       state = AsyncError(e, st);
       rethrow;

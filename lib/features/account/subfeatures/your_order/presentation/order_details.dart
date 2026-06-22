@@ -5,11 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:ojaewa/app/router/app_router.dart';
 import 'package:ojaewa/app/theme/app_theme_colors.dart';
 import 'package:ojaewa/app/widgets/app_page_scaffold.dart';
 import 'package:ojaewa/core/theme/wb_theme_exports.dart';
 import 'package:ojaewa/core/ui/price_formatter.dart';
 import 'package:ojaewa/core/widgets/image_placeholder.dart';
+import 'package:ojaewa/core/widgets/wb_widgets.dart';
 import 'package:ojaewa/features/orders/domain/order_models.dart';
 import 'package:ojaewa/features/orders/presentation/controllers/orders_controller.dart';
 import 'package:ojaewa/features/orders/presentation/order_status_ui.dart';
@@ -90,6 +92,10 @@ class OrderDetailsScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 _buildItemsInOrder(context, order.items, currency: order.currency),
                 const SizedBox(height: 16),
+                if (order.items.isNotEmpty) ...[
+                  _ReorderButton(orderId: order.id),
+                  const SizedBox(height: 16),
+                ],
                 if (effectiveOrder.shipments.isNotEmpty) ...[
                   _buildShipments(context, ref, effectiveOrder, effectiveOrder.shipments),
                   const SizedBox(height: 16),
@@ -958,6 +964,62 @@ class OrderDetailsScreen extends ConsumerWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+/// "Buy again" CTA that re-adds this order's items to the cart, mirroring
+/// WAWUBasket's reorder from the order detail screen.
+class _ReorderButton extends ConsumerStatefulWidget {
+  const _ReorderButton({required this.orderId});
+
+  final int orderId;
+
+  @override
+  ConsumerState<_ReorderButton> createState() => _ReorderButtonState();
+}
+
+class _ReorderButtonState extends ConsumerState<_ReorderButton> {
+  bool _loading = false;
+
+  Future<void> _reorder() async {
+    setState(() => _loading = true);
+    try {
+      final count = await ref
+          .read(orderActionsProvider.notifier)
+          .reorder(widget.orderId);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            count > 0
+                ? 'Re-added $count item${count == 1 ? '' : 's'} to your cart'
+                : 'Nothing to reorder',
+          ),
+        ),
+      );
+      if (count > 0) {
+        Navigator.of(context).pushNamed(AppRoutes.cart);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to reorder: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WBButton(
+      label: 'Buy again',
+      fullWidth: true,
+      variant: WBButtonVariant.secondary,
+      loading: _loading,
+      onPressed: _reorder,
     );
   }
 }

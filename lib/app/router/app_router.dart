@@ -17,6 +17,8 @@ import '../../features/home/subfeatures/music/presentation/music_screen.dart';
 import '../../features/home/subfeatures/schools/presentation/schools_screen.dart';
 import '../../features/home/subfeatures/hardware/presentation/hardware_screen.dart';
 import '../../features/home/subfeatures/sustainability/presentation/sustainability_screen.dart';
+import '../../features/beauty_kits/presentation/screens/beauty_kits_screen.dart';
+import '../../features/beauty_kits/presentation/screens/beauty_kit_detail_screen.dart';
 import '../../features/account/subfeatures/edit_profile/presentation/edit_profile.dart';
 import '../../features/account/subfeatures/your_address/presentation/add_edit_address.dart';
 import '../../features/account/subfeatures/connect/connect.dart';
@@ -88,6 +90,10 @@ abstract class AppRoutes {
   static const hardware = '/hardware';
   static const sustainability = '/sustainability';
   static const badgeVerifications = '/services/badge-verifications';
+
+  // Beauty Kits (curated "buy all" bundles) — browsing is guest-accessible.
+  static const beautyKits = '/beauty-kits';
+  static const beautyKitDetail = '/beauty-kit-detail';
 
   // Feature screens
   static const cart = '/cart';
@@ -248,6 +254,18 @@ abstract class AppRouter {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const AuthGuard(child: BadgeVerificationsScreen()),
+        );
+
+      case AppRoutes.beautyKits:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const BeautyKitsScreen(),
+        );
+
+      case AppRoutes.beautyKitDetail:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const BeautyKitDetailScreen(),
         );
 
       case AppRoutes.editProfile:

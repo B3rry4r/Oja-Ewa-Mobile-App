@@ -19,6 +19,36 @@ class OrdersScreen extends ConsumerStatefulWidget {
 
 class _OrdersScreenState extends ConsumerState<OrdersScreen> {
   String? _selectedStatus;
+  int? _reorderingOrderId;
+
+  Future<void> _reorder(int orderId) async {
+    setState(() => _reorderingOrderId = orderId);
+    try {
+      final count =
+          await ref.read(orderActionsProvider.notifier).reorder(orderId);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            count > 0
+                ? 'Re-added $count item${count == 1 ? '' : 's'} to your cart'
+                : 'Nothing to reorder',
+          ),
+        ),
+      );
+      if (count > 0) {
+        Navigator.of(context).pushNamed(AppRoutes.cart);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to reorder: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _reorderingOrderId = null);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +198,11 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                               ),
                             ],
                           ),
-                          Row(
+                          Flexible(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              reverse: true,
+                              child: Row(
                             children: [
                               if (hasReviewButton) ...[
                                 InkWell(
@@ -205,6 +239,43 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                                 const SizedBox(width: 8),
                               ],
                               InkWell(
+                                onTap: _reorderingOrderId == null
+                                    ? () => _reorder(order.id)
+                                    : null,
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  height: 33,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: colors.surface,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: colors.accent),
+                                  ),
+                                  child: Center(
+                                    child: _reorderingOrderId == order.id
+                                        ? SizedBox(
+                                            width: 14,
+                                            height: 14,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: colors.accent,
+                                            ),
+                                          )
+                                        : Text(
+                                            'Reorder',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: colors.accent,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              InkWell(
                                 onTap: () => Navigator.of(context).pushNamed(
                                   AppRoutes.trackingOrder,
                                   arguments: {'orderId': order.id},
@@ -232,6 +303,8 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                                 ),
                               ),
                             ],
+                              ),
+                            ),
                           ),
                         ],
                       ),

@@ -10,7 +10,9 @@ import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/features/account/subfeatures/start_selling/presentation/controllers/seller_status_controller.dart';
 import 'package:ojaewa/features/notifications/presentation/controllers/notifications_controller.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
+import 'package:ojaewa/core/ui/snackbars.dart';
 import 'package:ojaewa/features/home/presentation/widgets/orbital_categories.dart';
+import 'package:ojaewa/features/home/presentation/widgets/quick_action.dart';
 import 'package:ojaewa/features/search/presentation/search_screen.dart';
 
 import '../../../app/router/app_router.dart';
@@ -47,6 +49,8 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 20),
             _padded(_buildSearchBar(context)),
             const SizedBox(height: 28),
+            _padded(_buildQuickActions(context, ref)),
+            const SizedBox(height: 28),
             _padded(
               Text(
                 context.l10n.homeShopByCategory,
@@ -61,6 +65,53 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  /// Home quick-actions row, mirroring WAWUBasket's (same icon set).
+  /// Beauty Kits is guest-accessible; Track / Reorder require login and prompt
+  /// sign-in for guests (using the just-added gating pattern).
+  Widget _buildQuickActions(BuildContext context, WidgetRef ref) {
+    void requireAuth(String message, String route) {
+      final token = ref.read(accessTokenProvider);
+      if (token == null || token.isEmpty) {
+        AppSnackbars.showError(context, message);
+        Navigator.of(context).pushNamed(AppRoutes.signIn);
+        return;
+      }
+      Navigator.of(context).pushNamed(route);
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        QuickAction(
+          icon: WBIconName.star,
+          label: 'Beauty Kits',
+          // Browsing kits is guest-accessible.
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.beautyKits),
+        ),
+        QuickAction(
+          icon: WBIconName.pin,
+          label: 'Track',
+          onTap: () =>
+              requireAuth('Please sign in to track orders', AppRoutes.orders),
+        ),
+        QuickAction(
+          icon: WBIconName.basket,
+          label: 'Reorder',
+          onTap: () =>
+              requireAuth('Please sign in to reorder', AppRoutes.orders),
+        ),
+        QuickAction(
+          icon: WBIconName.bell,
+          label: 'Updates',
+          onTap: () => requireAuth(
+            'Please sign in to see updates',
+            AppRoutes.notifications,
+          ),
+        ),
+      ],
     );
   }
 
