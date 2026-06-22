@@ -40,6 +40,93 @@ class AccountScreen extends ConsumerWidget {
       }
     });
 
+    // Guest gating (mirrors WAWUBasket's ProfileScreen): a logged-out user
+    // sees a clean "Sign in / Create account" prompt instead of a "?" avatar
+    // and a menu full of rows that all require auth.
+    if (!isLoggedIn) {
+      return _buildGuestAccount(context);
+    }
+
+    return _buildSignedInAccount(context, ref, profile.value);
+  }
+
+  /// Clean logged-out state: no fake avatar, no "?", just a sign-in prompt.
+  /// Structure mirrors WAWUBasket's `ProfileScreen._buildGuest`.
+  Widget _buildGuestAccount(BuildContext context) {
+    final l = context.l10n;
+    return Scaffold(
+      backgroundColor: WBColors.bgPrimary,
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(
+            WBSpacing.screenPadding,
+            80,
+            WBSpacing.screenPadding,
+            180,
+          ),
+          children: [
+            Center(
+              child: Container(
+                width: 96,
+                height: 96,
+                decoration: BoxDecoration(
+                  color: WBColors.bgSoft,
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                alignment: Alignment.center,
+                child: const WBIcon(
+                  WBIconName.user,
+                  size: 36,
+                  color: WBColors.fgHeader,
+                ),
+              ),
+            ),
+            const SizedBox(height: WBSpacing.lg),
+            // TODO(i18n): key=accountGuestTitle / accountGuestBody
+            Text(
+              'Sign in to your account',
+              textAlign: TextAlign.center,
+              style: WBTypography.hero.copyWith(fontSize: 24),
+            ),
+            const SizedBox(height: WBSpacing.sm),
+            Text(
+              'Save your favorites, track orders, and manage your profile.',
+              textAlign: TextAlign.center,
+              style: WBTypography.body.copyWith(
+                color: WBColors.fgSecondary,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: WBSpacing.xl),
+            WBButton(
+              label: l.authSignIn,
+              size: WBButtonSize.lg,
+              fullWidth: true,
+              trailingIcon: WBIconName.arrowRight,
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.signIn),
+            ),
+            const SizedBox(height: WBSpacing.sm + 4),
+            WBButton(
+              label: l.authCreateAccount,
+              size: WBButtonSize.lg,
+              fullWidth: true,
+              variant: WBButtonVariant.secondary,
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.createAccount),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignedInAccount(
+    BuildContext context,
+    WidgetRef ref,
+    UserProfile? profile,
+  ) {
     return Scaffold(
       backgroundColor: WBColors.bgPrimary,
       body: SafeArea(
@@ -47,22 +134,20 @@ class AccountScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 140),
           children: [
-            _AccountHeader(profile: profile.value),
+            _AccountHeader(profile: profile),
             const SizedBox(height: 24),
             for (final section in _sections(context, ref)) ...[
               AccountMenuSectionCard(section: section),
               const SizedBox(height: 12),
             ],
-            if (isLoggedIn) ...[
-              _buildBadgeStatusCard(context, ref),
-              const SizedBox(height: 12),
-            ],
+            _buildBadgeStatusCard(context, ref),
+            const SizedBox(height: 12),
             if (_isTestUser(ref)) ...[
               _buildTestNotificationButton(context, ref),
               const SizedBox(height: 12),
             ],
             AccountMenuSectionCard(
-              section: _destructiveSection(context, ref, isLoggedIn),
+              section: _destructiveSection(context, ref, true),
             ),
           ],
         ),
@@ -185,6 +270,9 @@ class AccountScreen extends ConsumerWidget {
     ];
   }
 
+  // Only rendered for signed-in users (the guest state replaces the whole
+  // screen with a sign-in prompt), so [isLoggedIn] is always true here. The
+  // parameter is retained for call-site clarity.
   AccountMenuSection _destructiveSection(
     BuildContext context,
     WidgetRef ref,
@@ -194,30 +282,29 @@ class AccountScreen extends ConsumerWidget {
     return AccountMenuSection(
       title: '',
       rows: [
-        if (isLoggedIn)
-          AccountMenuRow(
-            icon: WBIconName.trash,
-            label: l.accountDelete,
-            danger: true,
-            onTap: () {
-              ConfirmationModal.show(
-                context,
-                title: 'Delete Account',
-                message:
-                    'Are you sure you want to permanently delete your account? '
-                    'This action cannot be undone. All your data, orders, and '
-                    'profile information will be permanently removed.',
-                confirmLabel: 'Delete Account',
-                cancelLabel: 'Cancel',
-                onConfirm: () => _handleDeleteAccount(context, ref),
-              );
-            },
-          ),
+        AccountMenuRow(
+          icon: WBIconName.trash,
+          label: l.accountDelete,
+          danger: true,
+          onTap: () {
+            ConfirmationModal.show(
+              context,
+              title: 'Delete Account',
+              message:
+                  'Are you sure you want to permanently delete your account? '
+                  'This action cannot be undone. All your data, orders, and '
+                  'profile information will be permanently removed.',
+              confirmLabel: 'Delete Account',
+              cancelLabel: 'Cancel',
+              onConfirm: () => _handleDeleteAccount(context, ref),
+            );
+          },
+        ),
         AccountMenuRow(
           icon: WBIconName.logout,
-          label: isLoggedIn ? l.authSignOut : l.authSignIn,
-          danger: isLoggedIn,
-          onTap: () => _handleAuthAction(context, ref, isLoggedIn),
+          label: l.authSignOut,
+          danger: true,
+          onTap: () => _handleAuthAction(context, ref),
         ),
       ],
     );
@@ -226,12 +313,7 @@ class AccountScreen extends ConsumerWidget {
   Future<void> _handleAuthAction(
     BuildContext context,
     WidgetRef ref,
-    bool isLoggedIn,
   ) async {
-    if (!isLoggedIn) {
-      Navigator.of(context).pushNamed(AppRoutes.signIn);
-      return;
-    }
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -480,7 +562,10 @@ class _AccountHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                name.isNotEmpty ? name : context.l10n.accountGuest,
+                // Signed-in only (guests get the dedicated guest screen), so
+                // fall back to a neutral label rather than "Guest" when a
+                // signed-in profile has no name yet.
+                name.isNotEmpty ? name : 'WAWUBeauty user',
                 style: WBTypography.cardTitle.copyWith(
                   fontWeight: FontWeight.w600,
                   fontSize: 20,
