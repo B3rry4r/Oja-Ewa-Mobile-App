@@ -18,6 +18,24 @@ class AuthController extends Notifier<AuthState> {
     return const AuthUnknown();
   }
 
+  /// When the live session token was last (re)minted via [setTokens] (login,
+  /// register, Google sign-in, refresh). The 401 interceptor reads this to
+  /// suppress an immediate sign-out in the brief window right after sign-in:
+  /// the post-login burst of authed calls can race the just-set token and a
+  /// transient 401 there must NOT undo the login the user just completed
+  /// ("logged in, then bounced back to onboarding").
+  DateTime? sessionEstablishedAt;
+
+  /// Grace window after a session is minted during which a 401 on an
+  /// authenticated endpoint is treated as a race against the fresh token rather
+  /// than a genuine expiry.
+  static const Duration freshSessionGrace = Duration(seconds: 8);
+
+  bool get isSessionFresh {
+    final at = sessionEstablishedAt;
+    return at != null && DateTime.now().difference(at) < freshSessionGrace;
+  }
+
   Future<void> loadFromStorage() async {
     try {
       final storage = ref.read(secureTokenStorageProvider);
@@ -47,6 +65,7 @@ class AuthController extends Notifier<AuthState> {
       await storage.writeRefreshToken(refreshToken);
     }
     AppEnv.accessToken = accessToken; // Set for Pusher authorization
+    sessionEstablishedAt = DateTime.now();
     state = AuthAuthenticated(accessToken: accessToken);
   }
 
@@ -93,6 +112,7 @@ class AuthController extends Notifier<AuthState> {
     await storage.deleteAccessToken();
     await storage.deleteRefreshToken();
     AppEnv.accessToken = null; // Clear Pusher authorization
+    sessionEstablishedAt = null;
     state = const AuthUnauthenticated();
   }
 }
