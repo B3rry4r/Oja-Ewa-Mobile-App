@@ -392,12 +392,14 @@ class _BadgeVerificationsScreenState
 
     setState(() => _isSubmitting = true);
     try {
-      final purchase = await ref
-          .read(iapServiceProvider)
-          .purchaseService(productId);
+      final iap = ref.read(iapServiceProvider);
+      final purchase = await iap.purchaseService(productId);
       if (purchase == null) {
         if (mounted) {
-          AppSnackbars.showError(context, 'Payment was not completed');
+          AppSnackbars.showError(
+            context,
+            iap.lastServiceError ?? 'Payment was not completed',
+          );
         }
         return;
       }

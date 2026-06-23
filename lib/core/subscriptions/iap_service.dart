@@ -29,45 +29,88 @@ class IapService {
   List<ProductDetails> _products = [];
   bool _isAvailable = false;
   bool _isInitialized = false;
+  // De-dupes concurrent initialize() calls. The provider fires initialize()
+  // without awaiting it, so a fast purchase tap can call it again before the
+  // first finishes — without this guard each call would attach another
+  // purchaseStream listener (double-delivery) and re-query products.
+  Future<void>? _initFuture;
   Completer<AppServicePurchase?>? _servicePurchaseCompleter;
   String? _pendingServiceProductId;
+  // Human-readable reason the last service purchase returned null, so the UI
+  // can show "Store unavailable"/"canceled"/etc. instead of a blanket
+  // "Payment was not completed".
+  String? _lastServiceError;
 
   /// Whether IAP is available on this device
   bool get isAvailable => _isAvailable;
 
+  /// Reason the most recent purchaseService() returned null, if any.
+  String? get lastServiceError => _lastServiceError;
+
   /// Available products loaded from the store
   List<ProductDetails> get products => _products;
 
-  /// Initialize the IAP service
-  Future<void> initialize() async {
-    if (_isInitialized) return;
+  /// Initialize the IAP service.
+  ///
+  /// Idempotent and safe to call concurrently: the first in-flight run is
+  /// shared by later callers, so we never attach a second purchaseStream
+  /// listener. If the store reports unavailable, _isInitialized stays false so
+  /// a later call (e.g. from ensureReady) retries the connection.
+  Future<void> initialize() {
+    if (_isInitialized) return Future.value();
+    return _initFuture ??= _doInitialize();
+  }
 
-    _isAvailable = await _iap.isAvailable();
+  Future<void> _doInitialize() async {
+    try {
+      _isAvailable = await _iap.isAvailable();
 
+      if (!_isAvailable) {
+        debugPrint('IAP: Store not available on this device');
+        return;
+      }
+
+      // Enable pending purchases for Android
+      if (Platform.isAndroid) {
+        _iap.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+        // Pending purchases are enabled by default in newer versions
+        // No explicit call needed
+      }
+
+      // Listen for purchase updates
+      _purchaseSubscription = _iap.purchaseStream.listen(
+        _handlePurchaseUpdates,
+        onDone: () => _purchaseSubscription?.cancel(),
+        onError: (error) => debugPrint('IAP Purchase Stream Error: $error'),
+      );
+
+      // Load products
+      await loadProducts();
+
+      _isInitialized = true;
+      debugPrint('IAP: Initialized successfully');
+    } finally {
+      _initFuture = null;
+    }
+  }
+
+  /// Make sure the store connection is up and products are loaded before a
+  /// purchase is attempted. The provider kicks off initialize() without
+  /// awaiting it, so a quick tap can race ahead of init — surfacing as a
+  /// spurious "Payment was not completed". Re-running init here is idempotent
+  /// (deduped via _initFuture) and closes that race.
+  Future<void> ensureReady() async {
+    if (!_isInitialized) {
+      await initialize();
+    }
+    // isAvailable() can transiently report false on a cold start; re-check.
     if (!_isAvailable) {
-      debugPrint('IAP: Store not available on this device');
-      return;
+      _isAvailable = await _iap.isAvailable();
     }
-
-    // Enable pending purchases for Android
-    if (Platform.isAndroid) {
-      _iap.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
-      // Pending purchases are enabled by default in newer versions
-      // No explicit call needed
+    // Products may not have loaded yet (or the first query returned none).
+    if (_isAvailable && _products.isEmpty) {
+      await loadProducts();
     }
-
-    // Listen for purchase updates
-    _purchaseSubscription = _iap.purchaseStream.listen(
-      _handlePurchaseUpdates,
-      onDone: () => _purchaseSubscription?.cancel(),
-      onError: (error) => debugPrint('IAP Purchase Stream Error: $error'),
-    );
-
-    // Load products
-    await loadProducts();
-
-    _isInitialized = true;
-    debugPrint('IAP: Initialized successfully');
   }
 
   /// Load products from the store
@@ -97,6 +140,10 @@ class IapService {
 
   /// Purchase a subscription
   Future<bool> purchaseSubscription(String productId) async {
+    // Same init-race guard as purchaseService: ensure the store is up and
+    // products are loaded before attempting a buy.
+    await ensureReady();
+
     if (!_isAvailable) {
       debugPrint('IAP: Store not available');
       return false;
@@ -134,19 +181,34 @@ class IapService {
   }
 
   Future<AppServicePurchase?> purchaseService(String productId) async {
+    _lastServiceError = null;
+
+    // Close the init race: the provider fires initialize() without awaiting,
+    // so on a cold start a fast tap could land here before the store was
+    // available or products were loaded — returning null and showing the
+    // misleading "Payment was not completed". Wait for readiness first.
+    await ensureReady();
+
     if (!_isAvailable) {
       debugPrint('IAP: Store not available');
+      _lastServiceError =
+          'In-app purchases are not available on this device right now. '
+          'Please try again in a moment.';
       return null;
     }
 
     final product = getProduct(productId);
     if (product == null) {
       debugPrint('IAP: Service product not found: $productId');
+      _lastServiceError =
+          'This badge is not available for purchase right now. '
+          'Please try again shortly.';
       return null;
     }
 
     if (_servicePurchaseCompleter != null) {
       debugPrint('IAP: Service purchase already in progress');
+      _lastServiceError = 'A purchase is already in progress.';
       return null;
     }
 
@@ -165,18 +227,24 @@ class IapService {
       );
       if (!success) {
         _clearPendingServicePurchase();
+        _lastServiceError =
+            'The store could not start the purchase. Please try again.';
         return null;
       }
       return completer.future.timeout(
         const Duration(minutes: 2),
         onTimeout: () {
           _clearPendingServicePurchase();
+          _lastServiceError =
+              'The purchase timed out before it completed. If you were '
+              'charged it will be restored automatically.';
           return null;
         },
       );
     } catch (e) {
       _clearPendingServicePurchase();
       debugPrint('IAP: Service purchase error: $e');
+      _lastServiceError = 'Something went wrong starting the purchase.';
       return null;
     }
   }
@@ -299,6 +367,9 @@ class IapService {
       'IAP: Purchase error for ${purchase.productID}: ${purchase.error}',
     );
     if (_isPendingServicePurchase(purchase.productID)) {
+      _lastServiceError = purchase.error?.message.isNotEmpty == true
+          ? purchase.error!.message
+          : 'The payment could not be completed. Please try again.';
       _servicePurchaseCompleter?.complete(null);
       _clearPendingServicePurchase();
     }
@@ -311,6 +382,7 @@ class IapService {
   void _onPurchaseCanceled(PurchaseDetails purchase) {
     debugPrint('IAP: Purchase canceled for ${purchase.productID}');
     if (_isPendingServicePurchase(purchase.productID)) {
+      _lastServiceError = 'Payment was canceled.';
       _servicePurchaseCompleter?.complete(null);
       _clearPendingServicePurchase();
     }
