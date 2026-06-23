@@ -130,6 +130,19 @@ class AuthTokenInterceptor extends Interceptor {
           !_isPublicPath(path) &&
           !path.contains('/api/login') &&
           !path.contains('/api/register')) {
+        final auth = _ref.read(authControllerProvider.notifier);
+
+        // Suppress the sign-out bounce while the session is brand new. Right
+        // after sign-in a burst of authed calls (profile, cart, push-token,
+        // first home fetch) fires almost at once and can race the just-minted
+        // token. A 401 in that window is transient — signing out here would
+        // undo the login the user just completed ("logged in, then bounced
+        // back to onboarding"). Let the call fail; the session stays intact.
+        if (auth.isSessionFresh) {
+          handler.next(err);
+          return;
+        }
+
         _handlingUnauthorized = true;
 
         try {
@@ -138,9 +151,7 @@ class AuthTokenInterceptor extends Interceptor {
           // Sign out locally — this sets state to AuthUnauthenticated.
           // Do NOT call _ref.invalidate(authControllerProvider) — that resets
           // the controller to AuthUnknown and breaks the bootstrap flow.
-          await _ref
-              .read(authControllerProvider.notifier)
-              .signOutLocal();
+          await auth.signOutLocal();
         } catch (_) {
           // Ignore errors during cleanup
         } finally {
