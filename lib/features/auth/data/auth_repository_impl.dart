@@ -29,6 +29,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String phone,
     required String country,
     String? referralCode,
+    String? gender,
   }) async {
     final tokens = await api.register(
       firstname: firstname,
@@ -38,6 +39,7 @@ class AuthRepositoryImpl implements AuthRepository {
       phone: phone,
       country: country,
       referralCode: referralCode,
+      gender: gender,
     );
     await authController.setTokens(
       tokens['accessToken'] ?? '',

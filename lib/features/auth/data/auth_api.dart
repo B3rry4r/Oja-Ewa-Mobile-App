@@ -115,6 +115,7 @@ class AuthApi {
     required String phone,
     required String country,
     String? referralCode,
+    String? gender,
   }) async {
     try {
       // WAWU ID's RegisterDto requires a phone (min 7 chars) and a country.
@@ -125,6 +126,11 @@ class AuthApi {
         'phone': phone,
         'country': country,
       };
+
+      // Optional canonical identity gender (lowercase 'male'|'female').
+      if (gender != null && gender.isNotEmpty) {
+        data['gender'] = gender;
+      }
 
       // Add referral_code if provided
       if (referralCode != null && referralCode.isNotEmpty) {

@@ -20,6 +20,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  // Canonical identity gender (lowercase 'male'|'female'); null = unset.
+  String? _gender;
+  // Tracks whether we've seeded the form from the loaded profile yet.
+  bool _genderInitialized = false;
 
   @override
   void dispose() {
@@ -43,6 +47,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         if (_emailController.text.isEmpty) _emailController.text = u.email;
         if (_phoneController.text.isEmpty) {
           _phoneController.text = u.phone ?? '';
+        }
+        if (!_genderInitialized) {
+          _genderInitialized = true;
+          _gender = u.gender;
         }
       });
     });
@@ -94,6 +102,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
                     ),
+                    const SizedBox(height: 19),
+                    _buildGenderField(),
                     const SizedBox(height: 60),
                     _buildSaveButton(context, actions),
                     const SizedBox(height: 100),
@@ -158,6 +168,77 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
+  Widget _buildGenderField() {
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Gender',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: colors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(child: _buildGenderOption('male', 'Male')),
+            const SizedBox(width: 12),
+            Expanded(child: _buildGenderOption('female', 'Female')),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenderOption(String value, String label) {
+    final colors = context.appColors;
+    final selected = _gender == value;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        // Tapping the selected option clears it (gender is optional).
+        onTap: () {
+          setState(() {
+            _gender = selected ? null : value;
+          });
+        },
+        child: Container(
+          height: 49,
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: selected ? colors.accent : colors.border,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                value == 'male' ? Icons.male_rounded : Icons.female_rounded,
+                size: 20,
+                color: selected ? colors.accent : colors.textSecondary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: selected ? colors.accent : colors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSaveButton(BuildContext context, AsyncValue<void> actions) {
     final colors = context.appColors;
     return Container(
@@ -187,6 +268,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         phone: _phoneController.text.trim().isEmpty
                             ? null
                             : _phoneController.text.trim(),
+                        gender: _gender,
                       );
                   if (!mounted) return;
                   if (ref.read(profileActionsProvider).hasError) {

@@ -18,7 +18,13 @@ class UserRepositoryImpl implements UserRepository {
     required String name,
     required String email,
     String? phone,
-  }) => _api.updateProfile(name: name, email: email, phone: phone);
+    String? gender,
+  }) => _api.updateProfile(
+        name: name,
+        email: email,
+        phone: phone,
+        gender: gender,
+      );
 }
 
 final userApiProvider = Provider<UserApi>((ref) {

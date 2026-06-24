@@ -8,6 +8,7 @@ class UserProfile {
     required this.lastname,
     required this.email,
     this.phone,
+    this.gender,
     this.avatarUrl,
     this.phoneCarrier,
     this.isMtnUser,
@@ -19,6 +20,9 @@ class UserProfile {
   final String lastname;
   final String email;
   final String? phone;
+
+  /// Canonical identity gender (lowercase 'male'|'female'), null if unset.
+  final String? gender;
   final String? avatarUrl;
   final String? phoneCarrier;
   final bool? isMtnUser;
@@ -35,6 +39,7 @@ class UserProfile {
     final lastname = (json['lastname'] as String?) ?? '';
     final email = (json['email'] as String?) ?? '';
     final phone = (json['phone'] as String?) ?? (json['phone_number'] as String?);
+    final gender = (json['gender'] as String?)?.toLowerCase();
     final avatarUrl = (json['avatar_url'] as String?) ?? (json['avatar'] as String?);
     final phoneCarrier = json['phone_carrier'] as String?;
     final isMtnUser = json['is_mtn_user'] as bool?;
@@ -46,6 +51,7 @@ class UserProfile {
       lastname: lastname,
       email: email,
       phone: phone,
+      gender: gender,
       avatarUrl: avatarUrl,
       phoneCarrier: phoneCarrier,
       isMtnUser: isMtnUser,
@@ -58,6 +64,7 @@ class UserProfile {
     String? lastname,
     String? email,
     String? phone,
+    String? gender,
     String? avatarUrl,
     String? phoneCarrier,
     bool? isMtnUser,
@@ -69,6 +76,7 @@ class UserProfile {
       lastname: lastname ?? this.lastname,
       email: email ?? this.email,
       phone: phone ?? this.phone,
+      gender: gender ?? this.gender,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       phoneCarrier: phoneCarrier ?? this.phoneCarrier,
       isMtnUser: isMtnUser ?? this.isMtnUser,
