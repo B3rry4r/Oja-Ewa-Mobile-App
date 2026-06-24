@@ -37,6 +37,8 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
   bool _obscurePassword = true;
   bool _agreeToTerms = false;
+  // Optional canonical identity gender (lowercase 'male'|'female'); null = unset.
+  String? _selectedGender;
   // Phone country code - empty by default
   String _selectedCountryCode = '';
   String _selectedCountryFlag = '';
@@ -89,6 +91,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                 ? _selectedCountryName
                 : 'Nigeria',
             referralCode: referralCode.isNotEmpty ? referralCode : null,
+            gender: _selectedGender,
           );
 
       if (!mounted) return;
@@ -214,6 +217,11 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
           // Phone Number Input
           _buildPhoneInput(),
+
+          const SizedBox(height: 20),
+
+          // Gender Selector (Optional)
+          _buildGenderSelector(),
 
           const SizedBox(height: 20),
 
@@ -462,6 +470,78 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildGenderSelector() {
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Gender (optional)',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: colors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(child: _buildGenderOption('male', 'Male')),
+            const SizedBox(width: 12),
+            Expanded(child: _buildGenderOption('female', 'Female')),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenderOption(String value, String label) {
+    final colors = context.appColors;
+    final selected = _selectedGender == value;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(WBRadius.input),
+        // Tapping the selected option clears it (gender is optional).
+        onTap: () {
+          setState(() {
+            _selectedGender = selected ? null : value;
+          });
+        },
+        child: Container(
+          height: 52,
+          decoration: BoxDecoration(
+            color: WBColors.surfaceInput,
+            borderRadius: BorderRadius.circular(WBRadius.input),
+            border: Border.all(
+              color: selected ? colors.accent : Colors.transparent,
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                value == 'male' ? Icons.male_rounded : Icons.female_rounded,
+                size: 20,
+                color: selected ? colors.accent : WBColors.fgPlaceholder,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: selected ? colors.accent : colors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

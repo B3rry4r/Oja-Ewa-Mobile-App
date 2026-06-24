@@ -7,5 +7,6 @@ abstract interface class UserRepository {
     required String name,
     required String email,
     String? phone,
+    String? gender,
   });
 }

@@ -21,6 +21,7 @@ class UserApi {
     required String name,
     required String email,
     String? phone,
+    String? gender,
   }) async {
     try {
       final res = await _dio.put(
@@ -31,6 +32,8 @@ class UserApi {
           ..._splitName(name),
           'email': email,
           if (phone != null) 'phone': phone,
+          // Lowercase 'male'|'female'; omitted when unset.
+          if (gender != null) 'gender': gender,
         },
       );
       return _extractUser(res.data);

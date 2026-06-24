@@ -24,10 +24,16 @@ class ProfileActionsController extends AsyncNotifier<void> {
     required String name,
     required String email,
     String? phone,
+    String? gender,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await ref.read(userRepositoryProvider).updateProfile(name: name, email: email, phone: phone);
+      await ref.read(userRepositoryProvider).updateProfile(
+            name: name,
+            email: email,
+            phone: phone,
+            gender: gender,
+          );
       ref.invalidate(userProfileProvider);
     });
   }

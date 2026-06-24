@@ -9,6 +9,7 @@ abstract interface class AuthRepository {
     required String phone,
     required String country,
     String? referralCode,
+    String? gender,
   });
 
   Future<void> logout();

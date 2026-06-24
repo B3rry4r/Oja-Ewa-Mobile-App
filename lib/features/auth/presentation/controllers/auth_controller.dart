@@ -45,6 +45,7 @@ class AuthFlowController extends AsyncNotifier<void> {
     required String phone,
     required String country,
     String? referralCode,
+    String? gender,
   }) async {
     state = const AsyncLoading();
     try {
@@ -56,6 +57,7 @@ class AuthFlowController extends AsyncNotifier<void> {
             phone: phone,
             country: country,
             referralCode: referralCode,
+            gender: gender,
           );
       state = const AsyncData(null);
     } catch (e, st) {
