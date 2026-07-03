@@ -13,44 +13,55 @@ class LocationApi {
 
   final Dio _dio;
 
-  /// Fetches list of African countries with their details
-  /// Uses REST Countries API
-  Future<List<Country>> fetchAfricanCountries() async {
-    try {
-      final response = await _dio.get(
-        'https://restcountries.com/v3.1/region/africa',
-        queryParameters: {
-          'fields': 'name,cca2,idd,flag',
-        },
-      );
+  /// ISO2 codes of African countries (for the Africa-only picker).
+  static const _africanIso2 = <String>{
+    'DZ', 'AO', 'BJ', 'BW', 'BF', 'BI', 'CV', 'CM', 'CF', 'TD', 'KM', 'CG', 'CD', 'CI', 'DJ', 'EG',
+    'GQ', 'ER', 'SZ', 'ET', 'GA', 'GM', 'GH', 'GN', 'GW', 'KE', 'LS', 'LR', 'LY', 'MG', 'MW', 'ML',
+    'MR', 'MU', 'MA', 'MZ', 'NA', 'NE', 'NG', 'RW', 'ST', 'SN', 'SC', 'SL', 'SO', 'ZA', 'SS', 'SD',
+    'TZ', 'TG', 'TN', 'UG', 'ZM', 'ZW',
+  };
 
-      final List<dynamic> data = response.data;
+  /// Fetches African countries with their dial codes.
+  Future<List<Country>> fetchAfricanCountries() async {
+    final all = await _fetchCountryCodes();
+    final african = all.where((c) => _africanIso2.contains(c.code.toUpperCase())).toList();
+    african.sort((a, b) => a.name.compareTo(b.name));
+    // Safety: never hand back an empty list if the filter matched nothing.
+    return african.isNotEmpty ? african : all;
+  }
+
+  /// Fetches all countries with their dial codes.
+  Future<List<Country>> fetchAllCountries() async {
+    final all = await _fetchCountryCodes();
+    all.sort((a, b) => a.name.compareTo(b.name));
+    return all;
+  }
+
+  /// Country name + ISO2 + dial code from CountriesNow. (REST Countries v3.1 was
+  /// deprecated — it now 301-redirects to a "version deprecated" error, which is
+  /// why the country-code list stopped loading.) The flag emoji is derived from
+  /// the ISO2 code, so we don't depend on the provider returning one.
+  Future<List<Country>> _fetchCountryCodes() async {
+    try {
+      final response = await _dio.get('https://countriesnow.space/api/v0.1/countries/codes');
+      final data = (response.data is Map ? response.data['data'] : null) as List<dynamic>? ?? [];
       final countries = <Country>[];
 
       for (final item in data) {
-        final name = item['name']?['common'] as String?;
-        final code = item['cca2'] as String?;
-        final flag = item['flag'] as String? ?? '';
-        
-        // Extract dial code
-        final idd = item['idd'] as Map<String, dynamic>?;
-        final root = idd?['root'] as String? ?? '';
-        final suffixes = idd?['suffixes'] as List<dynamic>? ?? [];
-        final suffix = suffixes.isNotEmpty ? suffixes.first as String : '';
-        final dialCode = '$root$suffix';
+        if (item is! Map) continue;
+        final name = item['name'] as String?;
+        final code = item['code'] as String?;
+        final dialCode = (item['dial_code'] as String?)?.trim() ?? '';
 
-        if (name != null && code != null && dialCode.isNotEmpty) {
+        if (name != null && code != null && code.length == 2 && dialCode.isNotEmpty) {
           countries.add(Country(
             name: name,
             code: code,
             dialCode: dialCode,
-            flag: flag,
+            flag: _flagEmoji(code),
           ));
         }
       }
-
-      // Sort alphabetically by name
-      countries.sort((a, b) => a.name.compareTo(b.name));
 
       return countries;
     } catch (e) {
@@ -58,48 +69,14 @@ class LocationApi {
     }
   }
 
-  /// Fetches all countries (not just Africa) for broader support
-  Future<List<Country>> fetchAllCountries() async {
-    try {
-      final response = await _dio.get(
-        'https://restcountries.com/v3.1/all',
-        queryParameters: {
-          'fields': 'name,cca2,idd,flag',
-        },
-      );
-
-      final List<dynamic> data = response.data;
-      final countries = <Country>[];
-
-      for (final item in data) {
-        final name = item['name']?['common'] as String?;
-        final code = item['cca2'] as String?;
-        final flag = item['flag'] as String? ?? '';
-        
-        // Extract dial code
-        final idd = item['idd'] as Map<String, dynamic>?;
-        final root = idd?['root'] as String? ?? '';
-        final suffixes = idd?['suffixes'] as List<dynamic>? ?? [];
-        final suffix = suffixes.isNotEmpty ? suffixes.first as String : '';
-        final dialCode = '$root$suffix';
-
-        if (name != null && code != null && dialCode.isNotEmpty) {
-          countries.add(Country(
-            name: name,
-            code: code,
-            dialCode: dialCode,
-            flag: flag,
-          ));
-        }
-      }
-
-      // Sort alphabetically by name
-      countries.sort((a, b) => a.name.compareTo(b.name));
-
-      return countries;
-    } catch (e) {
-      throw Exception('Failed to fetch countries: $e');
-    }
+  /// Turn an ISO2 country code (e.g. "NG") into its flag emoji (🇳🇬).
+  String _flagEmoji(String code) {
+    final c = code.toUpperCase();
+    if (c.length != 2) return '';
+    final a = c.codeUnitAt(0);
+    final b = c.codeUnitAt(1);
+    if (a < 65 || a > 90 || b < 65 || b > 90) return '';
+    return String.fromCharCode(0x1F1E6 + a - 65) + String.fromCharCode(0x1F1E6 + b - 65);
   }
 
   /// Fetches states/provinces for a given country
