@@ -9,6 +9,13 @@
 String currencyForCountry(String country) {
   final c = country.trim().toLowerCase();
 
+  // No country chosen yet (e.g. before an address is selected on checkout).
+  // This is a Nigeria-first marketplace, so default the DISPLAY to NGN (₦)
+  // rather than the USD fallback — an empty country means "unknown", not
+  // "foreign". The server still resolves the real charge currency from the
+  // delivery country at payment time, so this only affects on-screen symbols.
+  if (c.isEmpty) return 'NGN';
+
   if (['nigeria', 'ng', 'ngn'].contains(c)) return 'NGN';
 
   if (['united kingdom', 'uk', 'great britain', 'england',
