@@ -37,6 +37,11 @@ class _OrderConfirmationScreenState
   static const _returnArgKey = 'returnTo';
   static const _returnToOrderConfirmation = 'orderConfirmation';
   final Map<int, String> _selectedQuotesBySeller = {};
+  // Guards the place-order action: the create-order call goes through the
+  // repository directly (not the orderActions notifier), so its loading state
+  // never flips isBusy. Without this a second tap creates a duplicate order +
+  // duplicate payment link.
+  bool _placingOrder = false;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +49,7 @@ class _OrderConfirmationScreenState
     final optimisticCart = ref.watch(optimisticCartProvider);
     final cartAsync = ref.watch(cartProvider);
     final addressesAsync = ref.watch(addressesProvider);
-    final isBusy = ref.watch(orderActionsProvider).isLoading;
+    final isBusy = ref.watch(orderActionsProvider).isLoading || _placingOrder;
     final checkoutItems = ref.watch(checkoutOrderItemsProvider);
 
     // Use optimistic cart if available, otherwise fall back to cartProvider
@@ -158,13 +163,18 @@ class _OrderConfirmationScreenState
                     )
                     .toList();
 
-                // Show payment method selection
-                final paymentMethod = await PaymentMethodSheet.show(context);
-                if (paymentMethod == null) return;
-
-                if (!context.mounted) return;
+                // Guard against a double-tap creating duplicate orders /
+                // duplicate payment links (disables the button immediately).
+                if (_placingOrder) return;
+                setState(() => _placingOrder = true);
 
                 try {
+                  // Show payment method selection
+                  final paymentMethod = await PaymentMethodSheet.show(context);
+                  if (paymentMethod == null) return;
+
+                  if (!context.mounted) return;
+
                   // Create order first (common for both payment methods)
                   final order = await ref
                       .read(ordersRepositoryProvider)
@@ -199,6 +209,8 @@ class _OrderConfirmationScreenState
                       'Failed to create order: ${e.toString()}',
                     );
                   }
+                } finally {
+                  if (mounted) setState(() => _placingOrder = false);
                 }
               },
       ),

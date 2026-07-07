@@ -350,6 +350,19 @@ class _BusinessAccountReviewScreenState
             );
           }
         }
+
+        // Upload the drawn signature image. Previously only its local device
+        // path was sent to create() as a string and never uploaded, so the DB
+        // held a useless on-device path. Mirror the seller flow: overwrite the
+        // column with the real hosted file URL.
+        if ((draft.authorizedSignatorySignaturePath ?? '').isNotEmpty) {
+          await api.uploadFile(
+            businessId: businessId,
+            fileType: 'authorized_signatory_signature',
+            file: await multipartFromPathCompressed(
+                draft.authorizedSignatorySignaturePath!),
+          );
+        }
       }
 
       if (!context.mounted) return;

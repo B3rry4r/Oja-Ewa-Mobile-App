@@ -7,6 +7,7 @@ import 'package:ojaewa/app/widgets/header_icon_button.dart';
 import 'package:ojaewa/core/resources/app_assets.dart';
 
 import 'package:ojaewa/app/router/app_router.dart';
+import '../controllers/auth_controller.dart';
 import 'password_reset_args.dart';
 
 class VerificationCodeScreen extends ConsumerStatefulWidget {
@@ -86,16 +87,41 @@ class _VerificationCodeScreenState
     );
   }
 
-  void _resendCode() {
+  Future<void> _resendCode() async {
     final colors = context.appColors;
-    // Handle resend code logic
-    debugPrint('Resending code...');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('New code sent to your email'),
-        backgroundColor: colors.accent,
-      ),
-    );
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is! PasswordResetArgs) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Missing details to resend the code'),
+          backgroundColor: colors.accent,
+        ),
+      );
+      return;
+    }
+
+    // Actually re-request a code from WAWU ID (previously this was a no-op that
+    // only showed a fake "code sent" message).
+    try {
+      await ref
+          .read(authFlowControllerProvider.notifier)
+          .forgotPassword(identifier: args.identifier);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('A new code has been sent'),
+          backgroundColor: colors.accent,
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not resend the code. Please try again.'),
+          backgroundColor: colors.accent,
+        ),
+      );
+    }
   }
 
   @override

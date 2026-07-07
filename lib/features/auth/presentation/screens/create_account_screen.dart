@@ -53,6 +53,28 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
       _agreeToTerms;
 
   @override
+  void initState() {
+    super.initState();
+    // Rebuild as the user types so the gated "Create Account" button
+    // (disabled: !_isFormValid) reflects the current field state. Without this
+    // the button could stay greyed out on an already-valid form until an
+    // unrelated setState fired.
+    for (final c in [
+      _firstNameController,
+      _lastNameController,
+      _emailController,
+      _phoneController,
+      _passwordController,
+    ]) {
+      c.addListener(_onFieldChanged);
+    }
+  }
+
+  void _onFieldChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();

@@ -93,6 +93,7 @@ flutter:
     - assets/app_icon/
     - assets/empty_states/
     - assets/brand_icons/
+    - assets/data/
 
   # Typography is Albert Sans, loaded at runtime via google_fonts (WAWUBeauty
   # design system). The legacy Campton font bundle has been removed.

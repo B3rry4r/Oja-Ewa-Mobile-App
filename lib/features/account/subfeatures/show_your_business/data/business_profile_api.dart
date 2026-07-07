@@ -92,7 +92,7 @@ class BusinessProfileApi {
   Future<Map<String, dynamic>> uploadFile({
     required int businessId,
     required String
-    fileType, // business_logo|business_certificates|identity_document
+    fileType, // business_logo|business_certificates|identity_document|authorized_signatory_signature
     required MultipartFile file,
   }) async {
     try {

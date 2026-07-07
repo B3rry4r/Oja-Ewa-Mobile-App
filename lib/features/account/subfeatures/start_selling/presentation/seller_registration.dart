@@ -979,8 +979,9 @@ class _SellerRegistrationScreenState
       AppSnackbars.showError(context, 'Upload the identity document');
       return false;
     }
-    if (int.tryParse(_employeesController.text.trim()) == null) {
-      AppSnackbars.showError(context, 'Number of employees must be numeric');
+    final employees = int.tryParse(_employeesController.text.trim());
+    if (employees == null || employees < 1) {
+      AppSnackbars.showError(context, 'Number of employees must be a number of at least 1');
       return false;
     }
     return true;

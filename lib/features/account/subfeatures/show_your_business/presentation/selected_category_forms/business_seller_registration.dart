@@ -313,6 +313,27 @@ class _BusinessSellerRegistrationScreenState
           ),
           const SizedBox(height: 16),
           _buildLocationDropdown(
+            label: 'Country',
+            value: _selectedCountryName.isEmpty
+                ? 'Select Country'
+                : _selectedCountryName,
+            flag: _selectedCountryFlag.isEmpty ? null : _selectedCountryFlag,
+            onTap: () async {
+              final country = await CountryPickerSheet.show(
+                context,
+                selectedCountry: _selectedCountryName,
+              );
+              if (country != null && mounted) {
+                setState(() {
+                  _selectedCountryName = country.name;
+                  _selectedCountryFlag = country.flag;
+                  _selectedStateName = '';
+                });
+              }
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildLocationDropdown(
             label: 'State / Province',
             value: _selectedStateName.isEmpty
                 ? 'Select State'
@@ -348,6 +369,36 @@ class _BusinessSellerRegistrationScreenState
             controller: _postalCodeController,
             maxLength: 10,
             inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9 -]'))],
+          ),
+          const SizedBox(height: 28),
+          _buildSectionHeader('Section 2: Business Contact & Industry'),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Business Email',
+            'hello@example.com',
+            controller: _emailController,
+            keyboardType: TextInputType.emailAddress,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Business Phone Number',
+            '+2348012345678',
+            controller: _phoneController,
+            keyboardType: TextInputType.phone,
+          ),
+          const SizedBox(height: 16),
+          _buildPickerInput(
+            'Industry / Sector',
+            _industryController.text,
+            hint: 'Select industry',
+            onTap: _pickIndustry,
+          ),
+          const SizedBox(height: 16),
+          _buildTextInput(
+            'Number of Employees',
+            '12',
+            controller: _employeesController,
+            keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 28),
           _buildSectionHeader('Section 4: Authorized Signatory'),
@@ -745,8 +796,9 @@ class _BusinessSellerRegistrationScreenState
       AppSnackbars.showError(context, 'Upload the identity document');
       return false;
     }
-    if (int.tryParse(_employeesController.text.trim()) == null) {
-      AppSnackbars.showError(context, 'Number of employees must be numeric');
+    final employees = int.tryParse(_employeesController.text.trim());
+    if (employees == null || employees < 1) {
+      AppSnackbars.showError(context, 'Number of employees must be a number of at least 1');
       return false;
     }
     return true;
