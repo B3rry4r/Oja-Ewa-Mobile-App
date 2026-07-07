@@ -4,6 +4,24 @@ import '../../../core/network/dio_error_mapper.dart';
 import '../domain/logistics_models.dart';
 import '../domain/order_models.dart';
 
+/// A single page of orders plus the backend pagination meta needed to drive
+/// infinite scroll / "load more".
+class OrdersPage {
+  const OrdersPage({
+    required this.items,
+    required this.currentPage,
+    required this.lastPage,
+    required this.total,
+  });
+
+  final List<OrderSummary> items;
+  final int currentPage;
+  final int lastPage;
+  final int total;
+
+  bool get hasMore => currentPage < lastPage;
+}
+
 class OrdersApi {
   OrdersApi(this._dio);
 
@@ -27,6 +45,60 @@ class OrdersApi {
           .whereType<Map<String, dynamic>>()
           .map(OrderSummary.fromJson)
           .toList();
+    } catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  /// Like [listOrders] but preserves the pagination meta so callers can page
+  /// through the full order history instead of only the first 10.
+  ///
+  /// The backend paginates 10/page. Meta fields may live at the top level of
+  /// the response or nested under `meta` (Laravel resource collections), so we
+  /// read from both.
+  Future<OrdersPage> listOrdersPage({int page = 1}) async {
+    try {
+      final res = await _dio.get(
+        '/api/orders',
+        queryParameters: {'page': page},
+      );
+      final data = res.data;
+      if (data is! Map<String, dynamic>) {
+        throw const FormatException('Unexpected response');
+      }
+
+      final listRaw = data['data'];
+      final items = (listRaw is List)
+          ? listRaw
+              .whereType<Map<String, dynamic>>()
+              .map(OrderSummary.fromJson)
+              .toList()
+          : const <OrderSummary>[];
+
+      final metaRaw = data['meta'];
+      final meta = metaRaw is Map<String, dynamic>
+          ? metaRaw
+          : const <String, dynamic>{};
+
+      int? readInt(dynamic v) =>
+          (v is num) ? v.toInt() : (v is String ? int.tryParse(v) : null);
+
+      final currentPage =
+          readInt(data['current_page']) ?? readInt(meta['current_page']) ?? page;
+      final total =
+          readInt(data['total']) ?? readInt(meta['total']) ?? items.length;
+      final perPage =
+          readInt(data['per_page']) ?? readInt(meta['per_page']) ?? 10;
+      final lastPage = readInt(data['last_page']) ??
+          readInt(meta['last_page']) ??
+          (perPage > 0 ? ((total + perPage - 1) ~/ perPage) : currentPage);
+
+      return OrdersPage(
+        items: items,
+        currentPage: currentPage,
+        lastPage: lastPage,
+        total: total,
+      );
     } catch (e) {
       throw mapDioError(e);
     }

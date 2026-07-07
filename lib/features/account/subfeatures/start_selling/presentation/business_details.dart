@@ -308,9 +308,12 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
       final percentage = controllers.$2.text.trim();
       final nationality = controllers.$3.text.trim();
       final id = controllers.$4.text.trim();
-      if (name.isEmpty &&
-          percentage.isEmpty &&
-          nationality.isEmpty &&
+      // Only send owners whose every required field is present. Partial rows
+      // are rejected earlier in _validateStep2; here we simply drop any row
+      // that isn't fully complete so no empty strings reach the backend.
+      if (name.isEmpty ||
+          percentage.isEmpty ||
+          nationality.isEmpty ||
           id.isEmpty) {
         continue;
       }
@@ -641,6 +644,27 @@ class _BusinessDetailsScreenState extends State<BusinessDetailsScreen> {
         'Complete the settlement and signature fields',
       );
       return false;
+    }
+    // Each owner row must be either entirely empty or fully complete. A row
+    // with some (but not all) of full name, ownership %, nationality and ID
+    // filled would send empty strings and trigger a 422 via `required_with`.
+    for (var i = 1; i <= 3; i++) {
+      final controllers = _ownerControllers(i);
+      final fields = [
+        controllers.$1.text.trim(),
+        controllers.$2.text.trim(),
+        controllers.$3.text.trim(),
+        controllers.$4.text.trim(),
+      ];
+      final filled = fields.where((value) => value.isNotEmpty).length;
+      if (filled > 0 && filled < fields.length) {
+        AppSnackbars.showError(
+          context,
+          'Owner $i is incomplete. Fill full name, ownership %, nationality and '
+          'ID, or clear the row entirely.',
+        );
+        return false;
+      }
     }
     if (_beneficialOwners().isEmpty) {
       AppSnackbars.showError(context, 'Add at least one beneficial owner');

@@ -10,7 +10,11 @@ class ReviewsApi {
 
   Future<ReviewsPage> getReviews({required String type, required int id}) async {
     try {
-      final res = await _dio.get('/api/reviews/$type/$id');
+      // Product pages are guest-browsable, so read product reviews from the
+      // public endpoint (product-only, no auth required). Other entity types
+      // (e.g. business) have no public read endpoint and stay on the authed one.
+      final path = type == 'product' ? '/api/reviews/public/$type/$id' : '/api/reviews/$type/$id';
+      final res = await _dio.get(path);
       final data = res.data;
       if (data is! Map<String, dynamic>) throw const FormatException('Unexpected response');
       return ReviewsPage.fromJson(data);

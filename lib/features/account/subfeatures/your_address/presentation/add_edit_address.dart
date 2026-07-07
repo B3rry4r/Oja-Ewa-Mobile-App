@@ -66,6 +66,85 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
     super.dispose();
   }
 
+  void _showSnack(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: isError ? Colors.redAccent : null,
+        ),
+      );
+  }
+
+  /// Returns the name of the first missing required field, or `null` if valid.
+  String? _firstMissingField() {
+    if (_selectedCountryName.trim().isEmpty) return 'Country';
+    if (_selectedStateName.trim().isEmpty) return 'State';
+    if (_city.text.trim().isEmpty) return 'City/LGA';
+    if (_fullName.text.trim().isEmpty) return 'Full Name';
+    if (_phone.text.trim().isEmpty) return 'Phone Number';
+    if (_addressLine.text.trim().isEmpty) return 'Address Line';
+    if (_postCode.text.trim().isEmpty) return 'Post/Zip Code';
+    return null;
+  }
+
+  Future<void> _onSave() async {
+    final missing = _firstMissingField();
+    if (missing != null) {
+      _showSnack('Please enter $missing.', isError: true);
+      return;
+    }
+
+    final a = Address(
+      id: widget.initialAddress?.id ?? 0,
+      fullName: _fullName.text.trim(),
+      phone: _phone.text.trim(),
+      country: _selectedCountryName.trim(),
+      state: _selectedStateName.trim(),
+      city: _city.text.trim(),
+      postCode: _postCode.text.trim(),
+      addressLine: _addressLine.text.trim(),
+      isDefault: _makeDefault,
+    );
+
+    final notifier = ref.read(addressActionsProvider.notifier);
+    final success = widget.isEdit
+        ? await notifier.updateAddress(a)
+        : await notifier.create(a);
+
+    if (!mounted) return;
+
+    if (success) {
+      _showSnack(widget.isEdit ? 'Address updated.' : 'Address saved.');
+      Navigator.of(context).pop(true);
+    } else {
+      final error = ref.read(addressActionsProvider).error;
+      _showSnack(
+        'Could not save address. ${error ?? 'Please try again.'}',
+        isError: true,
+      );
+    }
+  }
+
+  Future<void> _onDelete() async {
+    final id = widget.initialAddress!.id;
+    final success = await ref.read(addressActionsProvider.notifier).delete(id);
+
+    if (!mounted) return;
+
+    if (success) {
+      _showSnack('Address deleted.');
+      Navigator.of(context).pop(true);
+    } else {
+      final error = ref.read(addressActionsProvider).error;
+      _showSnack(
+        'Could not delete address. ${error ?? 'Please try again.'}',
+        isError: true,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -318,32 +397,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
-          onTap: actions.isLoading
-              ? null
-              : () async {
-                  final a = Address(
-                    id: widget.initialAddress?.id ?? 0,
-                    fullName: _fullName.text.trim(),
-                    phone: _phone.text.trim(),
-                    country: _selectedCountryName,
-                    state: _selectedStateName,
-                    city: _city.text.trim(),
-                    postCode: _postCode.text.trim(),
-                    addressLine: _addressLine.text.trim(),
-                    isDefault: _makeDefault,
-                  );
-
-                  if (widget.isEdit) {
-                    await ref
-                        .read(addressActionsProvider.notifier)
-                        .updateAddress(a);
-                  } else {
-                    await ref.read(addressActionsProvider.notifier).create(a);
-                  }
-
-                  if (!mounted) return;
-                  Navigator.of(context).pop(true);
-                },
+          onTap: actions.isLoading ? null : () => _onSave(),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 20),
             alignment: Alignment.center,
@@ -383,14 +437,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
-          onTap: actions.isLoading
-              ? null
-              : () async {
-                  final id = widget.initialAddress!.id;
-                  await ref.read(addressActionsProvider.notifier).delete(id);
-                  if (!mounted) return;
-                  Navigator.of(context).pop(true);
-                },
+          onTap: actions.isLoading ? null : () => _onDelete(),
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
             child: Center(

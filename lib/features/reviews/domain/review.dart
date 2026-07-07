@@ -101,8 +101,9 @@ class ReviewsPage {
     final data = reviews['data'];
     final list = (data is List) ? data.whereType<Map<String, dynamic>>().map(Review.fromJson).toList() : <Review>[];
 
-    final meta = (reviews['meta'] as Map?)?.cast<String, dynamic>();
-    final total = (meta?['total'] as num?)?.toInt() ?? list.length;
+    // The backend returns a raw Laravel paginator: `total` sits at the top level
+    // of `reviews`, not inside a `meta` wrapper. Fall back to the list length.
+    final total = (reviews['total'] as num?)?.toInt() ?? list.length;
 
     return ReviewsPage(entity: entity, items: list, total: total);
   }

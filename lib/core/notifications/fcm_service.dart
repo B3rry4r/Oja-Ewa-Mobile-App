@@ -362,7 +362,9 @@ class FCMService {
     try {
       await _notificationsApi.registerDeviceToken(
         token: 'web-test-token',
-        deviceType: 'web',
+        // Backend validates device_type in:ios,android,mobile — 'web' is
+        // rejected, so register the web test token as 'mobile'.
+        deviceType: 'mobile',
       );
       debugPrint('Web test token registered');
     } catch (e) {

@@ -88,6 +88,10 @@ class OrderDetailsScreen extends ConsumerWidget {
               children: [
                 _buildOrderInformation(context, effectiveOrder),
                 const SizedBox(height: 16),
+                if (_isCancellable(effectiveOrder.status)) ...[
+                  _CancelOrderButton(orderId: order.id),
+                  const SizedBox(height: 16),
+                ],
                 _buildShippingAddress(context, shippingTo, phone: shippingPhone),
                 const SizedBox(height: 16),
                 _buildItemsInOrder(context, order.items, currency: order.currency),
@@ -1020,6 +1024,97 @@ class _ReorderButtonState extends ConsumerState<_ReorderButton> {
       variant: WBButtonVariant.secondary,
       loading: _loading,
       onPressed: _reorder,
+    );
+  }
+}
+
+/// The backend allows cancelling an order only while it is pending, paid or
+/// processing; anything further along returns 400. Gate the UI on the same set.
+bool _isCancellable(String? status) {
+  final s = (status ?? '').toLowerCase();
+  return s == 'pending' || s == 'paid' || s == 'processing';
+}
+
+/// "Cancel order" CTA shown on cancellable orders. Prompts for a reason,
+/// calls the cancel endpoint and refreshes the order on success.
+class _CancelOrderButton extends ConsumerStatefulWidget {
+  const _CancelOrderButton({required this.orderId});
+
+  final int orderId;
+
+  @override
+  ConsumerState<_CancelOrderButton> createState() => _CancelOrderButtonState();
+}
+
+class _CancelOrderButtonState extends ConsumerState<_CancelOrderButton> {
+  bool _loading = false;
+
+  Future<void> _cancel() async {
+    final controller = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancel Order'),
+        content: TextField(
+          controller: controller,
+          maxLines: 3,
+          decoration: const InputDecoration(
+            labelText: 'Reason',
+            hintText: 'Tell us why you are cancelling this order',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Keep Order'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Cancel Order'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    final reason = controller.text.trim();
+    if (reason.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please provide a reason')),
+      );
+      return;
+    }
+
+    setState(() => _loading = true);
+    try {
+      await ref.read(orderActionsProvider.notifier).cancelOrder(
+            orderId: widget.orderId,
+            reason: reason,
+          );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Order cancelled')),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to cancel order: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WBButton(
+      label: 'Cancel order',
+      fullWidth: true,
+      variant: WBButtonVariant.danger,
+      loading: _loading,
+      onPressed: _cancel,
     );
   }
 }

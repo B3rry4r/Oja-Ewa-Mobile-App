@@ -32,6 +32,9 @@ class AuthTokenInterceptor extends Interceptor {
     '/api/sellers/',
     '/api/sustainability',
 
+    // reviews (public read): product-only byEntityPublic endpoint
+    '/api/reviews/public/',
+
     // business directory (public): index, /search, /filters, /{id}
     '/api/business/public',
 

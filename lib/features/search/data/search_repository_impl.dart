@@ -16,7 +16,6 @@ class SearchRepositoryImpl implements SearchRepository {
     required String query,
     int page = 1,
     int perPage = 10,
-    String? gender,
     String? style,
     String? tribe,
     String? fabricType,
@@ -25,12 +24,12 @@ class SearchRepositoryImpl implements SearchRepository {
     String? categoryType,
     String? categorySlug,
     String? sort,
+    bool browse = false,
   }) {
     return _api.searchProducts(
       query: query,
       page: page,
       perPage: perPage,
-      gender: gender,
       style: style,
       tribe: tribe,
       fabricType: fabricType,
@@ -39,6 +38,7 @@ class SearchRepositoryImpl implements SearchRepository {
       categoryType: categoryType,
       categorySlug: categorySlug,
       sort: sort,
+      browse: browse,
     );
   }
 

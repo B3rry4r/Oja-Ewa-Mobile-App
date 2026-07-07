@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ojaewa/core/auth/auth_providers.dart';
 import '../../data/wishlist_repository_impl.dart';
 import '../../domain/wishlist_item.dart';
 import 'wishlist_controller.dart';
@@ -12,6 +13,10 @@ import 'wishlist_controller.dart';
 class WishlistIdsController extends AsyncNotifier<Set<String>> {
   @override
   FutureOr<Set<String>> build() async {
+    // Don't fetch (guaranteed 401) when signed out.
+    final token = ref.watch(accessTokenProvider);
+    if (token == null || token.isEmpty) return <String>{};
+
     final items = await ref.watch(wishlistRepositoryProvider).getWishlist();
     return items.map((w) => _key(w.type, w.wishlistableId)).toSet();
   }

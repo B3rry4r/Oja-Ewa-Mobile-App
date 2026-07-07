@@ -20,7 +20,7 @@ class VerificationCodeScreen extends ConsumerStatefulWidget {
 
 class _VerificationCodeScreenState
     extends ConsumerState<VerificationCodeScreen> {
-  // WAWU ID issues 6-digit reset codes (and the OTP_BYPASS_CODE is 6 digits).
+  // WAWU ID issues 6-digit reset codes, emailed to the account (no bypass).
   final List<TextEditingController> _codeControllers = List.generate(
     6,
     (_) => TextEditingController(),

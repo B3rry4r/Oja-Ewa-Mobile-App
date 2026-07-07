@@ -250,8 +250,11 @@ class NotificationsScreen extends ConsumerWidget {
 
     final deepLink = notification.deepLink;
     if (deepLink != null && deepLink.isNotEmpty) {
-      _handleDeepLinkNavigation(context, deepLink);
-      return;
+      // Only stop here if we could actually route the deep link; otherwise
+      // fall through to the detail screen so a tap always does something.
+      if (_handleDeepLinkNavigation(context, deepLink)) {
+        return;
+      }
     }
 
     if (!context.mounted) return;
@@ -262,17 +265,21 @@ class NotificationsScreen extends ConsumerWidget {
     );
   }
 
-  void _handleDeepLinkNavigation(BuildContext context, String deepLink) {
+  /// Route off the notification `deep_link`. Returns true if navigation was
+  /// handled, false if the caller should fall back to the detail screen.
+  bool _handleDeepLinkNavigation(BuildContext context, String deepLink) {
     // Expected formats:
     // /business/{id}
     // /products/{id}
     // /orders/{id}
     // /seller/profile
+    // /subscription/{manage|payment|renew}
+    // /profile/edit
     try {
       final uri = Uri.parse(deepLink);
       final segments = uri.pathSegments;
       if (segments.isEmpty) {
-        return;
+        return false;
       }
 
       if (segments.length >= 2 && segments[0] == 'business') {
@@ -283,7 +290,7 @@ class NotificationsScreen extends ConsumerWidget {
               builder: (_) => BusinessDetailsScreen(businessId: id),
             ),
           );
-          return;
+          return true;
         }
       }
 
@@ -295,20 +302,20 @@ class NotificationsScreen extends ConsumerWidget {
               builder: (_) => ProductDetailsScreen(productId: id),
             ),
           );
-          return;
+          return true;
         }
       }
 
       if (segments.isNotEmpty && segments[0] == 'orders') {
         // We don't yet support order-id specific screen; send to orders list.
         Navigator.of(context).pushNamed(AppRoutes.orders);
-        return;
+        return true;
       }
 
       if (segments.length >= 2 && segments[0] == 'seller') {
         if (segments[1] == 'profile') {
           Navigator.of(context).pushNamed(AppRoutes.sellerApprovalStatus);
-          return;
+          return true;
         }
         // Handle /seller/orders/{id}
         if (segments.length >= 3 && segments[1] == 'orders') {
@@ -319,14 +326,28 @@ class NotificationsScreen extends ConsumerWidget {
                 builder: (_) => ShopOrderDetailsScreen(orderId: orderId),
               ),
             );
-            return;
+            return true;
           }
         }
       }
 
-      // Unknown deep link → do nothing
+      // /subscription/{manage|payment|renew} → subscription & payment mgmt
+      if (segments[0] == 'subscription') {
+        Navigator.of(context).pushNamed(AppRoutes.managePayment);
+        return true;
+      }
+
+      // /profile/edit → edit profile
+      if (segments[0] == 'profile') {
+        Navigator.of(context).pushNamed(AppRoutes.editProfile);
+        return true;
+      }
+
+      // Unknown deep link → let the caller fall back to the detail screen.
+      return false;
     } catch (_) {
-      // Ignore invalid deep links
+      // Ignore invalid deep links; caller falls back to the detail screen.
+      return false;
     }
   }
 

@@ -24,28 +24,35 @@ class AddressActionsController extends AsyncNotifier<void> {
   @override
   Future<void> build() async {}
 
-  Future<void> create(Address address) async {
+  /// Returns `true` on success, `false` if the operation failed.
+  /// The error (if any) is captured in [state] for surfacing to the user.
+  Future<bool> create(Address address) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       await ref.read(addressRepositoryProvider).createAddress(address);
       ref.invalidate(addressesProvider);
     });
+    return !state.hasError;
   }
 
-  Future<void> updateAddress(Address address) async {
+  /// Returns `true` on success, `false` if the operation failed.
+  Future<bool> updateAddress(Address address) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       await ref.read(addressRepositoryProvider).updateAddress(address);
       ref.invalidate(addressesProvider);
     });
+    return !state.hasError;
   }
 
-  Future<void> delete(int id) async {
+  /// Returns `true` on success, `false` if the operation failed.
+  Future<bool> delete(int id) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       await ref.read(addressRepositoryProvider).deleteAddress(id);
       ref.invalidate(addressesProvider);
     });
+    return !state.hasError;
   }
 }
 

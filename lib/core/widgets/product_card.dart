@@ -71,11 +71,14 @@ class ProductCard extends StatelessWidget {
                           boxShadow: WBShadows.card,
                         ),
                         alignment: Alignment.center,
-                        child: const WBIcon(
-                          WBIconName.basket,
-                          size: 16,
-                          color: Colors.white,
-                          strokeWidth: 1.6,
+                        child: Icon(
+                          product.isFavorite
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          size: 18,
+                          color: product.isFavorite
+                              ? WBColors.statusError
+                              : Colors.white,
                         ),
                       ),
                     ),

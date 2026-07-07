@@ -53,8 +53,8 @@ class _BusinessSellerRegistrationScreenState
   String _selectedCountryName = '';
   String _selectedCountryFlag = '';
   String _selectedStateName = '';
-  String _businessType = 'limited_liability_company';
-  String _turnoverRange = '50000_to_250000';
+  String _businessType = '';
+  String _turnoverRange = '';
   String _otherBusinessType = '';
   String? _identityDocumentLocalPath;
 
@@ -81,6 +81,19 @@ class _BusinessSellerRegistrationScreenState
     'Creative',
     'Other',
   ];
+  static const _businessTypeLabels = <String, String>{
+    'limited_liability_company': 'Limited Liability Company',
+    'partnership': 'Partnership',
+    'sole_proprietorship_corporate': 'Sole Proprietorship (Corporate)',
+    'non_profit_ngo': 'Non-profit / NGO',
+    'other': 'Other',
+  };
+  static const _turnoverRangeLabels = <String, String>{
+    'under_50000': 'Under ₦50,000',
+    '50000_to_250000': '₦50,000 - ₦250,000',
+    '250000_to_1000000': '₦250,000 - ₦1,000,000',
+    'over_1000000': 'Over ₦1,000,000',
+  };
 
   @override
   void dispose() {
@@ -388,6 +401,13 @@ class _BusinessSellerRegistrationScreenState
           ),
           const SizedBox(height: 16),
           _buildPickerInput(
+            'Business Type',
+            _businessTypeLabels[_businessType] ?? '',
+            hint: 'Select business type',
+            onTap: _pickBusinessType,
+          ),
+          const SizedBox(height: 16),
+          _buildPickerInput(
             'Industry / Sector',
             _industryController.text,
             hint: 'Select industry',
@@ -399,6 +419,13 @@ class _BusinessSellerRegistrationScreenState
             '12',
             controller: _employeesController,
             keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 16),
+          _buildPickerInput(
+            'Annual Turnover Range',
+            _turnoverRangeLabels[_turnoverRange] ?? '',
+            hint: 'Select annual turnover range',
+            onTap: _pickTurnoverRange,
           ),
           const SizedBox(height: 28),
           _buildSectionHeader('Section 4: Authorized Signatory'),
@@ -605,6 +632,42 @@ class _BusinessSellerRegistrationScreenState
     });
   }
 
+  Future<void> _pickBusinessType() async {
+    final labels = _businessTypeLabels.values.toList();
+    final currentLabel = _businessTypeLabels[_businessType];
+    final next = await SelectionBottomSheet.show(
+      context,
+      title: 'Select business type',
+      options: labels,
+      selected: currentLabel ?? labels.first,
+    );
+    if (next == null) return;
+    final entry = _businessTypeLabels.entries.firstWhere(
+      (e) => e.value == next,
+    );
+    setState(() {
+      _businessType = entry.key;
+    });
+  }
+
+  Future<void> _pickTurnoverRange() async {
+    final labels = _turnoverRangeLabels.values.toList();
+    final currentLabel = _turnoverRangeLabels[_turnoverRange];
+    final next = await SelectionBottomSheet.show(
+      context,
+      title: 'Select annual turnover range',
+      options: labels,
+      selected: currentLabel ?? labels.first,
+    );
+    if (next == null) return;
+    final entry = _turnoverRangeLabels.entries.firstWhere(
+      (e) => e.value == next,
+    );
+    setState(() {
+      _turnoverRange = entry.key;
+    });
+  }
+
   Widget _buildLocationDropdown({
     required String label,
     required String value,
@@ -766,6 +829,14 @@ class _BusinessSellerRegistrationScreenState
     }
     if (_selectedCountryName.isEmpty || _selectedStateName.isEmpty) {
       AppSnackbars.showError(context, 'Select your country and state');
+      return false;
+    }
+    if (!_businessTypeLabels.containsKey(_businessType)) {
+      AppSnackbars.showError(context, 'Select your business type');
+      return false;
+    }
+    if (!_turnoverRangeLabels.containsKey(_turnoverRange)) {
+      AppSnackbars.showError(context, 'Select your annual turnover range');
       return false;
     }
     if (_businessNameController.text.trim().isEmpty &&

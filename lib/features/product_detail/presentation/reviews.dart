@@ -144,7 +144,17 @@ class _ReviewsScreenState extends ConsumerState<ReviewsScreen> {
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: ListView.separated(
+                child: reviews.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No reviews yet',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: colors.textSecondary,
+                          ),
+                        ),
+                      )
+                    : ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: reviews.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 12),

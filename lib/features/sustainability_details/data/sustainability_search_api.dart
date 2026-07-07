@@ -17,7 +17,8 @@ class SustainabilitySearchApi {
       final res = await _dio.get(
         '/api/sustainability/search',
         queryParameters: {
-          'q': q,
+          // Omit q when empty so filter/sort-only browsing isn't rejected.
+          if (q.trim().isNotEmpty) 'q': q.trim(),
           'page': page,
           'per_page': perPage,
           if (categorySlug != null && categorySlug.isNotEmpty) 'category_slug': categorySlug,

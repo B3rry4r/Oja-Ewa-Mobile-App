@@ -11,6 +11,11 @@ class OrderStatusUi {
       'out_for_delivery' => 'Out for Delivery',
       'delivered' => 'Delivered',
       'cancelled' => 'Cancelled',
+      // Shipment (logistics) statuses
+      'pending_booking' => 'Awaiting Booking',
+      'booking_failed' => 'Booking Failed',
+      'booked' => 'Booked',
+      'in_transit' => 'In Transit',
       _ => s.isEmpty ? 'Pending' : (s[0].toUpperCase() + s.substring(1)),
     };
   }
@@ -25,6 +30,11 @@ class OrderStatusUi {
       'paid' => const Color(0xFF3095CE),
       'cancelled' => const Color(0xFF8B8B8B),
       'pending' => const Color(0xFFFDAF40),
+      // Shipment (logistics) statuses
+      'in_transit' => const Color(0xFF3095CE),
+      'booked' => const Color(0xFF3095CE),
+      'pending_booking' => const Color(0xFFFDAF40),
+      'booking_failed' => const Color(0xFFD64545),
       _ => const Color(0xFF3095CE),
     };
   }

@@ -39,7 +39,6 @@ class FilterSheet extends ConsumerStatefulWidget {
 
 class _FilterSheetState extends ConsumerState<FilterSheet> {
   // Local filter state (before applying)
-  String? _selectedGender;
   String? _selectedStyle;
   String? _selectedTribe;
   String? _selectedFabricType;
@@ -50,7 +49,6 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     super.initState();
     // Initialize with current selected filters
     final currentFilters = ref.read(selectedFiltersProvider);
-    _selectedGender = currentFilters.gender;
     _selectedStyle = currentFilters.style;
     _selectedTribe = currentFilters.tribe;
     _selectedFabricType = currentFilters.fabricType;
@@ -113,18 +111,6 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
           children: [
             // Header with title and close button
             _buildHeader(),
-
-            // Gender filter section (textiles & shoes_bags only)
-            if (showExtendedFilters && filters.genders.isNotEmpty) ...[
-              _buildSectionTitle('Gender'),
-              const SizedBox(height: 8),
-              _buildChipFilters(
-                options: filters.genders,
-                selected: _selectedGender,
-                onSelected: (value) => setState(() => _selectedGender = value),
-              ),
-              const SizedBox(height: 24),
-            ],
 
             // Style filter section (textiles & shoes_bags only)
             if (showExtendedFilters && filters.styles.isNotEmpty) ...[
@@ -316,7 +302,6 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
             child: OutlinedButton(
               onPressed: () {
                 setState(() {
-                  _selectedGender = null;
                   _selectedStyle = null;
                   _selectedTribe = null;
                   _selectedFabricType = null;
@@ -352,7 +337,6 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               onPressed: () {
                 // Apply filters to the provider
                 final filters = SelectedFilters(
-                  gender: _selectedGender,
                   style: _selectedStyle,
                   tribe: _selectedTribe,
                   fabricType: _selectedFabricType,
@@ -366,7 +350,6 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                 ref
                     .read(selectedFiltersProvider.notifier)
                     .applyFilters(
-                      gender: _selectedGender,
                       style: _selectedStyle,
                       tribe: _selectedTribe,
                       fabricType: _selectedFabricType,

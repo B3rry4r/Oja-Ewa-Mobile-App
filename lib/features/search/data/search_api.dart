@@ -18,7 +18,6 @@ class SearchApi {
     required String query,
     int page = 1,
     int perPage = 10,
-    String? gender,
     String? style,
     String? tribe,
     String? fabricType,
@@ -27,30 +26,32 @@ class SearchApi {
     String? categoryType,
     String? categorySlug,
     String? sort,
+    // When true, hit /api/products/browse instead of /api/products/search.
+    // browse tolerates an empty term AND is the only endpoint that honours
+    // `sort`, so category listings with filters/sort (and no typed term) use it.
+    bool browse = false,
   }) async {
     try {
-      final queryParams = {
-        // Docs require `q`
-        'q': query,
-        // Docs define per_page; page is not documented but we send it to support pagination if implemented
+      final endpoint =
+          browse ? '/api/products/browse' : '/api/products/search';
+      final queryParams = <String, dynamic>{
+        // search requires `q`; browse only needs it when a term was typed.
+        if (!browse || query.isNotEmpty) 'q': query,
         'page': page,
         'per_page': perPage,
-        if (gender != null && gender.isNotEmpty) 'gender': gender,
         if (style != null && style.isNotEmpty) 'style': style,
         if (tribe != null && tribe.isNotEmpty) 'tribe': tribe,
         if (priceMin != null) 'price_min': priceMin,
         if (priceMax != null) 'price_max': priceMax,
-        
-        // These are not in the docs for /search; keep them only if backend supports them.
-        // If backend ignores unknown params, it's safe.
         if (categoryType != null && categoryType.isNotEmpty) 'type': categoryType,
-        if (categorySlug != null && categorySlug.isNotEmpty) 'category_slug': categorySlug,
-        if (sort != null && sort.isNotEmpty) 'sort': sort, // Backend expects 'sort' not 'sort_by'
+        if (categorySlug != null && categorySlug.isNotEmpty)
+          'category_slug': categorySlug,
+        if (sort != null && sort.isNotEmpty) 'sort': sort,
         if (fabricType != null && fabricType.isNotEmpty) 'fabric_type': fabricType,
       };
-      
+
       final res = await _dio.get(
-        '/api/products/search',
+        endpoint,
         queryParameters: queryParams,
       );
 

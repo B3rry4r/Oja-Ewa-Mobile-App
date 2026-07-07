@@ -20,6 +20,30 @@ class OrdersScreen extends ConsumerStatefulWidget {
 class _OrdersScreenState extends ConsumerState<OrdersScreen> {
   String? _selectedStatus;
   int? _reorderingOrderId;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final max = _scrollController.position.maxScrollExtent;
+    final current = _scrollController.position.pixels;
+    // Prefetch a little before hitting the bottom.
+    if (current >= max - 250) {
+      ref.read(ordersRealtimeProvider.notifier).loadMore();
+    }
+  }
 
   Future<void> _reorder(int orderId) async {
     setState(() => _reorderingOrderId = orderId);
@@ -60,7 +84,8 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
       child: ordersAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => const Center(child: Text('Failed to load orders')),
-        data: (orders) {
+        data: (ordersState) {
+          final orders = ordersState.orders;
           final filteredOrders = _selectedStatus == null
               ? orders
               : orders
@@ -77,11 +102,22 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
             );
           }
 
+          // Append a trailing loader row while the next page is loading.
+          final showLoader = ordersState.isLoadingMore;
+          final itemCount = filteredOrders.length + (showLoader ? 1 : 0);
+
           return ListView.separated(
+            controller: _scrollController,
             padding: const EdgeInsets.symmetric(vertical: 16),
-            itemCount: filteredOrders.length,
+            itemCount: itemCount,
             separatorBuilder: (context, index) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
+              if (index >= filteredOrders.length) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
               final order = filteredOrders[index];
               final status = order.status ?? 'pending';
               final statusColor = OrderStatusUi.color(status);

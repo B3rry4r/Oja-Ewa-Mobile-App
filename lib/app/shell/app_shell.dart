@@ -10,6 +10,9 @@ import '../../core/notifications/fcm_service.dart';
 import '../../core/widgets/in_app_notification.dart';
 import '../router/app_router.dart';
 import '../../features/home/presentation/home_screen.dart';
+import '../../features/business_details/presentation/screens/business_details_screen.dart';
+import '../../features/product_detail/presentation/product_detail_screen.dart';
+import '../../features/product_detail/presentation/seller_profile.dart';
 import '../../features/search/presentation/search_screen.dart';
 import '../../features/services/presentation/services_screen.dart';
 import '../../features/wishlist/presentation/wishlist.dart';
@@ -89,49 +92,139 @@ class _AppShellState extends ConsumerState<AppShell> {
 
   void _handleNotificationTap(Map<String, dynamic> data) {
     if (!mounted) return;
-    final type = data['type'] as String?;
-    final id = data['id'];
-    final orderId = data['order_id'] ?? id;
-    final productId = data['product_id'] ?? id;
 
-    switch (type) {
-      case 'order':
-      case 'order_status':
-        if (orderId != null) {
-          Navigator.of(context).pushNamed(
-            AppRoutes.orderDetails,
-            arguments: int.tryParse(orderId.toString()),
+    // Test notifications are the only payloads that carry a `type` key.
+    if (data['type'] == 'test') {
+      Navigator.of(context).pushNamed(AppRoutes.notifications);
+      return;
+    }
+
+    // Real order/business/seller/product payloads route off `deep_link`.
+    final deepLink = data['deep_link'] as String?;
+    if (deepLink != null &&
+        deepLink.isNotEmpty &&
+        _navigateByDeepLink(deepLink, data)) {
+      return;
+    }
+
+    // Fall back to the *_id keys when there's no usable deep link.
+    if (_navigateByIds(data)) return;
+
+    // Nothing matched — show the notifications list.
+    Navigator.of(context).pushNamed(AppRoutes.notifications);
+  }
+
+  /// Route off the notification `deep_link` path. Returns true if it handled
+  /// navigation, false if the caller should fall back to the *_id keys.
+  bool _navigateByDeepLink(String deepLink, Map<String, dynamic> data) {
+    final Uri uri;
+    try {
+      uri = Uri.parse(deepLink);
+    } catch (_) {
+      return false;
+    }
+    final segments = uri.pathSegments;
+    if (segments.isEmpty) return false;
+
+    final second = segments.length >= 2 ? segments[1] : null;
+
+    switch (segments.first) {
+      case 'business':
+        final id = _intFrom(second) ?? _intFrom(data['business_id']);
+        if (id != null) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => BusinessDetailsScreen(businessId: id),
+            ),
           );
+          return true;
+        }
+        return false;
+      case 'products':
+      case 'product':
+        final id =
+            _intFrom(second) ?? _intFrom(data['product_id'] ?? data['id']);
+        if (id != null) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => ProductDetailsScreen(productId: id),
+            ),
+          );
+          return true;
+        }
+        return false;
+      case 'orders':
+        final id = _intFrom(second) ?? _intFrom(data['order_id']);
+        if (id != null) {
+          Navigator.of(context)
+              .pushNamed(AppRoutes.orderDetails, arguments: id);
         } else {
           Navigator.of(context).pushNamed(AppRoutes.orders);
         }
-        break;
-      case 'new_order':
-        // Seller receiving new order - go to shop orders
-        Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
-        break;
-      case 'product':
-      case 'product_approval':
-        if (productId != null) {
-          Navigator.of(context).pushNamed(AppRoutes.yourShopDashboard);
+        return true;
+      case 'seller':
+        // /seller/profile → this user's approval status
+        if (second == 'profile') {
+          Navigator.of(context).pushNamed(AppRoutes.sellerApprovalStatus);
+          return true;
         }
-        break;
-      case 'seller_approval':
-        Navigator.of(context).pushNamed(AppRoutes.sellerApprovalStatus);
-        break;
-      case 'business_approval':
-        Navigator.of(context).pushNamed(AppRoutes.businessApprovalStatus);
-        break;
-      case 'cart':
-        Navigator.of(context).pushNamed(AppRoutes.cart);
-        break;
-      case 'test':
-        Navigator.of(context).pushNamed(AppRoutes.notifications);
-        break;
+        // /seller/{id} → public seller profile
+        final id = _intFrom(second) ?? _intFrom(data['seller_id']);
+        if (id != null) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => SellerProfileScreen(sellerId: id),
+            ),
+          );
+          return true;
+        }
+        return false;
+      case 'subscription':
+        // manage / payment / renew → subscription & payment management
+        Navigator.of(context).pushNamed(AppRoutes.managePayment);
+        return true;
+      case 'profile':
+        // /profile/edit → edit profile
+        Navigator.of(context).pushNamed(AppRoutes.editProfile);
+        return true;
       default:
-        Navigator.of(context).pushNamed(AppRoutes.notifications);
-        break;
+        return false;
     }
+  }
+
+  /// Fallback routing using the `*_id` keys when no deep link matched.
+  bool _navigateByIds(Map<String, dynamic> data) {
+    final orderId = _intFrom(data['order_id']);
+    if (orderId != null) {
+      Navigator.of(context)
+          .pushNamed(AppRoutes.orderDetails, arguments: orderId);
+      return true;
+    }
+    final businessId = _intFrom(data['business_id']);
+    if (businessId != null) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => BusinessDetailsScreen(businessId: businessId),
+        ),
+      );
+      return true;
+    }
+    final sellerId = _intFrom(data['seller_id']);
+    if (sellerId != null) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => SellerProfileScreen(sellerId: sellerId),
+        ),
+      );
+      return true;
+    }
+    return false;
+  }
+
+  int? _intFrom(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    return int.tryParse(value.toString());
   }
 
   @override

@@ -96,6 +96,17 @@ class SellerProfilePayload {
   final String? businessCertificate;
   final String? businessLogo;
 
+  /// Returns true only when [value] is a URL that actually carries a host.
+  /// A bare scheme such as "https://" (the default pre-fill) yields an empty
+  /// host and would be rejected by Laravel's `url` validator.
+  static bool _hasWebsiteHost(String? value) {
+    if (value == null) return false;
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return false;
+    final uri = Uri.tryParse(trimmed);
+    return uri != null && uri.host.isNotEmpty;
+  }
+
   Map<String, dynamic> toJson({bool includeFileFields = true}) {
     return {
       if (businessName.trim().isNotEmpty) 'business_name': businessName,
@@ -104,8 +115,10 @@ class SellerProfilePayload {
         'trading_name': tradingName,
       'business_email': businessEmail,
       'business_phone_number': businessPhoneNumber,
-      if (websiteUrl != null && websiteUrl!.isNotEmpty)
-        'website_url': websiteUrl,
+      // Only send website_url when it has a real host. A bare scheme like
+      // "https://" (the default pre-fill) has no host and fails Laravel's
+      // `url` rule, so it must be omitted.
+      if (_hasWebsiteHost(websiteUrl)) 'website_url': websiteUrl!.trim(),
       if (businessRegistrationNumber.trim().isNotEmpty)
         'business_registration_number': businessRegistrationNumber,
       'tax_identification_number': taxIdentificationNumber,
@@ -119,6 +132,8 @@ class SellerProfilePayload {
         'other_business_type': otherBusinessType,
       'number_of_employees': numberOfEmployees,
       'annual_turnover_range': annualTurnoverRange,
+      if (annualTurnoverCurrency.trim().isNotEmpty)
+        'annual_turnover_currency': annualTurnoverCurrency.trim(),
       'address': address,
       'city': city,
       'state': state,

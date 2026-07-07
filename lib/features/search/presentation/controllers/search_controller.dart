@@ -127,7 +127,6 @@ final searchProvider = FutureProvider.family<SearchState, SearchArgs>((ref, args
         query: q,
         page: 1,
         perPage: 10,
-        gender: f.gender,
         style: f.style,
         tribe: f.tribe,
         priceMin: f.priceMin,

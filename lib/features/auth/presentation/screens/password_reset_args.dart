@@ -1,7 +1,7 @@
 /// Navigation arguments for password reset flow.
 ///
-/// [identifier] is the account's phone number (E.164) entered on the reset
-/// screen — WAWU ID texts the reset code there via Termii.
+/// [identifier] is the account email entered on the reset screen — WAWU ID
+/// emails the 6-digit reset code there (WhatsApp/SMS isn't live yet).
 class PasswordResetArgs {
   const PasswordResetArgs({required this.identifier});
 

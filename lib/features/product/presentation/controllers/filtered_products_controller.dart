@@ -56,10 +56,9 @@ final filteredProductsProvider = FutureProvider.family<FilteredProductsState, Fi
   // Use empty query to get all products, filtered by category type
   // When user searches, the query will be passed
   final result = await ref.read(searchRepositoryProvider).searchProducts(
-        query: '', // Empty for browse, search term when filtering
+        query: '', // No term: browse endpoint handles filter/sort-only browsing
         page: 1,
         perPage: 15,
-        gender: filters.gender,
         style: filters.style,
         tribe: filters.tribe,
         fabricType: filters.fabricType,
@@ -67,6 +66,7 @@ final filteredProductsProvider = FutureProvider.family<FilteredProductsState, Fi
         priceMax: filters.priceMax,
         categoryType: arg.categoryType, // Use type for filtering (textiles, shoes_bags, etc.)
         sort: filters.sortBy,
+        browse: true, // /api/products/browse: q-optional and honours sort
       );
 
   return FilteredProductsState(

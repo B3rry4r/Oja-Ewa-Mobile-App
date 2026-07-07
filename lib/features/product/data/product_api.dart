@@ -99,7 +99,6 @@ class ProductApi {
     required String processingTimeType,
     required int processingDays,
     required num price,
-    int? discount,
     num? weightKg,
     num? lengthCm,
     num? widthCm,
@@ -114,13 +113,12 @@ class ProductApi {
         'processing_days': processingDays,
         'price': price,
       };
-      
+
       if (style != null) map['style'] = style;
       if (tribe != null) map['tribe'] = tribe;
       if (fabricType != null) map['fabric_type'] = fabricType;
       if (sizes != null && sizes.isNotEmpty) map['size'] = sizes.join(',');
-      if (discount != null) map['discount'] = discount;
-      
+
       if (weightKg != null) map['weight_kg'] = weightKg;
       if (lengthCm != null) map['length_cm'] = lengthCm;
       if (widthCm != null) map['width_cm'] = widthCm;
@@ -173,7 +171,6 @@ class ProductApi {
     String? processingTimeType,
     int? processingDays,
     num? price,
-    int? discount,
     num? weightKg,
     num? lengthCm,
     num? widthCm,
@@ -191,8 +188,7 @@ class ProductApi {
       if (processingTimeType != null) map['processing_time_type'] = processingTimeType;
       if (processingDays != null) map['processing_days'] = processingDays;
       if (price != null) map['price'] = price;
-      if (discount != null) map['discount'] = discount;
-      
+
       if (weightKg != null) map['weight_kg'] = weightKg;
       if (lengthCm != null) map['length_cm'] = lengthCm;
       if (widthCm != null) map['width_cm'] = widthCm;

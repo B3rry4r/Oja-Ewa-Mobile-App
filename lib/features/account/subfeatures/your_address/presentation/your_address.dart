@@ -35,15 +35,22 @@ class AddressesScreen extends ConsumerWidget {
             return _buildEmptyState(context);
           }
 
-          final defaultAddress = items.firstWhere(
-            (a) => a.isDefault,
-            orElse: () => items.first,
-          );
+          // Show default address(es) first, keeping all addresses visible.
+          final sorted = [...items]
+            ..sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildAddressCard(context, defaultAddress),
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.zero,
+                itemCount: sorted.length,
+                separatorBuilder: (_, _) => const SizedBox(height: 16),
+                itemBuilder: (_, index) =>
+                    _buildAddressCard(context, ref, sorted[index]),
+              ),
               const SizedBox(height: 40),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -68,7 +75,11 @@ class AddressesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAddressCard(BuildContext context, Address address) {
+  Widget _buildAddressCard(
+    BuildContext context,
+    WidgetRef ref,
+    Address address,
+  ) {
     final colors = context.appColors;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -143,54 +154,140 @@ class AddressesScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              InkWell(
-                onTap: () async {
-                  final updated = await Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          AddEditAddressScreen(initialAddress: address),
-                    ),
-                  );
-
-                  if (updated == true && context.mounted) {
-                    // Pop back to order confirmation flow if needed.
-                    final args = ModalRoute.of(context)?.settings.arguments;
-                    final returnToOrderConfirmation =
-                        args is Map && args['returnTo'] == 'orderConfirmation';
-                    if (returnToOrderConfirmation) {
-                      Navigator.of(context).pop(true);
-                    }
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 8,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.edit_outlined,
-                        size: 20,
-                        color: colors.textSecondary,
-                      ),
-                      SizedBox(width: 9),
-                      Text(
-                        'Edit',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: colors.textSecondary,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  InkWell(
+                    onTap: () async {
+                      final updated = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              AddEditAddressScreen(initialAddress: address),
                         ),
+                      );
+
+                      if (updated == true && context.mounted) {
+                        // Pop back to order confirmation flow if needed.
+                        final args = ModalRoute.of(context)?.settings.arguments;
+                        final returnToOrderConfirmation = args is Map &&
+                            args['returnTo'] == 'orderConfirmation';
+                        if (returnToOrderConfirmation) {
+                          Navigator.of(context).pop(true);
+                        }
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 8,
                       ),
-                    ],
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.edit_outlined,
+                            size: 20,
+                            color: colors.textSecondary,
+                          ),
+                          SizedBox(width: 9),
+                          Text(
+                            'Edit',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: colors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                  InkWell(
+                    onTap: () => _confirmDelete(context, ref, address),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 8,
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.delete_outline,
+                            size: 20,
+                            color: Colors.redAccent,
+                          ),
+                          const SizedBox(width: 9),
+                          const Text(
+                            'Delete',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.redAccent,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _confirmDelete(
+    BuildContext context,
+    WidgetRef ref,
+    Address address,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete address?'),
+        content: Text(
+          'Are you sure you want to delete the address for ${address.fullName}?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: Colors.redAccent),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    final success =
+        await ref.read(addressActionsProvider.notifier).delete(address.id);
+
+    if (!context.mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    if (success) {
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text('Address deleted.')));
+    } else {
+      final error = ref.read(addressActionsProvider).error;
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Could not delete address. ${error ?? 'Please try again.'}',
+            ),
+          ),
+        );
+    }
   }
 
   Widget _buildEmptyState(BuildContext context) {

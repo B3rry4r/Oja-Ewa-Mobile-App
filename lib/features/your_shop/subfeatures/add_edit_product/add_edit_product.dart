@@ -9,6 +9,8 @@ import 'package:ojaewa/features/categories/presentation/controllers/category_con
 import 'package:ojaewa/features/categories/presentation/widgets/category_tree_picker_sheet.dart';
 import 'package:ojaewa/core/widgets/selection_bottom_sheet.dart';
 import 'package:ojaewa/features/categories/domain/category_catalog.dart';
+import 'package:ojaewa/features/categories/domain/category_node.dart';
+import 'package:ojaewa/features/product/data/product_repository_impl.dart';
 import 'package:ojaewa/features/your_shop/presentation/controllers/seller_product_controller.dart';
 
 /// Fetch form options from categories endpoint
@@ -28,6 +30,12 @@ class AddProductScreen extends ConsumerStatefulWidget {
     this.categoryType,
     this.categoryId,
     this.categoryName,
+    this.initialName,
+    this.initialDescription,
+    this.initialStyle,
+    this.initialTribe,
+    this.initialSizes,
+    this.initialPrice,
   });
 
   final String?
@@ -42,6 +50,16 @@ class AddProductScreen extends ConsumerStatefulWidget {
   /// The selected category name for display
   final String? categoryName;
 
+  /// Seed values already known from the ShopProduct being edited. These are
+  /// shown immediately (before the details fetch completes) and act as a
+  /// fallback if that fetch fails, so the form is never fully blank.
+  final String? initialName;
+  final String? initialDescription;
+  final String? initialStyle;
+  final String? initialTribe;
+  final List<String>? initialSizes;
+  final String? initialPrice;
+
   @override
   ConsumerState<AddProductScreen> createState() => _AddProductScreenState();
 }
@@ -50,7 +68,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
-  final _discountController = TextEditingController();
   final _weightController = TextEditingController();
   final _lengthController = TextEditingController();
   final _widthController = TextEditingController();
@@ -58,6 +75,14 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   final _processingDaysController = TextEditingController(text: '3');
 
   String? _imagePath;
+
+  /// Existing hosted image URL when editing (so the seller isn't forced to
+  /// re-upload). Counts as a valid image on submit.
+  String? _existingImageUrl;
+
+  /// True while the existing product is being fetched for editing.
+  bool _loading = false;
+
   String? _selectedStyle;
   String? _selectedTribe;
   String? _selectedFabricType;
@@ -86,6 +111,143 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     _categoryType = widget.categoryType ?? 'textiles';
     _categoryId = widget.categoryId;
     _categoryName = widget.categoryName;
+
+    if (isEditing) {
+      // Seed with what we already know from the ShopProduct so the form isn't
+      // blank while (and if) the details fetch is in flight/fails.
+      if (widget.initialName != null) _nameController.text = widget.initialName!;
+      if (widget.initialDescription != null) {
+        _descriptionController.text = widget.initialDescription!;
+      }
+      if (widget.initialPrice != null && widget.initialPrice!.isNotEmpty) {
+        _priceController.text = widget.initialPrice!;
+      }
+      if (widget.initialStyle != null && widget.initialStyle!.isNotEmpty) {
+        _selectedStyle = widget.initialStyle;
+      }
+      if (widget.initialTribe != null && widget.initialTribe!.isNotEmpty) {
+        _selectedTribe = widget.initialTribe;
+      }
+      if (widget.initialSizes != null) {
+        _selectedSizes.addAll(widget.initialSizes!);
+      }
+      _loadProduct();
+    }
+  }
+
+  /// Fetch the existing product and populate the form so editing doesn't force
+  /// a full re-entry (including re-uploading the image).
+  Future<void> _loadProduct() async {
+    final id = int.tryParse(widget.productId!);
+    if (id == null) return;
+
+    setState(() => _loading = true);
+    try {
+      final json = await ref
+          .read(productRepositoryProvider)
+          .getProductDetails(id);
+
+      // Resolve category type/name from the category id via the catalog, since
+      // the details response only carries the numeric category id.
+      final categoryId = _asInt(json['category_id']) ??
+          _asInt((json['category'] as Map<String, dynamic>?)?['id']);
+      if (categoryId != null) {
+        final catalog = await ref.read(allCategoriesProvider.future);
+        final match = _findCategory(catalog, categoryId);
+        if (match != null) {
+          _categoryType = match.type;
+          _categoryName = match.name;
+        }
+        _categoryId = categoryId;
+      }
+
+      // Basic fields
+      _nameController.text = (json['name'] as String?) ?? '';
+      _descriptionController.text = (json['description'] as String?) ?? '';
+      final price = json['price'];
+      if (price != null) _priceController.text = price.toString();
+
+      final processingDays = _asInt(json['processing_days']);
+      if (processingDays != null) {
+        _processingDaysController.text = processingDays.toString();
+      }
+      final processingType = json['processing_time_type'] as String?;
+      if (processingType != null && processingType.isNotEmpty) {
+        _processingTimeType = processingType;
+      }
+
+      // Shipping dimensions
+      final weight = json['weight_kg'];
+      if (weight != null) _weightController.text = weight.toString();
+      final length = json['length_cm'];
+      if (length != null) _lengthController.text = length.toString();
+      final width = json['width_cm'];
+      if (width != null) _widthController.text = width.toString();
+      final height = json['height_cm'];
+      if (height != null) _heightController.text = height.toString();
+
+      // Category-specific fields
+      final style = json['style'] as String?;
+      if (style != null && style.isNotEmpty) _selectedStyle = style;
+      final tribe = json['tribe'] as String?;
+      if (tribe != null && tribe.isNotEmpty) _selectedTribe = tribe;
+      final fabricType = json['fabric_type'] as String?;
+      if (fabricType != null && fabricType.isNotEmpty) {
+        _selectedFabricType = fabricType;
+      }
+
+      // Sizes: API sends a comma-separated string under "size"
+      final sizeRaw = json['size'] ?? json['sizes'];
+      _selectedSizes
+        ..clear()
+        ..addAll(_parseSizes(sizeRaw));
+
+      // Existing hosted image so re-upload isn't required
+      final image = json['image'] as String?;
+      if (image != null && image.isNotEmpty) _existingImageUrl = image;
+
+      if (mounted) setState(() => _loading = false);
+    } catch (e) {
+      if (mounted) {
+        setState(() => _loading = false);
+        AppSnackbars.showError(context, 'Failed to load product: ${e.toString()}');
+      }
+    }
+  }
+
+  int? _asInt(dynamic v) {
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    if (v is String) return int.tryParse(v);
+    return null;
+  }
+
+  List<String> _parseSizes(dynamic raw) {
+    if (raw is List) {
+      return raw.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList();
+    }
+    if (raw is String) {
+      return raw.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    }
+    return const [];
+  }
+
+  /// Depth-first search across all category types for a node with [id].
+  CategoryNode? _findCategory(CategoryCatalog catalog, int id) {
+    CategoryNode? search(List<CategoryNode> nodes) {
+      for (final node in nodes) {
+        if (node.id == id) return node;
+        final child = search(node.children);
+        if (child != null) return child;
+      }
+      return null;
+    }
+
+    for (final roots in catalog.categories.values) {
+      final found = search(roots);
+      if (found != null) return found;
+    }
+    return null;
   }
 
   @override
@@ -93,7 +255,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     _nameController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
-    _discountController.dispose();
     _weightController.dispose();
     _lengthController.dispose();
     _widthController.dispose();
@@ -115,6 +276,16 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       'afro_beauty_products' => 'Beauty Products',
       _ => 'Product',
     };
+
+    if (_loading) {
+      return AppPageScaffold(
+        title: isEditing ? 'Edit Product' : 'Add $categoryTypeDisplay',
+        child: const Padding(
+          padding: EdgeInsets.only(top: 80),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
 
     return AppPageScaffold(
       title: isEditing ? 'Edit Product' : 'Add $categoryTypeDisplay',
@@ -194,15 +365,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Discount (optional)
-          _buildTextField(
-            label: 'Discount % (optional)',
-            hint: 'Enter discount percentage',
-            controller: _discountController,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: 16),
-
           // Shipping Dimensions (New)
           Text(
             'Shipping Dimensions (Optional)',
@@ -266,7 +428,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
 
   Widget _buildImageUpload() {
     final colors = context.appColors;
-    final hasImage = _imagePath != null && _imagePath!.isNotEmpty;
+    final hasNewImage = _imagePath != null && _imagePath!.isNotEmpty;
+    final hasExistingImage =
+        _existingImageUrl != null && _existingImageUrl!.isNotEmpty;
+    final hasImage = hasNewImage || hasExistingImage;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -293,36 +458,55 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               color: colors.surface,
               borderRadius: BorderRadius.circular(24),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  hasImage ? Icons.check_circle : Icons.cloud_upload_outlined,
-                  size: 40,
-                  color: hasImage
-                      ? const Color(0xFF4CAF50)
-                      : colors.textSecondary,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  hasImage ? 'Image selected' : 'Tap to upload image',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: hasImage
-                        ? const Color(0xFF4CAF50)
-                        : colors.textPrimary,
+            child: hasExistingImage && !hasNewImage
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Image.network(
+                      _existingImageUrl!,
+                      width: double.infinity,
+                      height: 180,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Center(
+                        child: Icon(
+                          Icons.broken_image_outlined,
+                          size: 40,
+                          color: colors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        hasImage
+                            ? Icons.check_circle
+                            : Icons.cloud_upload_outlined,
+                        size: 40,
+                        color: hasImage
+                            ? const Color(0xFF4CAF50)
+                            : colors.textSecondary,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        hasImage ? 'Image selected' : 'Tap to upload image',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: hasImage
+                              ? const Color(0xFF4CAF50)
+                              : colors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'JPG, PNG (max 5MB)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: colors.textSecondary,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'JPG, PNG (max 5MB)',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       ],
@@ -728,8 +912,12 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   }
 
   Future<void> _submitProduct() async {
-    // Validate common fields
-    if (_imagePath == null || _imagePath!.isEmpty) {
+    // Validate common fields. On edit, an already-hosted image URL counts as a
+    // valid image so the seller isn't forced to re-upload.
+    final hasNewImage = _imagePath != null && _imagePath!.isNotEmpty;
+    final hasExistingImage =
+        _existingImageUrl != null && _existingImageUrl!.isNotEmpty;
+    if (!hasNewImage && !hasExistingImage) {
       AppSnackbars.showError(context, 'Please upload a product image');
       return;
     }
@@ -781,8 +969,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       return;
     }
 
-    final discount = int.tryParse(_discountController.text.trim());
-
     try {
       if (isEditing) {
         final productIdInt = int.tryParse(widget.productId!) ?? 0;
@@ -802,7 +988,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               processingTimeType: _processingTimeType,
               processingDays: processingDays,
               price: price,
-              discount: discount,
               weightKg: num.tryParse(_weightController.text.trim()),
               lengthCm: num.tryParse(_lengthController.text.trim()),
               widthCm: num.tryParse(_widthController.text.trim()),
@@ -849,7 +1034,6 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               processingTimeType: _processingTimeType,
               processingDays: processingDays,
               price: price,
-              discount: discount,
               weightKg: num.tryParse(_weightController.text.trim()),
               lengthCm: num.tryParse(_lengthController.text.trim()),
               widthCm: num.tryParse(_widthController.text.trim()),

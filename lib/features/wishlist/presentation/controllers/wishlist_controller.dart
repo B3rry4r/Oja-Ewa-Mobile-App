@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import '../../data/wishlist_repository_impl.dart';
 import '../../domain/wishlist_item.dart';
+import 'wishlist_ids_controller.dart';
 
 final wishlistProvider = FutureProvider<List<WishlistItem>>((ref) async {
   // Don't fetch if not authenticated
@@ -25,6 +26,8 @@ class WishlistActionsController extends AsyncNotifier<void> {
     try {
       await ref.read(wishlistRepositoryProvider).add(type: type, id: id);
       ref.invalidate(wishlistProvider);
+      // Keep the id-set store (backs detail-screen heart) in sync.
+      ref.invalidate(wishlistIdsProvider);
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -37,6 +40,8 @@ class WishlistActionsController extends AsyncNotifier<void> {
     try {
       await ref.read(wishlistRepositoryProvider).remove(type: type, id: id);
       ref.invalidate(wishlistProvider);
+      // Keep the id-set store (backs detail-screen heart) in sync.
+      ref.invalidate(wishlistIdsProvider);
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);

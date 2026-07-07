@@ -6,7 +6,6 @@ abstract interface class SearchRepository {
     required String query,
     int page,
     int perPage,
-    String? gender,
     String? style,
     String? tribe,
     String? fabricType,
@@ -15,6 +14,7 @@ abstract interface class SearchRepository {
     String? categoryType,
     String? categorySlug,
     String? sort,
+    bool browse,
   });
 
   Future<List<SearchProduct>> suggestions({

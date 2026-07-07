@@ -1,20 +1,59 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojaewa/core/auth/auth_providers.dart';
 import 'package:ojaewa/features/cart/data/cart_repository_impl.dart';
 import 'package:ojaewa/features/cart/presentation/controllers/cart_controller.dart';
+import '../../data/orders_api.dart';
 import '../../data/orders_repository_impl.dart';
 import '../../domain/logistics_models.dart';
 import '../../domain/order_models.dart';
 
-final ordersProvider = FutureProvider<List<OrderSummary>>((ref) async {
+final ordersProvider = FutureProvider<OrdersPage>((ref) async {
   // Don't fetch if not authenticated
   final token = ref.watch(accessTokenProvider);
-  if (token == null || token.isEmpty) return const [];
+  if (token == null || token.isEmpty) {
+    return const OrdersPage(items: [], currentPage: 1, lastPage: 1, total: 0);
+  }
 
-  return ref.read(ordersRepositoryProvider).listOrders(page: 1);
+  return ref.read(ordersApiProvider).listOrdersPage(page: 1);
 });
+
+/// Paginated, real-time order list state for the buyer's "Your Orders" screen.
+@immutable
+class OrdersListState {
+  const OrdersListState({
+    required this.orders,
+    required this.currentPage,
+    required this.lastPage,
+    this.isLoadingMore = false,
+  });
+
+  final List<OrderSummary> orders;
+  final int currentPage;
+  final int lastPage;
+  final bool isLoadingMore;
+
+  bool get hasMore => currentPage < lastPage;
+
+  OrdersListState copyWith({
+    List<OrderSummary>? orders,
+    int? currentPage,
+    int? lastPage,
+    bool? isLoadingMore,
+  }) {
+    return OrdersListState(
+      orders: orders ?? this.orders,
+      currentPage: currentPage ?? this.currentPage,
+      lastPage: lastPage ?? this.lastPage,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    );
+  }
+
+  static const empty =
+      OrdersListState(orders: [], currentPage: 1, lastPage: 1);
+}
 
 /// Holds live order status overrides from real-time events.
 class OrderStatusOverridesController extends Notifier<Map<int, String>> {
@@ -31,19 +70,64 @@ final orderStatusOverridesProvider =
       OrderStatusOverridesController.new,
     );
 
-class OrdersRealtimeController extends AsyncNotifier<List<OrderSummary>> {
+class OrdersRealtimeController extends AsyncNotifier<OrdersListState> {
   @override
-  FutureOr<List<OrderSummary>> build() {
+  FutureOr<OrdersListState> build() {
     final async = ref.watch(ordersProvider);
-    async.whenData((data) {
-      state = AsyncData(data);
+    async.whenData((page) {
+      state = AsyncData(
+        OrdersListState(
+          orders: page.items,
+          currentPage: page.currentPage,
+          lastPage: page.lastPage,
+        ),
+      );
     });
-    return async.value ?? const [];
+    final page = async.value;
+    return page == null
+        ? OrdersListState.empty
+        : OrdersListState(
+            orders: page.items,
+            currentPage: page.currentPage,
+            lastPage: page.lastPage,
+          );
+  }
+
+  /// Fetch the next page of orders and append it to the current list.
+  ///
+  /// Mirrors the pagination pattern used elsewhere (e.g. category listing):
+  /// no-op while already loading or when the last page has been reached.
+  Future<void> loadMore() async {
+    final current = state.value;
+    if (current == null) return;
+    if (current.isLoadingMore || !current.hasMore) return;
+
+    state = AsyncData(current.copyWith(isLoadingMore: true));
+
+    final nextPage = current.currentPage + 1;
+    try {
+      final page = await ref.read(ordersApiProvider).listOrdersPage(
+            page: nextPage,
+          );
+      state = AsyncData(
+        current.copyWith(
+          orders: [...current.orders, ...page.items],
+          currentPage: page.currentPage,
+          lastPage: page.lastPage,
+          isLoadingMore: false,
+        ),
+      );
+    } catch (e, st) {
+      // Keep the already-loaded orders, just stop the spinner.
+      state = AsyncData(current.copyWith(isLoadingMore: false));
+      debugPrint('OrdersRealtimeController.loadMore error: $e\n$st');
+    }
   }
 
   void applyStatusUpdate(int orderId, String status) {
-    final current = state.value ?? const [];
-    final updated = current
+    final current = state.value;
+    if (current == null) return;
+    final updated = current.orders
         .map(
           (order) => order.id == orderId
               ? OrderSummary(
@@ -62,13 +146,13 @@ class OrdersRealtimeController extends AsyncNotifier<List<OrderSummary>> {
               : order,
         )
         .toList();
-    state = AsyncData(updated);
+    state = AsyncData(current.copyWith(orders: updated));
     ref.read(orderStatusOverridesProvider.notifier).setStatus(orderId, status);
   }
 }
 
 final ordersRealtimeProvider =
-    AsyncNotifierProvider<OrdersRealtimeController, List<OrderSummary>>(
+    AsyncNotifierProvider<OrdersRealtimeController, OrdersListState>(
       OrdersRealtimeController.new,
     );
 
@@ -179,6 +263,28 @@ class OrderActionsController extends AsyncNotifier<void> {
       ref.invalidate(cartProvider);
       state = const AsyncData(null);
       return added;
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
+  }
+
+  /// Cancel an order the buyer no longer wants.
+  ///
+  /// The backend only allows cancelling pending/paid/processing orders (else
+  /// 400); the UI should already gate the action on a cancellable status.
+  Future<void> cancelOrder({
+    required int orderId,
+    required String reason,
+  }) async {
+    state = const AsyncLoading();
+    try {
+      await ref
+          .read(ordersRepositoryProvider)
+          .cancelOrder(id: orderId, reason: reason);
+      state = const AsyncData(null);
+      ref.invalidate(orderDetailsProvider(orderId));
+      ref.invalidate(ordersProvider);
     } catch (e, st) {
       state = AsyncError(e, st);
       rethrow;

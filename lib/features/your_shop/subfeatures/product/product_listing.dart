@@ -286,7 +286,15 @@ class _ProductListingsScreenState extends ConsumerState<ProductListingsScreen> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => AddProductScreen(productId: product.id),
+                        builder: (_) => AddProductScreen(
+                          productId: product.id,
+                          initialName: product.name,
+                          initialDescription: product.description,
+                          initialStyle: product.style,
+                          initialTribe: product.tribe,
+                          initialSizes: product.sizes,
+                          initialPrice: product.normalPrice,
+                        ),
                       ),
                     );
                   },
