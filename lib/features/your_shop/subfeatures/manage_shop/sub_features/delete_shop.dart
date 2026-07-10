@@ -60,6 +60,8 @@ class _DeleteShopScreenState extends ConsumerState<DeleteShopScreen> {
   @override
   Widget build(BuildContext context) {
     return AppPageScaffold(
+      // Body is a ListView/GridView: it needs a bounded height and scrolls itself.
+      scrollable: false,
       title: 'Why are you leaving',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

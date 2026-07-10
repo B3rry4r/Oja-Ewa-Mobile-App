@@ -29,6 +29,8 @@ class _ReviewsScreenState extends ConsumerState<ReviewsScreen> {
     final colors = context.appColors;
 
     return AppPageScaffold(
+      // Body is a ListView/GridView: it needs a bounded height and scrolls itself.
+      scrollable: false,
       title: 'Reviews',
       showActions: false,
       child: async.when(

@@ -219,6 +219,8 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
         : null;
 
     return AppPageScaffold(
+      // Body is a ListView/GridView: it needs a bounded height and scrolls itself.
+      scrollable: false,
       title: widget.pageTitle,
       child: Builder(
         builder: (context) {

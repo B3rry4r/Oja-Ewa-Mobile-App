@@ -43,6 +43,8 @@ class WishlistScreen extends ConsumerWidget {
     final actions = ref.watch(wishlistActionsProvider);
 
     return AppPageScaffold(
+      // Body is a ListView/GridView: it needs a bounded height and scrolls itself.
+      scrollable: false,
       title: 'Wishlist',
       showBack: false,
       includeBottomNavSpacing: true,

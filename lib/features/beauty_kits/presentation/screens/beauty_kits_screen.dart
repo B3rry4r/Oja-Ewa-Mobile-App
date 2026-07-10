@@ -21,6 +21,8 @@ class BeautyKitsScreen extends ConsumerWidget {
     final kitsAsync = ref.watch(beautyKitsListProvider);
 
     return AppPageScaffold(
+      // Body is a ListView/GridView: it needs a bounded height and scrolls itself.
+      scrollable: false,
       title: 'Beauty Kits',
       child: kitsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

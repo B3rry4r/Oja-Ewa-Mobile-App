@@ -80,6 +80,8 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
     final ordersAsync = ref.watch(ordersRealtimeProvider);
 
     return AppPageScaffold(
+      // Body is a ListView/GridView: it needs a bounded height and scrolls itself.
+      scrollable: false,
       title: 'Your Orders',
       child: ordersAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

@@ -34,6 +34,8 @@ class _ShopOrdersScreenState extends ConsumerState<ShopOrdersScreen> {
     );
 
     return AppPageScaffold(
+      // Body is a ListView/GridView: it needs a bounded height and scrolls itself.
+      scrollable: false,
       title: 'Orders',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

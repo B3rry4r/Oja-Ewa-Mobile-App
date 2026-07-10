@@ -95,6 +95,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         _focusNode.hasFocus && _searchController.text.isNotEmpty;
 
     return AppPageScaffold(
+      // Body is a ListView/GridView: it needs a bounded height and scrolls itself.
+      scrollable: false,
       title: context.l10n.searchTitle,
       showBack: false,
       includeBottomNavSpacing: true,

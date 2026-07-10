@@ -31,6 +31,8 @@ class SellerProfileScreen extends ConsumerWidget {
     final colors = context.appColors;
 
     return AppPageScaffold(
+      // Body is a ListView/GridView: it needs a bounded height and scrolls itself.
+      scrollable: false,
       showActions: true,
       child: sellerAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

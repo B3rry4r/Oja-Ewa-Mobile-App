@@ -20,6 +20,8 @@ class ConnectToUsScreen extends ConsumerWidget {
     final info = ref.watch(connectInfoProvider);
 
     return AppPageScaffold(
+      // Body is a ListView/GridView: it needs a bounded height and scrolls itself.
+      scrollable: false,
       title: 'Connect to us',
       child: info.when(
         loading: () => const Center(child: CircularProgressIndicator()),

@@ -57,6 +57,8 @@ class _SellerCategorySelectionScreenState
   Widget build(BuildContext context) {
     final colors = context.appColors;
     return AppPageScaffold(
+      // Body is a ListView/GridView: it needs a bounded height and scrolls itself.
+      scrollable: false,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

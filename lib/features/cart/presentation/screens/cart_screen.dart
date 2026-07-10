@@ -38,6 +38,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final hasError = ref.watch(cartProvider).hasError && cart == null;
 
     return AppPageScaffold(
+      // Body is a ListView/GridView: it needs a bounded height and scrolls itself.
+      scrollable: false,
       title: context.l10n.cartTitle,
       showActions: false,
       bottomBar: _CheckoutSection(cart: cart),
