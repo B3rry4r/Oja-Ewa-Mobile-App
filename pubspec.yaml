@@ -3,7 +3,13 @@ description: "A new Flutter project."
 
 publish_to: 'none'
 
-version: 1.0.7+60
+# version: <marketing>+<build>
+# CI (.github/workflows/bump-build.yml) only ever increments the build number.
+# The marketing version must be bumped BY HAND once Apple approves a version:
+# approval permanently closes that train, and every later upload fails with
+# "Invalid Pre-Release Train. The train version 'X.Y.Z' is closed".
+# 1.0.5 closed -> 1.0.7. 1.0.7 approved and closed -> 1.0.8.
+version: 1.0.8+61
 
 environment:
   sdk: '>=3.9.0 <4.0.0'
