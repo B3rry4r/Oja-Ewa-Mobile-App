@@ -301,10 +301,10 @@ class AppLocalizationsRw extends AppLocalizations {
   String get accountStartSellingSub => 'Shyira ibicuruzwa byawe ubone abaguzi';
 
   @override
-  String get accountShowBusiness => 'Erekana ubucuruzi bwawe';
+  String get accountShowBusiness => 'Amashuri';
 
   @override
-  String get accountShowBusinessSub => 'Umurage wawe n\'inkuru y\'izina ryawe';
+  String get accountShowBusinessSub => 'Andikisha kandi ucunge ishuri ryawe';
 
   @override
   String get accountEmailUs => 'Twandikire imeyili';

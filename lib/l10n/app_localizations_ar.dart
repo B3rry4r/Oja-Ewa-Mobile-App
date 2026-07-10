@@ -300,10 +300,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get accountStartSellingSub => 'اعرض منتجاتك وتواصل مع المشترين';
 
   @override
-  String get accountShowBusiness => 'اعرض نشاطك التجاري';
+  String get accountShowBusiness => 'المدارس';
 
   @override
-  String get accountShowBusinessSub => 'تراثك وقصة علامتك التجارية';
+  String get accountShowBusinessSub => 'سجّل مدرستك وأدرها';
 
   @override
   String get accountEmailUs => 'راسلنا';

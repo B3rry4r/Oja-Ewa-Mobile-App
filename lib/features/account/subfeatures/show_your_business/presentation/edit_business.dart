@@ -179,7 +179,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const ComplianceProgressBanner(
-                title: 'Business compliance edit',
+                title: 'School compliance edit',
                 subtitle:
                     'Update the legal business profile and submit the full current state back for review.',
                 currentSection: 'Business Information',

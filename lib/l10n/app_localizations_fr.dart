@@ -304,11 +304,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Listez vos produits et atteignez des acheteurs';
 
   @override
-  String get accountShowBusiness => 'Présenter votre entreprise';
+  String get accountShowBusiness => 'Écoles';
 
   @override
-  String get accountShowBusinessSub =>
-      'Votre héritage et l\'histoire de votre marque';
+  String get accountShowBusinessSub => 'Inscrivez et gérez votre école';
 
   @override
   String get accountEmailUs => 'Écrivez-nous';

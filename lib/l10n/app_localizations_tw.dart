@@ -298,10 +298,10 @@ class AppLocalizationsTw extends AppLocalizations {
   String get accountStartSellingSub => 'Fa wo nneɛma kyerɛ na nya atɔfoɔ';
 
   @override
-  String get accountShowBusiness => 'Kyerɛ wo adwuma';
+  String get accountShowBusiness => 'Sukuu';
 
   @override
-  String get accountShowBusinessSub => 'Wo abakɔsɛm ne wo din ho asɛm';
+  String get accountShowBusinessSub => 'Kyerɛw wo sukuu din na hwɛ so';
 
   @override
   String get accountEmailUs => 'Email yɛn';

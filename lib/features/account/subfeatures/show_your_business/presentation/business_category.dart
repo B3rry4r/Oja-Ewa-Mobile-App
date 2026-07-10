@@ -47,7 +47,7 @@ class _BusinessCategoryScreenState
 
           // Screen Title
           Text(
-            "Choose a business category",
+            "Choose your category",
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w600,

@@ -43,11 +43,11 @@ class BusinessApprovalStatusScreen extends ConsumerWidget {
 
           final message = switch (b.storeStatus) {
             'approved' =>
-              'Your business profile is approved. You can manage it now.',
+              'Your school profile is approved. You can manage it now.',
             'pending' =>
-              'We are reviewing your business profile. This takes 12–24 hours.',
+              'We are reviewing your school profile. This takes 12 to 24 hours.',
             'deactivated' =>
-              'Your business profile was deactivated. Please update and resubmit.',
+              'Your school profile was deactivated. Please update and resubmit.',
             _ => 'Status: ${b.storeStatus}',
           };
 

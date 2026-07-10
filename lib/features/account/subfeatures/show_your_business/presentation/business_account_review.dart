@@ -50,7 +50,7 @@ class _BusinessAccountReviewScreenState
         children: [
           const SizedBox(height: 20),
           const ComplianceProgressBanner(
-            title: 'Business compliance review',
+            title: 'School compliance review',
             subtitle:
                 'Review the submitted business sections before the final compliance submission.',
             currentSection: 'Signature',
@@ -76,8 +76,8 @@ class _BusinessAccountReviewScreenState
           const SizedBox(height: 32),
           Text(
             _isSubmitted
-                ? 'Your business has been submitted!\nWe will review it within 12-24 hours.'
-                : 'Ready to submit your business profile?',
+                ? 'Your school has been submitted!\nWe will review it within 12 to 24 hours.'
+                : 'Ready to submit your school profile?',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,

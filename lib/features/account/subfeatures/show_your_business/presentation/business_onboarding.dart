@@ -36,7 +36,7 @@ class BusinessOnboardingScreen extends ConsumerWidget {
     );
 
     return AppPageScaffold(
-      title: 'Show',
+      title: 'Schools',
       scrollable: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +44,7 @@ class BusinessOnboardingScreen extends ConsumerWidget {
           const SizedBox(height: 16),
 
           Text(
-            "Share your Business Heritage on WAWUBeauty",
+            "List your School on WAWUBeauty",
             style: TextStyle(
               fontSize: 33,
               fontWeight: FontWeight.w600,
@@ -82,7 +82,7 @@ class BusinessOnboardingScreen extends ConsumerWidget {
                 _buildStepRow(
                   context,
                   "1",
-                  "Provide your business information",
+                  "Provide your school information",
                 ),
                 _buildStepRow(
                   context,
@@ -92,7 +92,7 @@ class BusinessOnboardingScreen extends ConsumerWidget {
                 _buildStepRow(
                   context,
                   "3",
-                  "Wait and let people looking for your products or services find you",
+                  "Wait and let people looking for your classes find you",
                 ),
               ],
             ),

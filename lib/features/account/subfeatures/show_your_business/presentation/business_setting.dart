@@ -38,7 +38,7 @@ class BusinessSettingsScreen extends ConsumerWidget {
       child: Column(
         children: [
           Text(
-            "Your Business",
+            "Your School",
             style: TextStyle(
               fontSize: 33,
               fontWeight: FontWeight.w600,

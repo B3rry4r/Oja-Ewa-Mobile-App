@@ -302,10 +302,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountStartSellingSub => 'List your products and reach buyers';
 
   @override
-  String get accountShowBusiness => 'Show your business';
+  String get accountShowBusiness => 'Schools';
 
   @override
-  String get accountShowBusinessSub => 'Your heritage and brand story';
+  String get accountShowBusinessSub => 'Register and manage your school';
 
   @override
   String get accountEmailUs => 'Email us';

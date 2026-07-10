@@ -226,7 +226,7 @@ class _BusinessSellerRegistrationScreenState
         children: [
           const SizedBox(height: 20),
           ComplianceProgressBanner(
-            title: (ModalRoute.of(context)?.settings.arguments is Map) ? 'Edit Business Information' : 'Business compliance onboarding',
+            title: (ModalRoute.of(context)?.settings.arguments is Map) ? 'Edit School Information' : 'School compliance onboarding',
             subtitle:
                 'Start with the legal business profile, registered address, and authorized signatory details.',
             currentSection: 'Business Information',

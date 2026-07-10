@@ -685,13 +685,13 @@ abstract class AppLocalizations {
   /// No description provided for @accountShowBusiness.
   ///
   /// In en, this message translates to:
-  /// **'Show your business'**
+  /// **'Schools'**
   String get accountShowBusiness;
 
   /// No description provided for @accountShowBusinessSub.
   ///
   /// In en, this message translates to:
-  /// **'Your heritage and brand story'**
+  /// **'Register and manage your school'**
   String get accountShowBusinessSub;
 
   /// No description provided for @accountEmailUs.

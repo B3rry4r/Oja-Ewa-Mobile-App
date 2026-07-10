@@ -37,7 +37,7 @@ class DeactivateShopScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'This will hide your business from customers until you reactivate it.',
+              'This will hide your school from customers until you reactivate it.',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
