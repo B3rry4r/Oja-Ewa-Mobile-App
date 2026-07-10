@@ -39,57 +39,69 @@ class _BusinessAccountReviewScreenState
     final args = ModalRoute.of(context)?.settings.arguments;
     final draft = draftFromArgs(args, categoryLabelFallback: 'Beauty');
 
+    // Same fix as the seller flow's account_review: AppPageScaffold defaults to
+    // scrollable: false, so this step could not scroll and the submit button was
+    // unreachable on shorter devices. The Spacers below centre the content when
+    // there is room, so ConstrainedBox(minHeight) + IntrinsicHeight are used to
+    // give the Column a bounded height instead of a bare SingleChildScrollView,
+    // which would throw on the unbounded flex.
     return AppPageScaffold(
       showBack: !_isSubmitted,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            const ComplianceProgressBanner(
-              title: 'Business compliance review',
-              subtitle:
-                  'Review the submitted business sections before the final compliance submission.',
-              currentSection: 'Signature',
-              sectionLabels: [
-                'Business Information',
-                'Business Type & Industry',
-                'Registered Office',
-                'Authorized Signatory',
-                'Beneficial Owners',
-                'Banking & Settlement',
-                'Declarations',
-                'Signature',
-              ],
-            ),
-            const Spacer(flex: 2),
-            Icon(
-              _isSubmitted
-                  ? Icons.check_circle
-                  : Icons.access_time_filled_rounded,
-              size: 80,
-              color: colors.accent,
-            ),
-            const SizedBox(height: 32),
-            Text(
-              _isSubmitted
-                  ? 'Your business has been submitted!\nWe will review it within 12-24 hours.'
-                  : 'Ready to submit your business profile?',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: colors.textPrimary,
-                height: 1.5,
+      child: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  const ComplianceProgressBanner(
+                    title: 'Business compliance review',
+                    subtitle:
+                        'Review the submitted business sections before the final compliance submission.',
+                    currentSection: 'Signature',
+                    sectionLabels: [
+                      'Business Information',
+                      'Business Type & Industry',
+                      'Registered Office',
+                      'Authorized Signatory',
+                      'Beneficial Owners',
+                      'Banking & Settlement',
+                      'Declarations',
+                      'Signature',
+                    ],
+                  ),
+                  const Spacer(flex: 2),
+                  Icon(
+                    _isSubmitted
+                        ? Icons.check_circle
+                        : Icons.access_time_filled_rounded,
+                    size: 80,
+                    color: colors.accent,
+                  ),
+                  const SizedBox(height: 32),
+                  Text(
+                    _isSubmitted
+                        ? 'Your business has been submitted!\nWe will review it within 12-24 hours.'
+                        : 'Ready to submit your business profile?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: colors.textPrimary,
+                      height: 1.5,
+                    ),
+                  ),
+                  const Spacer(flex: 3),
+                  _isSubmitted
+                      ? _buildDoneButton(context)
+                      : _buildSubmitButton(context, draft),
+                  const SizedBox(height: 40),
+                ],
               ),
             ),
-            const Spacer(flex: 3),
-            _isSubmitted
-                ? _buildDoneButton(context)
-                : _buildSubmitButton(context, draft),
-            const SizedBox(height: 40),
-          ],
+          ),
         ),
       ),
     );

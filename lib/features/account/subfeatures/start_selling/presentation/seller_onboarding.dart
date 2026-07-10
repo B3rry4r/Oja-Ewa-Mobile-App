@@ -141,7 +141,6 @@ class SellerOnboardingScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           Text(
             'At WAWUBeauty your trust is our foundation. Every product on WAWUBeauty must pass our verification for authenticity and craftsmanship.\n\n'
-            'We guarantee: If a newly registered brand/product fails our review and does not meet our published Quality Standards, its registration fee will be fully refunded.\n\n'
             'We invest in your success by ensuring only excellence reaches our marketplace.\n\n'
             'Based on who you be, we ensure what you sell is worthy.\n\n'
             'The WAWUBeauty Team',

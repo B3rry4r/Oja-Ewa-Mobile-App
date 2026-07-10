@@ -38,59 +38,73 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
     final args = ModalRoute.of(context)?.settings.arguments;
     final draft = sellerDraftFromArgs(args);
 
+    // AppPageScaffold defaults to scrollable: false, which drops the child
+    // straight into an Expanded with no scroll view — so on shorter devices the
+    // banner + quality-standards card + submit button overflowed and the user
+    // could not scroll down to submit. The Spacers below centre the content
+    // when there is room to spare, and a plain SingleChildScrollView would throw
+    // on them (unbounded flex). ConstrainedBox(minHeight) + IntrinsicHeight give
+    // the Column a bounded height, so the Spacers resolve when the content is
+    // shorter than the viewport and the page scrolls when it is taller.
     return AppPageScaffold(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            ComplianceProgressBanner(
-              title: draft.isResubmission ? 'Review Updates' : 'Seller compliance review',
-              subtitle: draft.isResubmission
-                  ? 'Review your updated business information before resubmitting for approval.'
-                  : 'Review the completed compliance sections before final submission. The form will be sent as one full current-state payload.',
-              currentSection: 'Signature',
-              sectionLabels: [
-                'Business Information',
-                'Business Type & Industry',
-                'Registered Office',
-                'Authorized Signatory',
-                'Beneficial Owners',
-                'Banking & Settlement',
-                'Declarations',
-                'Signature',
-              ],
-            ),
-            const Spacer(flex: 2),
-            Icon(
-              Icons.access_time_filled_rounded,
-              size: 80,
-              color: colors.accent,
-            ),
-            const SizedBox(height: 32),
-            Text(
-              _isSubmitted
-                  ? "Your seller application has been submitted\nThis takes 12-24 hours."
-                  : "Ready to submit your seller application?",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: colors.textPrimary,
-                height: 1.5,
+      child: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  ComplianceProgressBanner(
+                    title: draft.isResubmission ? 'Review Updates' : 'Seller compliance review',
+                    subtitle: draft.isResubmission
+                        ? 'Review your updated business information before resubmitting for approval.'
+                        : 'Review the completed compliance sections before final submission. The form will be sent as one full current-state payload.',
+                    currentSection: 'Signature',
+                    sectionLabels: const [
+                      'Business Information',
+                      'Business Type & Industry',
+                      'Registered Office',
+                      'Authorized Signatory',
+                      'Beneficial Owners',
+                      'Banking & Settlement',
+                      'Declarations',
+                      'Signature',
+                    ],
+                  ),
+                  const Spacer(flex: 2),
+                  Icon(
+                    Icons.access_time_filled_rounded,
+                    size: 80,
+                    color: colors.accent,
+                  ),
+                  const SizedBox(height: 32),
+                  Text(
+                    _isSubmitted
+                        ? "Your seller application has been submitted\nThis takes 12-24 hours."
+                        : "Ready to submit your seller application?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: colors.textPrimary,
+                      height: 1.5,
+                    ),
+                  ),
+                  const Spacer(flex: 3),
+                  if (!_isSubmitted) ...[
+                    _buildQualityStandards(),
+                    const SizedBox(height: 24),
+                  ],
+                  _isSubmitted
+                      ? _buildDoneButton(context)
+                      : _buildSubmitButton(draft),
+                  const SizedBox(height: 40),
+                ],
               ),
             ),
-            const Spacer(flex: 3),
-            if (!_isSubmitted) ...[
-              _buildQualityStandards(),
-              const SizedBox(height: 24),
-            ],
-            _isSubmitted
-                ? _buildDoneButton(context)
-                : _buildSubmitButton(draft),
-            const SizedBox(height: 40),
-          ],
+          ),
         ),
       ),
     );
@@ -138,7 +152,6 @@ class _AccountReviewScreenState extends ConsumerState<AccountReviewScreen> {
           const SizedBox(height: 12),
           Text(
             'At WAWUBeauty your trust is our foundation. Every product on WAWUBeauty must pass our verification for authenticity and craftsmanship.\n\n'
-            'We guarantee: If a newly registered brand/product fails our review and does not meet our published Quality Standards, its registration fee will be fully refunded.\n\n'
             'We invest in your success by ensuring only excellence reaches our marketplace.\n\n'
             'Based on who you be, we ensure what you sell is worthy.\n\n'
             'The WAWUBeauty Team',
