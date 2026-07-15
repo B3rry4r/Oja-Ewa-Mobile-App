@@ -22,15 +22,23 @@ void main() {
     test('login persists the returned token', () async {
       when(
         () => api.login(email: 'tester@example.com', password: 'secret'),
-      ).thenAnswer((_) async => 'token-1');
-      when(() => authController.setAccessToken('token-1')).thenAnswer((_) async {});
+      ).thenAnswer((_) async => {'accessToken': 'token-1', 'refreshToken': ''});
+      when(
+        () => authController.setTokens('token-1', '', persist: true),
+      ).thenAnswer((_) async {});
 
-      await repository.login(email: 'tester@example.com', password: 'secret');
+      await repository.login(
+        email: 'tester@example.com',
+        password: 'secret',
+        rememberMe: true,
+      );
 
       verify(
         () => api.login(email: 'tester@example.com', password: 'secret'),
       ).called(1);
-      verify(() => authController.setAccessToken('token-1')).called(1);
+      verify(
+        () => authController.setTokens('token-1', '', persist: true),
+      ).called(1);
     });
 
     test('register forwards referral code and persists the returned token', () async {
@@ -40,16 +48,22 @@ void main() {
           lastname: 'Lovelace',
           email: 'ada@example.com',
           password: 'secret',
+          phone: '08012345678',
+          country: 'Nigeria',
           referralCode: 'REF-42',
         ),
-      ).thenAnswer((_) async => 'token-2');
-      when(() => authController.setAccessToken('token-2')).thenAnswer((_) async {});
+      ).thenAnswer((_) async => {'accessToken': 'token-2', 'refreshToken': ''});
+      when(
+        () => authController.setTokens('token-2', ''),
+      ).thenAnswer((_) async {});
 
       await repository.register(
         firstname: 'Ada',
         lastname: 'Lovelace',
         email: 'ada@example.com',
         password: 'secret',
+        phone: '08012345678',
+        country: 'Nigeria',
         referralCode: 'REF-42',
       );
 
@@ -59,10 +73,12 @@ void main() {
           lastname: 'Lovelace',
           email: 'ada@example.com',
           password: 'secret',
+          phone: '08012345678',
+          country: 'Nigeria',
           referralCode: 'REF-42',
         ),
       ).called(1);
-      verify(() => authController.setAccessToken('token-2')).called(1);
+      verify(() => authController.setTokens('token-2', '')).called(1);
     });
 
     test('logout always clears local auth state even when server logout fails', () async {
@@ -79,7 +95,9 @@ void main() {
       when(
         () => api.googleSignIn(idToken: 'google-token', referralCode: 'REF'),
       ).thenAnswer((_) async => 'token-3');
-      when(() => authController.setAccessToken('token-3')).thenAnswer((_) async {});
+      when(
+        () => authController.setTokens('token-3', ''),
+      ).thenAnswer((_) async {});
 
       await repository.googleSignIn(
         idToken: 'google-token',
@@ -89,7 +107,7 @@ void main() {
       verify(
         () => api.googleSignIn(idToken: 'google-token', referralCode: 'REF'),
       ).called(1);
-      verify(() => authController.setAccessToken('token-3')).called(1);
+      verify(() => authController.setTokens('token-3', '')).called(1);
     });
 
     test('deleteAccount clears local auth state after backend deletion', () async {

@@ -58,11 +58,23 @@ class AuthController extends Notifier<AuthState> {
 
   /// Persist both the access and refresh tokens and mark the session
   /// authenticated.
-  Future<void> setTokens(String accessToken, String refreshToken) async {
+  Future<void> setTokens(
+    String accessToken,
+    String refreshToken, {
+    bool persist = true,
+  }) async {
     final storage = ref.read(secureTokenStorageProvider);
-    await storage.writeAccessToken(accessToken);
-    if (refreshToken.isNotEmpty) {
-      await storage.writeRefreshToken(refreshToken);
+    if (persist) {
+      await storage.writeAccessToken(accessToken);
+      if (refreshToken.isNotEmpty) {
+        await storage.writeRefreshToken(refreshToken);
+      }
+    } else {
+      // Remember Me is off: keep the session in memory only and clear any token
+      // stored from a prior "remembered" login so it does not rehydrate on the
+      // next cold start.
+      await storage.deleteAccessToken();
+      await storage.deleteRefreshToken();
     }
     AppEnv.accessToken = accessToken; // Set for Pusher authorization
     sessionEstablishedAt = DateTime.now();

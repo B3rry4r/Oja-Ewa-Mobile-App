@@ -16,9 +16,21 @@ class AudioController extends Notifier<bool> {
 
     // Listen for player state changes to keep UI in sync
     _player.onPlayerStateChanged.listen((PlayerState playerState) {
+      // In loop mode the player emits `completed` at each loop boundary before
+      // it restarts; treating that as not-playing desyncs the icon on
+      // auto-replay.
+      if (playerState == PlayerState.completed) return;
       final isPlaying = playerState == PlayerState.playing;
       if (state != isPlaying) {
         state = isPlaying;
+      }
+    });
+
+    // In loop mode the track restarts automatically; keep the icon playing for
+    // backends that fire `completed` without a following `playing`.
+    _player.onPlayerComplete.listen((_) {
+      if (_sourceSet && state != true) {
+        state = true;
       }
     });
 
@@ -52,8 +64,16 @@ class AudioController extends Notifier<bool> {
 
   Future<void> play() async {
     if (!_sourceSet) {
-      debugPrint('AudioPlayer: Cannot play - source not set');
-      return;
+      // Lazily set the source if init was skipped (guest) or previously failed,
+      // so the manual play button is never a no-op.
+      try {
+        await _player.setSource(AssetSource('OJAEWA3.mp3'));
+        _sourceSet = true;
+        _initialized = true;
+      } catch (e) {
+        debugPrint('AudioPlayer: Cannot play - source not set: $e');
+        return;
+      }
     }
     try {
       await _player.resume();

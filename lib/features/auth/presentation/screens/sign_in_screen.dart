@@ -25,7 +25,10 @@ class SignInScreen extends ConsumerStatefulWidget {
 }
 
 class _SignInScreenState extends ConsumerState<SignInScreen> {
-  bool _rememberMe = false;
+  // Default on: the app has always kept sessions signed in across restarts, so
+  // keeping this checked preserves that behavior. Unchecking now meaningfully
+  // opts out (session kept in memory only), which is what the control implies.
+  bool _rememberMe = true;
   bool _obscurePassword = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -422,7 +425,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     try {
       await ref
           .read(authFlowControllerProvider.notifier)
-          .login(email: email, password: password);
+          .login(email: email, password: password, rememberMe: _rememberMe);
       if (!mounted) return;
       Navigator.of(
         context,

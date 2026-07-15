@@ -12,11 +12,12 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthController authController;
 
   @override
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login({required String email, required String password, required bool rememberMe}) async {
     final tokens = await api.login(email: email, password: password);
     await authController.setTokens(
       tokens['accessToken'] ?? '',
       tokens['refreshToken'] ?? '',
+      persist: rememberMe,
     );
   }
 

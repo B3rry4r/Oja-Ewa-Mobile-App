@@ -26,10 +26,10 @@ class AuthFlowController extends AsyncNotifier<void> {
     return null;
   }
 
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login({required String email, required String password, required bool rememberMe}) async {
     state = const AsyncLoading();
     try {
-      await ref.read(authRepositoryProvider).login(email: email, password: password);
+      await ref.read(authRepositoryProvider).login(email: email, password: password, rememberMe: rememberMe);
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);

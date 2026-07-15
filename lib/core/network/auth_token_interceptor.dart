@@ -32,6 +32,14 @@ class AuthTokenInterceptor extends Interceptor {
     '/api/sellers/',
     '/api/sustainability',
 
+    // WAWUBeauty public content a guest legitimately browses without logging in.
+    // These are public GET endpoints server-side; omitting them here made the
+    // interceptor reject a logged-out request with a synthetic 401 before it was
+    // ever sent (guest could not load Beauty Kits, FAQs, or contact info).
+    '/api/beauty-kits',
+    '/api/faqs',
+    '/api/connect',
+
     // reviews (public read): product-only byEntityPublic endpoint
     '/api/reviews/public/',
 

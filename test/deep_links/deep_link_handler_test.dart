@@ -124,7 +124,10 @@ class _FakeOrderActionsController extends OrderActionsController {
   FutureOr<void> build() {}
 
   @override
-  Future<PaymentVerifyResult> verifyPayment({required String reference}) async {
+  Future<PaymentVerifyResult> verifyPayment({
+    required String reference,
+    String? transactionId,
+  }) async {
     lastReference = reference;
     if (verifyDelay > Duration.zero) {
       await Future<void>.delayed(verifyDelay);
