@@ -9,7 +9,7 @@ publish_to: 'none'
 # approval permanently closes that train, and every later upload fails with
 # "Invalid Pre-Release Train. The train version 'X.Y.Z' is closed".
 # 1.0.5 closed -> 1.0.7. 1.0.7 approved and closed -> 1.0.8.
-version: 1.0.8+61
+version: 1.0.10+61
 
 environment:
   sdk: '>=3.9.0 <4.0.0'
