@@ -62,6 +62,8 @@ void main() {
         lastname: 'Lovelace',
         email: 'ada@example.com',
         password: 'secret',
+        phone: '08012345678',
+        country: 'Nigeria',
         referralCode: 'REF-42',
       );
 
@@ -142,7 +144,7 @@ void main() {
       );
 
       expect(
-        () => api.forgotPassword(email: 'tester@example.com'),
+        () => api.forgotPassword(identifier: 'tester@example.com'),
         throwsA(
           isA<NetworkException>().having(
             (error) => error.message,

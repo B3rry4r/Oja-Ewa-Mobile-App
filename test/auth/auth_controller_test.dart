@@ -94,7 +94,7 @@ void main() {
 
       await container
           .read(authControllerProvider.notifier)
-          .setAccessToken('fresh-token');
+          .setTokens('fresh-token', '');
 
       expect(
         container.read(authControllerProvider),

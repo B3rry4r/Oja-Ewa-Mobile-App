@@ -65,14 +65,14 @@ void main() {
 
       await container.read(ordersProvider.future);
       final initialOrders = await container.read(ordersRealtimeProvider.future);
-      expect(initialOrders.single.status, 'pending');
+      expect(initialOrders.orders.single.status, 'pending');
 
       container
           .read(ordersRealtimeProvider.notifier)
           .applyStatusUpdate(7, 'processing');
 
       final updatedOrders = container.read(ordersRealtimeProvider).requireValue;
-      expect(updatedOrders.single.status, 'processing');
+      expect(updatedOrders.orders.single.status, 'processing');
       expect(container.read(orderStatusOverridesProvider), {7: 'processing'});
     });
   });
@@ -146,7 +146,7 @@ void main() {
           const AsyncData<void>(null),
         );
         expect(paymentLink.reference, 'pay-ref-42');
-        expect(refreshedOrders.single.id, 2);
+        expect(refreshedOrders.items.single.id, 2);
         verify(
           () => repository.createOrder(
             items: const [
@@ -207,7 +207,7 @@ void main() {
 
       expect(container.read(orderActionsProvider), const AsyncData<void>(null));
       expect(result.status, 'success');
-      expect(refreshedOrders.single.id, 2);
+      expect(refreshedOrders.items.single.id, 2);
       verify(() => repository.verifyPayment(reference: 'pay-ref-1')).called(1);
       verify(
         () => repository.listOrders(page: 1),

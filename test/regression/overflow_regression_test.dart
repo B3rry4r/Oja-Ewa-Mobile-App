@@ -37,7 +37,7 @@ void main() {
                 settings: const RouteSettings(
                   name: '/new-password',
                   arguments: NewPasswordArgs(
-                    email: 'tester@example.com',
+                    identifier: 'tester@example.com',
                     token: 'reset-token',
                   ),
                 ),
